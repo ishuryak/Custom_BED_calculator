@@ -1,0 +1,11 @@
+Package: CustomBEDCalculator
+Type: Application
+Title: Custom BED Calculator
+Version: 0.1.0
+Author: Your Name
+Maintainer: Your Name <your.email@example.com>
+Description: A Shiny application for calculating BED values.
+License: MIT
+Imports:
+    shiny,
+    ggplot2

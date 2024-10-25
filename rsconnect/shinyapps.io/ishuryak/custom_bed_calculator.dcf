@@ -1,0 +1,10 @@
+name: custom_bed_calculator
+title:
+username: ishuryak
+account: ishuryak
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13135964
+bundleId: 9270644
+url: https://ishuryak.shinyapps.io/custom_bed_calculator/
+version: 1
