@@ -112,14 +112,14 @@ With the default tumor parameters, no regimen gains tumor BED under the DD model
 10. Bentzen SM, Gupta T, Jacinto AA, et al. Hypofractionated versus normofractionated accelerated radiation therapy with or without cisplatin for locally advanced head and neck squamous cell carcinoma (HYPNO): a randomized, open-label, phase 3, noninferiority trial. Int J Radiat Oncol Biol Phys. 2026;125(2):387-398. https://doi.org/10.1016/j.ijrobp.2025.12.056
 11. Jacinto AA, Batalha Filho ES, Viana LS, et al. Feasibility of concomitant cisplatin with hypofractionated radiotherapy for locally advanced head and neck squamous cell carcinoma. BMC Cancer. 2018;18:1026. https://doi.org/10.1186/s12885-018-4893-5
 
-### Not modeled
+### Limitations
 
-- the effect of concurrent chemotherapy on tumor control or on any BED (only the Fowler tolerance zone is adjusted)
-- human papillomavirus (HPV) status of the tumor
-- tumor volume and stage
-- dose to individual organs at risk
-- two or more fractions per day, where incomplete repair between fractions would raise late-tissue BED
-- treatment gaps.
+- **Concurrent chemotherapy.** The chemotherapy checkbox only lowers the displayed Fowler tolerance zone for acute mucositis, and the Fowler early limit when that option is used in the search. No BED in this calculator, tumor, early or late, includes an effect of chemotherapy, although chemotherapy increases both tumor control and acute toxicity. The default early limit compares against the reference regimen, which is assumed to receive the same chemotherapy.
+- **Fowler tolerance zone.** The early-toxicity parameters and the 59–61 Gy₁₀ zone are taken from the abstract of Fowler et al. [5]. The full paper was not available for checking. The authors describe the zone as a "tolerance zone of uncertainty", within a range of about 2–10 Gy in total BED, not a sharp threshold. How that paper counts the overall time $T$ was not verified. A one-day difference in $T$ changes the early BED by about 0.8 Gy₁₀. This cancels in comparisons with the reference regimen (the default limit), but not when the fixed Fowler limit is used.
+- Human papillomavirus (HPV) status of the tumor, tumor volume and stage are not modeled.
+- Dose to individual organs at risk is not modeled. BEDs use the prescription dose per fraction.
+- Two or more fractions per day are not supported. Incomplete repair between fractions would raise the late-tissue BED.
+- Treatment gaps are not modeled.
 
 ### Version
 
