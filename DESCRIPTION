@@ -1,11 +1,18 @@
 Package: CustomBEDCalculator
 Type: Application
-Title: Custom BED Calculator
-Version: 0.1.0
-Author: Your Name
-Maintainer: Your Name <your.email@example.com>
-Description: A Shiny application for calculating BED values.
+Title: HNSCC BED Calculator with Early and Late Toxicity
+Version: 2.0.0
+Author: Igor Shuryak
+Maintainer: Igor Shuryak <is144@cumc.columbia.edu>
+Description: A Shiny application computing tumor BED under dose-independent and
+    dose-dependent repopulation models, early and late toxicity BED, and a search
+    for hypofractionated regimens meeting tumor and toxicity criteria.
 License: MIT
 Imports:
     shiny,
-    ggplot2
+    bslib,
+    ggplot2,
+    DT,
+    markdown
+Suggests:
+    testthat

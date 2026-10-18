@@ -1,0 +1,10 @@
+# Reference PDFs: only redistributable (CC BY / public domain) sources may be
+# committed; see References/README.md for each file's licence.
+References/**/*.[Pp][Dd][Ff]
+References/*.[Pp][Dd][Ff]
+References/*.xls
+!References/README.md
+external_proofs.yaml
+.Rhistory
+.Rproj.user/
+rsconnect/
