@@ -1,6 +1,7 @@
 # Server-side tests of app.R, driven with shiny::testServer.
 
 app_dir <- testthat::test_path("..", "..")
+app_abs <- normalizePath(app_dir)
 
 defaults <- list(
   m = 20, d = 2.65, auto_T = TRUE, T = 26,
@@ -24,7 +25,7 @@ test_that("default inputs render results, comparisons and suggestions", {
     expect_equal(round(b$bed_di, 2), c(67.04, 65.00))
     expect_true(grepl("Tumor BED, DI model", output$results))
     expect_true(grepl("HYPNO test arm", output$benchmarks))
-    expect_true(grepl("55.07", output$benchmarks))
+    expect_true(grepl("55.87", output$benchmarks))   # HYPNO acute BED, elapsed clock
     s <- suggestions()
     expect_equal(nrow(s), 7)
     expect_true(all(s$d_di >= 1 - 1e-9))
@@ -34,9 +35,9 @@ test_that("default inputs render results, comparisons and suggestions", {
     expect_true(grepl(">\\s*26\\s*<", output$results))
     expect_false(grepl("26\\.00", output$results))
     expect_true(grepl("+0.9 Gy under DI and -4.7 Gy under DD", output$hypno_note$html, fixed = TRUE))
-    expect_true(grepl("55.1 Gy", output$hypno_cap_note$html) && grepl("above the current early limit of 52.3", output$hypno_cap_note$html))
+    expect_true(grepl("55.9 Gy", output$hypno_cap_note$html) && grepl("above the current early limit of 53.1", output$hypno_cap_note$html))
     expect_false(grepl("bg-success|bg-danger", v))   # no green/red safety badges
-    expect_true(grepl("59.61 Gy", output$acute_zone$html))
+    expect_true(grepl("59\u201361 Gy", output$acute_zone$html))
   })
 })
 
@@ -122,15 +123,31 @@ test_that("search inputs reach the search", {
   })
 })
 
-test_that("downloaded CSV is rounded and has plain-text headers", {
+read_zip <- function(f) {
+  d <- tempfile(); utils::unzip(f, exdir = d)
+  list(res = read.csv(file.path(d, "results.csv"), check.names = FALSE),
+       all = read.csv(file.path(d, "all_qualifying.csv"), check.names = FALSE),
+       sc = jsonlite::fromJSON(file.path(d, "scenario.json")),
+       files = list.files(d))
+}
+
+test_that("download is a ZIP with full-precision results and a rerunnable scenario", {
   shiny::testServer(app_dir, {
     set_defaults(session)
-    f <- output$download
-    x <- read.csv(f, check.names = FALSE)
-    expect_equal(nrow(x), 7)
-    expect_true("Delta BED DI" %in% names(x))
-    expect_false(any(grepl("Δ", names(x))))
-    expect_true(all(abs(x[["Delta BED DI"]] * 1000 - round(x[["Delta BED DI"]] * 1000)) < 1e-6))
+    z <- read_zip(output$download)
+    expect_setequal(z$files, c("results.csv", "all_qualifying.csv", "scenario.json", "README.txt"))
+    expect_equal(nrow(z$res), 7)
+    expect_gte(nrow(z$all), nrow(z$res))
+    s <- suggestions()
+    expect_equal(z$res$bed_dd, s$bed_dd, tolerance = 1e-12)       # not rounded
+    expect_equal(z$sc$anchor$m, 35)
+    expect_equal(z$sc$clocks$acute, "elapsed")
+    expect_true(nchar(z$sc$scenario_id) == 12)
+    env <- new.env(); source(file.path(app_abs, "R", "bed_models.R"), local = env)
+    source(file.path(app_abs, "R", "export.R"), local = env)
+    r2 <- env$rerun_scenario(z$sc)
+    expect_equal(r2$bed_di, z$res$bed_di, tolerance = 1e-8)
+    expect_equal(r2$d, z$res$d, tolerance = 1e-12)
   })
 })
 
@@ -182,17 +199,6 @@ test_that("changed acute parameters disable the Fowler zone and limit", {
   })
 })
 
-test_that("downloaded CSV keeps three decimals", {
-  shiny::testServer(app_dir, {
-    set_defaults(session)
-    x <- read.csv(output$download, check.names = FALSE)
-    v <- x[["Delta early BED"]]
-    expect_true(all(abs(v * 1000 - round(v * 1000)) < 1e-6))
-    expect_true(any(abs(v * 100 - round(v * 100)) > 1e-6))   # not rounded to two
-    expect_equal(x[["Weeks saved"]], (47 - x[["Days"]]) / 7, tolerance = 1e-3)
-  })
-})
-
 test_that("worst-case ranking with an unavailable DD model explains itself", {
   shiny::testServer(app_dir, {
     set_defaults(session, lambda_dd = 0, rank_by = "worst")
@@ -221,9 +227,9 @@ test_that("empty-search hint does not suggest the criterion already chosen", {
   shiny::testServer(app_dir, {
     set_defaults(session, alpha = 0.2, lambda_di = 0.144, Tk = 28)   # Withers preset: no rows
     expect_equal(nrow(suggestions()), 0)
-    expect_false(grepl("require the gain under", output$suggest_msg$html))
+    expect_false(grepl("require the change under", output$suggest_msg$html))
     set_defaults(session, alpha = 0.2, lambda_di = 0.144, Tk = 28, criterion = "di")
-    expect_true(grepl("require the gain under", output$suggest_msg$html))
+    expect_true(grepl("require the change under", output$suggest_msg$html))
   })
 })
 
@@ -233,6 +239,73 @@ test_that("an unavailable DD column reads 'not available'", {
     x <- pretty_suggestions()
     expect_gt(nrow(x), 0)
     expect_true(all(x[["\u0394 BED DD"]] == "not available"))
-    expect_true(grepl("not available", paste(readLines(output$download), collapse = "")))
+    expect_true(all(is.na(read_zip(output$download)$res$d_dd)))   # NA, never zero
+  })
+})
+
+test_that("comparison regimen does not move the DD model unless legacy coupling is chosen", {
+  shiny::testServer(app_dir, {
+    set_defaults(session, m = 20, d = 2.75)
+    dd_std <- both()$bed_dd[1]
+    expect_equal(dd_std, 58.02143210, tolerance = 1e-8)
+    session$setInputs(comparator = "hypno_control")
+    expect_equal(ref()$T, 38)
+    expect_equal(both()$bed_dd[1], dd_std, tolerance = 1e-12)       # same DD model
+    session$setInputs(coupled = TRUE)
+    expect_false(isTRUE(all.equal(both()$bed_dd[1], dd_std)))        # legacy: model moves
+    expect_true(grepl("Legacy mode", output$anchor_note$html))
+  })
+})
+
+test_that("HYPNO acute and late limits reach the search", {
+  shiny::testServer(app_dir, {
+    set_defaults(session, early_mode = "hypno", late_mode = "hypno", min_gain = -5)
+    expect_equal(search()$cap, 55.86597229, tolerance = 1e-8)
+    expect_equal(search()$late_cap, 105.41666667, tolerance = 1e-8)
+    s <- suggestions()
+    expect_gt(nrow(s), 0)
+    expect_true(all(s$bed_early <= 55.86597229 + 1e-9 & s$bed_late <= 105.41666667 + 1e-9))
+    expect_true(all(s$d_di >= -5 - 1e-9 | s$d_dd >= -5 - 1e-9))
+  })
+})
+
+test_that("a negative minimum change (non-inferiority margin) is accepted", {
+  shiny::testServer(app_dir, {
+    set_defaults(session, min_gain = -2)
+    expect_equal(search_args()$min_gain, -2)
+    set_defaults(session, min_gain = -25)
+    expect_match(err_msg(search_args()), "between -20 and 30")
+  })
+})
+
+test_that("results show late BED at alpha/beta 2 and 4, and the sensitivity tab renders", {
+  shiny::testServer(app_dir, {
+    set_defaults(session, m = 20, d = 2.9)
+    expect_true(grepl("Late toxicity BED at \u03b1/\u03b2 2 Gy", output$results))
+    expect_true(grepl("Late toxicity BED at \u03b1/\u03b2 4 Gy", output$results))
+    st <- sens()
+    expect_equal(nrow(st), 5 * 3)
+    expect_setequal(unique(st$preset), c("calculator", "withers", "hartley", "hyhope", "d18"))
+    expect_true(grepl("scenarios under DI", output$sens_summary$html))
+    expect_true(grepl("+2.10", output$sens_tox, fixed = TRUE))      # 142.1 - 140 at alpha/beta 2
+    expect_true(grepl("-2.60", output$sens_tox, fixed = TRUE))      # 114.07 - 116.67 at alpha/beta 3
+  })
+})
+
+test_that("search table shows which model credits each row and flags large fractions", {
+  shiny::testServer(app_dir, {
+    set_defaults(session, tol_early = 10, tol_late = 10, d_max = 4)
+    x <- pretty_suggestions()
+    expect_true(all(c("Credited by", "Beyond precedent") %in% names(x)))
+    s <- suggestions()
+    expect_equal(x[["Beyond precedent"]] == "yes", s$d > 3.1 + 1e-9)
+  })
+})
+
+test_that("HYHOPE benchmark row and HYPNO context are shown", {
+  shiny::testServer(app_dir, {
+    set_defaults(session)
+    expect_true(grepl("HYHOPE", output$benchmarks))
+    expect_true(grepl("50.7%", output$hypno_note$html) && grepl("10-percentage-point", output$hypno_note$html))
   })
 })

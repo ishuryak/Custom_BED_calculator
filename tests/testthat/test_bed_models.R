@@ -38,14 +38,16 @@ o_calibrate <- function(q, rf) {
   if (f(lo) > 0) return(NA_real_)  # even the earliest onset loses too little
   uniroot(f, c(lo, hi), tol = 1e-12)$root
 }
-o_early <- function(n, d, T, q) o_lq(n, d, q$ab_e) - q$lambda_e / q$alpha_e * o_smax(T - q$Tk_e)
+# Acute BED on Fowler's clock: elapsed days = inclusive days - 1.
+o_early <- function(n, d, T, q) o_lq(n, d, q$ab_e) - q$lambda_e / q$alpha_e * o_smax((T - 1) - q$Tk_e)
 o_late <- function(n, d, q) o_lq(n, d, q$ab_l)
 
 # Brute-force search with explicit loops, same rules as documented.
+# `anchor` is the regimen at which DD is calibrated (fixed, version 2.1).
 o_search <- function(q, rf, m_range, d_step, d_max, criterion, rank_by,
                      tol_early = 0, tol_late = 0, early_cap = NULL,
-                     min_gain = 0, min_days_saved = 1) {
-  Ca <- o_calibrate(q, rf)
+                     min_gain = 0, min_days_saved = 1, anchor = rf) {
+  Ca <- o_calibrate(q, anchor)
   dd <- function(n, d, T) if (is.na(Ca)) NA_real_ else o_dd_given(n, d, T, q, Ca)
   di0 <- o_di(rf$m, rf$d, rf$T, q); dd0 <- dd(rf$m, rf$d, rf$T)
   cap_e <- if (is.null(early_cap)) o_early(rf$m, rf$d, rf$T, q) + tol_early else early_cap
@@ -178,7 +180,7 @@ test_that("overall time matches a day-by-day Mon-Fri calendar", {
 })
 
 test_that("early and late toxicity BEDs match hand calculations", {
-  hand_early <- 70 * (1 + 2 / 10) - (log(2) / 2.5) * (47 - 7) / 0.35
+  hand_early <- 70 * (1 + 2 / 10) - (log(2) / 2.5) * (46 - 7) / 0.35   # 47 inclusive = 46 elapsed
   a <- compute_all(35, 2, 47, p, ref)
   expect_equal(a$bed_early, hand_early, tolerance = 1e-9)
   expect_equal(a$eqd2_early, hand_early / 1.2, tolerance = 1e-9)
@@ -225,14 +227,14 @@ test_that("suggestions equal an independent brute-force search", {
     list(criterion = "either", rank_by = "best", tol_early = 3, min_days_saved = 14))
   refs <- list(ref, list(m = 30, d = 2, T = 40), list(m = 33, d = 2.03, T = 45))
   n_rows <- 0
-  for (rf in refs) for (st in settings) {
+  for (rf in refs) for (an in list(rf, ref)) for (st in settings) {   # legacy coupling, then fixed anchor
     args <- modifyList(list(m_range = 5:(rf$m - 1), d_step = 0.05, d_max = 6,
                             criterion = "either", rank_by = "best",
                             tol_early = 0, tol_late = 0, early_cap = NULL,
                             min_gain = 0, min_days_saved = 1), st)
     if (is.null(st$early_cap)) args["early_cap"] <- list(NULL)
-    s <- do.call(suggest_regimens, c(list(p = p, ref = rf), args))
-    o <- do.call(o_search, c(list(q = p, rf = rf), args))
+    s <- do.call(suggest_regimens, c(list(p = p, ref = rf, anchor = an), args))
+    o <- do.call(o_search, c(list(q = p, rf = rf, anchor = an), args))
     expect_equal(nrow(s), nrow(o))
     n_rows <- n_rows + nrow(o)
     if (nrow(o) > 0 && nrow(s) == nrow(o)) {
@@ -337,14 +339,14 @@ test_that("Fowler zone, presets and benchmark regimens match their sources", {
   expect_equal(pr$hyhope$alpha, 0.35)
   expect_equal(pr$hyhope$lambda_di, log(2) / 3)               # Tp = 3 days
   expect_equal(pr$hyhope$Tk, 21)
-  expect_equal(pr$calculator, list(alpha = 0.2, lambda_di = 0.2, Tk = 28))
+  expect_equal(pr$calculator, list(alpha = 0.2, ab = 10, lambda_di = 0.2, lambda_dd = 0.5, Tk = 28))
   for (nm in names(pr)) {
-    q <- modifyList(p, pr[[nm]])
+    q <- modifyList(p, resolve_preset(nm, p$ab))
     expect_equal(dd_calibration(ref, q$alpha, q$ab, q$lambda_di, q$lambda_dd, q$Tk)$status, "ok")
   }
   b <- benchmark_regimens()
-  expect_equal(b$m * b$d, c(55, 66))
-  expect_equal(b$T, c(o_calendar(20, 5), o_calendar(33, 6)))
+  expect_equal(b$m * b$d, c(55, 66, 46.5))
+  expect_equal(b$T, c(o_calendar(20, 5), o_calendar(33, 6), o_calendar(15, 5)))
 })
 
 test_that("only 5 fractions per week (Mon-Fri) is offered", {
