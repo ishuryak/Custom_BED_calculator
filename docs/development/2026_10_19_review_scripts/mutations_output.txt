@@ -1,16 +1,20 @@
 M1_sensitivity_bypass                      applied=TRUE failing tests=1
 M2_pass_counts_invalid                     applied=TRUE failing tests=2
-M3_agreement_wrong_comparator              applied=TRUE failing tests=11
+M3_agreement_wrong_comparator              applied=TRUE failing tests=9
 M4_candidate_leaks_into_agreement          applied=TRUE failing tests=1
 M5_replay_ignores_hinge                    applied=TRUE failing tests=1
 M6_replay_ignores_equation                 applied=TRUE failing tests=1
 M7_id_key_order                            applied=TRUE failing tests=1
 M8_unit_label                              applied=TRUE failing tests=5
-M9_agreement_sidebar_anchor                applied=TRUE failing tests=1
+M9_agreement_anchor_follows_comparison     applied=TRUE failing tests=1
 M10_calibration_not_checked                applied=TRUE failing tests=1
 M11_export_needs_regimen                   applied=TRUE failing tests=1
 M12_search_negative_candidate_credited     applied=TRUE failing tests=4
 M13_onset_inf_printed                      applied=TRUE failing tests=2
 M14_display_ignores_validity               applied=TRUE failing tests=3
-All 14 mutations caught.
-revision 725514a
+M15_comparison_moves_dd_model              applied=TRUE failing tests=3
+M16_preset_note_silent_on_default          applied=TRUE failing tests=1
+M17_default_not_labeled                    applied=TRUE failing tests=1
+M18_anchor_note_unexplained                applied=TRUE failing tests=1
+All 18 mutations caught.
+revision 953b284 plus the uncommitted interface changes of 2026-10-19 (committed with this file)

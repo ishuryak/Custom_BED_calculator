@@ -17,7 +17,7 @@ mutations <- list(
                                     "if (FALSE)"),
   M7_id_key_order = list("R/export.R", "x <- x[order(names(x), method = \"radix\")]", "x <- x"),
   M8_unit_label = list("app.R", "if (isTRUE(all.equal(ab, 10))) \"Gy\\u2081\\u2080\" else", "if (TRUE) \"Gy\\u2081\\u2080\" else"),
-  M9_agreement_sidebar_anchor = list("app.R", "agree_anchor <- reactive(anchor_for(agree_ref()))", "agree_anchor <- reactive(anchor())"),
+  M9_agreement_anchor_follows_comparison = list("app.R", "agree_anchor <- reactive(fixed_anchor())", "agree_anchor <- reactive(agree_ref())"),
   M10_calibration_not_checked = list("R/export.R", "replay_fail(\"saved calibration C/alpha does not match", "warning(\"saved calibration C/alpha does not match"),
   M11_export_needs_regimen = list("app.R", "regimen_evaluated = tryCatch(regimen(), error = function(e) NULL))",
                                   "regimen_evaluated = regimen())"),
@@ -26,6 +26,11 @@ mutations <- list(
   M13_onset_inf_printed = list("app.R", "ifelse(is.finite(a$dd_onset), sprintf(\"%.1f\", a$dd_onset), \"none\")",
                                "sprintf(\"%.1f\", a$dd_onset)"),
   M14_display_ignores_validity = list("app.R", "    ok <- is.finite(x) & x > 0 & is.finite(y) & y > 0", "    ok <- !is.na(x) & !is.na(y)"))
+# 2026-10-19 interface changes (legacy switch removed, anchor and preset notes)
+mutations$M15_comparison_moves_dd_model <- list("app.R", "anchor <- reactive(fixed_anchor())", "anchor <- reactive(ref())")
+mutations$M16_preset_note_silent_on_default <- list("app.R", "d18 = paste(\"The default. Scenario D18", "d18 = paste(\"Scenario D18")
+mutations$M17_default_not_labeled <- list("app.R", "\"Scenario D18 (default): ", "\"Scenario D18: ")
+mutations$M18_anchor_note_unexplained <- list("app.R", "    helpText(intro, txt,", "    helpText(txt,")
 results <- data.frame(mutation = names(mutations), applied = NA, failed = NA)
 for (i in seq_along(mutations)) {
   m <- mutations[[i]]

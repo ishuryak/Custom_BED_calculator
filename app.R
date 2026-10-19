@@ -42,11 +42,11 @@ LIMITS <- list(
   agree_days = list("Minimum days saved (agreement)", 1, 140, TRUE))
 
 PRESET_LABELS <- c(
-  "Calculator defaults (version 1)" = "calculator",
+  "Version 1 values (defaults of the published version 1 website)" = "calculator",
   "Withers et al. 1988: 0.6 Gy/day in 2-Gy fractions after 4 weeks (follows α/β)" = "withers",
   "Hartley et al. 2011: α 0.3/Gy, doubling time 3 d, onset day 22 (elapsed)" = "hartley",
   "HYHOPE protocol: α 0.35/Gy, doubling time 3 d, onset day 21" = "hyhope",
-  "Scenario D18 (2026-10-18 proposal, not fitted)" = "d18",
+  "Scenario D18 (default): α 0.35/Gy, doubling time 3 d, onset day 28" = "d18",
   "Custom (edited values)" = "custom")
 
 # Short names for the sensitivity table.
@@ -124,6 +124,7 @@ ui <- page_sidebar(
                  "It does not change the DD model, which is calibrated at the anchor below.")),
       accordion_panel("Tumor (DI and DD models)",
         selectInput("preset", "Parameter preset", PRESET_LABELS, selected = DEFAULT_PRESET),
+        uiOutput("preset_note"),
         num("alpha", "α, tumor cell killing (1/Gy)", DEF$alpha, 0.01, 2, 0.01),
         num("ab", "α/β, tumor (Gy)", DEF$ab, 0.5, 100, 1),
         num("lambda_di", "Repopulation rate, DI model (1/day)", DEF$lambda_di, 0, 2, 0.01),
@@ -134,7 +135,6 @@ ui <- page_sidebar(
       accordion_panel("DD calibration anchor",
         num("anchor_m", "Anchor number of fractions", 35, 2, 100, 1),
         num("anchor_d", "Anchor dose per fraction (Gy)", 2, 0.1, 30, 0.05),
-        checkboxInput("coupled", "Legacy: calibrate at the comparison regimen instead (versions 1 and 2.0)", FALSE),
         uiOutput("anchor_note")),
       accordion_panel("Early toxicity (acute mucosa)",
         num("ab_e", "α/β, mucosa (Gy)", 10, 0.5, 100, 1),
@@ -321,15 +321,12 @@ server <- function(input, output, session) {
     m <- checked("m")
     list(m = m, d = checked("d"), T = time_for(m, input$auto_T, "T"))
   })
-  coupled <- reactive(isTRUE(input$coupled))
   fixed_anchor <- reactive({
     m <- checked_or("anchor_m", 35)
     list(m = m, d = checked_or("anchor_d", 2), T = overall_time(m))
   })
-  # The DD anchor of an analysis: the fixed anchor, or in legacy mode that
-  # analysis's own comparison regimen.
-  anchor_for <- function(r) if (coupled()) list(m = r$m, d = r$d, T = r$T) else fixed_anchor()
-  anchor <- reactive(anchor_for(ref()))
+  # The DD anchor: the same for every tab, whatever the comparison regimen.
+  anchor <- reactive(fixed_anchor())
   calibration <- reactive({
     p <- params(); a <- anchor()
     dd_calibration(a, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk)
@@ -356,6 +353,25 @@ server <- function(input, output, session) {
     helpText(sprintf(paste("Mucosal repopulation rate = ln2 / doubling time = %.3f per day.",
                            "Overall time is converted to Fowler's elapsed days (calendar days minus 1)."),
                      params()$lambda_e)))
+  output$preset_note <- renderUI({
+    keeps_dd <- "It keeps the DD maximum rate entered below."
+    txt <- switch(input$preset,
+      d18 = paste("The default. Scenario D18 was chosen by the developer on 2026-10-18 and is not fitted to",
+                  "outcome data. Its DI values are within published ranges: repopulation at 0.23 per day",
+                  "(doubling time 3.0 days) from day 28, a loss of 0.66 Gy₁₀ of tumor BED per day, at the low",
+                  "end of published estimates. Its DD maximum rate (0.40 per day) is a constructed value, not",
+                  "a published DD estimate. See \"Model and sources\"."),
+      calculator = paste("The tumor values of the published version 1 website: α 0.2/Gy, DI repopulation 0.2 per",
+                         "day from day 28 (a loss of 1.0 Gy₁₀ per day) and DD maximum rate 0.5 per day."),
+      withers = paste("Withers et al. 1988: about 0.6 Gy per day, in 2-Gy fractions, after about 4 weeks, with",
+                      "α 0.2/Gy. The DI rate follows the tumor α/β.", keeps_dd),
+      hartley = paste("Hartley et al. 2011: α 0.3/Gy, α/β 10 Gy, doubling time 3 days, onset on elapsed day 22",
+                      "(day 23 in this calculator's count).", keeps_dd),
+      hyhope = paste("HYHOPE protocol: α 0.35/Gy, α/β 10 Gy, doubling time 3 days, onset day 21.", keeps_dd),
+      custom = "The tumor values below were edited and match no preset.",
+      "")
+    helpText(txt, "A preset fills the tumor values below; editing a value switches the preset to Custom.")
+  })
   output$tumor_note <- renderUI({
     p <- params()
     helpText(sprintf(paste("DI repopulation costs %.2f Gy of tumor BED per day after day %g",
@@ -366,12 +382,17 @@ server <- function(input, output, session) {
   output$anchor_note <- renderUI({
     a <- anchor(); cal <- calibration()
     where <- sprintf("%d × %g Gy in %g days", a$m, a$d, a$T)
+    intro <- sprintf(paste("The DD model has one constant that is not entered: it is set so that DD and DI give",
+                           "the same tumor BED for this anchor course (%s). The two models therefore agree",
+                           "for the anchor course and differ only for other schedules."), where)
     txt <- switch(cal$status,
-      ok = sprintf("DD and DI tumor BEDs are equal at the anchor (%s). DD repopulation there starts on day %.1f.", where, cal$onset_ref),
-      no_repopulation = sprintf("No DI repopulation, so DD has none either (anchor %s).", where),
-      infeasible = sprintf("No DD calibration exists at the anchor (%s).", where))
-    helpText(txt, if (coupled()) "Legacy mode: changing the comparison regimen changes the DD model." else
-      "Changing the comparison regimen does not change the DD model.")
+      ok = sprintf("With the current tumor values, DD accelerated repopulation in the anchor course starts on day %.1f (DI: day %g).",
+                   cal$onset_ref, params()$Tk),
+      no_repopulation = "The DI repopulation rate is 0, so DD has no accelerated repopulation either.",
+      infeasible = "With the current tumor values no DD calibration exists at this anchor, so DD results are not shown.")
+    helpText(intro, txt,
+             "The anchor is separate from the comparison regimen: changing the comparison changes the differences shown, not the DD model.",
+             "To reproduce version 1, which calibrated at the comparison regimen, enter that regimen here.")
   })
 
   dd_message <- reactive({
@@ -648,16 +669,15 @@ server <- function(input, output, session) {
   export_context <- function() {
     list(comparator = choice_or("comparator", "custom"), preset = input$preset,
          early_mode = input$early_mode, late_mode = choice_or("late_mode", "reference"),
-         chemo = isTRUE(input$chemo), coupled = coupled(),
+         chemo = isTRUE(input$chemo),
          regimen_evaluated = tryCatch(regimen(), error = function(e) NULL))
   }
-  anchor_mode <- function() if (coupled()) "coupled" else "fixed"
 
   scenario <- reactive({
     sr <- search()
     validate(need(!isTRUE(sr$blocked), "Nothing to export with the current settings."))
     build_scenario(p = params(), ref = ref(), anchor = anchor(), search = search_args(),
-                   context = export_context(), analysis = "candidate", anchor_mode = anchor_mode())
+                   context = export_context(), analysis = "candidate")
   })
 
   output$download <- downloadHandler(
@@ -692,7 +712,7 @@ server <- function(input, output, session) {
     r <- comparator_presets()$hypno_test
     list(m = r$m, d = r$d, T = r$T)
   })
-  agree_anchor <- reactive(anchor_for(agree_ref()))
+  agree_anchor <- reactive(fixed_anchor())
 
   # Arguments of the agreement search: the shared toxicity settings and the
   # agreement tab's own fraction range and days saved.
@@ -718,7 +738,7 @@ server <- function(input, output, session) {
                            "onset and rate depend on cell killing, so shortening can save part of the repopulation or",
                            "cost more, depending on the regimen."),
                      rf$m, rf$d, rf$T, an$m, an$d, an$T,
-                     if (coupled()) "legacy: calibrated at this tab's comparison" else "fixed", p$Tk,
+                     "fixed", p$Tk,
                      if (p$g > 0) sprintf(" Background growth g still gives %.3f %s per day saved, before and after that day.",
                                           p$g / p$alpha, bed_unit(p$ab)) else ""))
   })
@@ -761,8 +781,7 @@ server <- function(input, output, session) {
     build_scenario(p = params(), ref = agree_ref(), anchor = agree_anchor(), search = args,
                    context = c(export_context(), list(agree_cmp = input$agree_cmp)),
                    analysis = "agreement",
-                   agreement = list(margin = checked("agree_margin"), ab_values = SCENARIO_AB_VALUES),
-                   anchor_mode = anchor_mode())
+                   agreement = list(margin = checked("agree_margin"), ab_values = SCENARIO_AB_VALUES))
   })
 
   output$download_agree <- downloadHandler(

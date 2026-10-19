@@ -1,0 +1,51 @@
+Input-effect audit 2026-10-19 13:29:38, revision 953b284 plus uncommitted app changes, chromote 0.5.1
+Default snapshot output errors: none
+PASS  m (fractions)                  changed: T_shown,r_T,r_total,r_DI,r_DD,r_early,r_eqd2e,r_late,r_eqd2l,r_late_s1,r_late_s2,acute_zone,download_scenario,download_agree_scenario,sens_summary,sens_table,sens_tox
+PASS  d (dose per fraction)          changed: T_shown,r_total,r_DI,r_DD,r_early,r_eqd2e,r_late,r_eqd2l,r_late_s1,r_late_s2,verdicts,acute_zone,download_scenario,download_agree_scenario,sens_summary,sens_table,sens_tox
+PASS  auto_T off + T = 33            changed: T_shown,r_T,r_DI,r_DD,r_early,r_eqd2e,acute_zone,download_scenario,download_agree_scenario,sens_summary,sens_table,sens_tox
+PASS  comparator = HYPNO test        changed: ref_T_shown,r_T,r_total,r_DI,r_DD,r_early,r_eqd2e,r_late,r_eqd2l,r_late_s1,r_late_s2,acute_zone,benchmarks,suggest_msg,suggest_table,suggest_plot,download,download_scenario,download_agree_scenario,sens_summary,sens_table,sens_tox
+PASS  comparator = HYPNO control     changed: ref_T_shown,r_T,r_total,r_DI,r_DD,r_early,r_eqd2e,r_late,r_eqd2l,r_late_s1,r_late_s2,acute_zone,benchmarks,suggest_msg,suggest_table,suggest_plot,download,download_scenario,download_agree_scenario,sens_summary,sens_table,sens_tox
+PASS  ref_m                          changed: ref_T_shown,r_T,r_total,r_DI,r_DD,r_early,r_eqd2e,r_late,r_eqd2l,r_late_s1,r_late_s2,verdicts,acute_zone,benchmarks,suggest_table,suggest_plot,download,download_scenario,sens_summary,sens_table,sens_tox
+PASS  ref_d                          changed: ref_T_shown,r_total,r_DI,r_DD,r_early,r_eqd2e,r_late,r_eqd2l,r_late_s1,r_late_s2,acute_zone,benchmarks,suggest_msg,suggest_table,suggest_plot,download,download_scenario,sens_summary,sens_table,sens_tox
+PASS  ref_auto_T off + ref_T = 50    changed: ref_T_shown,r_T,r_DI,r_DD,r_early,r_eqd2e,verdicts,acute_zone,benchmarks,suggest_table,suggest_plot,download,download_scenario,sens_summary,sens_table,sens_tox
+PASS  preset = version 1 values      changed: preset_note,tumor_note,anchor_note,r_DI,r_DD,verdicts,benchmarks,hypno_note,search_note,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario,sens_table
+PASS  preset = Withers               changed: preset_note,tumor_note,anchor_note,r_DI,r_DD,benchmarks,hypno_note,search_note,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario
+PASS  preset = Hartley               changed: preset_note,tumor_note,anchor_note,r_DI,r_DD,benchmarks,hypno_note,search_note,suggest_table,suggest_plot,download,download_scenario,agree_note,agree_table,download_agree,download_agree_scenario
+PASS  preset = HYHOPE                changed: preset_note,tumor_note,anchor_note,r_DI,r_DD,benchmarks,hypno_note,suggest_table,suggest_plot,download,download_scenario,agree_note,agree_table,download_agree,download_agree_scenario
+PASS  alpha                          changed: preset_note,tumor_note,anchor_note,r_DI,r_DD,benchmarks,hypno_note,search_note,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario
+PASS  ab (tumor)                     changed: preset_note,tumor_note,anchor_note,r_DI,r_DD,benchmarks,hypno_note,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario
+PASS  lambda_di                      changed: preset_note,tumor_note,anchor_note,r_DI,r_DD,benchmarks,hypno_note,search_note,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario
+PASS  lambda_dd                      changed: preset_note,anchor_note,r_DD,benchmarks,hypno_note,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario,sens_table
+PASS  Tk                             changed: preset_note,tumor_note,anchor_note,r_DI,r_DD,benchmarks,hypno_note,suggest_table,suggest_plot,download,download_scenario,agree_note,agree_table,download_agree,download_agree_scenario
+PASS  g                              changed: tumor_note,r_DI,r_DD,benchmarks,hypno_note,suggest_table,suggest_plot,download,download_scenario,agree_note,agree_table,download_agree,download_agree_scenario,sens_table
+PASS  anchor_m                       changed: anchor_note,r_DD,benchmarks,suggest_plot,download,download_scenario,agree_note,agree_table,download_agree,download_agree_scenario,sens_table
+PASS  anchor_d                       changed: anchor_note,r_DD,benchmarks,hypno_note,suggest_table,suggest_plot,download,download_scenario,agree_note,agree_table,download_agree,download_agree_scenario,sens_table
+PASS  ab_e                           changed: r_early,r_eqd2e,acute_zone,benchmarks,search_note,suggest_table,download,download_scenario,agree_table,download_agree,download_agree_scenario,sens_tox
+PASS  alpha_e                        changed: r_early,r_eqd2e,verdicts,acute_zone,benchmarks,search_note,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario,sens_tox
+PASS  Tp_e                           changed: lambda_e_shown,r_early,r_eqd2e,acute_zone,benchmarks,search_note,suggest_msg,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario,sens_tox
+PASS  Tk_e                           changed: r_early,r_eqd2e,acute_zone,benchmarks,search_note,suggest_table,download,download_scenario,agree_table,download_agree,download_agree_scenario
+PASS  chemo (HYPNO early limit)      changed: acute_zone,download_scenario,download_agree_scenario
+PASS  chemo (Fowler early limit)     changed: acute_zone,search_note,hypno_cap_note,suggest_msg,suggest_table,suggest_plot,download,download_scenario,agree_msg,agree_table,download_agree,download_agree_scenario
+PASS  ab_l                           changed: r_late,r_eqd2l,r_late_s2,benchmarks,suggest_table,download,download_scenario,agree_table,download_agree,download_agree_scenario
+PASS  criterion = both               changed: suggest_msg,suggest_table,suggest_plot,download,download_scenario
+PASS  criterion = DD                 changed: suggest_msg,suggest_table,suggest_plot,download,download_scenario
+PASS  criterion = DI                 changed: download_scenario
+PASS  rank_by = worst                changed: suggest_table,download,download_scenario
+PASS  rank_by = DD                   changed: suggest_table,download,download_scenario
+PASS  m_range 29-30                  changed: suggest_table,suggest_plot,download,download_scenario
+PASS  min_gain = -3                  changed: suggest_table,suggest_plot,download,download_scenario,sens_summary
+PASS  min_days = 7 (no effect expected) changed: <nothing>
+PASS  min_days = 3 (late excess 2 Gy) changed: suggest_table,suggest_plot,download,download_scenario
+PASS  d_step = 0.25                  changed: search_note,suggest_table,suggest_plot,download,download_scenario,agree_msg,agree_table,download_agree,download_agree_scenario
+PASS  d_max = 2.75                   changed: search_note,download_scenario,agree_msg,agree_table,download_agree,download_agree_scenario
+PASS  d_max = 2.25                   changed: search_note,suggest_table,suggest_plot,download,download_scenario,agree_msg,agree_table,download_agree,download_agree_scenario
+PASS  early_mode = reference         changed: search_note,hypno_cap_note,suggest_msg,suggest_table,suggest_plot,download,download_scenario,download_agree_scenario
+PASS  early_mode = Fowler            changed: search_note,hypno_cap_note,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario
+PASS  early_mode = Fenwick           changed: search_note,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario
+PASS  tol_early = 3                  changed: hypno_cap_note,suggest_msg,suggest_table,suggest_plot,download,download_scenario,agree_table,download_agree,download_agree_scenario
+PASS  late_mode = HYPNO              changed: search_note,suggest_msg,suggest_table,suggest_plot,download,download_scenario,download_agree_scenario
+PASS  tol_late = 5                   changed: suggest_table,download,download_scenario,download_agree,download_agree_scenario
+PASS  agree_cmp = sidebar            changed: agree_note,agree_table,download_agree,download_agree_scenario
+PASS  agree_margin = -1              changed: agree_msg,agree_table,download_agree,download_agree_scenario
+PASS  agree_days = 3                 changed: agree_table,download_agree,download_agree_scenario
+48 passed, 0 failed

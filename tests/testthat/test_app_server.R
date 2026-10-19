@@ -243,7 +243,7 @@ test_that("an unavailable DD column reads 'not available'", {
   })
 })
 
-test_that("comparison regimen does not move the DD model unless legacy coupling is chosen", {
+test_that("comparison regimen does not move the DD model; only the anchor does", {
   shiny::testServer(app_dir, {
     set_defaults(session, m = 20, d = 2.75)
     dd_std <- both()$bed_dd[1]
@@ -251,9 +251,10 @@ test_that("comparison regimen does not move the DD model unless legacy coupling 
     session$setInputs(comparator = "hypno_control")
     expect_equal(ref()$T, 38)
     expect_equal(both()$bed_dd[1], dd_std, tolerance = 1e-12)       # same DD model
-    session$setInputs(coupled = TRUE)
-    expect_false(isTRUE(all.equal(both()$bed_dd[1], dd_std)))        # legacy: model moves
-    expect_true(grepl("Legacy mode", output$anchor_note$html))
+    session$setInputs(coupled = TRUE)                                # no such input any more
+    expect_equal(both()$bed_dd[1], dd_std, tolerance = 1e-12)
+    session$setInputs(anchor_m = 33, anchor_d = 2)                   # the anchor does move it
+    expect_false(isTRUE(all.equal(both()$bed_dd[1], dd_std)))
   })
 })
 

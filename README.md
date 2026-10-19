@@ -35,13 +35,21 @@ shiny::runApp("path/to/Custom_BED_calculator_v2")
 testthat::test_dir("tests/testthat")
 ```
 
+## Changes in version 2.5.1
+
+Interface only; no result changes (`docs/development/2026_10_19_interface_clarity_and_input_audit.md`).
+
+- The legacy checkbox "calibrate at the comparison regimen" is removed. To reproduce versions 1 and 2.0, enter the comparison regimen as the DD anchor. The anchor note now explains in plain words what the anchor does.
+- The preset menu labels the default (scenario D18) and explains the selected preset: its source, its values, and that D18 is not fitted.
+- A browser audit changed every menu box one at a time and checked which outputs change and which must not.
+
 ## Changes in version 2.5
 
 Fixes from the 2026-10-19 review (`docs/development/2026_10_19_review_and_plan.md`, which verifies the external review in `docs/development/2026_10_19_external_review_codex.md`). No equation and no default changed; default results are unchanged.
 
 - **One validity rule** for the search, the Sensitivity tab and the Model agreement tab: a tumor model's difference is used only when the model is calibrated and both BEDs are positive. The agreement tab counts evaluable scenarios separately and never counts a non-evaluable one as passing.
 - **Wording:** no claims of parameter uncertainty, clinical equivalence or bounds that the calculator does not compute. The numerical control is an allowed BED change, not a non-inferiority margin. The D18/HYPNO statement is conditional on a cited dose-response slope.
-- **Independent tabs:** the agreement tab no longer depends on candidate-only inputs, the candidate export no longer depends on the Results regimen, and in the legacy option each analysis calibrates at its own comparison.
+- **Independent tabs:** the agreement tab no longer depends on candidate-only inputs, the candidate export no longer depends on the Results regimen. The legacy coupling switch was removed on 2026-10-19 (see `docs/FIXES.md`).
 - **Export and replay:** the agreement analysis has its own ZIP with every regimen under every scenario. Scenario files (schema 2) record the analysis, selection and scenario-set versions and the code identity. Replay refuses unsupported versions, hinge or clocks, and checks the saved calibration. The scenario ID no longer depends on key order.
 - **Labels and records:** BED units follow the α/β in use, the fraction-size flag is named for the benchmark set, and the Model page has a parameter-origin table. Source records are corrected. New `renv.lock` and a launcher that finds R.
 
@@ -62,7 +70,7 @@ Fixes from the 2026-10-19 review (`docs/development/2026_10_19_review_and_plan.m
 ## Changes in version 2.1
 
 - **Acute BED on Fowler's clock.** Fowler's acute parameters and tolerance zone count elapsed days. Acute BEDs are now 0.79 Gy₁₀ higher than in version 2.0 (35 × 2 Gy: 53.1 instead of 52.3), which makes the fixed Fowler limit stricter. Comparisons with a reference beyond the onset day do not change.
-- **Fixed DD calibration anchor.** The DD model is calibrated at an anchor regimen (default 35 × 2 Gy, 47 days) that no longer moves with the comparison regimen. The old coupling is available as a labeled legacy option.
+- **Fixed DD calibration anchor.** The DD model is calibrated at an anchor regimen (default 35 × 2 Gy, 47 days) that no longer moves with the comparison regimen. To reproduce versions 1 and 2.0, which calibrated at the comparison regimen, enter that regimen as the anchor.
 - **Presets** set every value their source gives: version 1 defaults, Withers (follows the tumor α/β), Hartley 2011, the HYHOPE protocol, and scenario D18. Defaults are unchanged.
 - **Search:** blocks a model whose comparison BED is negative, shows which model credits each row, flags fraction sizes above 3.1 Gy, allows a negative minimum change, and offers HYPNO 55 Gy/20 fractions as an acute and as a late limit. Default maximum dose per fraction 5 Gy.
 - Optional background growth g, late BED at α/β 2 and 4 Gy, HYHOPE benchmark row, ZIP export with a rerunnable scenario, Sensitivity tab.

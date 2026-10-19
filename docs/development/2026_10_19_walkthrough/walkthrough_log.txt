@@ -1,4 +1,4 @@
-Walkthrough 2026-10-19 10:13:37, app at C:\Users\ishur\OneDrive\Desktop\Office\HNSCC_BED_calculator\Custom_BED_calculator_v2, chromote 0.5.1, Chrome C:\Program Files\Google\Chrome\Application\chrome.exe
+Walkthrough 2026-10-19 13:00:12, app at C:\Users\ishur\OneDrive\Desktop\Office\HNSCC_BED_calculator\Custom_BED_calculator_v2, chromote 0.5.1, Chrome C:\Program Files\Google\Chrome\Application\chrome.exe
 PASS  app title shows version 2.5
 PASS  Results tab: no output errors
 PASS  Results tab: units on BED rows
@@ -15,11 +15,12 @@ PASS  agreement table: wider than its box only inside a horizontal scroller, pag
 PASS  agreement download: includes scenario_detail.csv  [all_qualifying.csv,README.txt,results.csv,scenario.json,scenario_detail.csv]
 PASS  agreement download: 45 scenario rows
 PASS  agreement survives a cleared candidate minimum
-PASS  legacy coupling: agreement calibrates at its own comparison
+PASS  no legacy coupling switch
+PASS  anchor note explains the anchor
+PASS  preset note explains the default
 PASS  DD unavailable is explained on the agreement tab
 PASS  custom mucosal alpha/beta: cap labeled in BED Gy at alpha/beta 5
 PASS  sensitivity tab: no output errors
 PASS  sensitivity tab: 15 scenario rows
 PASS  Model page: equations rendered by MathJax  [74]
 PASS  Model page: provenance table
-revision 725514a

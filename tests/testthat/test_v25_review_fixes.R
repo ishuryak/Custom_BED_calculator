@@ -132,7 +132,7 @@ server_defaults <- list(
   m = 20, d = 2.65, auto_T = TRUE, T = 26, comparator = "custom",
   ref_m = 35, ref_d = 2, ref_auto_T = TRUE, ref_T = 47,
   preset = "d18", alpha = 0.35, ab = 10, lambda_di = 0.23, lambda_dd = 0.4, Tk = 28, g = 0,
-  anchor_m = 35, anchor_d = 2, coupled = FALSE,
+  anchor_m = 35, anchor_d = 2,
   ab_e = 10, alpha_e = 0.35, Tp_e = 2.5, Tk_e = 7, chemo = FALSE, ab_l = 3,
   criterion = "either", rank_by = "best", m_range = c(5, 34), min_gain = 1, min_days = 7,
   d_step = "0.05", d_max = 5, early_mode = "hypno", late_mode = "reference",
@@ -173,18 +173,44 @@ test_that("F03: in fixed-anchor mode the sidebar comparison does not move the ag
   })
 })
 
-test_that("N6: legacy coupling calibrates the agreement at its own comparison and says so", {
+test_that("version 1 calibration is reproduced by entering the comparison regimen as the anchor", {
   shiny::testServer(app_dir, {
-    set_srv(session, coupled = TRUE)
+    set_srv(session, anchor_m = 20, anchor_d = 2.75)
     expect_equal(agree_anchor()[c("m", "d", "T")], list(m = 20, d = 2.75, T = 26))
-    expect_true(grepl("20 × 2.75 Gy in 26 days", output$agree_note$html, fixed = TRUE))
-    a <- agreement()
-    if (nrow(a) > 0) {
-      # DD equals DI at the anchor, which is the agreement comparison
-      x <- compute_all(20, 2.75, 26, p, list(m = 20, d = 2.75, T = 26))
-      expect_equal(x$bed_dd, x$bed_di, tolerance = 1e-9)
+    expect_true(grepl("DD anchor: 20 × 2.75 Gy in 26 days (fixed)", output$agree_note$html, fixed = TRUE))
+    # DD equals DI at the anchor, here the agreement comparison
+    x <- compute_all(20, 2.75, 26, p, list(m = 20, d = 2.75, T = 26))
+    expect_equal(x$bed_dd, x$bed_di, tolerance = 1e-9)
+  })
+})
+
+test_that("the UI has no legacy coupling switch and the anchor note explains the anchor", {
+  expect_false(grepl("coupled", read_text("app.R"), fixed = TRUE))
+  shiny::testServer(app_dir, {
+    set_srv(session)
+    h <- output$anchor_note$html
+    expect_true(grepl("same tumor BED for this anchor course (35 × 2 Gy in 47 days)", h, fixed = TRUE))
+    expect_true(grepl("starts on day 23.5 (DI: day 28)", h, fixed = TRUE))
+    expect_false(grepl("Legacy", h, fixed = TRUE))
+  })
+})
+
+test_that("the preset menu explains the default and every preset", {
+  shiny::testServer(app_dir, {
+    set_srv(session, preset = "d18")
+    h <- output$preset_note$html
+    expect_true(grepl("The default. Scenario D18", h, fixed = TRUE))
+    expect_true(grepl("not fitted", h, fixed = TRUE))
+    for (nm in c("calculator", "withers", "hartley", "hyhope", "custom")) {
+      session$setInputs(preset = nm)
+      expect_false(grepl("The default.", output$preset_note$html, fixed = TRUE), info = nm)
+      expect_gt(nchar(output$preset_note$html), 120)
     }
   })
+  app_txt <- read_text("app.R")
+  expect_true(grepl("\"Scenario D18 \\(default\\)[^\"]*\" = \"d18\"", app_txt))
+  expect_identical(DEFAULT_PRESET, "d18")
+  expect_false(grepl("Calculator defaults (version 1)", app_txt, fixed = TRUE))
 })
 
 test_that("F03: an empty agreement explains its own reason", {
