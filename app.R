@@ -652,12 +652,13 @@ server <- function(input, output, session) {
   }
   context_strip <- function(...) div(class = "alert alert-light", style = "padding: 0.5rem 0.75rem;", ...)
   regimen_txt <- function(r) sprintf("%d × %g Gy in %g days", r$m, r$d, r$T)
+  days_txt <- function(n) sprintf("%g %s", n, if (n == 1) "day" else "days")
 
   output$search_context <- renderUI({
     rf <- ref(); an <- anchor(); p <- params()
     context_strip(sprintf(paste("Comparison: %s (sidebar). DD anchor: %s. Tumor α/β %g Gy, mucosa %g Gy,",
-                                "late tissue %g Gy. Tumor criterion: change of at least %g Gy, and at least %g days saved."),
-                          regimen_txt(rf), regimen_txt(an), p$ab, p$ab_e, p$ab_l, checked("min_gain"), checked("min_days")),
+                                "late tissue %g Gy. Tumor criterion: change of at least %g Gy, and at least %s saved."),
+                          regimen_txt(rf), regimen_txt(an), p$ab, p$ab_e, p$ab_l, checked("min_gain"), days_txt(checked("min_days"))),
                   tags$br(), if (isTRUE(search()$blocked)) "Early toxicity limit: not available (see below)." else limits_text(rf))
   })
 
@@ -807,10 +808,10 @@ server <- function(input, output, session) {
 
   output$agree_context <- renderUI({
     rf <- agree_ref()
-    context_strip(sprintf("Comparison: %s (%s). Allowed change: at least %g Gy under both models, and at least %g days saved.",
+    context_strip(sprintf("Comparison: %s (%s). Allowed change: at least %g Gy under both models, and at least %s saved.",
                           regimen_txt(rf),
                           if (identical(input$agree_cmp, "sidebar")) "the sidebar comparison" else "HYPNO test arm",
-                          checked("agree_margin"), checked("agree_days")),
+                          checked("agree_margin"), days_txt(checked("agree_days"))),
                   tags$br(), limits_text(rf))
   })
 

@@ -312,6 +312,8 @@ test_that("R6: each analysis tab names its own comparison, anchor and numerical 
     ac <- output$agree_context$html
     expect_true(grepl("Comparison: 20 × 2.75 Gy in 26 days (HYPNO test arm)", ac, fixed = TRUE))
     expect_true(grepl("105.42 Gy₃ (comparison 105.42 + 0)", ac, fixed = TRUE))
+    expect_true(grepl("at least 1 day saved", ac, fixed = TRUE))
+    expect_true(grepl("at least 7 days saved", sc, fixed = TRUE))
     expect_true(grepl("the sidebar regimen, not a candidate row", output$sens_context$html, fixed = TRUE))
     dd_fixed <- compute_all(20, 2.75, 26, params(), anchor())$bed_dd
     session$setInputs(comparator = "custom")
