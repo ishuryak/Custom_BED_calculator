@@ -396,6 +396,13 @@ server <- function(input, output, session) {
   fmt <- function(x, plus = FALSE) {
     ifelse(is.na(x), "not available", sprintf(if (plus) "%+.2f" else "%.2f", x))
   }
+  # Tumor BED difference under the shared validity rule (tumor_endpoint):
+  # shown only when both BEDs are positive.
+  tumor_delta_txt <- function(x, y) {
+    ok <- is.finite(x) & x > 0 & is.finite(y) & y > 0
+    ifelse(ok, sprintf("%+.2f", x - y),
+           ifelse(is.na(x) | is.na(y), "not available", "not evaluable (BED \u2264 0)"))
+  }
 
   output$results <- renderTable({
     b <- both(); r <- regimen(); rf <- ref()
@@ -407,8 +414,9 @@ server <- function(input, output, session) {
                      sprintf("Early toxicity BED (%s)", bed_unit(pp$ab_e)), "Early toxicity EQD2 (Gy)",
                      sprintf("Late toxicity BED (%s)", bed_unit(pp$ab_l)), "Late toxicity EQD2 (Gy)")
     v1 <- unlist(b[1, rows]); v2 <- unlist(b[2, rows])
+    diff <- ifelse(rows %in% c("bed_di", "bed_dd"), tumor_delta_txt(v1, v2), fmt(v1 - v2, plus = TRUE))
     out <- data.frame(Quantity = names(rows), `This regimen` = fmt(v1), Comparison = fmt(v2),
-                      Difference = fmt(v1 - v2, plus = TRUE), check.names = FALSE)
+                      Difference = diff, check.names = FALSE)
     out[1, 2:4] <- c(sprintf("%g", v1[1]), sprintf("%g", v2[1]), sprintf("%+g", v1[1] - v2[1]))
     ab_l <- params()$ab_l
     for (ab in setdiff(c(2, 4), ab_l)) {
@@ -423,7 +431,8 @@ server <- function(input, output, session) {
   output$verdicts <- renderUI({
     b <- both()
     word <- function(x, y) {
-      if (is.na(x)) "not available" else if (x > y + 1e-9) "higher" else if (x < y - 1e-9) "lower" else "the same"
+      if (is.na(x) || is.na(y)) "not available" else if (x <= 0 || y <= 0) "not evaluable (a BED is not positive)" else
+        if (x > y + 1e-9) "higher" else if (x < y - 1e-9) "lower" else "the same"
     }
     tags$p(class = "text-muted",
       sprintf(paste("Compared with the comparison regimen (model values): tumor BED is %s under DI",
@@ -484,8 +493,8 @@ server <- function(input, output, session) {
   output$benchmarks <- renderTable({
     z <- bench(); x <- z$x; r0 <- z$r0
     data.frame(Regimen = z$bm$name, Days = sprintf("%g", z$bm$T),
-               `Δ BED DI` = fmt(x$bed_di - r0$bed_di, TRUE),
-               `Δ BED DD` = fmt(x$bed_dd - r0$bed_dd, TRUE),
+               `Δ BED DI` = tumor_delta_txt(x$bed_di, r0$bed_di),
+               `Δ BED DD` = tumor_delta_txt(x$bed_dd, r0$bed_dd),
                `Early BED` = fmt(x$bed_early),
                `Δ early BED` = fmt(x$bed_early - r0$bed_early, TRUE),
                `Late BED` = fmt(x$bed_late),
@@ -494,14 +503,19 @@ server <- function(input, output, session) {
 
   output$hypno_note <- renderUI({
     x <- bench()$x
-    dd_txt <- if (is.na(x$bed_dd[1])) "not available" else sprintf("%+.1f Gy", x$bed_dd[1] - x$bed_dd[2])
+    one <- function(a, b) {
+      t <- tumor_delta_txt(a, b)
+      if (startsWith(t, "not")) t else sprintf("%+.1f Gy", a - b)
+    }
+    dd_txt <- one(x$bed_dd[1], x$bed_dd[2])
+    di_txt <- one(x$bed_di[1], x$bed_di[2])
     tagList(
       helpText(sprintf(paste("Δ values are relative to the comparison regimen chosen in the sidebar.",
                              "HYPNO compared its test arm with its own control arm (66 Gy in 33 fractions",
                              "at 6 fractions/week), not with 70 Gy in 35 fractions. With the current",
-                             "parameters, test arm minus control arm in tumor BED is %+.1f Gy under DI",
+                             "parameters, test arm minus control arm in tumor BED is %s under DI",
                              "and %s under DD."),
-                       x$bed_di[1] - x$bed_di[2], dd_txt)),
+                       di_txt, dd_txt)),
       helpText(paste("HYPNO (792 patients, 75% with weekly cisplatin 35 mg/m², HPV not tested):",
                      "3-year locoregional control 50.7% vs 51.2%; grade 3+ late effects 18.8% vs 20.2%;",
                      "both passed a 10-percentage-point non-inferiority margin. Grade 3+ acute mucositis",

@@ -24,13 +24,15 @@ mutations <- list(
   M12_search_negative_candidate_credited = list("R/bed_models.R", "  cand_ok <- is.finite(cand_bed) & cand_bed > 0",
                                                 "  cand_ok <- !is.na(cand_bed)"),
   M13_onset_inf_printed = list("app.R", "ifelse(is.finite(a$dd_onset), sprintf(\"%.1f\", a$dd_onset), \"none\")",
-                               "sprintf(\"%.1f\", a$dd_onset)"))
+                               "sprintf(\"%.1f\", a$dd_onset)"),
+  M14_display_ignores_validity = list("app.R", "    ok <- is.finite(x) & x > 0 & is.finite(y) & y > 0", "    ok <- !is.na(x) & !is.na(y)"))
 results <- data.frame(mutation = names(mutations), applied = NA, failed = NA)
 for (i in seq_along(mutations)) {
   m <- mutations[[i]]
   tmp <- file.path(tempdir(), paste0("mut_", i)); dir.create(tmp)
   for (f in c("app.R", "about.md", "README.md", "DESCRIPTION")) file.copy(file.path(root, f), tmp)
-  for (d in c("R", "tests", "References")) file.copy(file.path(root, d), tmp, recursive = TRUE)
+  for (d in c("R", "tests")) file.copy(file.path(root, d), tmp, recursive = TRUE)
+  dir.create(file.path(tmp, "References")); file.copy(file.path(root, "References", "README.md"), file.path(tmp, "References"))
   path <- file.path(tmp, m[[1]])
   src <- paste(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
   hit <- grepl(m[[2]], src, fixed = TRUE)

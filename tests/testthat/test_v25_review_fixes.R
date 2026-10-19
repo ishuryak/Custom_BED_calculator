@@ -333,6 +333,21 @@ test_that("Wide tables scroll horizontally instead of being cut off (walkthrough
     expect_true(grepl(sprintf('overflow-x: auto;", tableOutput("%s")', id), src, fixed = TRUE), info = id)
 })
 
+test_that("F01: the Results and benchmark tables apply the validity rule too", {
+  shiny::testServer(app_dir, {
+    set_srv(session, preset = "custom", alpha = 0.2, lambda_di = 2)   # comparison DI BED -106 Gy
+    b <- both()
+    expect_lt(b$bed_di[2], 0)
+    r <- output$results
+    expect_true(grepl("not evaluable (BED \u2264 0)", r, fixed = TRUE))
+    expect_false(grepl(sprintf("%+.2f", b$bed_di[1] - b$bed_di[2]), r, fixed = TRUE))
+    expect_true(grepl("not evaluable", output$benchmarks, fixed = TRUE))
+    expect_true(grepl("not evaluable", output$verdicts$html, fixed = TRUE))
+    set_srv(session)
+    expect_false(grepl("not evaluable", output$results, fixed = TRUE))
+  })
+})
+
 test_that("N5: Results rows carry BED units", {
   shiny::testServer(app_dir, {
     set_srv(session)
