@@ -1,0 +1,25 @@
+Walkthrough 2026-10-19 10:13:37, app at C:\Users\ishur\OneDrive\Desktop\Office\HNSCC_BED_calculator\Custom_BED_calculator_v2, chromote 0.5.1, Chrome C:\Program Files\Google\Chrome\Application\chrome.exe
+PASS  app title shows version 2.5
+PASS  Results tab: no output errors
+PASS  Results tab: units on BED rows
+PASS  candidate tab: no output errors
+PASS  candidate tab: 3 default rows  [3]
+PASS  candidate tab: renamed fraction-size column
+PASS  candidate tab: no uncertainty claim
+PASS  candidate download: 4 files  [all_qualifying.csv,README.txt,results.csv,scenario.json]
+PASS  candidate download: 3 rows
+PASS  agreement tab: no output errors
+PASS  agreement tab: 17, 18, 19 fractions with 15 of 15
+PASS  agreement note states the anchor
+PASS  agreement table: wider than its box only inside a horizontal scroller, page does not overflow  [1086 974 auto 1400 1400]
+PASS  agreement download: includes scenario_detail.csv  [all_qualifying.csv,README.txt,results.csv,scenario.json,scenario_detail.csv]
+PASS  agreement download: 45 scenario rows
+PASS  agreement survives a cleared candidate minimum
+PASS  legacy coupling: agreement calibrates at its own comparison
+PASS  DD unavailable is explained on the agreement tab
+PASS  custom mucosal alpha/beta: cap labeled in BED Gy at alpha/beta 5
+PASS  sensitivity tab: no output errors
+PASS  sensitivity tab: 15 scenario rows
+PASS  Model page: equations rendered by MathJax  [74]
+PASS  Model page: provenance table
+revision 725514a

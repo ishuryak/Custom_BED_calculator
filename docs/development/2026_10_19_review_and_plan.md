@@ -28,7 +28,7 @@ No equation, default parameter, onset law or default acute policy needs to chang
 |---|---|---|---|
 | F01 | Sensitivity/agreement count scenarios with a negative comparison BED | **Confirmed** | λ_DI 0, 35 × 2 Gy over 150 days: 32 × 2.10/44 d and 33 × 2.05/45 d listed with 15/15. Only 3 scenarios have positive DI and DD comparison BED. Version 1 defaults at α/β 10 give comparison DI −38 Gy and ΔDI +103.31 Gy, counted as a pass |
 | F02 | Unsupported outcome and uncertainty claims | **Confirmed, one modified** (N1) | g counterexample: 17 × 3.05 vs HYPNO, ΔDI −2.4602 (g 0), −2.3282 (g 0.0154), −1.6031 (g 0.1), although both end before day 28. α/β 2: ΔDI +0.2968 at acute 55.78 < 55.87 Gy₁₀ |
-| F03 | Agreement depends on candidate-tab inputs. Export depends on the Results regimen | **Confirmed** by reading `app.R:489-510, 600-609, 644-654` (agreement calls `search_args()`, which validates `min_gain`, `min_days`, `m_range`; `scenario()` reads `regimen()`). Server tests added in step 2 reproduce it | |
+| F03 | Agreement depends on candidate-tab inputs. Export depends on the Results regimen | **Confirmed** by reading `app.R:489-510, 600-609, 644-654` (agreement calls `search_args()`, which validates `min_gain`, `min_days`, `m_range`; `scenario()` reads `regimen()`). Server tests added in step 4 reproduce it | |
 | F04 | The agreement analysis cannot be exported. Filename says 2.1 | **Confirmed** (`app.R:611-617`) | |
 | F05 | Replay ignores versions, hinge, clock. ID depends on key order | **Confirmed** | Equation 9.9 + hard hinge + elapsed tumor clock replays to the same 3 rows. Reversing `params` changes the ID (a98024bb355b → 0f3766cc8351) |
 | F06 | HYPNO acute cap labeled Gy₁₀ at mucosal α/β 5. Preset provenance overstated. Fenwick comment says elapsed days | **Confirmed** | Cap 70.99 BED Gy at (α/β)_e 5, labeled "Gy₁₀" (`app.R:528`); `R/bed_models.R:68-71` |
@@ -95,4 +95,13 @@ Deferred (separate scientific work, as both reviews agree): DD refit to outcome 
 
 ## 8. Implementation record
 
-Filled in after implementation (section 9).
+All seven steps were implemented on 2026-10-19 in commits `73b54a5` and `725514a` (branch `v2-toxicity-hypofractionation`). The second applies the validity rule to the Results-tab, benchmark and HYPNO-note differences, which still showed raw differences against a non-positive BED; I found it while searching for other copies of the old logic. Nothing was deployed. Evidence rows: `docs/FIXES.md`, version 2.5.
+
+- **Tests first.** `tests/testthat/test_v25_review_fixes.R` (26 tests) was written before the code changes and run against `ad16504` in a separate worktree: 25 failed on the reproduced defects, and one guard (fixed anchor ignores the sidebar comparison) passed, as it should.
+- **Suite on `725514a`:** 1651 expectations, 0 failed, 0 errors, 0 skipped (baseline 1504).
+- **Mutations:** all 14 mutations (`docs/development/2026_10_19_review_scripts/mutations.R`, output in `mutations_output.txt`) turn at least one test red on `725514a`: sensitivity validity bypassed, invalid scenarios counted as passing, wrong agreement comparator, candidate inputs leaking into the agreement, replay ignoring hinge or equation version, key-order-dependent ID, wrong unit label, sidebar anchor in the agreement, unchecked calibration, export requiring the Results regimen, negative candidate credited, Inf onset printed, and the old display rule.
+- **Live in the app:** headless-browser walkthrough on `725514a`, 23 of 23 checks (all tabs, both downloads, cleared candidate input, legacy coupling, unavailable DD, custom mucosal α/β, MathJax). It found one more defect, the agreement table's last column cut off at the card edge, fixed by horizontal scrolling and pinned by a test.
+- **Defaults unchanged:** the probe after the fixes (`2026_10_19_review_scripts/probe_after_output.txt`) reproduces the default candidate and agreement rows to every printed digit. The stress case now gives 3 evaluable passes and 12 non-evaluable scenarios.
+- **Existing tests changed** only where they pinned a renamed label or message (`test_app_server.R`: the fraction-size column and the agreement empty message) or a renamed column (`test_v24_agreement.R`: `n_both_within` → `n_pass_both`).
+
+Not done, by design: deployment; the deferred scientific work in section 6. Still for Igor: confirm A1–A5 (section 7).
