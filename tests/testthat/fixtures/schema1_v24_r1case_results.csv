@@ -1,0 +1,2 @@
+"m","d","T","total_dose","bed_di","bed_dd","bed_early","eqd2_early","bed_late","eqd2_late","d_di","d_dd","d_early","d_late","d_min","qual_di","qual_dd","credited_by","beyond_precedent","score","next_step","weeks_saved"
+32,2.1,44,67.2,49.312,54.7642231902823,52.793944571248,43.9949538093733,114.24,68.544,3.312,8.76422319028237,-0.31149538093733,-2.42666666666663,3.312,TRUE,TRUE,"DI and DD",FALSE,3.312,"none (a higher dose ranks lower)",0.428571428571429

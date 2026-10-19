@@ -9,7 +9,13 @@ Verbatim quotes are marked with quotation marks and their location. "Abstract (P
 means the value was checked against the PubMed abstract only, not the full text.
 
 **Git note.** Only files whose licence permits redistribution (CC BY, CC BY-NC, public protocol)
-should ever be committed. Paywalled items are recorded here and were NOT downloaded.
+should ever be committed. Paywalled items are recorded here and are never committed.
+
+**Status fields.** Each entry's "Status" line records how the source was first sought on
+2026-10-18 (acquisition history). Where a "Current status" line follows, it supersedes the
+history: on 2026-10-18 the user saved local full-text copies of several sources, listed in
+section F, which are held in this folder but git-ignored. Supplements that are still missing
+are listed at the end of section F.
 
 ---
 
@@ -29,7 +35,8 @@ should ever be committed. Paywalled items are recorded here and were NOT downloa
 - Citation: Fowler JF. 21 years of biologically effective dose. Br J Radiol. 2010;83(991):554-568.
 - DOI: 10.1259/bjr/31372149 · PMID: 20603408 · PMCID: PMC3473681 · https://pmc.ncbi.nlm.nih.gov/articles/PMC3473681/
 - Status: FREE TO READ in PMC but NOT downloaded: PMC, Europe PMC and the publisher (academic.oup.com) all returned bot-challenge pages to scripted download, and the article is not in the PMC open-access (reuse-licensed) subset. Download manually in a browser if a local copy is wanted.
-- Full text read via the PMC HTML page (automated page reader, 2026-10-18); quotes below should be re-checked against the PDF before publication.
+- Full text read via the PMC HTML page (automated page reader, 2026-10-18).
+- Current status (2026-10-19): local PDF held and read in full (section F); git-ignored, not committed. The PDF is the reference copy for the quotes below.
 - Supports: acute parameters (same as A1), acute "grey zone" upper limit 63 Gy10, late BED3 constraint; cited by the HYHOPE protocol (A4) as its ref 23.
 - Verbatim, Table 4 item 3: "Acute BED10 = nd(1+d/10)−0.693 (T−7d)/0.35×2.5d"
 - Verbatim, Table 6 caption: "Acute mucosal constraints are 51 Gy EQD with α/β = 10 Gy, α = 0.35 Gy−1, Tk = 7d, Tp = 2.5d."
@@ -40,6 +47,7 @@ should ever be committed. Paywalled items are recorded here and were NOT downloa
 - Citation: Hartley A, Sanghera P, Kazi W, Mehanna H, McConkey C, Glaholm J, Fowler J. Correlation of currently used radiobiological parameters with local control and acute and late mucosal toxicity in randomised studies of altered fractionation for locally advanced head and neck cancer. Clin Oncol (R Coll Radiol). 2011;23(1):29-33.
 - DOI: 10.1016/j.clon.2010.08.007 · PMID: 20829006
 - Status: PAYWALLED. The WRAP record (eprint 41625) is METADATA ONLY ("Restricted or Subscription Access"; full text "not available from this repository"). Not downloaded.
+- Current status (2026-10-19): local PDF held and read in full (section F); git-ignored, not committed.
 - Supports: acute mucosal BED with α = 0.3; late mucosal α/β = 3; empirical check against randomized trials.
 - Verbatim, Abstract (PubMed), Methods: "The tumour biologically effective dose (tBED; α/β=10Gy, t(k) [onset time of accelerated repopulation]=22 days, t(p) [average doubling time during accelerated repopulation]=3 days, α=0.3Gy(-1)), acute mucosal biologically effective dose (amBED; α/β=10Gy, t(k)=7 days, t(p)=2.5 days, α=0.3Gy(-1)) and late mucosal biologically effective dose (lmBED; α/β=3Gy) were calculated"
 - Verbatim, Abstract (PubMed), Results: "A trend towards a correlation was seen between the percentage difference in amBED and the percentage difference in acute grade 3 mucositis (P=0.06). A significant correlation was observed between the percentage difference in lmBED and the percentage difference in grade 3 late mucosal toxicity (P=0.02). However, a 15% decrease in lmBED between control and experimental arms of the study was necessary for any sparing of late mucosal toxicity to be observed."
@@ -93,9 +101,9 @@ should ever be committed. Paywalled items are recorded here and were NOT downloa
 - Fowler JF. Optimum overall times II: Extended modelling for head and neck radiotherapy. Clin Oncol (R Coll Radiol). 2008;20(2):113-126. DOI 10.1016/j.clon.2007.11.003 · PMID 18155893. PAYWALLED.
 - Verbatim, 2008 Abstract (PubMed): "Standard linear quadratic modelling was used, assuming at first alpha/beta=10 Gy, alpha=0.35 ln/Gy, Tk=21 days, Tp=3 days for tumours, but with Tk=7 days, Tp=2.5 Gy for acute mucosal reactions, as before. A late complications constraint of 70 Gy was accepted, and an acute constraint of 51 Gy (both at 2 Gy fractions)." ("Tp=2.5 Gy" is a typo for days in the abstract.)
 
-### A10. Other acute-tolerance models (cited, not downloaded, all PAYWALLED)
+### A10. Other acute-tolerance models (cited; all PAYWALLED; only Meade 2014 is now held locally, section F)
 - Strigari L, et al. A new model for predicting acute mucosal toxicity in head-and-neck cancer patients undergoing radiotherapy with altered schedules. Int J Radiat Oncol Biol Phys. 2012;83(5):e697-702. DOI 10.1016/j.ijrobp.2012.02.004 · PMID 22578541. Abstract: AUC 0.84 (95% CI 0.75-0.92) for tolerable vs intolerable.
-- Meade S, Sanghera P, Glaholm J, Hartley A. Models of acute mucosal tolerance to radiotherapy alone applied to synchronous chemoradiation schedules in head and neck cancer. Tumour Biol. 2014;35(3):2017-23. DOI 10.1007/s13277-013-1267-0 · PMID 24104502. Verbatim abstract: "a global value for the contribution of chemotherapy of 5.1 Gy10".
+- Meade S, Sanghera P, Glaholm J, Hartley A. Models of acute mucosal tolerance to radiotherapy alone applied to synchronous chemoradiation schedules in head and neck cancer. Tumour Biol. 2014;35(3):2017-23. DOI 10.1007/s13277-013-1267-0 · PMID 24104502. Verbatim abstract: "a global value for the contribution of chemotherapy of 5.1 Gy10". Full text held (section F). Its chemotherapy values (5.1 Gy10 globally; 4.4 Gy10 for cisplatin 300 mg/m² in Table 4) are estimates within that study's data set and model, not a measured drug conversion, and the calculator does not apply them.
 - Fenwick JD, Pardo-Montero J, Nahum AE, Malik ZI. Impact of schedule duration on head and neck radiotherapy: accelerated tumor repopulation versus compensatory mucosal proliferation. Int J Radiat Oncol Biol Phys. 2012;82(2):1021-30. DOI 10.1016/j.ijrobp.2010.12.048 · PMID 21377280.
 - Fowler JF. Sensitivity analysis of parameters in linear-quadratic radiobiologic modeling. Int J Radiat Oncol Biol Phys. 2009;73(5):1532-7. DOI 10.1016/j.ijrobp.2008.11.039 · PMID 19306749.
 
@@ -108,6 +116,7 @@ should ever be committed. Paywalled items are recorded here and were NOT downloa
 - DOI: 10.1016/s0167-8140(99)00042-0 · PMID: 10435801
 - Note: published in Radiotherapy and Oncology, NOT IJROBP. The 1997 IJROBP paper by the same authors (Stuschke M, Thames HD. Hyperfractionated radiotherapy of human tumors: overview of the randomized clinical trials. Int J Radiat Oncol Biol Phys. 1997;37(2):259-67; DOI 10.1016/s0360-3016(96)00511-1; PMID 9069295) is a different paper.
 - Status: PAYWALLED. Not downloaded.
+- Current status (2026-10-19): local PDF held and read in full (section F); git-ignored, not committed. The full text's logit fit gives γ₅₀ 3.2 (95% CI 1.6-4.8) (Table 1, p. 115; γ₅₀ is defined in Appendix A, eqs 1-3, p. 119, as D dP/dD at TCD50 with D the physical or isoeffective conventional dose); the abstract's 3.1 (1.5-4.7) is a different reported fit. RTOG 83-13 alone: 0.8 ± 0.4 (p. 117).
 - Verbatim, Abstract (PubMed): "The tumours showed small fractionation sensitivities characterized by an overall alpha/beta of 10.5 (6.5-29) Gy. One trial allowed quantitative estimation of the alpha/beta values for late normal tissue damage: The alpha/beta estimate for late effects of grade 2 + was 4.0 (3.3-5.0) Gy, assuming a fixed gamma50 of 5 and was even smaller for smaller gamma50 values." Also: "An overall gamma50 of 3.1 (1.5-4.7)".
 
 ### B2. van Leeuwen CM, et al. (2018)
@@ -166,6 +175,7 @@ should ever be committed. Paywalled items are recorded here and were NOT downloa
 - Citation: Bentzen SM, Gupta T, Jacinto AA, Rosenblatt E, Bhasker S, Napoles M, Binia S, Chansilpa Y, Aguiar S, Nagarajan M, Laskar SG, De Marchi P, Goloubeva O, Hopkins K, Zubizarreta E, Agarwal JP, Abdel-Wahab M. Hypofractionated Versus Normofractionated Accelerated Radiation Therapy With or Without Cisplatin for Locally Advanced Head and Neck Squamous Cell Carcinoma (HYPNO): A Randomized, Open-Label, Phase 3, Noninferiority Trial. Int J Radiat Oncol Biol Phys. 2026;125(2):387-398. Epub 2026 Feb 19.
 - DOI: 10.1016/j.ijrobp.2025.12.056 · PMID: 41711624 · NCT02765503 (as given by the requester; not separately checked here)
 - Status: OPEN ACCESS (hybrid, CC BY-NC-ND 4.0 per Unpaywall and the Elsevier API) but NOT downloaded: redjournal.org and sciencedirect.com returned bot-challenge / HTTP 403 pages to scripted requests, and the Elsevier API returned metadata only. Download manually from https://www.redjournal.org/article/S0360-3016(26)00020-9/pdf.
+- Current status (2026-10-19): local PDF held and read in full (section F); git-ignored, not committed (CC BY-NC-ND). Missing: Appendix E1 / Figure E1.
 - Verbatim, Abstract (PubMed): "a 20-fraction hypofractionated (HFX) schedule delivering 55 Gy in 20 fractions, 5 fractions per week, over 4 weeks would be noninferior to a 33-fraction accelerated, normofractionated (NFX) 2 Gy per fraction schedule, delivering 66 Gy in 2-Gy fractions, 6 fractions per week over 5.5 weeks"; "792 patients were centrally randomized: 395 to HFX and 397 to NFX"; "The HYPNO test arm passed the separate noninferiority tests for both loco-regional tumor control (P = .04) and grade 3+ late adverse events (P = .004). At 3 years, the absolute difference in outcome between the 2 arms was ≤1.4 percentage points for overall survival, progression-free survival, loco-regional control, and grade 3+ late adverse events." "Concurrent chemoradiation therapy with 35 mg/m2 cisplatin weekly was permitted."
 - Acute mucositis rates by arm (full text, checked 2026-10-18): grade 3+ 50.9% (190/373) vs 54.7% (208/380). Table 3: 3-year LRC 50.7% vs 51.2%, HR 1.098 (90% CI 0.93-1.30); grade 3+ late effects 18.8% vs 20.2%, HR 0.926 (0.68-1.25). Cisplatin 597/792 (75%).
 - Units of the design assumption (p. 389): "0.65 Gy/day recovered ... equivalent dose in 2-Gy fractions of 71.85 Gy" (66 + 9 x 0.65 = 71.85). The 0.65 is in EQD2 (2-Gy-equivalent) units, which is 0.65 x 1.2 = 0.78 Gy10 BED per day at alpha/beta 10 Gy. It is a compensation rule, not a fitted alpha or onset.
@@ -241,16 +251,18 @@ These PDFs sit in this folder but are git-ignored (`References/*.pdf`), because 
 | Stuschke_1999_HN_alpha_beta.pdf | Stuschke M, Thames HD. Radiother Oncol. 1999;51:113-121 | 10435801 | 10.1016/s0167-8140(99)00042-0 | Tumor α/β 10.5 Gy (6.5-29), from 1.1-2.55 Gy fractions; late α/β 3.3-4.0 Gy from one trial |
 | Hartley_2011_mucosal_parameters.pdf | Hartley A, et al. Clin Oncol. 2011;23:29-33 | 20829006 | 10.1016/j.clon.2010.08.007 | Mucosal α 0.3 Gy⁻¹; acute BED vs grade 3 mucositis a trend only (p = 0.06) |
 | Moon_2025_HYHOPE_outcomes.pdf | Moon DH, et al. Int J Radiat Oncol Biol Phys. 2025;123:694-702 | 40383163 | 10.1016/j.ijrobp.2025.05.009 | 46.5 Gy/15 fx maximum tolerated dose; grade 3 oral mucositis 21% |
-| Bentzen_2026_HYPNO.pdf | Bentzen SM, et al. Int J Radiat Oncol Biol Phys. 2026;125:387-398 | 41711624 | 10.1016/j.ijrobp.2025.12.056 | Grade 3+ mucositis 50.9% vs 54.7%; 3-year LRC difference ≤ 1.4 points; design assumed 0.65 Gy/day in EQD2 units (0.78 Gy10/day) |
+| Bentzen_2026_HYPNO.pdf | Bentzen SM, et al. Int J Radiat Oncol Biol Phys. 2026;125:387-398 | 41711624 | 10.1016/j.ijrobp.2025.12.056 | Grade 3+ mucositis 50.9% vs 54.7%; 3-year LRC 50.7% vs 51.2% (test minus control −0.5 percentage points; HR 1.098, 90% CI 0.93-1.30, Table 3); design assumed 0.65 Gy/day in EQD2 units (0.78 Gy10/day) |
 | Fowler_2010_21_years_BED.pdf | Fowler JF. Br J Radiol. 2010;83:554-568 | 20603408 | 10.1259/bjr/31372149 | Tumor Tk 21-32 d, Tp 3 d, α 0.35 Gy⁻¹; repopulation "no more than about 0.7 Gy/day", stated elsewhere in the paper as about 0.7 Gy EQD2 per day (0.84 Gy₁₀ BED per day); mucosal Tk 7 d from biopsy cell counts |
-| Meade_2014_chemo_mucosal_tolerance.pdf | Meade S, et al. Tumour Biol. 2014;35:2017-2023 | 24104502 | 10.1007/s13277-013-1267-0 | Fowler ceiling 61 + 0.792(T − 7) with 46 d for 35 fx; cisplatin 300 mg/m² adds 4.4 Gy10, scaled by dose given |
+| Meade_2014_chemo_mucosal_tolerance.pdf | Meade S, et al. Tumour Biol. 2014;35:2017-2023 | 24104502 | 10.1007/s13277-013-1267-0 | Fowler ceiling 61 + 0.792(T − 7) with 46 d for 35 fx; cisplatin 300 mg/m² estimated to add 4.4 Gy10 in this study's data and model, scaled by dose given (study-specific, not applied by the calculator) |
 | Madhava_2006_carboplatin_hypofractionation.pdf | Madhava K, et al. Clin Oncol. 2006;18:77-81 | 16477924 | 10.1016/j.clon.2005.08.014 | 55 Gy/20 fx + carboplatin: grade 3 mucositis 16/19 (84%) |
 | Miller_2026_hypofractionation_cohort.pdf | Miller D, et al. Clin Oncol. 2026;59:104332 | 42759386 | 10.1016/j.clon.2026.104332 | Real-world 55 Gy/20 fx, almost all without chemotherapy: grade 3 mucositis 64% (72/113 completers) at end of treatment, RTOG grading |
 | Kirkpatrick_2010_QUANTEC_spinal_cord.pdf | Kirkpatrick JP, et al. Int J Radiat Oncol Biol Phys. 2010;76(3 Suppl):S42-S49 | 20171517 | 10.1016/j.ijrobp.2009.04.095 | Cord α/β 0.87 Gy (0.54-1.19); 50/60/69 Gy in 2-Gy fractions give 0.2/6/50% myelopathy |
 
-## G. Current parameter ledger (version 2.5)
+Still missing (not held): HYPNO Appendix E1 / Figure E1; HYHOPE outcomes supplements E1/E2; Miller 2026 Supplemental Table 1.
 
-Every numeric input the app ships, with its origin. Direct = stated by the source; conversion = derived from a source value by the stated rule; chosen = a representative or completing value set for this calculator; analyst = a constructed scenario, not a source estimate. The same table, for the tumor presets, is on the app's "Model and sources" page.
+## G. Current parameter ledger (version 2.6)
+
+Every numeric model input and default search setting the app ships, with its origin. Direct = stated by the source; conversion = derived from a source value by the stated rule; chosen = a representative or completing value set for this calculator; analyst = a constructed scenario, not a source estimate. The same table, for the tumor presets, is on the app's "Model and sources" page.
 
 | Value | Origin | Source and locator |
 |---|---|---|
@@ -266,3 +278,8 @@ Every numeric input the app ships, with its origin. Direct = stated by the sourc
 | Version 1 α 0.2, λ_DI 0.2, λ_DD 0.5, T_k 28 | chosen (version 1 website) | version 1 app |
 | γ₅₀ 3.2 (1.6–4.8) and 0.8 ± 0.4 (About page illustration only) | direct | Stuschke 1999 (B1), Table 1 and Discussion 4.1 |
 | 2018 fitted DD (α 0.224, λ 1.17, C 14.5, g 0.0154) (About page only) | direct | Shuryak 2018 (E1), Table 2 |
+| HYPNO control 3-year LRC 0.512 and HR upper limit 1.30 (About page illustration only) | direct | Bentzen 2026 (C1), pp. 391-392 and Table 3 |
+| DD anchor 35 × 2 Gy, 47 days | chosen (conventional reference; version 1 anchor) | version 1 app |
+| Candidate search: minimum change +1 Gy, 7 days saved, dose step 0.05 Gy, highest dose 5 Gy, criterion "DI or DD", ranking "larger change" | chosen (screening settings) | this calculator |
+| Agreement: allowed change −3 Gy (BED, each scenario's α/β), 1 day saved, comparison HYPNO 55 Gy/20 | chosen (PI decision 2026-10-19) | `docs/development/2026_10_19_review_and_plan.md` |
+| Sensitivity: tumor α/β 7, 10 and 15 Gy for each preset | chosen | this calculator |

@@ -1,0 +1,60 @@
+{
+  "schema_version": "1",
+  "app_version": "2.4.0",
+  "equation_version": "2.2",
+  "hinge": {
+    "type": "softplus",
+    "k_per_day": 3
+  },
+  "clocks": {
+    "input": "inclusive calendar days, first to last treatment day",
+    "tumor": "inclusive",
+    "acute": "elapsed"
+  },
+  "params": {
+    "alpha": 0.2,
+    "ab": 10,
+    "lambda_di": 0.4,
+    "lambda_dd": 5,
+    "Tk": 28,
+    "g": 0,
+    "ab_e": 10,
+    "alpha_e": 0.35,
+    "lambda_e": 0.277258872223978,
+    "Tk_e": 7,
+    "ab_l": 3
+  },
+  "comparison": {
+    "m": 35,
+    "d": 2,
+    "T": 47
+  },
+  "anchor": {
+    "m": 35,
+    "d": 2,
+    "T": 47
+  },
+  "calibration": {
+    "status": "ok",
+    "c_over_alpha": 74.9609542016865,
+    "onset_anchor": 41.9424386604675
+  },
+  "search": {
+    "m_range": 32,
+    "d_step": 0.05,
+    "d_max": 2.5,
+    "criterion": "either",
+    "rank_by": "worst",
+    "tol_early": 30,
+    "tol_late": 30,
+    "early_cap": null,
+    "late_cap": null,
+    "min_gain": 0,
+    "min_days_saved": 1,
+    "fenwick": false
+  },
+  "context": {
+    "note": "R1 ranking case, built by v2.4"
+  },
+  "scenario_id": "b1ec2cd3cc41"
+}

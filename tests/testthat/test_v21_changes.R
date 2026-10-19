@@ -154,7 +154,8 @@ test_that("an exported scenario reruns to the same rows", {
                        search = list(m_range = 5:34, d_step = 0.05, d_max = 5,
                                      criterion = "either", rank_by = "best",
                                      tol_early = 0, tol_late = 0, early_cap = NULL,
-                                     late_cap = NULL, min_gain = 1, min_days_saved = 7),
+                                     late_cap = NULL, min_gain = 1, min_days_saved = 7,
+                                     fenwick = FALSE),   # 2.6: schema 2 requires the flag
                        context = list(comparator = "custom", early_mode = "reference",
                                       late_mode = "reference", chemo = FALSE, coupled = FALSE))
   js <- scenario_json(sc)

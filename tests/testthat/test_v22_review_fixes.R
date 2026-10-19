@@ -14,7 +14,7 @@ test_that("an unusable model shows no difference and does not enter the score", 
   expect_false(any(s$qual_di))
   expect_true(all(is.na(s$d_di)))                            # was +57.8 to +63.2 in 2.1
   expect_equal(s$score, s$d_dd, tolerance = 1e-12)
-  expect_equal(s$d_min, s$d_dd, tolerance = 1e-12)
+  expect_true(all(is.na(s$d_min)))   # 2.6: d_min needs both models (was d_dd alone)
   expect_true(all(is.na(attr(s, "feasible")$d_di)))
 })
 

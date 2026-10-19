@@ -292,13 +292,15 @@ test_that("F05: replay rejects unsupported model versions, hinge and clocks", {
   expect_error(rerun_scenario(bad(function(x) { x$calibration$c_over_alpha <- 1; x })), "calibration")
 })
 
-test_that("F05: schema 1 candidate files are migrated explicitly", {
+test_that("F05: schema 1 candidate files are refused by strict replay and migrated on request", {
+  # 2.6 (review R3): strict replay refuses an older file; migration is explicit.
   sc <- jsonlite::fromJSON(scenario_json(cand_scenario()))
   sc$schema_version <- "1"; sc$analysis <- NULL; sc$selection_version <- NULL
   sc$scenario_set_version <- NULL
-  r <- rerun_scenario(sc)
+  expect_error(rerun_scenario(sc), "migrate_scenario")
+  r <- rerun_scenario(migrate_scenario(sc))
   expect_equal(nrow(r), 3)
-  expect_equal(attr(r, "migrated_from"), "1")
+  expect_equal(attr(r, "migration")$from$schema_version, "1")
 })
 
 test_that("F05: the scenario ID ignores key order but not scientific inputs", {

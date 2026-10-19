@@ -8,11 +8,13 @@
 # All max(0, x) terms use the same smooth version as the v1 website,
 # log(1 + exp(3x)) / 3, so v1 and v2 agree at the v1 defaults.
 
-APP_VERSION <- "2.5.1"
+APP_VERSION <- "2.6.0"
 EQUATION_VERSION <- "2.2"  # 2.1 + optional Fenwick 2008 acute boundary
 # Selection rules (filtering, validity, ranking), versioned apart from the
 # equations. 2.5: one validity rule for search, sensitivity and agreement.
-SELECTION_VERSION <- "2.5"
+# 2.6: a row is ranked only when its ranking score is evaluable (rank_eligible),
+# d_min needs both models, agreement ranges use jointly evaluable scenarios.
+SELECTION_VERSION <- "2.6"
 # The sensitivity scenario set: every tumor preset at each tumor alpha/beta.
 SCENARIO_SET_VERSION <- "1"
 SCENARIO_AB_VALUES <- c(7, 10, 15)
@@ -200,15 +202,21 @@ tumor_endpoint <- function(cand_bed, ref_bed, available = TRUE) {
 # regimen, and a candidate with a negative BED cannot qualify on it.
 # For each number of fractions, the dose per fraction with the highest score
 # is listed (rank_by: "best" = larger of dDI and dDD, "worst" = smaller,
-# "di", "dd"). Column next_step says what the next dose step would break.
-# All qualifying grid rows are attached as attribute "feasible".
+# "di", "dd"). A qualifying row is ranked only when its score is evaluable
+# (rank_eligible): "worst" needs both differences, "di" and "dd" need that
+# model's, and "best" uses whichever differences are evaluable (the documented
+# optimistic fallback). Column next_step says what the next dose step would
+# break. All qualifying grid rows, rankable or not, are attached as attribute
+# "feasible" with column rank_eligible.
 # Empty results carry attribute "reason":
 #   "dd_unavailable" / "negative_reference_di" / "negative_reference_dd" /
 #   "negative_reference_both" /
 #   "negative_reference_early" / "negative_reference_late": the criterion,
 #     ranking or toxicity limit needs a model that is unavailable;
 #   "empty_dose_range": no dose per fraction between the comparison dose and d_max;
-#   "no_shorter_regimen": no fraction number saves enough days.
+#   "no_shorter_regimen": no fraction number saves enough days;
+#   "no_rankable_row": regimens qualified, but none has an evaluable score
+#     for the chosen ranking (they are still in attribute "feasible").
 suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
                              d_step = 0.05, d_max = 8,
                              criterion = "either", rank_by = "best",
@@ -265,29 +273,40 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
       !is.na(lim) & fenwick_cell_kill(m, d) <= lim + eps
     } else a$bed_early > 0 & a$bed_early <= cap_early + eps
     a$late_ok <- a$bed_late <= cap_late + eps
+    # Ranking score: evaluable only when the endpoints it needs are evaluable.
+    ok_di <- is.finite(a$d_di); ok_dd <- is.finite(a$d_dd)
+    a$score <- switch(rank_by,
+      best = ifelse(ok_di & ok_dd, pmax(a$d_di, a$d_dd), ifelse(ok_di, a$d_di, a$d_dd)),
+      worst = ifelse(ok_di & ok_dd, pmin(a$d_di, a$d_dd), NA_real_),
+      di = a$d_di,
+      dd = a$d_dd,
+      stop("unknown rank_by: ", rank_by))
+    a$rank_eligible <- is.finite(a$score)
     a
   }
   a <- evaluate(g$m, g$d, g$T)
   a <- a[a$tumor_ok & a$early_ok & a$late_ok, , drop = FALSE]
   if (nrow(a) == 0) return(out)
 
-  # A model that is not usable for a row has NA difference and does not enter
-  # the score.
-  a$score <- switch(rank_by,
-    best = pmax(a$d_di, a$d_dd, na.rm = TRUE),
-    worst = pmin(a$d_di, a$d_dd, na.rm = TRUE),
-    di = a$d_di,
-    dd = a$d_dd,
-    stop("unknown rank_by: ", rank_by))
-  a$d_min <- pmin(a$d_di, a$d_dd, na.rm = TRUE)
+  # d_min is the smaller of the two differences, defined only when both are.
+  a$d_min <- ifelse(is.finite(a$d_di) & is.finite(a$d_dd), pmin(a$d_di, a$d_dd), NA_real_)
   a$credited_by <- ifelse(a$qual_di & a$qual_dd, "DI and DD",
                           ifelse(a$qual_di, "DI only", "DD only"))
   a$beyond_precedent <- a$d > PRECEDENT_MAX_D + eps
   a$weeks_saved <- (ref$T - a$T) / 7
-  feasible <- a[order(a$m, -a$score), setdiff(names(a), c("tumor_ok", "early_ok", "late_ok")),
+  a$fractions_saved <- ref$m - a$m
+  a$early_slack <- if (fenwick) fenwick_limit(a$T) - fenwick_cell_kill(a$m, a$d) else cap_early - a$bed_early
+  a$late_slack <- cap_late - a$bed_late
+  feasible <- a[order(a$m, !a$rank_eligible, -a$score), setdiff(names(a), c("tumor_ok", "early_ok", "late_ok")),
                 drop = FALSE]
   rownames(feasible) <- NULL
 
+  a <- a[a$rank_eligible, , drop = FALSE]
+  if (nrow(a) == 0) {
+    out <- blocked("no_rankable_row")
+    attr(out, "feasible") <- feasible
+    return(out)
+  }
   a <- a[order(a$m, -a$score), , drop = FALSE]
   a <- a[!duplicated(a$m), , drop = FALSE]
   a <- a[order(-a$score), , drop = FALSE]
@@ -295,14 +314,16 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   # What would the next dose step break?
   nxt_d <- round(a$d + d_step, 6)
   nx <- evaluate(a$m, nxt_d, a$T)
-  broken <- mapply(function(e, l, t) {
+  broken <- mapply(function(e, l, t, r) {
     parts <- c(if (!e) "early toxicity", if (!l) "late toxicity", if (!t) "tumor criterion")
+    if (length(parts) == 0 && !r) return("ranking not evaluable (a tumor BED is not positive)")
     if (length(parts) == 0) "none (a higher dose ranks lower)" else paste(parts, collapse = " and ")
-  }, nx$early_ok, nx$late_ok, nx$tumor_ok)
+  }, nx$early_ok, nx$late_ok, nx$tumor_ok, nx$rank_eligible)
   a$next_step <- ifelse(nxt_d > d_max + eps, "end of dose search range", broken)
   a$tumor_ok <- NULL
   a$early_ok <- NULL
   a$late_ok <- NULL
+  a$rank_eligible <- NULL
   rownames(a) <- NULL
   a <- a[, names(empty_suggestions()), drop = FALSE]
   attr(a, "feasible") <- feasible
@@ -317,7 +338,8 @@ empty_suggestions <- function() {
              d_late = numeric(), d_min = numeric(), qual_di = logical(),
              qual_dd = logical(), credited_by = character(),
              beyond_precedent = logical(), score = numeric(),
-             next_step = character(), weeks_saved = numeric())
+             next_step = character(), weeks_saved = numeric(),
+             fractions_saved = numeric(), early_slack = numeric(), late_slack = numeric())
 }
 
 # Regimen at which the DD model is calibrated, unless the user changes it.
@@ -464,14 +486,16 @@ sensitivity_table <- function(reg, ref, anchor, p, ab_values = SCENARIO_AB_VALUE
 }
 
 # Counts and ranges over sensitivity scenarios for one regimen. A scenario is
-# evaluable when both models' differences are valid; only evaluable scenarios
-# can pass, and ranges use valid differences only (NA when there are none).
+# evaluable when both models' differences are valid. Counts and both ranges
+# use the same population, the evaluable scenarios (ranges NA when there are
+# none). n_valid_di and n_valid_dd give each model's own count for reference.
 scenario_summary <- function(st, margin) {
   both <- st$valid_di & st$valid_dd
   rng <- function(x, ok) if (any(ok)) range(x[ok]) else c(NA_real_, NA_real_)
-  di <- rng(st$d_di, st$valid_di); dd <- rng(st$d_dd, st$valid_dd)
+  di <- rng(st$d_di, both); dd <- rng(st$d_dd, both)
   data.frame(d_di_min = di[1], d_di_max = di[2], d_dd_min = dd[1], d_dd_max = dd[2],
-             n_scenarios = nrow(st), n_valid_both = sum(both), n_invalid = nrow(st) - sum(both),
+             n_scenarios = nrow(st), n_valid_di = sum(st$valid_di), n_valid_dd = sum(st$valid_dd),
+             n_valid_both = sum(both), n_invalid = nrow(st) - sum(both),
              n_pass_both = sum(both & st$d_di >= margin - 1e-9 & st$d_dd >= margin - 1e-9))
 }
 
