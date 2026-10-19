@@ -218,8 +218,8 @@ should ever be committed. Paywalled items are recorded here and were NOT downloa
 | Moon_2024_HYHOPE_protocol_NCT04580446.pdf | public ClinicalTrials.gov document; "CONFIDENTIAL" template header | cdn.clinicaltrials.gov |
 | Joiner_2023_LQ_fractionation_UofT_lecture.pdf | not stated (public teaching file) | radonc.utoronto.ca |
 
-Not downloaded, paywalled: Fowler 2003; Hartley 2011; Fenwick 2008, 2012; Bentzen 2001; Denham 1995; Fowler 2007, 2008, 2009; Strigari 2012; Meade 2014; Stuschke & Thames 1999; Rezvani 1991; Maciejewski 1986; Kirkpatrick 2010; Sanghera 2007; Miller 2026.
-Not downloaded although free to read (bot-blocked): Fowler 2010 BJR (PMC3473681); HYPNO 2026 IJROBP (CC BY-NC-ND).
+Paywalled and NOT committed. Local copies of eleven of them are now held in this folder, excluded from git (see section F): Fowler 2003, Hartley 2011, Fenwick 2008, Meade 2014, Stuschke & Thames 1999, Kirkpatrick 2010, Miller 2026, Madhava 2006, HYHOPE 2025 (Moon). Still not held: Fenwick 2012, Bentzen 2001, Denham 1995, Fowler 2007, 2008, 2009, Strigari 2012, Rezvani 1991, Maciejewski 1986, Sanghera 2007.
+Free to read but bot-blocked; local copies now held, excluded from git (section F): Fowler 2010 BJR (PMC3473681); HYPNO 2026 IJROBP (CC BY-NC-ND, not committed because of the ND/NC terms).
 
 ### E1. Shuryak I, Hall EJ, Brenner DJ (2018) - DI and DD repopulation models
 - Citation: Shuryak I, Hall EJ, Brenner DJ. Dose dependence of accelerated repopulation in head and neck cancer: supporting evidence and clinical implications. Radiother Oncol. 2018;127(1):20-26.
@@ -227,3 +227,21 @@ Not downloaded although free to read (bot-blocked): Fowler 2010 BJR (PMC3473681)
 - Status: Elsevier, not redistributable. Local copy outside this folder: `Office/Publications/Articles/accelerated_repopulation.pdf` (the author's own paper). Not copied here.
 - Supports: the DI model (Eq. 1) and the DD model (Eqs. 2-5) used by the calculator; the background growth rate g = 0.0154 per day, which the calculator omits.
 - Checked 2026-10-18 against the local copy: the DD onset C = (αD + βD²/n)·TkDD/T and the rate γDD = γ·Pkill with Pkill = 1 − exp(−(αd + βd²)n/T) match `R/bed_models.R`.
+
+## F. Full-text copies received 2026-10-18 (saved by the user, excluded from git)
+
+These PDFs sit in this folder but are git-ignored (`References/*.pdf`), because they are paywalled or carry licences that do not permit redistribution. Each was read in full on 2026-10-18; the detailed findings are in `PLAN_v2_fixes_2026_10_18.md` (sections 5 and 6), one level above the repository.
+
+| File | Citation | PMID | DOI | Key checked content |
+|---|---|---|---|---|
+| Fowler_2003_acute_mucosa_tolerance.pdf | Fowler JF, et al. Radiother Oncol. 2003;69:161-168 | 14643953 | 10.1016/s0167-8140(03)00231-7 | Table 1: 70 Gy/7 w at 46 days gives acute BED 53.1 Gy10 (elapsed-day T); zone 59-61 Gy10; chemotherapy "may add approximately 3-5 Gy10" |
+| Fenwick_2008_mucosal_tolerance.pdf | Fenwick JD, et al. Int J Radiat Oncol Biol Phys. 2008;71:625-634 | 18474317 | 10.1016/j.ijrobp.2008.02.008 | Boundary 69.5·(T/32.2)/sin(T/32.2) − 3.5 Gy10 for T ≤ 50 d; Tk 8 d with inclusive T equals Fowler's Tk 7 d |
+| Stuschke_1999_HN_alpha_beta.pdf | Stuschke M, Thames HD. Radiother Oncol. 1999;51:113-121 | 10435801 | 10.1016/s0167-8140(99)00042-0 | Tumor α/β 10.5 Gy (6.5-29), from 1.1-2.55 Gy fractions; late α/β 3.3-4.0 Gy from one trial |
+| Hartley_2011_mucosal_parameters.pdf | Hartley A, et al. Clin Oncol. 2011;23:29-33 | 20829006 | 10.1016/j.clon.2010.08.007 | Mucosal α 0.3 Gy⁻¹; acute BED vs grade 3 mucositis a trend only (p = 0.06) |
+| Moon_2025_HYHOPE_outcomes.pdf | Moon DH, et al. Int J Radiat Oncol Biol Phys. 2025;123:694-702 | 40383163 | 10.1016/j.ijrobp.2025.05.009 | 46.5 Gy/15 fx maximum tolerated dose; grade 3 oral mucositis 21% |
+| Bentzen_2026_HYPNO.pdf | Bentzen SM, et al. Int J Radiat Oncol Biol Phys. 2026;125:387-398 | 41711624 | 10.1016/j.ijrobp.2025.12.056 | Grade 3+ mucositis 50.9% vs 54.7%; 3-year LRC difference ≤ 1.4 points; design assumed 0.65 Gy/day |
+| Fowler_2010_21_years_BED.pdf | Fowler JF. Br J Radiol. 2010;83:554-568 | 20603408 | 10.1259/bjr/31372149 | Tumor Tk 21-32 d, Tp 3 d, α 0.35 Gy⁻¹; repopulation "no more than about 0.7 Gy/day"; mucosal Tk 7 d from biopsy cell counts |
+| Meade_2014_chemo_mucosal_tolerance.pdf | Meade S, et al. Tumour Biol. 2014;35:2017-2023 | 24104502 | 10.1007/s13277-013-1267-0 | Fowler ceiling 61 + 0.792(T − 7) with 46 d for 35 fx; cisplatin 300 mg/m² adds 4.4 Gy10, scaled by dose given |
+| Madhava_2006_carboplatin_hypofractionation.pdf | Madhava K, et al. Clin Oncol. 2006;18:77-81 | 16477924 | 10.1016/j.clon.2005.08.014 | 55 Gy/20 fx + carboplatin: grade 3 mucositis 16/19 (84%) |
+| Miller_2026_hypofractionation_cohort.pdf | Miller D, et al. Clin Oncol. 2026;59:104332 | 42759386 | 10.1016/j.clon.2026.104332 | Real-world 55 Gy/20 fx, no chemotherapy: grade 3 mucositis 64% (72/113) at end of treatment |
+| Kirkpatrick_2010_QUANTEC_spinal_cord.pdf | Kirkpatrick JP, et al. Int J Radiat Oncol Biol Phys. 2010;76(3 Suppl):S42-S49 | 20171517 | 10.1016/j.ijrobp.2009.04.095 | Cord α/β 0.87 Gy (0.54-1.19); 50/60/69 Gy in 2-Gy fractions give 0.2/6/50% myelopathy |

@@ -13,3 +13,7 @@
 | What it moves | BED_DD for every regimen when tumor α/β ≠ 10 Gy. Example: 35 × 2 Gy at α/β = 5 Gy goes from 73.80 to 79.00 Gy. Version 1 values at α/β = 10 Gy are reproduced to a relative difference below 1e-8. |
 
 Other changes in version 2 (new features, review fixes, and decisions) are recorded in `docs/development/2026_10_18_code_review.md`.
+
+## 2026-10-18 (later): records only, no code change
+
+**Changes published numbers:** no. The app code is unchanged. This entry adds the planning record: `docs/development/2026_10_18_handoff.md` (start here), `docs/development/2026_10_18_fix_plan.md` (the external-review verification, work packages and decisions D1–D18), and `docs/development/2026_10_18_dd_parameters/` (DD parameter analysis and grid search). Fixes from that plan will get their own rows when they land.
