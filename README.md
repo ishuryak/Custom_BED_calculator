@@ -10,7 +10,7 @@ It also screens shorter, hypofractionated regimens against a comparison regimen 
 
 It is a research tool for hypothesis generation, not for treatment decisions.
 
-**Not deployed.** Version 2.6 is on branch `v2-toxicity-hypofractionation` and has not been published to shinyapps.io.
+**Live:** https://ishuryak.shinyapps.io/custom_bed_calculator_v2/ (version 2.6.0, code `cd5d835`, deployed 2026-10-19 with `Rscript tools/deploy.R`, a separate app from version 1). The live site was checked in a headless browser after deployment: version 2.6, default candidate rows 29 × 2.25, 28 × 2.30 and 30 × 2.20 Gy, agreement 15 of 15, no output errors on any tab.
 
 **Version 1 warning.** Version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/, branch `main`) is unchanged and still carries the DD calibration error described below. Do not use version 1 DD results computed at a tumor α/β other than 10 Gy.
 
@@ -22,7 +22,7 @@ It is a research tool for hypothesis generation, not for treatment decisions.
 - `about.md`: the "Model and sources" page.
 - `tests/testthat/`: tests of the formulas against an independent implementation and published values, of the server logic, and of the export round trip.
 - `run_app.bat`: double-click launcher for Windows. It uses `RSCRIPT` if set, else Rscript on the PATH, else the newest R under Program Files, and starts `tools/launch.R`, which uses the release library when it has been restored.
-- `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`.
+- `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`, `deploy.R` (publishes to shinyapps.io as `custom_bed_calculator_v2` only; refuses the version 1 name).
 - `.rscignore`: keeps `References/`, `tests/` and `docs/` out of a shinyapps.io deployment.
 - `docs/FIXES.md`: one row per landed change, with its evidence.
 - `docs/development/`: review records and plans. Start with `2026_10_19_v26_review_response.md`.
