@@ -1,4 +1,4 @@
-# Custom BED calculator, version 2
+# Custom BED calculator, version 2.1
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC). It computes three biologically effective doses (BEDs):
 
@@ -6,19 +6,25 @@ R Shiny app for head and neck squamous cell carcinoma (HNSCC). It computes three
 - early (acute mucosal) toxicity BED
 - late toxicity BED.
 
-It also lists shorter, hypofractionated regimens whose tumor BED gain over a reference regimen (default 35 × 2 Gy in 47 days) meets a chosen minimum under the DI or DD model, while early and late toxicity BED stay within chosen limits. Published regimens (the HYPNO trial arms) are shown for comparison.
+It also screens shorter, hypofractionated regimens against a comparison regimen (default 35 × 2 Gy in 47 days, or either HYPNO arm): the tumor BED change must meet a chosen minimum, which may be negative as a non-inferiority margin, under the DI or DD model, while early and late toxicity BED stay within chosen limits. A sensitivity tab shows the tumor BED difference across tumor parameter sets. Results download as a ZIP with a scenario file that reruns the search.
 
-Version 1 is unchanged: https://ishuryak.shinyapps.io/custom_bed_calculator/ (repo `ishuryak/Custom_BED_calculator`).
+It is a research tool for hypothesis generation, not for treatment decisions.
+
+**Not deployed.** Version 2.1 is on branch `v2-toxicity-hypofractionation` and has not been published to shinyapps.io.
+
+**Version 1 warning.** Version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/, branch `main`) is unchanged and still carries the DD calibration error described below. Do not use version 1 DD results computed at a tumor α/β other than 10 Gy.
 
 ## Files
 
 - `R/bed_models.R`: all formulas, as plain functions.
+- `R/export.R`: the scenario file and ZIP export, and `rerun_scenario()`.
 - `app.R`: the user interface.
 - `about.md`: the "Model and sources" page.
-- `tests/testthat/`: tests of the formulas against an independent implementation, and of the server logic.
+- `tests/testthat/`: tests of the formulas against an independent implementation and published values, of the server logic, and of the export round trip.
 - `run_app.bat`: double-click launcher for Windows.
 - `.rscignore`: keeps `References/`, `tests/` and `docs/` out of a shinyapps.io deployment.
-- `docs/development/`: review records.
+- `docs/FIXES.md`: one row per landed change, with its evidence.
+- `docs/development/`: review records and plans. Start with `2026_10_18_synthesis_plan.md`.
 - `References/`: sources, with `References/README.md` giving each one's license and the quoted parameter values. Paywalled or non-redistributable PDFs are git-ignored.
 
 ## Run locally
@@ -28,8 +34,18 @@ shiny::runApp("path/to/Custom_BED_calculator_v2")
 testthat::test_dir("tests/testthat")
 ```
 
+## Changes in version 2.1
+
+- **Acute BED on Fowler's clock.** Fowler's acute parameters and tolerance zone count elapsed days. Acute BEDs are now 0.79 Gy₁₀ higher than in version 2.0 (35 × 2 Gy: 53.1 instead of 52.3), which makes the fixed Fowler limit stricter. Comparisons with a reference beyond the onset day do not change.
+- **Fixed DD calibration anchor.** The DD model is calibrated at an anchor regimen (default 35 × 2 Gy, 47 days) that no longer moves with the comparison regimen. The old coupling is available as a labeled legacy option.
+- **Presets** set every value their source gives: version 1 defaults, Withers (follows the tumor α/β), Hartley 2011, the HYHOPE protocol, and scenario D18. Defaults are unchanged.
+- **Search:** blocks a model whose comparison BED is negative, shows which model credits each row, flags fraction sizes above 3.1 Gy, allows a negative minimum change, and offers HYPNO 55 Gy/20 fractions as an acute and as a late limit. Default maximum dose per fraction 5 Gy.
+- Optional background growth g, late BED at α/β 2 and 4 Gy, HYHOPE benchmark row, ZIP export with a rerunnable scenario, Sensitivity tab.
+
+Details and evidence: `docs/FIXES.md`.
+
 ## Change from version 1
 
-Version 1 calibrates the DD model so that the DD and DI tumor BEDs are equal for 35 × 2 Gy in 47 days, but hard-codes that regimen's value at a tumor α/β of 10 Gy. At any other α/β the calibration is wrong. For example, at α/β = 5 Gy the DD tumor BED is 73.8 Gy instead of 79.0 Gy. Version 2 recalculates the calibration for any α/β and any reference regimen. At α/β = 10 Gy the two versions agree to a relative difference below 1e-8. Version 2 also marks the DD model as unavailable when no calibration with a repopulation onset after the start of treatment exists, instead of showing a meaningless number.
+Version 1 calibrates the DD model so that the DD and DI tumor BEDs are equal for 35 × 2 Gy in 47 days, but hard-codes that regimen's value at a tumor α/β of 10 Gy. At any other α/β the calibration is wrong. For example, at α/β = 5 Gy the DD tumor BED is 73.8 Gy instead of 79.0 Gy. Version 2 recalculates the calibration for any α/β. At α/β = 10 Gy the two versions agree to a relative difference below 1e-8 for tumor BED. Version 2 also marks the DD model as unavailable when no calibration with a repopulation onset after the start of treatment exists, instead of showing a meaningless number.
 
 Igor Shuryak, MD, PhD, is144@cumc.columbia.edu
