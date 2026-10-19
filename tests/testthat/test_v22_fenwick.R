@@ -5,7 +5,7 @@
 models_file <- Sys.getenv("BED_MODELS_FILE",
                           testthat::test_path("..", "..", "R", "bed_models.R"))
 source(models_file, local = TRUE)
-p <- default_params()
+p <- legacy_params()   # version 1 tumor values (pinned results)
 std <- list(m = 35, d = 2, T = 47)
 
 test_that("Fenwick boundary reproduces the published formula and its domain", {

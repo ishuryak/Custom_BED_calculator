@@ -9,7 +9,7 @@ source(models_file, local = TRUE)
 export_file <- testthat::test_path("..", "..", "R", "export.R")
 if (file.exists(export_file)) source(export_file, local = TRUE)
 
-p <- default_params()
+p <- legacy_params()   # version 1 tumor values (pinned results)
 std <- list(m = 35, d = 2, T = 47)
 anchor_fn <- function() if (exists("default_anchor")) default_anchor() else std
 

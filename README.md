@@ -1,4 +1,4 @@
-# Custom BED calculator, version 2.2
+# Custom BED calculator, version 2.3
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC). It computes three biologically effective doses (BEDs):
 
@@ -10,7 +10,7 @@ It also screens shorter, hypofractionated regimens against a comparison regimen 
 
 It is a research tool for hypothesis generation, not for treatment decisions.
 
-**Not deployed.** Version 2.2 is on branch `v2-toxicity-hypofractionation` and has not been published to shinyapps.io.
+**Not deployed.** Version 2.3 is on branch `v2-toxicity-hypofractionation` and has not been published to shinyapps.io.
 
 **Version 1 warning.** Version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/, branch `main`) is unchanged and still carries the DD calibration error described below. Do not use version 1 DD results computed at a tumor α/β other than 10 Gy.
 
@@ -33,6 +33,10 @@ It is a research tool for hypothesis generation, not for treatment decisions.
 shiny::runApp("path/to/Custom_BED_calculator_v2")
 testthat::test_dir("tests/testthat")
 ```
+
+## Changes in version 2.3
+
+- **New defaults (Igor Shuryak, 2026-10-19):** tumor scenario D18 (α 0.35 Gy⁻¹, α/β 10 Gy, DI rate 0.23/day, DD maximum rate 0.40/day, onset day 28) and the acute BED of HYPNO 55 Gy/20 fractions as the early-toxicity limit. The version 1 tumor values stay available as a preset. Default results change: see `docs/FIXES.md`.
 
 ## Changes in version 2.2
 

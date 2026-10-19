@@ -55,3 +55,15 @@ Verification: `testthat::test_dir("tests/testthat")`, Windows R 4.5.1, 2026-10-1
 | F1. Fenwick 2008 boundary | Not available | Fix plan D11 | `test_v22_fenwick.R` (published-formula values 98.574, 74.169, 70.203 Gy₁₀; 20 × 2.9 Gy above, 55/20 below), `test_app_server.R::Fenwick acute limit reaches the search and the Results tab` | New option; default unchanged |
 | C1. CI | No automated test run on push | Not applicable | `.github/workflows/tests.yml` (test only, never deploys) | Nothing in the app |
 | D1. Text | HYHOPE acute BEDs (51.3, 51.4) are on the protocol's inclusive clock, not the app's; DD smoothing range unstated; archived `dd_floor.R` uses the inclusive acute clock | Review | `about.md`, `ERRATA.md` | Text only |
+
+## 2026-10-19: version 2.3 (new defaults)
+
+**Changes published numbers: yes, all default results.** Decision by Igor Shuryak on 2026-10-19: default tumor parameters become scenario D18, and the default early-toxicity limit becomes the acute BED of HYPNO 55 Gy/20 fractions. With the default regimen (20 × 2.65 Gy, 26 days) against 35 × 2 Gy: tumor BED DI 67.04 vs 71.51 (was 67.04 vs 65.00), DD 60.45 vs 71.51 (was 56.01 vs 65.00). Default search: 3 rows (was 7), led by 29 × 2.25 Gy in 39 days, ΔDI +1.19, ΔDD −2.41, early limit 55.87 Gy₁₀ (was 53.11). Nothing is deployed.
+
+| Item | Record |
+|---|---|
+| What changed | `default_params()` tumor values α 0.35, α/β 10, λ_DI 0.23, λ_DD 0.40, Tk 28 (were 0.2, 10, 0.2, 0.5, 28). `DEFAULT_EARLY_MODE = "hypno"`, `DEFAULT_PRESET = "d18"`. The interface reads its starting values from `default_params()`. Version 1 values: `legacy_params()` and the "Calculator defaults (version 1)" preset. Tests that pin version 1 results now use `legacy_params()` explicitly. |
+| Proof of the previous state | At `a82d8a6`, `default_params()$alpha` was 0.2 and the search tab opened on the comparison-relative acute limit. |
+| Tests | `tests/testthat/test_v23_defaults.R` (defaults equal D18; the default search uses the 55.866 Gy₁₀ HYPNO limit and returns 3 rows led by 29 × 2.25 Gy; the rendered interface starts at α 0.35, λ_DI 0.23, λ_DD 0.40, preset D18, HYPNO limit checked). All three failed at `a82d8a6`. |
+| Verification | Full suite, Windows R 4.5.1, 2026-10-19: 1474 passed, 0 failed, plus 2 package-version warnings. Headless browser: a fresh page shows preset D18, α 0.35, HYPNO limit selected, and the same 3 rows. |
+| What it moves | Every default number on the Results and Candidate tabs. The model page explains the HYPNO limit and its limits, and that D18's DD values conflict with HYPNO's result. |

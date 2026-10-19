@@ -80,3 +80,7 @@ Every step: tests written first and observed failing on the pre-change code (`6f
 | A4 | Default d_max 5 Gy (was 8). Rows above 3.1 Gy flagged | One UI default |
 | A5 | Export is a ZIP | `downloadHandler` |
 | A6 | Default anchor 35 × 2 Gy / 47 d. Legacy coupling available | Anchor panel |
+
+## Decision, 2026-10-19
+
+Igor Shuryak chose scenario D18 as the default tumor parameter set and the HYPNO 55 Gy/20 fractions acute BED as the default early-toxicity limit. This supersedes A1 (defaults stay at version 1) and the acute half of A2. The late limit default stays relative to the comparison regimen. Analysis behind the choice (search results under D18 with relaxed limits): D18 with +2 Gy early and late allowances gives no regimen with a tumor BED gain; acute toxicity binds in every row and late BED never does. With the HYPNO acute limit, 3 regimens gain at least 1 Gy₁₀ under DI and none under DD.

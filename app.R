@@ -56,9 +56,11 @@ COMPARATOR_LABELS <- c(
   "HYPNO test arm: 55 Gy in 20 fractions (26 days)" = "hypno_test",
   "HYPNO control arm: 66 Gy in 33 fractions, 6 fractions/week (38 days)" = "hypno_control")
 
+DEF <- default_params()
+
 ui <- page_sidebar(
   fillable = FALSE,
-  title = "Biologically effective dose (BED) calculator for head and neck squamous cell carcinoma (HNSCC), version 2.2",
+  title = "Biologically effective dose (BED) calculator for head and neck squamous cell carcinoma (HNSCC), version 2.3",
   theme = bs_theme(version = 5, bootswatch = "flatly"),
   sidebar = sidebar(
     width = 360,
@@ -83,13 +85,13 @@ ui <- page_sidebar(
         helpText("All differences and toxicity limits are relative to this regimen.",
                  "It does not change the DD model, which is calibrated at the anchor below.")),
       accordion_panel("Tumor (DI and DD models)",
-        selectInput("preset", "Parameter preset", PRESET_LABELS),
-        num("alpha", "α, tumor cell killing (1/Gy)", 0.2, 0.01, 2, 0.01),
-        num("ab", "α/β, tumor (Gy)", 10, 0.5, 100, 1),
-        num("lambda_di", "Repopulation rate, DI model (1/day)", 0.2, 0, 2, 0.01),
-        num("lambda_dd", "Maximum repopulation rate, DD model (1/day)", 0.5, 0, 5, 0.01),
-        num("Tk", "Onset of accelerated repopulation, DI model (days)", 28, 0, 100, 1),
-        num("g", "Background tumor growth rate g (1/day, 0 = off)", 0, 0, 0.1, 0.001),
+        selectInput("preset", "Parameter preset", PRESET_LABELS, selected = DEFAULT_PRESET),
+        num("alpha", "α, tumor cell killing (1/Gy)", DEF$alpha, 0.01, 2, 0.01),
+        num("ab", "α/β, tumor (Gy)", DEF$ab, 0.5, 100, 1),
+        num("lambda_di", "Repopulation rate, DI model (1/day)", DEF$lambda_di, 0, 2, 0.01),
+        num("lambda_dd", "Maximum repopulation rate, DD model (1/day)", DEF$lambda_dd, 0, 5, 0.01),
+        num("Tk", "Onset of accelerated repopulation, DI model (days)", DEF$Tk, 0, 100, 1),
+        num("g", "Background tumor growth rate g (1/day, 0 = off)", DEF$g, 0, 0.1, 0.001),
         uiOutput("tumor_note")),
       accordion_panel("DD calibration anchor",
         num("anchor_m", "Anchor number of fractions", 35, 2, 100, 1),
@@ -155,7 +157,8 @@ ui <- page_sidebar(
                      c("Comparison regimen, plus allowed excess" = "reference",
                        "Lower edge of the Fowler tolerance zone" = "fowler",
                        "Acute BED of HYPNO 55 Gy/20 fractions" = "hypno",
-                       "Fenwick et al. 2008 boundary (cell-kill BED, up to 50 days)" = "fenwick")),
+                       "Fenwick et al. 2008 boundary (cell-kill BED, up to 50 days)" = "fenwick"),
+                     selected = DEFAULT_EARLY_MODE),
         conditionalPanel("input.early_mode == 'reference'",
           num("tol_early", "Allowed early BED above the comparison (Gy)", 0, 0, 30, 0.5)),
         radioButtons("late_mode", "Late toxicity limit",

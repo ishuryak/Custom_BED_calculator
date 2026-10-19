@@ -8,7 +8,7 @@
 # All max(0, x) terms use the same smooth version as the v1 website,
 # log(1 + exp(3x)) / 3, so v1 and v2 agree at the v1 defaults.
 
-APP_VERSION <- "2.2.0"
+APP_VERSION <- "2.3.0"
 EQUATION_VERSION <- "2.2"  # 2.1 + optional Fenwick 2008 acute boundary
 
 SMOOTH_K <- 3  # sharpness (1/day) of the smooth max(0, x), as in v1
@@ -351,13 +351,21 @@ resolve_preset <- function(name, ab = 10) {
   pr
 }
 
-# Defaults: tumor values are the v1 website defaults; toxicity values are
-# literature defaults (see References/README.md).
+# Defaults (version 2.3, chosen by Igor Shuryak on 2026-10-19): tumor values
+# are scenario D18; toxicity values are literature defaults (see
+# References/README.md). The default early-toxicity limit is the acute BED of
+# HYPNO's 55 Gy in 20 fractions.
 default_params <- function() {
-  list(alpha = 0.2, ab = 10, lambda_di = 0.2, lambda_dd = 0.5, Tk = 28, g = 0,
+  list(alpha = 0.35, ab = 10, lambda_di = 0.23, lambda_dd = 0.40, Tk = 28, g = 0,
        ab_e = 10, alpha_e = 0.35, lambda_e = log(2) / 2.5, Tk_e = 7,
        clock_e = "elapsed", ab_l = 3)
 }
+
+# Version 1 tumor values with the same toxicity values (the "calculator" preset).
+legacy_params <- function() modifyList(default_params(), resolve_preset("calculator"))
+
+DEFAULT_EARLY_MODE <- "hypno"
+DEFAULT_PRESET <- "d18"
 
 default_ref <- function() list(m = 35, d = 2, T = 47)
 
