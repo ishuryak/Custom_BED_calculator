@@ -309,3 +309,21 @@ test_that("HYHOPE benchmark row and HYPNO context are shown", {
     expect_true(grepl("50.7%", output$hypno_note$html) && grepl("10-percentage-point", output$hypno_note$html))
   })
 })
+
+test_that("Fenwick acute limit reaches the search and the Results tab", {
+  shiny::testServer(app_dir, {
+    set_defaults(session, early_mode = "fenwick", min_gain = -20, tol_late = 30, d_max = 4)
+    expect_true(search_args()$fenwick)
+    expect_null(search_args()$early_cap)
+    s <- suggestions()
+    expect_gt(nrow(s), 0)
+    ck <- s$m * s$d * (1 + s$d / 10); lim <- 69.5 * (s$T / 32.2) / sin(s$T / 32.2) - 3.5
+    expect_true(all(ck <= lim + 1e-9))
+    expect_true(grepl("Fenwick", output$search_note$html))
+    expect_null(output$hypno_cap_note)
+    set_defaults(session, m = 20, d = 2.9)
+    expect_true(grepl("this regimen 74.8 vs 74.2 Gy\u2081\u2080, above", output$acute_zone$html, fixed = TRUE))
+    z <- read_zip(output$download)
+    expect_true(isTRUE(z$sc$search$fenwick) || identical(z$sc$search$fenwick, FALSE))
+  })
+})

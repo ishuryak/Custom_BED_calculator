@@ -90,7 +90,7 @@ test_that("a negative reference BED blocks that endpoint", {
   expect_equal(nrow(e), 0)
   expect_equal(attr(e, "reason"), "negative_reference_di")
   s <- suggest_regimens(q, std, anchor = std, tol_early = 10)
-  expect_false(any(s$qual_di))
+  expect_equal(nrow(s), 0)        # DD is infeasible here too, so nothing qualifies
 })
 
 test_that("search rows say which model credits them, and flag fraction sizes beyond precedent", {

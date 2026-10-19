@@ -58,7 +58,7 @@ COMPARATOR_LABELS <- c(
 
 ui <- page_sidebar(
   fillable = FALSE,
-  title = "Biologically effective dose (BED) calculator for head and neck squamous cell carcinoma (HNSCC), version 2.1",
+  title = "Biologically effective dose (BED) calculator for head and neck squamous cell carcinoma (HNSCC), version 2.2",
   theme = bs_theme(version = 5, bootswatch = "flatly"),
   sidebar = sidebar(
     width = 360,
@@ -154,7 +154,8 @@ ui <- page_sidebar(
         radioButtons("early_mode", "Early toxicity limit",
                      c("Comparison regimen, plus allowed excess" = "reference",
                        "Lower edge of the Fowler tolerance zone" = "fowler",
-                       "Acute BED of HYPNO 55 Gy/20 fractions" = "hypno")),
+                       "Acute BED of HYPNO 55 Gy/20 fractions" = "hypno",
+                       "Fenwick et al. 2008 boundary (cell-kill BED, up to 50 days)" = "fenwick")),
         conditionalPanel("input.early_mode == 'reference'",
           num("tol_early", "Allowed early BED above the comparison (Gy)", 0, 0, 30, 0.5)),
         radioButtons("late_mode", "Late toxicity limit",
@@ -203,7 +204,8 @@ server <- function(input, output, session) {
   last_ab <- reactiveVal(10)
   observeEvent(input$preset, {
     if (input$preset == "custom") return()
-    pr <- resolve_preset(input$preset, if (is.numeric(input$ab)) input$ab else 10)
+    ab <- input$ab
+    pr <- resolve_preset(input$preset, if (is.numeric(ab) && length(ab) == 1 && is.finite(ab)) ab else 10)
     for (k in intersect(names(pr), c("alpha", "ab", "lambda_di", "lambda_dd", "Tk")))
       updateNumericInput(session, k, value = pr[[k]])
   }, ignoreInit = TRUE)
@@ -211,7 +213,10 @@ server <- function(input, output, session) {
   # Show which preset the current tumor values match, or "custom".
   observeEvent(list(input$alpha, input$lambda_di, input$Tk, input$ab, input$lambda_dd), {
     ab <- input$ab
-    if (identical(input$preset, "withers") && is.numeric(ab) && is.finite(ab) &&
+    # While a field is being retyped it is empty (NA); keep the preset as it is.
+    vals <- c(input$alpha, input$lambda_di, input$Tk, ab)
+    if (length(vals) < 4 || any(!is.finite(vals))) return()
+    if (identical(input$preset, "withers") &&
         !isTRUE(all.equal(ab, last_ab()))) {
       last_ab(ab)
       updateNumericInput(session, "lambda_di", value = withers_lambda(input$alpha, ab))
@@ -391,7 +396,17 @@ server <- function(input, output, session) {
                    b$bed_early[1], u, b$bed_early[2], u)
     if (!fowler_defaults())
       txt <- paste(txt, "The zone applies only with Fowler's acute parameters (the defaults), which have been changed.")
-    tags$p(class = "text-muted", txt)
+    r <- regimen(); rf <- ref()
+    fw <- function(m, d, T) {
+      lim <- fenwick_limit(T)
+      if (is.na(lim)) return("outside its 50-day range")
+      ck <- fenwick_cell_kill(m, d)
+      sprintf("%.1f vs %.1f Gy₁₀, %s", ck, lim, if (ck <= lim + 1e-9) "below" else "above")
+    }
+    txt2 <- sprintf(paste("Fenwick et al. (2008) boundary on cell-kill BED (α/β 10 Gy, no repopulation",
+                          "term, chemotherapy not included): this regimen %s; comparison %s."),
+                    fw(r$m, r$d, r$T), fw(rf$m, rf$d, rf$T))
+    tagList(tags$p(class = "text-muted", txt), tags$p(class = "text-muted", txt2))
   })
 
   bench <- reactive({
@@ -440,7 +455,7 @@ server <- function(input, output, session) {
 
   output$hypno_cap_note <- renderUI({
     sr <- search(); rf <- ref()
-    if (isTRUE(sr$blocked) || identical(input$early_mode, "hypno")) return(NULL)
+    if (isTRUE(sr$blocked) || input$early_mode %in% c("hypno", "fenwick")) return(NULL)
     e <- hypno_caps()$early
     r0 <- compute_all(rf$m, rf$d, rf$T, params(), anchor())$bed_early
     cap <- if (is.null(sr$cap)) r0 + checked("tol_early") else sr$cap
@@ -462,12 +477,14 @@ server <- function(input, output, session) {
       hypno = hypno_caps()$early,
       NULL)
     late_cap <- if (late_mode == "hypno") hypno_caps()$late else NULL
+    fenwick <- identical(early_mode, "fenwick")
     list(m_range = input$m_range[1]:m_hi, d_step = as.numeric(input$d_step),
          d_max = checked("d_max"), criterion = input$criterion, rank_by = input$rank_by,
-         tol_early = if (is.null(cap)) checked("tol_early") else 0,
+         tol_early = if (is.null(cap) && !fenwick) checked("tol_early") else 0,
          tol_late = if (is.null(late_cap)) checked("tol_late") else 0,
          early_cap = cap, late_cap = late_cap,
-         min_gain = checked("min_gain"), min_days_saved = checked("min_days"))
+         min_gain = checked("min_gain"), min_days_saved = checked("min_days"),
+         fenwick = fenwick)
   })
 
   search <- reactive({
@@ -485,7 +502,8 @@ server <- function(input, output, session) {
   output$search_note <- renderUI({
     p <- params(); sr <- search()
     if (isTRUE(sr$blocked)) return(NULL)
-    early_txt <- if (is.null(sr$cap)) "early BED at most the comparison's plus the allowed excess" else
+    early_txt <- if (identical(input$early_mode, "fenwick")) "cell-kill BED (α/β 10 Gy) at or below the Fenwick et al. 2008 boundary for its overall time" else
+      if (is.null(sr$cap)) "early BED at most the comparison's plus the allowed excess" else
       if (input$early_mode == "hypno") sprintf("early BED at most %.1f Gy₁₀ (HYPNO 55 Gy/20 fractions)", sr$cap) else
       sprintf("early BED at most %g Gy₁₀ (Fowler zone, lower edge%s)", sr$cap,
               if (isTRUE(input$chemo)) ", with concurrent chemotherapy" else "")
@@ -521,10 +539,12 @@ server <- function(input, output, session) {
     if (identical(reason, "dd_unavailable"))
       return(msg("The DD model is unavailable with these parameters, so DD-based criteria and rankings",
                  "(including 'smaller of ΔDI and ΔDD') cannot be used."))
-    if (identical(reason, "negative_reference_di") || identical(reason, "negative_reference_dd"))
+    if (identical(reason, "negative_reference_di") || identical(reason, "negative_reference_dd") ||
+        identical(reason, "negative_reference_both"))
       return(msg("The comparison regimen's tumor BED is negative under the",
-                 if (reason == "negative_reference_di") "DI" else "DD",
-                 "model with these parameters, so that model cannot credit any regimen.",
+                 switch(reason, negative_reference_di = "DI model", negative_reference_dd = "DD model",
+                        negative_reference_both = "DI and DD models"),
+                 "with these parameters, so a negative model cannot credit any regimen.",
                  "Check the repopulation settings."))
     if (identical(reason, "negative_reference_early") || identical(reason, "negative_reference_late"))
       return(msg("The comparison regimen's toxicity BED is negative, so a limit relative to it is not meaningful.",

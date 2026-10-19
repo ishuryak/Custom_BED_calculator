@@ -33,11 +33,15 @@ scenario_json <- function(sc) {
   jsonlite::toJSON(sc, auto_unbox = TRUE, digits = NA, null = "null", pretty = TRUE)
 }
 
-# Deterministic ID from the scientific content (no dates, no software paths).
+# Deterministic ID from the fields that determine the search result only:
+# versions, hinge, clocks, parameters, comparison, anchor and search settings.
+# Interface context (preset label, regimen on the Results tab) is excluded.
+SCIENTIFIC_FIELDS <- c("schema_version", "equation_version", "hinge", "clocks",
+                       "params", "comparison", "anchor", "search")
 scenario_id <- function(sc) {
   f <- tempfile(fileext = ".json")
   on.exit(unlink(f))
-  writeLines(scenario_json(sc), f, useBytes = TRUE)
+  writeLines(scenario_json(sc[intersect(SCIENTIFIC_FIELDS, names(sc))]), f, useBytes = TRUE)
   substr(unname(tools::md5sum(f)), 1, 12)
 }
 
@@ -52,7 +56,8 @@ rerun_scenario <- function(sc) {
                    criterion = s$criterion, rank_by = s$rank_by,
                    tol_early = s$tol_early, tol_late = s$tol_late,
                    early_cap = nul(s$early_cap), late_cap = nul(s$late_cap),
-                   min_gain = s$min_gain, min_days_saved = s$min_days_saved)
+                   min_gain = s$min_gain, min_days_saved = s$min_days_saved,
+                   fenwick = isTRUE(s$fenwick))
 }
 
 export_readme <- function(sc, id) {
@@ -65,7 +70,9 @@ export_readme <- function(sc, id) {
     "Columns: m fractions, d Gy per fraction, T overall days (inclusive), bed_* absolute BEDs (Gy),",
     "d_* differences from the comparison regimen, d_min the smaller of d_di and d_dd,",
     "qual_di / qual_dd whether that model credits the regimen, beyond_precedent d > 3.1 Gy.",
-    "Empty cells (NA) mean 'not available', never zero.",
+    "Empty cells (NA) mean 'not available', never zero. A model whose comparison BED",
+    "is negative shows NA differences. If no regimen qualified, scenario.json gives the",
+    "reason under result$empty_reason (no value means the limits excluded every regimen).",
     "",
     "To rerun in R from the app folder:",
     "  source('R/bed_models.R'); source('R/export.R')",
@@ -78,6 +85,9 @@ export_readme <- function(sc, id) {
 write_export_zip <- function(file, sc, best, feasible) {
   id <- scenario_id(sc)
   sc$scenario_id <- id
+  sc$result <- list(rows_listed = nrow(best),
+                    rows_qualifying = if (is.null(feasible)) nrow(best) else nrow(feasible),
+                    empty_reason = attr(best, "reason"))
   sc$exported_at <- format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z")
   dir <- tempfile("bed_export_")
   dir.create(dir)

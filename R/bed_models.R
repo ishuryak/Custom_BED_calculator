@@ -8,8 +8,8 @@
 # All max(0, x) terms use the same smooth version as the v1 website,
 # log(1 + exp(3x)) / 3, so v1 and v2 agree at the v1 defaults.
 
-APP_VERSION <- "2.1.0"
-EQUATION_VERSION <- "2.1"  # softplus hinge, fixed DD anchor, Fowler elapsed clock, optional g
+APP_VERSION <- "2.2.0"
+EQUATION_VERSION <- "2.2"  # 2.1 + optional Fenwick 2008 acute boundary
 
 SMOOTH_K <- 3  # sharpness (1/day) of the smooth max(0, x), as in v1
 
@@ -19,6 +19,21 @@ SMOOTH_K <- 3  # sharpness (1/day) of the smooth max(0, x), as in v1
 # his elapsed-day clock.
 FOWLER_ZONE <- c(59, 61)
 FOWLER_CHEMO_REDUCTION <- c(3, 5)
+
+# Fenwick et al. 2008 acute tolerance boundary on cell-kill BED (Gy10, no
+# repopulation term): B(T) = 69.5 (T/32.2)/sin(T/32.2) - 3.5, T inclusive
+# days, valid for T <= 50 days. Cell-kill BED uses alpha/beta 10 Gy and, for
+# once-daily fractions, complete repair.
+FENWICK <- list(b0 = 69.5, tc = 32.2, shift = 3.5, t_max = 50, ab = 10)
+
+fenwick_limit <- function(T) {
+  x <- T / FENWICK$tc
+  out <- FENWICK$b0 * x / sin(x) - FENWICK$shift
+  out[!(T > 0 & T <= FENWICK$t_max)] <- NA_real_
+  out
+}
+
+fenwick_cell_kill <- function(m, d) bed_lq(m, d, FENWICK$ab)
 
 # Largest dose per fraction with curative precedent in the benchmark trials
 # (HYHOPE 46.5 Gy in 15 fractions). Larger fractions are flagged.
@@ -153,6 +168,7 @@ fowler_zone <- function(chemo = FALSE) {
 # A regimen is kept when
 #   early BED <= early_cap (default: comparison early BED + tol_early),
 #   late BED  <= late_cap  (default: comparison late BED + tol_late),
+#   or, with fenwick = TRUE, cell-kill BED <= fenwick_limit(T) instead,
 #   tumor BED change >= min_gain (negative = allowed loss) under the
 #   criterion "either" (DI or DD), "both", "di" or "dd".
 # A model whose comparison BED is negative or not finite cannot credit any
@@ -163,6 +179,7 @@ fowler_zone <- function(chemo = FALSE) {
 # All qualifying grid rows are attached as attribute "feasible".
 # Empty results carry attribute "reason":
 #   "dd_unavailable" / "negative_reference_di" / "negative_reference_dd" /
+#   "negative_reference_both" /
 #   "negative_reference_early" / "negative_reference_late": the criterion,
 #     ranking or toxicity limit needs a model that is unavailable;
 #   "empty_dose_range": no dose per fraction between the comparison dose and d_max;
@@ -171,7 +188,8 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
                              d_step = 0.05, d_max = 8,
                              criterion = "either", rank_by = "best",
                              tol_early = 0, tol_late = 0, early_cap = NULL,
-                             late_cap = NULL, min_gain = 0, min_days_saved = 1) {
+                             late_cap = NULL, min_gain = 0, min_days_saved = 1,
+                             fenwick = FALSE) {
   eps <- 1e-9
   out <- empty_suggestions()
   blocked <- function(reason) { attr(out, "reason") <- reason; out }
@@ -184,8 +202,8 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   if (cal$status == "infeasible" && needs_dd) return(blocked("dd_unavailable"))
   if (!dd_usable && needs_dd) return(blocked("negative_reference_dd"))
   if (!di_usable && needs_di) return(blocked("negative_reference_di"))
-  if (!di_usable && !dd_usable) return(blocked("negative_reference_di"))
-  if (is.null(early_cap) && !(is.finite(r0$bed_early) && r0$bed_early > 0))
+  if (!di_usable && !dd_usable) return(blocked("negative_reference_both"))
+  if (!fenwick && is.null(early_cap) && !(is.finite(r0$bed_early) && r0$bed_early > 0))
     return(blocked("negative_reference_early"))
   if (is.null(late_cap) && !(is.finite(r0$bed_late) && r0$bed_late > 0))
     return(blocked("negative_reference_late"))
@@ -212,24 +230,28 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
       either = a$qual_di | a$qual_dd, both = a$qual_di & a$qual_dd,
       di = a$qual_di, dd = a$qual_dd,
       stop("unknown criterion: ", criterion))
-    a$early_ok <- a$bed_early > 0 & a$bed_early <= cap_early + eps
+    a$early_ok <- if (fenwick) {
+      lim <- fenwick_limit(T)
+      !is.na(lim) & fenwick_cell_kill(m, d) <= lim + eps
+    } else a$bed_early > 0 & a$bed_early <= cap_early + eps
     a$late_ok <- a$bed_late <= cap_late + eps
     a
   }
   a <- evaluate(g$m, g$d, g$T)
   a <- a[a$tumor_ok & a$early_ok & a$late_ok, , drop = FALSE]
   if (nrow(a) == 0) return(out)
+  # A model that is not usable shows no difference at all (NA, not a number).
+  if (!di_usable) a$d_di <- NA_real_
+  if (!dd_usable) a$d_dd <- NA_real_
 
   # A model that is not usable does not enter the score.
-  sdi <- if (di_usable) a$d_di else NA_real_
-  sdd <- if (dd_usable) a$d_dd else NA_real_
   a$score <- switch(rank_by,
-    best = pmax(sdi, sdd, na.rm = TRUE),
-    worst = pmin(sdi, sdd, na.rm = TRUE),
+    best = pmax(a$d_di, a$d_dd, na.rm = TRUE),
+    worst = pmin(a$d_di, a$d_dd, na.rm = TRUE),
     di = a$d_di,
     dd = a$d_dd,
     stop("unknown rank_by: ", rank_by))
-  a$d_min <- pmin(a$d_di, a$d_dd)
+  a$d_min <- pmin(a$d_di, a$d_dd, na.rm = TRUE)
   a$credited_by <- ifelse(a$qual_di & a$qual_dd, "DI and DD",
                           ifelse(a$qual_di, "DI only", "DD only"))
   a$beyond_precedent <- a$d > PRECEDENT_MAX_D + eps
