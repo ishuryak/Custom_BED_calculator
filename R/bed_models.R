@@ -8,7 +8,7 @@
 # All max(0, x) terms use the same smooth version as the v1 website,
 # log(1 + exp(3x)) / 3, so v1 and v2 agree at the v1 defaults.
 
-APP_VERSION <- "2.3.0"
+APP_VERSION <- "2.4.0"
 EQUATION_VERSION <- "2.2"  # 2.1 + optional Fenwick 2008 acute boundary
 
 SMOOTH_K <- 3  # sharpness (1/day) of the smooth max(0, x), as in v1
@@ -412,4 +412,35 @@ sensitivity_table <- function(reg, ref, anchor, p, ab_values = c(7, 10, 15)) {
       stringsAsFactors = FALSE)
   }
   do.call(rbind, rows)
+}
+
+# Two-model agreement: regimens whose tumor BED change from the comparison is
+# at least `margin` under BOTH models with the current parameters (ranked by
+# the smaller change), plus how robust that is over the sensitivity
+# scenarios (tumor presets x ab_values): ranges of each model's change and
+# the number of scenarios in which both changes are at least `margin`.
+# dd_onset is the DD repopulation onset day of the regimen with the current
+# parameters; before_di_onset says whether the course ends before the DI
+# onset (then DI credits no saved repopulation for shortening it).
+# `...` passes toxicity limits and the search grid to suggest_regimens().
+agreement_regimens <- function(p, ref, anchor, margin = -3, ab_values = c(7, 10, 15), ...) {
+  s <- suggest_regimens(p, ref, anchor = anchor, criterion = "both", rank_by = "worst",
+                        min_gain = margin, ...)
+  if (nrow(s) == 0) return(s)
+  s <- s[order(s$m), , drop = FALSE]
+  cal <- dd_calibration(anchor, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk)
+  s$dd_onset <- dd_onset_rate(s$m, s$d, s$T, p$alpha, p$ab, p$lambda_dd, cal$c_over_alpha)$onset
+  s$before_di_onset <- s$T < p$Tk
+  rob <- lapply(seq_len(nrow(s)), function(i) {
+    st <- sensitivity_table(list(m = s$m[i], d = s$d[i], T = s$T[i]), ref, anchor, p, ab_values)
+    ok <- !is.na(st$d_dd)
+    data.frame(d_di_min = min(st$d_di), d_di_max = max(st$d_di),
+               d_dd_min = if (any(ok)) min(st$d_dd[ok]) else NA_real_,
+               d_dd_max = if (any(ok)) max(st$d_dd[ok]) else NA_real_,
+               n_both_within = sum(ok & st$d_di >= margin - 1e-9 & st$d_dd >= margin - 1e-9),
+               n_scenarios = nrow(st))
+  })
+  s <- cbind(s, do.call(rbind, rob))
+  rownames(s) <- NULL
+  s
 }

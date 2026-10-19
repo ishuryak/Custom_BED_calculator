@@ -67,3 +67,15 @@ Verification: `testthat::test_dir("tests/testthat")`, Windows R 4.5.1, 2026-10-1
 | Tests | `tests/testthat/test_v23_defaults.R` (defaults equal D18; the default search uses the 55.866 Gy₁₀ HYPNO limit and returns 3 rows led by 29 × 2.25 Gy; the rendered interface starts at α 0.35, λ_DI 0.23, λ_DD 0.40, preset D18, HYPNO limit checked). All three failed at `a82d8a6`. |
 | Verification | Full suite, Windows R 4.5.1, 2026-10-19: 1474 passed, 0 failed, plus 2 package-version warnings. Headless browser: a fresh page shows preset D18, α 0.35, HYPNO limit selected, and the same 3 rows. |
 | What it moves | Every default number on the Results and Candidate tabs. The model page explains the HYPNO limit and its limits, and that D18's DD values conflict with HYPNO's result. |
+
+## 2026-10-19: version 2.4 (two-model agreement tab)
+
+**Changes published numbers: no.** A new tab only; existing tabs and defaults are unchanged. Nothing is deployed.
+
+| Item | Record |
+|---|---|
+| What was missing | No view of regimens that both tumor models support against an evidence-based comparison (HYPNO 55/20), or of how robust that is over parameter scenarios. Requested by Igor Shuryak, 2026-10-19, after the analysis in this session. |
+| What it does | `agreement_regimens()` in `R/bed_models.R` runs the search with both models required (ranked by the smaller change) at a margin, then adds each model's range over the 15 sensitivity scenarios, the count of scenarios in which both meet the margin, the DD onset day and whether the course ends before the DI onset. Tab "Model agreement" in `app.R`, defaults: HYPNO 55/20, margin −3 Gy₁₀, at least 1 day saved, toxicity limits from the candidate tab. |
+| Tests | `tests/testthat/test_v24_agreement.R` (rows 17 × 3.05, 18 × 2.90, 19 × 2.80 Gy with ΔDI −2.460, −2.786, −2.028 and ΔDD −1.590, −1.961, −1.477 Gy₁₀ and DD onsets 14.28, 14.97, 15.42 days from an independent Python implementation; 15 of 15 scenarios; none at margin 0; counts need both models; long courses do not end before the DI onset), `test_app_server.R::model agreement tab lists the regimens both models support against HYPNO`. All failed before the function existed. Four mutations (either model instead of both, count ignoring DD, wrong DI-onset flag, tab ignoring the days input) are each caught. |
+| Verification | Full suite, Windows R 4.5.1, 2026-10-19: 1502 passed, 0 failed, plus 2 package-version warnings. Headless browser: on a fresh page the tab shows the three regimens with "15 of 15". |
+| What it moves | Nothing on existing tabs. |

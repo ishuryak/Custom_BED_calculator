@@ -65,6 +65,22 @@ It is evaluated at the prescription dose per fraction, not at the dose to indivi
 
 With the defaults (scenario D18 and the HYPNO acute limit), three regimens gain at least 1 Gy₁₀ under the DI model, led by 29 × 2.25 Gy in 39 days (ΔDI +1.2, ΔDD −2.4 Gy₁₀). None gains under the DD model. A shorter course at HYPNO's acute BED gives less tumor BED than 35 × 2 Gy under both models, so a non-inferiority margin (a negative minimum change) is the natural setting for hypofractionation questions. The list depends strongly on the tumor repopulation settings. An empty list is a result, not an error.
 
+### Two-model agreement
+
+The tab "Model agreement" lists regimens that both tumor models support: the tumor BED change from the comparison regimen is at least a chosen margin under DI and under DD, within the toxicity limits chosen on the candidate tab. By default the comparison is HYPNO's 55 Gy in 20 fractions, the margin is −3 Gy₁₀ and at least one day must be saved. A toxicity limit set relative to the comparison then means "no higher than HYPNO", for late BED as well as early.
+
+For each regimen the tab shows:
+
+- ΔBED under each model with the current parameters, and the range of each over the 15 scenarios of the Sensitivity tab (five tumor presets, tumor α/β 7, 10 and 15 Gy)
+- in how many scenarios both changes meet the margin (the toxicity limits do not depend on the tumor scenario)
+- the DD repopulation onset day, and whether the course ends before the DI onset.
+
+The last two explain why the models agree or differ. A course that ends before the DI onset gets no DI credit for being shortened further, so under DI a shorter course at the same acute BED can only lose dose. Under DD, repopulation in short courses starts around days 14–16, so shortening saves part of it and the DD loss is smaller.
+
+With the defaults, three regimens qualify: 17 × 3.05 Gy (23 days), 18 × 2.90 Gy (24 days) and 19 × 2.80 Gy (25 days). Both models predict a loss of 1.5–2.8 Gy₁₀ against HYPNO, and both changes stay within −3 Gy₁₀ in all 15 scenarios. No regimen is supported by both models without a loss. 17 × 3.05 Gy sits at HYPNO's acute BED (55.8 vs 55.9 Gy₁₀).
+
+How to read it: agreement here is not two independent confirmations, because the models share α and the DD model is calibrated to the DI model at the anchor. A loss of 1.5–3 Gy₁₀ is within the parameter uncertainty, so these regimens are best described as close to HYPNO in tumor effect, possibly slightly lower, and 1–3 days shorter. Whether such a loss is acceptable depends on a margin in percentage points of locoregional control, which needs a dose-response relation this calculator does not provide.
+
 ### Calculation details
 
 - **Smooth threshold.** Every $\max(0, x)$ is computed as $\ln(1 + e^{3x})/3$, as in the original calculator. This differs from the sharp threshold by less than $\ln 2/3$ = 0.231 days. It changes a BED by at most about 0.23 days times the daily repopulation loss ($\lambda/\alpha$ Gy per day), most when the overall time is close to the onset time: with the defaults, at most 0.23 Gy for the DI BED and 0.18 Gy for the early BED. For the DD BED it is up to about 0.3 Gy with the defaults over the default search range (up to 5 Gy per fraction) and 0.4 Gy up to 8 Gy, and larger with a small $\alpha$ or a large $\lambda_{DD}$. The threshold type is recorded in every export.
@@ -136,6 +152,6 @@ With the defaults (scenario D18 and the HYPNO acute limit), three regimens gain 
 
 ### Version
 
-Version 2.3 of the Custom BED calculator. Version 1 remains available at https://ishuryak.shinyapps.io/custom_bed_calculator/. It still carries a calibration error at tumor α/β other than 10 Gy (at α/β 5 Gy, 35 × 2 Gy gives a DD BED of 73.8 Gy instead of 79.0).
+Version 2.4 of the Custom BED calculator. Version 1 remains available at https://ishuryak.shinyapps.io/custom_bed_calculator/. It still carries a calibration error at tumor α/β other than 10 Gy (at α/β 5 Gy, 35 × 2 Gy gives a DD BED of 73.8 Gy instead of 79.0).
 
 Igor Shuryak, MD, PhD, is144@cumc.columbia.edu

@@ -37,7 +37,9 @@ LIMITS <- list(
   tol_late = list("Allowed late BED above the comparison", 0, 30, FALSE),
   min_gain = list("Minimum tumor BED change", -20, 30, FALSE),
   min_days = list("Minimum days saved", 1, 140, TRUE),
-  d_max = list("Highest dose per fraction searched", 2, 30, FALSE))
+  d_max = list("Highest dose per fraction searched", 2, 30, FALSE),
+  agree_margin = list("Margin for both models", -20, 30, FALSE),
+  agree_days = list("Minimum days saved (agreement)", 1, 140, TRUE))
 
 PRESET_LABELS <- c(
   "Calculator defaults (version 1)" = "calculator",
@@ -60,7 +62,7 @@ DEF <- default_params()
 
 ui <- page_sidebar(
   fillable = FALSE,
-  title = "Biologically effective dose (BED) calculator for head and neck squamous cell carcinoma (HNSCC), version 2.3",
+  title = "Biologically effective dose (BED) calculator for head and neck squamous cell carcinoma (HNSCC), version 2.4",
   theme = bs_theme(version = 5, bootswatch = "flatly"),
   sidebar = sidebar(
     width = 360,
@@ -173,6 +175,22 @@ ui <- page_sidebar(
       br(),
       downloadButton("download", "Download results and scenario (ZIP)"),
       plotOutput("suggest_plot", height = "380px")),
+    nav_panel("Model agreement",
+      helpText("Regimens that both tumor models support: the tumor BED change from the comparison",
+               "is at least the margin under DI and under DD, with the toxicity limits chosen on the",
+               "candidate tab. Each row also shows how the two changes vary over the 15 scenarios of the",
+               "Sensitivity tab, and why the models agree or differ. The two models share α and DD is",
+               "calibrated to DI at the anchor, so their agreement is not two independent confirmations."),
+      layout_columns(
+        col_widths = c(4, 4, 4),
+        selectInput("agree_cmp", "Compare with",
+                    c("HYPNO test arm: 55 Gy in 20 fractions (26 days)" = "hypno_test",
+                      "The comparison regimen in the sidebar" = "sidebar")),
+        num("agree_margin", "Margin for both models (Gy; negative = allowed loss)", -3, -20, 30, 0.5),
+        num("agree_days", "Minimum days saved", 1, 1, 140, 1)),
+      uiOutput("agree_note"),
+      uiOutput("agree_msg"),
+      tableOutput("agree_table")),
     nav_panel("Sensitivity",
       helpText("Tumor BED of the regimen being evaluated minus the comparison regimen, under",
                "each tumor preset and three tumor α/β values. These are selected scenarios,",
@@ -616,6 +634,61 @@ server <- function(input, output, session) {
       theme_minimal(base_size = 15) +
       theme(axis.title = element_text(face = "bold"), legend.position = "top")
   })
+
+  agree_ref <- reactive({
+    if (identical(input$agree_cmp, "sidebar")) { r <- ref(); return(list(m = r$m, d = r$d, T = r$T)) }
+    r <- comparator_presets()$hypno_test
+    list(m = r$m, d = r$d, T = r$T)
+  })
+
+  agreement <- reactive({
+    validate(need(!(input$early_mode == "fowler" && !fowler_defaults()),
+                  "The Fowler limit needs Fowler's acute parameters. Restore them or choose another early limit."))
+    rf <- agree_ref(); args <- search_args()
+    validate(need(rf$m > 1, "The comparison needs at least 2 fractions."))
+    args$m_range <- 1:(rf$m - 1)
+    args$min_days_saved <- checked("agree_days")
+    args$min_gain <- NULL; args$criterion <- NULL; args$rank_by <- NULL
+    do.call(agreement_regimens, c(list(p = params(), ref = rf, anchor = anchor(),
+                                       margin = checked("agree_margin")), args))
+  })
+
+  output$agree_note <- renderUI({
+    rf <- agree_ref(); p <- params()
+    helpText(sprintf(paste("Comparison: %d × %g Gy in %g days. Toxicity limits: as chosen on the candidate tab",
+                           "(an early or late limit relative to the comparison is now relative to this regimen).",
+                           "DI repopulation starts on day %g; a course that ends earlier gets no DI credit for being",
+                           "shortened further, so under DI it can only lose dose. Under DD, repopulation starts at",
+                           "the day shown, so shortening saves some of it."),
+                     rf$m, rf$d, rf$T, p$Tk))
+  })
+
+  output$agree_msg <- renderUI({
+    a <- agreement()
+    if (nrow(a) > 0) return(NULL)
+    reason <- attr(a, "reason")
+    div(class = "alert alert-info",
+        if (!is.null(reason)) paste0("No search was possible (", reason, "). See the candidate tab for the explanation.") else
+          paste("No regimen meets the margin under both models within the toxicity limits.",
+                "Try a more negative margin, fewer days saved, or another toxicity limit."))
+  })
+
+  output$agree_table <- renderTable({
+    a <- agreement()
+    validate(need(nrow(a) > 0, ""))
+    mg <- checked("agree_margin")
+    rng <- function(lo, hi) ifelse(is.na(lo), "not available", sprintf("%+.2f to %+.2f", lo, hi))
+    data.frame(Fractions = sprintf("%d", a$m), `Gy per fraction` = sprintf("%.2f", a$d),
+               Days = sprintf("%g", a$T), `Total Gy` = sprintf("%.2f", a$total_dose),
+               `Δ BED DI` = fmt(a$d_di, TRUE), `Δ BED DD` = fmt(a$d_dd, TRUE),
+               `Δ DI over scenarios` = rng(a$d_di_min, a$d_di_max),
+               `Δ DD over scenarios` = rng(a$d_dd_min, a$d_dd_max),
+               `Scenarios with both ≥ margin` = sprintf("%d of %d", a$n_both_within, a$n_scenarios),
+               `DD onset (day)` = sprintf("%.1f", a$dd_onset),
+               `Ends before DI onset` = ifelse(a$before_di_onset, "yes", "no"),
+               `Early BED` = sprintf("%.2f", a$bed_early), `Late BED` = sprintf("%.2f", a$bed_late),
+               `Beyond precedent` = ifelse(a$beyond_precedent, "yes", ""), check.names = FALSE)
+  }, striped = TRUE, bordered = TRUE)
 
   sens <- reactive(sensitivity_table(regimen(), ref(), anchor(), params()))
 

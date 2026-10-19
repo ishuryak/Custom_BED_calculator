@@ -327,3 +327,21 @@ test_that("Fenwick acute limit reaches the search and the Results tab", {
     expect_true(isTRUE(z$sc$search$fenwick) || identical(z$sc$search$fenwick, FALSE))
   })
 })
+
+test_that("model agreement tab lists the regimens both models support against HYPNO", {
+  shiny::testServer(app_dir, {
+    set_defaults(session, alpha = 0.35, lambda_di = 0.23, lambda_dd = 0.4, Tk = 28,
+                 early_mode = "hypno", d_max = 5, agree_cmp = "hypno_test", agree_margin = -3, agree_days = 1)
+    a <- agreement()
+    expect_equal(a$m, c(17, 18, 19))
+    expect_equal(a$d, c(3.05, 2.90, 2.80), tolerance = 1e-12)
+    tab <- output$agree_table
+    expect_true(grepl("15 of 15", tab, fixed = TRUE))
+    expect_true(grepl("-2.79", tab, fixed = TRUE) && grepl("-1.96", tab, fixed = TRUE))
+    session$setInputs(agree_margin = 0)
+    expect_equal(nrow(agreement()), 0)
+    expect_true(grepl("No regimen meets the margin", output$agree_msg$html))
+    session$setInputs(agree_cmp = "sidebar", agree_margin = -3, agree_days = 7)
+    expect_true(all(agreement()$T <= 47 - 7))
+  })
+})
