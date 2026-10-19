@@ -59,7 +59,7 @@ should ever be committed. Paywalled items are recorded here and were NOT downloa
 ### A5. Fenwick JD, et al. (2008) - alternative acute tolerance boundary
 - Citation: Fenwick JD, Lawrence GP, Malik Z, Nahum AE, Mayles WP. Early mucosal reactions during and after head-and-neck radiotherapy: dependence of treatment tolerance on radiation dose and schedule duration. Int J Radiat Oncol Biol Phys. 2008;71(2):625-634.
 - DOI: 10.1016/j.ijrobp.2008.02.008 · PMID: 18474317
-- Status: PAYWALLED. Not downloaded.
+- Status: PAYWALLED. Local copy held, full text read 2026-10-18 (section F, not committed). T is counted including the first and last treatment days; Tk 8 d in that convention equals Fowler's 7 d.
 - Supports: a non-linear, time-dependent tolerance boundary on cell-kill BED (no Tk/Tp time factor).
 - Verbatim, Abstract (PubMed), Conclusions: "All schedules analyzed (regular, gap, and accelerating) with BED(CK) values below BED(CKboundary)(T)=69.5x(T/32.2)/sin((T/32.2)((radians)))-3.5Gy(10)(forT< or =50 days) are tolerable, and many lying above the boundary are intolerable."
 - Verbatim, Methods: "Total cell-kill biologically effective doses (BED(CK)) have been calculated for 84 schedules, including incomplete repair effects, but making no other corrections for the effect of schedule duration T."

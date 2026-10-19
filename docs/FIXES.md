@@ -37,3 +37,21 @@ Verification for every row: `testthat::test_dir("tests/testthat")` with Windows 
 | 8. Text and records | HYPNO's 0.65 Gy/day was treated as Gy₁₀ (it is EQD2, 0.78 Gy₁₀); incomplete-repair direction reversed in the analysis notes; Gupta 6.4 Gy attributed to Stuschke; page claimed the Fowler full text was unread | HYPNO p. 389: 66 Gy + 9 × 0.65 = 71.85 Gy in 2-Gy equivalents | Text; `about.md`, `References/README.md`, `docs/development/2026_10_18_dd_parameters/ERRATA.md` | No numbers in the app |
 
 Reasoning, the two reviews and the decisions taken without the PI (A1–A6): `docs/development/2026_10_18_synthesis_plan.md`.
+
+## 2026-10-19: version 2.2 (independent review of 2.1, Fenwick option, CI)
+
+**Changes published numbers: no** for default settings. The search tables change only where a model's comparison BED is negative (its differences now show as NA instead of spurious numbers). Nothing is deployed.
+
+Verification: `testthat::test_dir("tests/testthat")`, Windows R 4.5.1, 2026-10-19: **1462 passed, 0 failed, 0 errors, 0 skipped, plus 2 warnings** (shiny and DT built under R 4.5.3), at the commit that adds this entry. (Earlier rows report the testthat result count, which includes the 2 warnings: 1419 = 1417 passed + 2 warnings.) The new review-fix tests were run against the 2.1 model code (`6225dd4`) first: the three that test changed behavior failed; three others pin 2.1 behavior that was correct but untested. Mutation checks: the seven mutations the reviewer found surviving were rerun, and six are now caught; the seventh (dropping the candidate-positivity rule for DI) cannot be reached with realistic inputs, because a shorter course with larger fractions cannot lose more DI BED than its comparison, so it stays a defensive guard. Four Fenwick mutations (Meade's rounded constant 31.8, option ignored, 50-day domain not enforced, app not passing the option) are each caught.
+
+| Item | What was wrong | Proof it was real (code at `6225dd4`) | Test that pins it | What it moves |
+|---|---|---|---|---|
+| R1. Unusable model display | A model whose comparison BED is negative was excluded from crediting and ranking, but its differences were still shown and entered `d_min` | λ_DI 1/day, λ_DD 2/day, anchor 20 × 2 Gy / 26 d: comparison DI BED −11 Gy, rows showed ΔBED DI +57.8 to +63.2 Gy | `test_v22_review_fixes.R::an unusable model shows no difference and does not enter the score` | Display and export in invalid settings only |
+| R2. Both models negative | Reported as DI only | λ_DI 1, λ_DD 5, anchor 20 × 2 Gy: DI −11, DD −50.7, reason `negative_reference_di` | `::both models negative gives its own reason` | Message only |
+| R3. Scenario ID | Hashed interface context (preset label, evaluated regimen), so identical searches got different IDs | Three IDs for one search (e54c3a920b74, 09a68b76c398, f06de2cba5b6) | `::scenario ID ignores interface context but not search settings` | File names of exports |
+| R4. Empty export | `scenario.json` did not record why no regimen qualified | `attr(s, "reason")` not written | Rerun test plus `result$empty_reason` in `write_export_zip()` | Export content |
+| R5. Withers rule and an empty field | Clearing α/β (NA) while retyping switched the preset to Custom and left λ_DI at the α/β 10 value | Reviewer's trace of `app.R` observer | Code review; browser walkthrough (the observer now returns early on any empty tumor field) | UI only |
+| R6. Weak tests | A test could not fail (empty table), and six mutations survived | `any(logical(0))` is FALSE | `test_v22_review_fixes.R` (six tests), `test_v21_changes.R` negative-reference test now asserts the empty result | Tests only |
+| F1. Fenwick 2008 boundary | Not available | Fix plan D11 | `test_v22_fenwick.R` (published-formula values 98.574, 74.169, 70.203 Gy₁₀; 20 × 2.9 Gy above, 55/20 below), `test_app_server.R::Fenwick acute limit reaches the search and the Results tab` | New option; default unchanged |
+| C1. CI | No automated test run on push | Not applicable | `.github/workflows/tests.yml` (test only, never deploys) | Nothing in the app |
+| D1. Text | HYHOPE acute BEDs (51.3, 51.4) are on the protocol's inclusive clock, not the app's; DD smoothing range unstated; archived `dd_floor.R` uses the inclusive acute clock | Review | `about.md`, `ERRATA.md` | Text only |

@@ -1,0 +1,26 @@
+# Test-only workflow for version 2. It never deploys. (The nested
+# .github/workflows/.github/workflows/deploy.yml inherited from version 1 is
+# not in the path GitHub reads and stays inactive.)
+name: tests
+
+on:
+  push:
+    branches: [v2-toxicity-hypofractionation]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  testthat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.5.1"
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::testthat, any::callr
+      - name: Run tests
+        run: |
+          Rscript -e 'r <- as.data.frame(testthat::test_dir("tests/testthat", reporter = "summary", stop_on_failure = FALSE)); cat("\nexpectations", sum(r$nb), "failed", sum(r$failed), "errors", sum(r$error), "skipped", sum(r$skipped), "\n"); if (sum(r$failed) + sum(r$error) > 0) quit(status = 1)'
