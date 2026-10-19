@@ -1,4 +1,4 @@
-# Custom BED calculator, version 2.5
+# Custom BED calculator, version 2.6
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC). It computes three biologically effective doses (BEDs):
 
@@ -10,7 +10,7 @@ It also screens shorter, hypofractionated regimens against a comparison regimen 
 
 It is a research tool for hypothesis generation, not for treatment decisions.
 
-**Not deployed.** Version 2.5 is on branch `v2-toxicity-hypofractionation` and has not been published to shinyapps.io.
+**Not deployed.** Version 2.6 is on branch `v2-toxicity-hypofractionation` and has not been published to shinyapps.io.
 
 **Version 1 warning.** Version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/, branch `main`) is unchanged and still carries the DD calibration error described below. Do not use version 1 DD results computed at a tumor α/β other than 10 Gy.
 
@@ -21,19 +21,41 @@ It is a research tool for hypothesis generation, not for treatment decisions.
 - `app.R`: the user interface.
 - `about.md`: the "Model and sources" page.
 - `tests/testthat/`: tests of the formulas against an independent implementation and published values, of the server logic, and of the export round trip.
-- `run_app.bat`: double-click launcher for Windows. It uses `RSCRIPT` if set, else Rscript on the PATH, else the newest R under Program Files.
+- `run_app.bat`: double-click launcher for Windows. It uses `RSCRIPT` if set, else Rscript on the PATH, else the newest R under Program Files, and starts `tools/launch.R`, which uses the release library when it has been restored.
+- `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`.
 - `.rscignore`: keeps `References/`, `tests/` and `docs/` out of a shinyapps.io deployment.
 - `docs/FIXES.md`: one row per landed change, with its evidence.
-- `docs/development/`: review records and plans. Start with `2026_10_19_review_and_plan.md`.
-- `renv.lock`: package versions (R 4.5.1) the tests were run with. `renv::restore()` reinstalls them.
+- `docs/development/`: review records and plans. Start with `2026_10_19_v26_review_response.md`.
+- `renv.lock`: the release package versions (R 4.5.1), all from the Posit Package Manager snapshot of 2026-10-15, which serves binaries of exactly these versions for Windows, macOS and Linux.
 - `References/`: sources, with `References/README.md` giving each one's license and the quoted parameter values. Paywalled or non-redistributable PDFs are git-ignored.
 
 ## Run locally
 
-```r
-shiny::runApp("path/to/Custom_BED_calculator_v2")
-testthat::test_dir("tests/testthat")
+From the app folder, once per computer (about one minute, binaries only, no compiler needed):
+
 ```
+Rscript tools/restore_library.R
+```
+
+This installs the locked versions into a per-user folder outside the project (`tools::R_user_dir("HNSCC_BED_calculator", "cache")`; set `BED_LIBRARY` to choose another). Then:
+
+```
+Rscript tools/run_tests.R      # full suite in that library only; exit status 1 on any failure
+run_app.bat                     # or: Rscript tools/launch.R
+```
+
+Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
+
+## Changes in version 2.6
+
+Fixes from the external review of 2.5.1 (`docs/development/2026_10_19_v26_review_response.md`). No equation and no default changed; the default candidate and agreement rows are unchanged.
+
+- **Ranking (result change in edge cases).** A regimen is ranked only when its ranking value can be evaluated. Before, the "smaller change (conservative)" ranking could list a regimen whose DD BED was not positive, scored by DI alone: in the review's example it listed 32 × 2.50 Gy (DD BED −0.60, score +22) instead of 32 × 2.10 Gy (score +3.31). A one-model ranking could list a row with no score. Selection version 2.6.
+- **Agreement ranges** are now over the same evaluable scenarios as the counts (before, each model's range used its own evaluable scenarios). Each model's own count is in the download.
+- **Replay** is strict: only files of the current versions are rerun; malformed fields (for example a Fenwick flag "true" instead of true), contradictory agreement settings, a wrong saved onset and oversized grids are refused. Older files are reanalyzed only on request with `migrate_scenario()`, which records their original versions and ID.
+- **Wording.** Each analysis tab states its comparison, anchor and numerical limits; the sidebar says which tabs use its comparison; the version 1 and 2.0 anchor history is corrected; the HYPNO dose-response illustration states its extra assumptions and uses the exact logistic curve; the default narrative and preset notes match the outputs; source records are reconciled.
+- **Candidate table:** fractions saved, and early and late limit minus the regimen's BED.
+- **Environment:** a lockfile that restores without a compiler, used by the launcher, the tests and CI.
 
 ## Changes in version 2.5.1
 

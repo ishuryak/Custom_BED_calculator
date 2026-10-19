@@ -11,5 +11,6 @@ if not defined RS (
   exit /b 1
 )
 echo Using "%RS%"
-"%RS%" -e "shiny::runApp('.', launch.browser = TRUE)"
+rem tools\launch.R uses the release library (tools\restore_library.R) when restored.
+"%RS%" tools\launch.R
 pause
