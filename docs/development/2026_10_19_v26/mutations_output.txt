@@ -1,0 +1,14 @@
+M1 conservative score ignores missing DD -> CAUGHT 14
+M2 unrankable rows listed -> CAUGHT 4
+M3 per-model range masks -> CAUGHT 3
+M4 d_min from one model -> CAUGHT 13
+M5 next step ignores ranking -> CAUGHT 1
+M6 fenwick coerced with isTRUE -> CAUGHT 5
+M7 agreement contradictions accepted -> CAUGHT 3
+M8 onset_anchor unchecked -> CAUGHT 1
+M9 old selection replayed silently -> CAUGHT 3
+M10 grid size unbounded -> CAUGHT 1
+M11 hash via digest(file=) -> CAUGHT 2
+M12 code identity taken at export -> CAUGHT 1
+M13 old sidebar help restored -> CAUGHT 1
+M14 version footer hard-coded -> CAUGHT 1

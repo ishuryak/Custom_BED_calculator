@@ -1,0 +1,434 @@
+C:/Users/ishur/AppData/Local/Temp/bed_renv_lib
+C:/Program Files/R/R-4.5.1/library
+package 'renv' successfully unpacked and MD5 sums checked
+
+Attaching package: 'renv'
+
+The following objects are masked from 'package:stats':
+
+    embed, update
+
+The following objects are masked from 'package:utils':
+
+    history, upgrade
+
+The following objects are masked from 'package:base':
+
+    autoload, load, remove, use
+
+Warning message:
+package 'renv' was built under R version 4.5.3 
+The following package(s) will be updated:
+
+# CRAN -----------------------------------------------------------------------
+- renv           [1.3.1 -> 1.1.5]
+- base64enc      [* -> 0.1-3]
+- brio           [* -> 1.1.5]
+- bslib          [* -> 0.9.0]
+- cachem         [* -> 1.1.0]
+- callr          [* -> 3.7.6]
+- cli            [* -> 3.6.5]
+- commonmark     [* -> 2.0.0]
+- crayon         [* -> 1.5.3]
+- crosstalk      [* -> 1.2.2]
+- desc           [* -> 1.4.3]
+- diffobj        [* -> 0.3.9]
+- digest         [* -> 0.6.37]
+- DT             [* -> 0.34.0]
+- evaluate       [* -> 1.0.5]
+- farver         [* -> 2.1.2]
+- fastmap        [* -> 1.2.0]
+- fontawesome    [* -> 0.5.3]
+- fs             [* -> 1.6.6]
+- ggplot2        [* -> 4.0.0]
+- glue           [* -> 1.8.0]
+- gtable         [* -> 0.3.6]
+- highr          [* -> 0.11]
+- htmltools      [* -> 0.5.8.1]
+- htmlwidgets    [* -> 1.6.4]
+- httpuv         [* -> 1.6.17]
+- isoband        [* -> 0.2.7]
+- jquerylib      [* -> 0.1.4]
+- jsonlite       [* -> 2.0.0]
+- knitr          [* -> 1.50]
+- labeling       [* -> 0.4.3]
+- later          [* -> 1.4.8]
+- lazyeval       [* -> 0.2.3]
+- lifecycle      [* -> 1.0.4]
+- litedown       [* -> 0.7]
+- magrittr       [* -> 2.0.4]
+- markdown       [* -> 2.0]
+- memoise        [* -> 2.0.1]
+- mime           [* -> 0.13]
+- otel           [* -> 0.2.0]
+- pkgbuild       [* -> 1.4.8]
+- pkgload        [* -> 1.5.3]
+- praise         [* -> 1.0.0]
+- processx       [* -> 3.8.6]
+- promises       [* -> 1.5.0]
+- ps             [* -> 1.9.1]
+- R6             [* -> 2.6.1]
+- rappdirs       [* -> 0.3.3]
+- RColorBrewer   [* -> 1.1-3]
+- Rcpp           [* -> 1.1.0]
+- rlang          [* -> 1.1.6]
+- rmarkdown      [* -> 2.30]
+- rprojroot      [* -> 2.1.1]
+- S7             [* -> 0.2.0]
+- sass           [* -> 0.4.10]
+- scales         [* -> 1.4.0]
+- shiny          [* -> 1.14.0]
+- sourcetools    [* -> 0.1.7-2]
+- testthat       [* -> 3.3.2]
+- tinytex        [* -> 0.57]
+- vctrs          [* -> 0.6.5]
+- viridisLite    [* -> 0.4.2]
+- waldo          [* -> 0.6.2]
+- withr          [* -> 3.0.2]
+- xfun           [* -> 0.53]
+- xtable         [* -> 1.8-4]
+- yaml           [* -> 2.3.10]
+- zip            [* -> 3.0.2]
+
+- Querying repositories for available source packages ... Done!
+# Downloading packages -------------------------------------------------------
+[?25l  (0/68) Downloading: rappdirs, sass, renv, praise, ...                                                                                                         [32m✔[0m praise 1.0.0                             [20 kB in 82s]
+  (1/68) Downloading: rappdirs, sass, renv, digest, ...                                                                                                         [32m✔[0m rappdirs 0.3.3                           [12 kB in 91s]
+  (2/68) Downloading: sass, renv, digest, magrittr, ...                                                                                                         [32m✔[0m rprojroot 2.1.1                          [122 kB in 0.1s]
+  (3/68) Downloading: sass, renv, digest, magrittr, ...                                                                                                         [32m✔[0m brio 1.1.5                               [42 kB in 0.1s]
+  (4/68) Downloading: sass, renv, digest, magrittr, ...                                                                                                         [32m✔[0m pkgbuild 1.4.8                           [211 kB in 0.12s]
+  (5/68) Downloading: sass, renv, digest, magrittr, ...                                                                                                         [32m✔[0m RColorBrewer 1.1-3                       [55 kB in 0.12s]
+  (6/68) Downloading: sass, renv, digest, magrittr, ...                                                                                                         [32m✔[0m tinytex 0.57                             [36 kB in 42s]
+  (7/68) Downloading: sass, renv, digest, magrittr, ...                                                                                                         [32m✔[0m evaluate 1.0.5                           [105 kB in 0.13s]
+  (8/68) Downloading: sass, renv, digest, magrittr, ...                                                                                                         [32m✔[0m fastmap 1.2.0                            [138 kB in 0.14s]
+  (9/68) Downloading: sass, renv, digest, magrittr, ...                                                                                                         [32m✔[0m magrittr 2.0.4                           [282 kB in 0.15s]
+  (10/68) Downloading: sass, renv, digest, pkgload, ...                                                                                                         [32m✔[0m digest 0.6.37                            [232 kB in 0.15s]
+  (11/68) Downloading: sass, renv, pkgload, jsonlite, ...                                                                                                       [32m✔[0m pkgload 1.5.3                            [228 kB in 0.15s]
+  (12/68) Downloading: sass, renv, jsonlite, zip, ...                                                                                                           [32m✔[0m processx 3.8.6                           [165 kB in 0.17s]
+  (13/68) Downloading: sass, renv, jsonlite, zip, ...                                                                                                           [32m✔[0m ps 1.9.1                                 [168 kB in 83s]
+  (14/68) Downloading: sass, renv, jsonlite, zip, ...                                                                                                           [32m✔[0m lazyeval 0.2.3                           [208 kB in 62s]
+  (15/68) Downloading: sass, renv, jsonlite, zip, ...                                                                                                           [32m✔[0m sass 0.4.10                              [2.6 MB in 0.19s]
+  (16/68) Downloading: renv, jsonlite, zip, promises, ...                                                                                                       [32m✔[0m crosstalk 1.2.2                          [418 kB in 88s]
+  (17/68) Downloading: renv, jsonlite, zip, promises, ...                                                                                                       [32m✔[0m zip 3.0.2                                [763 kB in 0.21s]
+  (18/68) Downloading: renv, jsonlite, promises, viridisLite, ...                                                                                               [32m✔[0m renv 1.1.5                               [1.3 MB in 0.22s]
+  (19/68) Downloading: jsonlite, promises, viridisLite, scales, ...                                                                                             [32m✔[0m commonmark 2.0.0                         [143 kB in 30s]
+  (20/68) Downloading: jsonlite, promises, viridisLite, scales, ...                                                                                             [32m✔[0m promises 1.5.0                           [1.7 MB in 0.12s]
+  (21/68) Downloading: jsonlite, viridisLite, scales, isoband, ...                                                                                              [32m✔[0m crayon 1.5.3                             [167 kB in 64s]
+  (22/68) Downloading: jsonlite, viridisLite, scales, isoband, ...                                                                                              [32m✔[0m litedown 0.7                             [101 kB in 53s]
+  (23/68) Downloading: jsonlite, viridisLite, scales, isoband, ...                                                                                              [32m✔[0m yaml 2.3.10                              [95 kB in 46s]
+  (24/68) Downloading: jsonlite, viridisLite, scales, isoband, ...                                                                                              [32m✔[0m viridisLite 0.4.2                        [1.3 MB in 0.12s]
+  (25/68) Downloading: jsonlite, scales, isoband, jquerylib, ...                                                                                                [32m✔[0m cli 3.6.5                                [640 kB in 94s]
+  (26/68) Downloading: jsonlite, scales, isoband, jquerylib, ...                                                                                                [32m✔[0m base64enc 0.1-3                          [8 kB in 31s]
+  (27/68) Downloading: jsonlite, scales, isoband, jquerylib, ...                                                                                                [32m✔[0m jquerylib 0.1.4                          [526 kB in 0.11s]
+  (28/68) Downloading: jsonlite, scales, isoband, shiny, ...                                                                                                    [32m✔[0m withr 3.0.2                              [103 kB in 45s]
+  (29/68) Downloading: jsonlite, scales, isoband, shiny, ...                                                                                                    [32m✔[0m jsonlite 2.0.0                           [1.1 MB in 0.25s]
+  (30/68) Downloading: scales, isoband, shiny, rlang, ...                                                                                                       [32m✔[0m otel 0.2.0                               [286 kB in 32s]
+  (31/68) Downloading: scales, isoband, shiny, rlang, ...                                                                                                       [32m✔[0m scales 1.4.0                             [880 kB in 0.14s]
+  (32/68) Downloading: isoband, shiny, rlang, diffobj, ...                                                                                                      [32m✔[0m rlang 1.1.6                              [768 kB in 0.12s]
+  (33/68) Downloading: isoband, shiny, diffobj, cachem, ...                                                                                                     [32m✔[0m sourcetools 0.1.7-2                      [130 kB in 33s]
+  (34/68) Downloading: isoband, shiny, diffobj, cachem, ...                                                                                                     [32m✔[0m memoise 2.0.1                            [51 kB in 45s]
+  (35/68) Downloading: isoband, shiny, diffobj, cachem, ...                                                                                                     [32m✔[0m diffobj 0.3.9                            [1.0 MB in 0.12s]
+  (36/68) Downloading: isoband, shiny, cachem, ggplot2, ...                                                                                                     [32m✔[0m isoband 0.2.7                            [1.6 MB in 0.16s]
+  (37/68) Downloading: shiny, cachem, ggplot2, httpuv, ...                                                                                                      [32m✔[0m waldo 0.6.2                              [137 kB in 32s]
+  (38/68) Downloading: shiny, cachem, ggplot2, httpuv, ...                                                                                                      [32m✔[0m cachem 1.1.0                             [74 kB in 96s]
+  (39/68) Downloading: shiny, ggplot2, httpuv, DT, ...                                                                                                          [32m✔[0m lifecycle 1.0.4                          [108 kB in 69s]
+  (40/68) Downloading: shiny, ggplot2, httpuv, DT, ...                                                                                                          [32m✔[0m DT 0.34.0                                [2.0 MB in 93s]
+  (41/68) Downloading: shiny, ggplot2, httpuv, vctrs, ...                                                                                                       [32m✔[0m R6 2.6.1                                 [89 kB in 89s]
+  (42/68) Downloading: shiny, ggplot2, httpuv, vctrs, ...                                                                                                       [32m✔[0m httpuv 1.6.17                            [1.1 MB in 0.1s]
+  (43/68) Downloading: shiny, ggplot2, vctrs, mime, ...                                                                                                         [32m✔[0m htmlwidgets 1.6.4                        [814 kB in 80s]
+  (44/68) Downloading: shiny, ggplot2, vctrs, mime, ...                                                                                                         [32m✔[0m callr 3.7.6                              [104 kB in 60s]
+  (45/68) Downloading: shiny, ggplot2, vctrs, mime, ...                                                                                                         [32m✔[0m fontawesome 0.5.3                        [1.4 MB in 90s]
+  (46/68) Downloading: shiny, ggplot2, vctrs, mime, ...                                                                                                         [32m✔[0m vctrs 0.6.5                              [969 kB in 0.12s]
+  (47/68) Downloading: shiny, ggplot2, mime, fs, ...                                                                                                            [32m✔[0m fs 1.6.6                                 [1.2 MB in 0.11s]
+  (48/68) Downloading: shiny, ggplot2, mime, desc, ...                                                                                                          [32m✔[0m desc 1.4.3                               [338 kB in 80s]
+  (49/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m glue 1.8.0                               [127 kB in 43s]
+  (50/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m later 1.4.8                              [480 kB in 63s]
+  (51/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m highr 0.11                               [14 kB in 47s]
+  (52/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m xfun 0.53                                [168 kB in 68s]
+  (53/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m Rcpp 1.1.0                               [3.1 MB in 87s]
+  (54/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m knitr 1.50                               [534 kB in 82s]
+  (55/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m htmltools 0.5.8.1                        [135 kB in 66s]
+  (56/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m xtable 1.8-4                             [565 kB in 86s]
+  (57/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m S7 0.2.0                                 [183 kB in 74s]
+  (58/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m markdown 2.0                             [68 kB in 54s]
+  (59/68) Downloading: shiny, ggplot2, mime, bslib, ...                                                                                                         [32m✔[0m ggplot2 4.0.0                            [3.8 MB in 0.24s]
+  (60/68) Downloading: shiny, mime, bslib, gtable, ...                                                                                                          [32m✔[0m farver 2.1.2                             [1.5 MB in 0.13s]
+  (61/68) Downloading: shiny, mime, bslib, gtable, ...                                                                                                          [32m✔[0m testthat 3.3.2                           [2.5 MB in 0.12s]
+  (62/68) Downloading: shiny, mime, bslib, gtable, ...                                                                                                          [32m✔[0m rmarkdown 2.30                           [2.2 MB in 0.15s]
+  (63/68) Downloading: shiny, mime, bslib, gtable, ...                                                                                                          [32m✔[0m mime 0.13                                [52 kB in 0.27s]
+  (64/68) Downloading: shiny, bslib, gtable, labeling                                                                                                           [32m✔[0m shiny 1.14.0                             [4.6 MB in 0.68s]
+  (65/68) Downloading: bslib, gtable, labeling                                                                                                                  [32m✔[0m gtable 0.3.6                             [251 kB in 0.61s]
+  (66/68) Downloading: bslib, labeling                                                                                                                          [32m✔[0m bslib 0.9.0                              [5.4 MB in 0.7s]
+  (67/68) Downloading: labeling                                                                                                                                 [32m✔[0m labeling 0.4.3                           [64 kB in 0.88s]
+                                                                                Successfully downloaded 68 packages in 2 seconds.
+
+# Installing packages --------------------------------------------------------
+                                                                                [32m✔[0m brio 1.1.5                               [installed binary]
+                                                                                [32m✔[0m commonmark 2.0.0                         [installed binary]
+                                                                                [32m✔[0m crayon 1.5.3                             [installed binary]
+                                                                                [32m✔[0m evaluate 1.0.5                           [installed binary]
+                                                                                [32m✔[0m farver 2.1.2                             [installed binary]
+                                                                                [32m✔[0m fastmap 1.2.0                            [installed binary]
+  (6/68) Installing: base64enc, cli, digest, fs                                   (6/68) Installing: base64enc, cli, digest, fs                                                                                                                 [31m✖[0m base64enc 0.1-3                         
+  (7/68) Installing: cli, digest, fs                                              (7/68) Installing: cli, digest, fs, glue                                        (7/68) Installing: cli, digest, fs, glue                                        (7/68) Installing: cli, digest, fs, glue                                                                                                                      [31m✖[0m digest 0.6.37                           
+  (8/68) Installing: cli, fs, glue                                                                                                                              [32m✔[0m jsonlite 2.0.0                           [installed binary]
+                                                                                [32m✔[0m labeling 0.4.3                           [installed binary]
+  (10/68) Installing: cli, fs, glue, isoband                                      (10/68) Installing: cli, fs, glue, isoband                                      (10/68) Installing: cli, fs, glue, isoband                                      (10/68) Installing: cli, fs, glue, isoband                                                                                                                    [31m✖[0m glue 1.8.0                              
+  (11/68) Installing: cli, fs, isoband                                                                                                                          [32m✔[0m mime 0.13                                [installed binary]
+                                                                                [32m✔[0m otel 0.2.0                               [installed binary]
+                                                                                [32m✔[0m praise 1.0.0                             [installed binary]
+  (14/68) Installing: cli, fs, isoband, magrittr                                                                                                                [31m✖[0m cli 3.6.5                               
+  (15/68) Installing: fs, isoband, magrittr                                                                                                                     [31m✖[0m isoband 0.2.7                           
+  (16/68) Installing: fs, magrittr                                                                                                                              [32m✔[0m R6 2.6.1                                 [installed binary]
+                                                                                [32m✔[0m RColorBrewer 1.1-3                       [installed binary]
+  (18/68) Installing: fs, magrittr, ps, rappdirs                                                                                                                [31m✖[0m magrittr 2.0.4                          
+  (19/68) Installing: fs, ps, rappdirs                                            (19/68) Installing: fs, ps, rappdirs, Rcpp                                      (19/68) Installing: fs, ps, rappdirs, Rcpp                                      (19/68) Installing: fs, ps, rappdirs, Rcpp                                      (19/68) Installing: fs, ps, rappdirs, Rcpp                                                                                                                    [31m✖[0m rappdirs 0.3.3                          
+  (20/68) Installing: fs, ps, Rcpp                                                (20/68) Installing: fs, ps, Rcpp, renv                                          (20/68) Installing: fs, ps, Rcpp, renv                                                                                                                        [31m✖[0m fs 1.6.6                                
+  (21/68) Installing: ps, Rcpp, renv                                                                                                                            [32m✔[0m rprojroot 2.1.1                          [installed binary]
+  (22/68) Installing: ps, Rcpp, renv, rlang                                       (22/68) Installing: ps, Rcpp, renv, rlang                                       (22/68) Installing: ps, Rcpp, renv, rlang                                                                                                                     [31m✖[0m ps 1.9.1                                
+  (23/68) Installing: Rcpp, renv, rlang                                                                                                                         [32m✔[0m sourcetools 0.1.7-2                      [installed binary]
+  (24/68) Installing: Rcpp, renv, rlang, S7                                       (24/68) Installing: Rcpp, renv, rlang, S7                                                                                                                     [31m✖[0m Rcpp 1.1.0                              
+  (25/68) Installing: renv, rlang, S7                                             (25/68) Installing: renv, rlang, S7, viridisLite                                                                                                              [31m✖[0m rlang 1.1.6                             
+  (26/68) Installing: renv, S7, viridisLite                                       (26/68) Installing: renv, S7, viridisLite, withr                                (26/68) Installing: renv, S7, viridisLite, withr                                (26/68) Installing: renv, S7, viridisLite, withr                                                                                                              [31m✖[0m S7 0.2.0                                
+  (27/68) Installing: renv, viridisLite, withr                                    (27/68) Installing: renv, viridisLite, withr, xfun                                                                                                            [32m✔[0m viridisLite 0.4.2                        [built from source in 2.4s]
+  (28/68) Installing: renv, withr, xfun                                           (28/68) Installing: renv, withr, xfun, xtable                                   (28/68) Installing: renv, withr, xfun, xtable                                   (28/68) Installing: renv, withr, xfun, xtable                                                                                                                 [31m✖[0m xfun 0.53                               
+  (29/68) Installing: renv, withr, xtable                                                                                                                       [32m✔[0m diffobj 0.3.9                            [installed binary]
+  (30/68) Installing: renv, withr, xtable, yaml                                   (30/68) Installing: renv, withr, xtable, yaml                                                                                                                 [32m✔[0m withr 3.0.2                              [built from source in 7.0s]
+  (31/68) Installing: renv, xtable, yaml                                          (31/68) Installing: renv, xtable, yaml                                                                                                                        [32m✔[0m xtable 1.8-4                             [built from source in 4.8s]
+  (32/68) Installing: renv, yaml                                                  (32/68) Installing: renv, yaml                                                                                                                                [31m✖[0m yaml 2.3.10                             
+  (33/68) Installing: renv                                                        (33/68) Installing: renv                                                        (33/68) Installing: renv                                                        (33/68) Installing: renv                                                        (33/68) Installing: renv                                                        (33/68) Installing: renv                                                        (33/68) Installing: renv                                                                                                                                      [32m✔[0m renv 1.1.5                               [built from source in 46s]
+Rolled back installation of 20 packages due to errors.
+
+The following package(s) were not installed successfully:
+- [base64enc]: install failed
+- [digest]: install failed
+- [glue]: install failed
+- [cli]: install failed
+- [isoband]: install failed
+- [magrittr]: install failed
+- [rappdirs]: install failed
+- [fs]: install failed
+- [ps]: install failed
+- [Rcpp]: install failed
+- [rlang]: install failed
+- [S7]: install failed
+- [xfun]: install failed
+- [yaml]: install failed
+- [bslib]: dependency failed (base64enc, cachem, htmltools, jquerylib, lifecycle, memoise, rlang, sass)
+- [cachem]: dependency failed (rlang)
+- [callr]: dependency failed (processx)
+- [crosstalk]: dependency failed (htmltools, lazyeval)
+- [desc]: dependency failed (cli)
+- [DT]: dependency failed (crosstalk, htmltools, htmlwidgets, jquerylib, magrittr, promises)
+- [fontawesome]: dependency failed (rlang, htmltools)
+- [ggplot2]: dependency failed (cli, gtable, isoband, lifecycle, rlang, S7, scales, vctrs)
+- [gtable]: dependency failed (cli, glue, lifecycle, rlang)
+- [highr]: dependency failed (xfun)
+- [htmltools]: dependency failed (base64enc, digest, rlang)
+- [htmlwidgets]: dependency failed (htmltools, knitr, rmarkdown, yaml)
+- [httpuv]: dependency failed (later, promises, Rcpp)
+- [jquerylib]: dependency failed (htmltools)
+- [knitr]: dependency failed (highr, xfun, yaml)
+- [later]: dependency failed (Rcpp, rlang)
+- [lazyeval]: dependency failed (rlang)
+- [lifecycle]: dependency failed (cli, glue, rlang)
+- [litedown]: dependency failed (xfun)
+- [markdown]: dependency failed (xfun, litedown)
+- [memoise]: dependency failed (rlang, cachem)
+- [pkgbuild]: dependency failed (callr, cli, desc, processx)
+- [pkgload]: dependency failed (cli, desc, fs, glue, lifecycle, pkgbuild, processx, rlang)
+- [processx]: dependency failed (ps)
+- [promises]: dependency failed (later, lifecycle, magrittr, rlang)
+- [rmarkdown]: dependency failed (bslib, fontawesome, htmltools, jquerylib, knitr, tinytex, xfun, yaml)
+- [sass]: dependency failed (fs, rlang, htmltools, rappdirs)
+- [scales]: dependency failed (cli, glue, lifecycle, rlang)
+- [shiny]: dependency failed (bslib, cachem, cli, fontawesome, glue, htmltools, httpuv, later, lifecycle, promises, rlang)
+- [testthat]: dependency failed (callr, cli, desc, lifecycle, magrittr, pkgload, processx, ps, rlang, waldo)
+- [tinytex]: dependency failed (xfun)
+- [vctrs]: dependency failed (cli, glue, lifecycle, rlang)
+- [waldo]: dependency failed (cli, glue, rlang)
+- [zip]: dependency failed (cli)
+You may need to manually download and install these packages.
+
+# base64enc ------------------------------------------------------------------
+* installing *source* package 'base64enc' ...
+** this is package 'base64enc' version '0.1-3'
+** package 'base64enc' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG     -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c base64.c -o base64.o
+/bin/sh: line 1: gcc: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: base64.o] Error 127
+ERROR: compilation failed for package 'base64enc'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/base64enc'
+
+# digest ---------------------------------------------------------------------
+* installing *source* package 'digest' ...
+** this is package 'digest' version '0.6.37'
+** package 'digest' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+g++ -std=gnu++17  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG -I.    -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall  -mfpmath=sse -msse2 -mstackrealign    -c SpookyV2.cpp -o SpookyV2.o
+/bin/sh: line 1: g++: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:296: SpookyV2.o] Error 127
+ERROR: compilation failed for package 'digest'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/digest'
+
+# glue -----------------------------------------------------------------------
+* installing *source* package 'glue' ...
+** this is package 'glue' version '1.8.0'
+** package 'glue' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG     -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c glue.c -o glue.o
+/bin/sh: line 1: gcc: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: glue.o] Error 127
+ERROR: compilation failed for package 'glue'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/glue'
+
+# cli ------------------------------------------------------------------------
+* installing *source* package 'cli' ...
+** this is package 'cli' version '3.6.5'
+** package 'cli' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG -I../inst/include    -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c ansi.c -o ansi.o
+/bin/sh: line 1: gcc: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: ansi.o] Error 127
+ERROR: compilation failed for package 'cli'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/cli'
+
+# isoband --------------------------------------------------------------------
+* installing *source* package 'isoband' ...
+** this is package 'isoband' version '0.2.7'
+** package 'isoband' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+g++  -std=gnu++11 -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG     -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall  -mfpmath=sse -msse2 -mstackrealign    -c clip-lines.cpp -o clip-lines.o
+/bin/sh: line 1: g++: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:296: clip-lines.o] Error 127
+ERROR: compilation failed for package 'isoband'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/isoband'
+
+# magrittr -------------------------------------------------------------------
+* installing *source* package 'magrittr' ...
+** this is package 'magrittr' version '2.0.4'
+** package 'magrittr' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG     -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c pipe.c -o pipe.o
+/bin/sh: line 1: gcc: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: pipe.o] Error 127
+ERROR: compilation failed for package 'magrittr'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/magrittr'
+
+# rappdirs -------------------------------------------------------------------
+* installing *source* package 'rappdirs' ...
+** this is package 'rappdirs' version '0.3.3'
+** package 'rappdirs' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG     -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c init.c -o init.o
+/bin/sh: line 1: gcc: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: init.o] Error 127
+ERROR: compilation failed for package 'rappdirs'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/rappdirs'
+
+# fs -------------------------------------------------------------------------
+* installing *source* package 'fs' ...
+** this is package 'fs' version '1.6.6'
+** package 'fs' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+/usr/bin/make --directory=libuv-1.44.2 -f Makefile.mingw clean
+make[1]: Entering directory '/c/Users/ishur/AppData/Local/Temp/Rtmp4yGsa2/R.INSTALL8038f3047a7/fs/src/libuv-1.44.2'
+rm -f  src/fs-poll.o  src/idna.o  src/inet.o  src/random.o  src/strscpy.o  src/strtok.o  src/threadpool.o  src/timer.o  src/uv-common.o  src/uv-data-getter-setters.o  src/version.o  src/win/async.o  src/win/core.o  src/win/detect-wakeup.o  src/win/dl.o  src/win/error.o  src/win/fs-event.o  src/win/fs.o  src/win/getaddrinfo.o  src/win/getnameinfo.o  src/win/handle.o  src/win/loop-watcher.o  src/win/pipe.o  src/win/poll.o  src/win/process-stdio.o  src/win/process.o  src/win/signal.o  src/win/stream.o  src/win/tcp.o  src/win/thread.o  src/win/tty.o  src/win/udp.o  src/win/util.o  src/win/winapi.o  src/win/winsock.o libuv.a
+make[1]: Leaving directory '/c/Users/ishur/AppData/Local/Temp/Rtmp4yGsa2/R.INSTALL8038f3047a7/fs/src/libuv-1.44.2'
+rm -f dir.o error.o file.o fs.o getmode.o id.o init.o link.o path.o utils.o windows/getmode.o
+g++ -std=gnu++17  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG -I./libuv-1.44.2/include -D_WIN32_WINNT=0x0600 -DSTRICT_R_HEADERS -I.    -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall  -mfpmath=sse -msse2 -mstackrealign    -c dir.cc -o dir.o
+/bin/sh: line 1: g++: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:294: dir.o] Error 127
+ERROR: compilation failed for package 'fs'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/fs'
+
+# ps -------------------------------------------------------------------------
+* installing *source* package 'ps' ...
+** this is package 'ps' version '1.9.1'
+** package 'ps' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+gcc  -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign    -Wall px.c -o px
+make: gcc: No such file or directory
+make: *** [Makevars:11: px] Error 127
+ERROR: compilation failed for package 'ps'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/ps'
+
+# Rcpp -----------------------------------------------------------------------
+* installing *source* package 'Rcpp' ...
+** this is package 'Rcpp' version '1.1.0'
+** package 'Rcpp' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+g++ -std=gnu++17  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG -I../inst/include/    -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall  -mfpmath=sse -msse2 -mstackrealign    -c api.cpp -o api.o
+/bin/sh: line 1: g++: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:296: api.o] Error 127
+ERROR: compilation failed for package 'Rcpp'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/Rcpp'
+
+# rlang ----------------------------------------------------------------------
+* installing *source* package 'rlang' ...
+** this is package 'rlang' version '1.1.6'
+** package 'rlang' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG -I./rlang/    -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c capture.c -o capture.o
+/bin/sh: line 1: gcc: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: capture.o] Error 127
+ERROR: compilation failed for package 'rlang'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/rlang'
+
+# S7 -------------------------------------------------------------------------
+* installing *source* package 'S7' ...
+** this is package 'S7' version '0.2.0'
+** package 'S7' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG     -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c init.c -o init.o
+/bin/sh: line 1: gcc: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: init.o] Error 127
+ERROR: compilation failed for package 'S7'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/S7'
+
+# xfun -----------------------------------------------------------------------
+* installing *source* package 'xfun' ...
+** this is package 'xfun' version '0.53'
+** package 'xfun' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG     -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c base64.c -o base64.o
+/bin/sh: line 1: gcc: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: base64.o] Error 127
+ERROR: compilation failed for package 'xfun'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/xfun'
+
+# yaml -----------------------------------------------------------------------
+* installing *source* package 'yaml' ...
+** this is package 'yaml' version '2.3.10'
+** package 'yaml' successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG -I. -DNDEBUG    -I"c:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c api.c -o api.o
+/bin/sh: line 1: gcc: command not found
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: api.o] Error 127
+ERROR: compilation failed for package 'yaml'
+* removing 'C:/Users/ishur/AppData/Local/Temp/bed_renv_lib/.renv/1/yaml'
+
+[?25hError: failed to install "DT", "Rcpp", "S7", "base64enc", "bslib", "cachem", "callr", "cli", "crosstalk", "desc", "digest", "fontawesome", "fs", "ggplot2", "glue", "gtable", "highr", "htmltools", "htmlwidgets", "httpuv", "isoband", "jquerylib", "knitr", "later", "lazyeval", "lifecycle", "litedown", "magrittr", "markdown", "memoise", "pkgbuild", "pkgload", "processx", "promises", "ps", "rappdirs", "rlang", "rmarkdown", "sass", "scales", "shiny", "testthat", "tinytex", "vctrs", "waldo", "xfun", "yaml", "zip"
+Traceback (most recent calls last):
+4: renv::restore(lockfile = "renv.lock", library = lib, prompt = FALSE, 
+       clean = FALSE)
+3: renv_restore_run_actions(project, diff, current, lockfile, rebuild, 
+       strict, descriptions, retry)
+2: stopf("failed to install %s", paste(dQuote(failed), collapse = ", "))
+1: stop(sprintf(fmt, ...), call. = call.)
+Execution halted

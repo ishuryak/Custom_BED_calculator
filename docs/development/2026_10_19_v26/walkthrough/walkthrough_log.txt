@@ -1,0 +1,83 @@
+Walkthrough 2026-10-19 16:23:15; revision cd5d835a3a12fdbdb012358fb4d0ee561e108e9d; app in release library C:\Users\ishur\AppData\Local/R/cache/R/HNSCC_BED_calculator/library-2026-10-15-R4.5.1 (R version 4.5.1 (2025-06-13 ucrt), shiny 1.14.0); chromote 0.5.1, Chrome C:\Program Files\Google\Chrome\Application\chrome.exe
+PASS  title shows version 2.6
+PASS  1 all six sidebar panels open
+PASS  1 Results: no output errors at defaults
+PASS  1 fractional fraction count gives a validation message
+PASS  1 blank fraction count gives a validation message, no stale table
+PASS  1 out-of-range fraction count gives a validation message
+PASS  2 35 fractions give 47 days
+PASS  2 20 fractions give 26 days
+PASS  2 15 fractions give 19 days
+PASS  2 too-short manual time is rejected
+PASS  2 HYPNO test comparison is 20 fractions, 26 days
+PASS  2 HYPNO control comparison is 33 fractions, 38 days
+PASS  2 fraction slider upper bound follows the comparison (32)
+PASS  2 custom comparison fields hidden for a preset comparison
+PASS  2 fixed anchor: changing the comparison leaves this regimen's DD BED unchanged
+PASS  3 preset calculator keeps itself selected and has a note
+PASS  3 preset withers keeps itself selected and has a note
+PASS  3 preset hartley keeps itself selected and has a note
+PASS  3 preset hyhope keeps itself selected and has a note
+PASS  3 preset d18 keeps itself selected and has a note
+PASS  3 Withers at α/β 5 gives 0.84 Gy/day  [DI repopulation costs 0.84 Gy of tumor BED per day after day 28 (0.60 Gy per day in 2-Gy-equivalent terms).]
+PASS  3 Withers at α/β 10 gives 0.72 Gy/day  [DI repopulation costs 0.72 Gy of tumor BED per day after day 28 (0.60 Gy per day in 2-Gy-equivalent terms).]
+PASS  3 editing an inherited DD value keeps the Hartley preset
+PASS  3 editing g keeps the Hartley preset
+PASS  3 editing a preset-controlled value switches to Custom
+PASS  3 D18 restored  [0.35 0.4]
+PASS  4 zero DI: no output errors
+PASS  4 zero DD with positive DI: DD unavailable warning
+PASS  4 zero DD: agreement explains
+PASS  4 zero DD: sensitivity labels unavailable values
+PASS  4 R1 through the controls: conservative ranking lists 32 × 2.10 Gy  [Fractions	Gy per fraction	Days	Weeks saved	Fractions saved	Total Gy	Δ BED DI	Δ BED DD	Credited by	Δ early BED	Δ late BED	Early EQD2	Late EQD2	Early limit minus regimen	Late limit minus regimen	Above b]
+PASS  4 R1: 32 × 2.50 Gy is not listed
+PASS  4 R1: DD ranking with no evaluable DD explains, lists nothing
+PASS  4 defaults restored  [d18 0.35 0.23 0.4]
+PASS  5 units follow nonstandard α/β
+PASS  5 Fowler zone flagged as not applicable
+PASS  5 benchmark heading says recomputed
+PASS  6 default candidate rows: 3  [3]
+PASS  6 default rows 29 × 2.25, 28 × 2.30, 30 × 2.20
+PASS  6 slack and fractions-saved columns
+PASS  6 context strip names comparison and limits  [Comparison: 35 × 2 Gy in 47 days (sidebar). DD anchor: 35 × 2 Gy in 47 days. Tumor α/β 10 Gy, mucosa 10 Gy, late tissue 3 Gy. Tumor criterion: change of at least 1 Gy, and at least 7 days saved.
+Early toxicity limit: 55.87 Gy₁₀ (HYPNO 55 Gy/20, fixed). Late toxicity limit: 116.67 Gy₃ (comparison 116.67 + 0). Dose grid: multiples of 0.05 Gy up to 5 Gy.]
+PASS  6 all 16 criterion/ranking pairs render without errors
+PASS  6 every dose step renders
+PASS  6 early limit reference renders
+PASS  6 reference mode shows the excess input
+PASS  6 early limit fowler renders
+PASS  6 Fowler limit shown as 59  [Comparison: 35 × 2 Gy in 47 days (sidebar). DD anchor: 35 × 2 Gy in 47 days. Tumor α/β 10 Gy, mucosa 10 Gy, late tissue 3 Gy. Tumor criterion: change of at least 1 Gy, and at least 7 days saved.
+Early toxicity limit: 59.00 Gy₁₀ (Fowler zone lower edge, fixed). Late toxicity limit: 116.67 Gy₃ (comparison 116.67 + 0). Dose grid: multiples of 0.05 Gy up to 5 Gy.]
+PASS  6 chemotherapy lowers the Fowler limit to 54
+PASS  6 changed acute parameters block the Fowler limit
+PASS  6 early limit fenwick renders
+PASS  6 early limit hypno renders
+PASS  6 HYPNO late limit shown
+PASS  6 empty search explains itself
+PASS  6 empty-state download has its files
+PASS  6 table sorts by a column click
+PASS  6 plot renders
+PASS  9 candidate download replays in a fresh process to full precision
+PASS  9 export records 2.6 versions and unchanged code
+PASS  7 default agreement rows with 15 of 15
+PASS  7 agreement context names its own comparison and limits
+PASS  7 range columns say evaluable scenarios
+PASS  7 agreement survives cleared candidate-only inputs
+PASS  7 sidebar comparison switches the agreement comparison
+PASS  7 agreement table scrolls inside its box
+PASS  9 agreement download replays to full precision, details included
+PASS  9 agreement ranges reconstruct from scenario_detail
+PASS  8 sensitivity: 15 rows, no errors
+PASS  8 sensitivity context: the sidebar regimen and the threshold
+PASS  8 inherited DD rates marked
+PASS  10 equations rendered by MathJax  [74]
+PASS  10 no raw TeX left in the page
+PASS  10 version footer from the code
+PASS  10 conditional illustration present
+PASS  10 source links present  [17]
+PASS  narrow 420 px: Results has no page-level horizontal scroll  [0 px; table shiny-table table-striped table-bo:437 ; THEAD:437 ; TR:437 ; TH:437 ; TBODY:437 ; TR:437]
+PASS  narrow 420 px: Candidate regimens has no page-level horizontal scroll  [0 px; table table-striped table-hover row-bord:1450 ; THEAD:1450 ; TR:1450 ; dt-right sorting:478 ; dt-right sorting:548 ; dt-right sorting:613]
+PASS  narrow 420 px: Model agreement has no page-level horizontal scroll  [0 px; table shiny-table table-striped table-bo:1122 ; THEAD:1122 ; TR:1122 ; TH:456 ; TH:550 ; TH:644]
+PASS  narrow 420 px: Sensitivity has no page-level horizontal scroll  [0 px; table shiny-table table-striped table-bo:741 ; THEAD:741 ; TR:741 ; TH:443 ; TH:529 ; TH:604]
+PASS  narrow 420 px: Model and sources has no page-level horizontal scroll  [0 px; MathJax-Element-10-Frame:489 ; NOBR:489 ; MathJax-Span-50:489 ; SPAN:489 ; SPAN:489 ; MathJax-Span-51:489]
+PASS  browser console: no errors
