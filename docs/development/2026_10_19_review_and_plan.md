@@ -85,7 +85,9 @@ Order follows dependencies. Every change gets a test that fails on `ad16504` for
 
 Deferred (separate scientific work, as both reviews agree): DD refit to outcome data, chemotherapy effect, OAR/NTCP module, repair-aware or twice-daily schedules, a robust-search mode that optimizes over scenarios.
 
-## 7. Decisions taken without the PI (to confirm)
+## 7. Decisions taken without the PI (confirmed)
+
+**Igor Shuryak confirmed A1–A5 on 2026-10-19, after reviewing the implemented version 2.5.**
 
 - **A1.** D18/HYPNO sentence restated conditionally with Stuschke's γ₅₀ (N1) rather than removed.
 - **A2.** Legacy coupling calibrates each analysis at its own comparison (N6). Fixed anchor stays the default, so default results do not move.
@@ -104,4 +106,4 @@ All seven steps were implemented on 2026-10-19 in commits `73b54a5` and `725514a
 - **Defaults unchanged:** the probe after the fixes (`2026_10_19_review_scripts/probe_after_output.txt`) reproduces the default candidate and agreement rows to every printed digit. The stress case now gives 3 evaluable passes and 12 non-evaluable scenarios.
 - **Existing tests changed** only where they pinned a renamed label or message (`test_app_server.R`: the fraction-size column and the agreement empty message) or a renamed column (`test_v24_agreement.R`: `n_both_within` → `n_pass_both`).
 
-Not done, by design: deployment; the deferred scientific work in section 6. Still for Igor: confirm A1–A5 (section 7).
+Not done, by design: deployment; the deferred scientific work in section 6. A1–A5 confirmed by Igor Shuryak on 2026-10-19 (section 7).
