@@ -1,4 +1,4 @@
-# Custom BED calculator, version 2.4
+# Custom BED calculator, version 2.5
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC). It computes three biologically effective doses (BEDs):
 
@@ -6,11 +6,11 @@ R Shiny app for head and neck squamous cell carcinoma (HNSCC). It computes three
 - early (acute mucosal) toxicity BED
 - late toxicity BED.
 
-It also screens shorter, hypofractionated regimens against a comparison regimen (default 35 × 2 Gy in 47 days, or either HYPNO arm): the tumor BED change must meet a chosen minimum, which may be negative as a non-inferiority margin, under the DI or DD model, while early and late toxicity BED stay within chosen limits. A sensitivity tab shows the tumor BED difference across tumor parameter sets. Results download as a ZIP with a scenario file that reruns the search.
+It also screens shorter, hypofractionated regimens against a comparison regimen (default 35 × 2 Gy in 47 days, or either HYPNO arm): the tumor BED change must meet a chosen minimum, which may be negative (an allowed loss of modeled tumor BED, not a clinical non-inferiority margin), under the DI or DD model, while early and late toxicity BED stay within chosen limits. A sensitivity tab shows the tumor BED difference across tumor parameter sets. Results download as a ZIP with a scenario file that reruns the search.
 
 It is a research tool for hypothesis generation, not for treatment decisions.
 
-**Not deployed.** Version 2.4 is on branch `v2-toxicity-hypofractionation` and has not been published to shinyapps.io.
+**Not deployed.** Version 2.5 is on branch `v2-toxicity-hypofractionation` and has not been published to shinyapps.io.
 
 **Version 1 warning.** Version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/, branch `main`) is unchanged and still carries the DD calibration error described below. Do not use version 1 DD results computed at a tumor α/β other than 10 Gy.
 
@@ -21,10 +21,11 @@ It is a research tool for hypothesis generation, not for treatment decisions.
 - `app.R`: the user interface.
 - `about.md`: the "Model and sources" page.
 - `tests/testthat/`: tests of the formulas against an independent implementation and published values, of the server logic, and of the export round trip.
-- `run_app.bat`: double-click launcher for Windows.
+- `run_app.bat`: double-click launcher for Windows. It uses `RSCRIPT` if set, else Rscript on the PATH, else the newest R under Program Files.
 - `.rscignore`: keeps `References/`, `tests/` and `docs/` out of a shinyapps.io deployment.
 - `docs/FIXES.md`: one row per landed change, with its evidence.
-- `docs/development/`: review records and plans. Start with `2026_10_18_synthesis_plan.md`.
+- `docs/development/`: review records and plans. Start with `2026_10_19_review_and_plan.md`.
+- `renv.lock`: package versions (R 4.5.1) the tests were run with. `renv::restore()` reinstalls them.
 - `References/`: sources, with `References/README.md` giving each one's license and the quoted parameter values. Paywalled or non-redistributable PDFs are git-ignored.
 
 ## Run locally
@@ -33,6 +34,16 @@ It is a research tool for hypothesis generation, not for treatment decisions.
 shiny::runApp("path/to/Custom_BED_calculator_v2")
 testthat::test_dir("tests/testthat")
 ```
+
+## Changes in version 2.5
+
+Fixes from the 2026-10-19 review (`docs/development/2026_10_19_review_and_plan.md`, which verifies the external review in `docs/development/2026_10_19_external_review_codex.md`). No equation and no default changed; default results are unchanged.
+
+- **One validity rule** for the search, the Sensitivity tab and the Model agreement tab: a tumor model's difference is used only when the model is calibrated and both BEDs are positive. The agreement tab counts evaluable scenarios separately and never counts a non-evaluable one as passing.
+- **Wording:** no claims of parameter uncertainty, clinical equivalence or bounds that the calculator does not compute. The numerical control is an allowed BED change, not a non-inferiority margin. The D18/HYPNO statement is conditional on a cited dose-response slope.
+- **Independent tabs:** the agreement tab no longer depends on candidate-only inputs, the candidate export no longer depends on the Results regimen, and in the legacy option each analysis calibrates at its own comparison.
+- **Export and replay:** the agreement analysis has its own ZIP with every regimen under every scenario. Scenario files (schema 2) record the analysis, selection and scenario-set versions and the code identity. Replay refuses unsupported versions, hinge or clocks, and checks the saved calibration. The scenario ID no longer depends on key order.
+- **Labels and records:** BED units follow the α/β in use, the fraction-size flag is named for the benchmark set, and the Model page has a parameter-origin table. Source records are corrected. New `renv.lock` and a launcher that finds R.
 
 ## Changes in version 2.4
 

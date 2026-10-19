@@ -8,3 +8,7 @@ external_proofs.yaml
 .Rhistory
 .Rproj.user/
 rsconnect/
+
+# testthat failure snapshots
+tests/testthat/_problems/
+tests/testthat/testthat-problems.rds

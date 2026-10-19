@@ -38,7 +38,7 @@ LIMITS <- list(
   min_gain = list("Minimum tumor BED change", -20, 30, FALSE),
   min_days = list("Minimum days saved", 1, 140, TRUE),
   d_max = list("Highest dose per fraction searched", 2, 30, FALSE),
-  agree_margin = list("Margin for both models", -20, 30, FALSE),
+  agree_margin = list("Allowed tumor BED change for both models", -20, 30, FALSE),
   agree_days = list("Minimum days saved (agreement)", 1, 140, TRUE))
 
 PRESET_LABELS <- c(
@@ -60,9 +60,45 @@ COMPARATOR_LABELS <- c(
 
 DEF <- default_params()
 
+# Download file name: version, analysis, scenario ID and date.
+export_filename <- function(analysis, id, date = Sys.Date()) {
+  sprintf("bed_v%s_%s_%s_%s.zip", APP_VERSION, analysis, id, format(date))
+}
+
+# BED unit for a tissue alpha/beta: Gy with a subscript for the conventional
+# 10 Gy and 3 Gy, otherwise the alpha/beta spelled out.
+bed_unit <- function(ab) {
+  if (isTRUE(all.equal(ab, 10))) "Gy\u2081\u2080" else if (isTRUE(all.equal(ab, 3))) "Gy\u2083" else
+    sprintf("Gy (\u03b1/\u03b2 = %g Gy)", ab)
+}
+
+# Explanation of an empty search, shared by the candidate and agreement tabs.
+reason_text <- function(reason, criterion = "either") {
+  if (is.null(reason)) return(NULL)
+  txt <- switch(reason,
+    dd_unavailable = c("The DD model is unavailable with these parameters, so DD-based criteria and rankings",
+                       "(including 'smaller of \u0394DI and \u0394DD' and the two-model agreement) cannot be used."),
+    negative_reference_di = , negative_reference_dd = , negative_reference_both =
+      c("The comparison regimen's tumor BED is not positive under the",
+        switch(reason, negative_reference_di = "DI model", negative_reference_dd = "DD model",
+               negative_reference_both = "DI and DD models"),
+        "with these parameters, so that model cannot credit any regimen. Check the repopulation settings."),
+    negative_reference_early = , negative_reference_late =
+      c("The comparison regimen's toxicity BED is not positive, so a limit relative to it is not meaningful.",
+        "Check the toxicity parameters or choose an absolute limit."),
+    empty_dose_range = "No dose per fraction lies between the comparison dose per fraction and the highest dose searched.",
+    fowler_params_changed = c("The Fowler tolerance zone applies only with Fowler's acute parameters",
+                              "(the defaults: \u03b1/\u03b2 10 Gy, \u03b1 0.35/Gy, doubling time 2.5 d, onset day 7 elapsed).",
+                              "Restore them or use another early limit."),
+    no_shorter_regimen = "No number of fractions in the searched range saves the minimum number of days.",
+    paste("No search was possible:", reason))
+  paste(txt, collapse = " ")
+}
+
 ui <- page_sidebar(
   fillable = FALSE,
-  title = "Biologically effective dose (BED) calculator for head and neck squamous cell carcinoma (HNSCC), version 2.4",
+  title = paste0("Biologically effective dose (BED) calculator for head and neck squamous cell carcinoma (HNSCC), version ",
+                 sub("\\.0$", "", APP_VERSION)),
   theme = bs_theme(version = 5, bootswatch = "flatly"),
   sidebar = sidebar(
     width = 360,
@@ -127,18 +163,18 @@ ui <- page_sidebar(
                "with a fixed onset and rate, and dose-dependent (DD), where onset and rate",
                "depend on cell killing. EQD2 is the equivalent dose in 2-Gy fractions.",
                "Model outputs for hypothesis generation, not treatment recommendations."),
-      tableOutput("results"),
+      div(class = "table-scroll", style = "overflow-x: auto;", tableOutput("results")),
       uiOutput("verdicts"),
       uiOutput("acute_zone"),
       h5("Published regimens for comparison"),
-      tableOutput("benchmarks"),
+      div(class = "table-scroll", style = "overflow-x: auto;", tableOutput("benchmarks")),
       uiOutput("hypno_note")),
     nav_panel("Candidate regimens (model screen)",
       uiOutput("dd_warning2"),
       div(class = "alert alert-secondary",
           "These are model outputs for hypothesis generation, not treatment recommendations.",
-          "Differences of a few Gy are within the uncertainty of the model parameters.",
-          "A listed regimen is not shown to be safe or effective. Any trial regimen needs",
+          "The calculator does not quantify parameter uncertainty, and a BED difference is not a",
+          "difference in tumor control. A listed regimen is not shown to be safe or effective. Any trial regimen needs",
           "clinical precedent, organ-at-risk planning and toxicity stopping rules."),
       layout_columns(
         col_widths = c(4, 4, 4),
@@ -176,28 +212,33 @@ ui <- page_sidebar(
       downloadButton("download", "Download results and scenario (ZIP)"),
       plotOutput("suggest_plot", height = "380px")),
     nav_panel("Model agreement",
-      helpText("Regimens that both tumor models support: the tumor BED change from the comparison",
-               "is at least the margin under DI and under DD, with the toxicity limits chosen on the",
-               "candidate tab. Each row also shows how the two changes vary over the 15 scenarios of the",
-               "Sensitivity tab, and why the models agree or differ. The two models share α and DD is",
-               "calibrated to DI at the anchor, so their agreement is not two independent confirmations."),
+      helpText("Regimens whose tumor BED change from the comparison is at least the allowed change",
+               "under DI and under DD, with the toxicity limits chosen on the candidate tab (dose step,",
+               "highest dose, early and late limits). Each row also shows how the two changes vary over",
+               "the 15 scenarios of the Sensitivity tab, counting only scenarios in which both models can be",
+               "evaluated. The two models share α and DD is calibrated to DI at the anchor, so their",
+               "agreement is not two independent confirmations. The allowed change is a BED screening",
+               "value, not a clinical non-inferiority margin."),
       layout_columns(
         col_widths = c(4, 4, 4),
         selectInput("agree_cmp", "Compare with",
                     c("HYPNO test arm: 55 Gy in 20 fractions (26 days)" = "hypno_test",
                       "The comparison regimen in the sidebar" = "sidebar")),
-        num("agree_margin", "Margin for both models (Gy; negative = allowed loss)", -3, -20, 30, 0.5),
+        num("agree_margin", "Allowed tumor BED change for both models (Gy; negative = allowed loss)", -3, -20, 30, 0.5),
         num("agree_days", "Minimum days saved", 1, 1, 140, 1)),
       uiOutput("agree_note"),
       uiOutput("agree_msg"),
-      tableOutput("agree_table")),
+      div(class = "table-scroll", style = "overflow-x: auto;", tableOutput("agree_table")),
+      downloadButton("download_agree", "Download the agreement analysis (ZIP)")),
     nav_panel("Sensitivity",
       helpText("Tumor BED of the regimen being evaluated minus the comparison regimen, under",
                "each tumor preset and three tumor α/β values. These are selected scenarios,",
                "not a probability distribution: a count of scenarios is not a chance of benefit.",
-               "Presets that set only DI values keep the DD maximum rate entered in the sidebar."),
+               "Presets that set only DI values keep the DD maximum rate entered in the sidebar, and every",
+               "scenario keeps the sidebar's background growth g and DD anchor. A difference is shown only",
+               "when both BEDs are positive (and the DD model is calibrated)."),
       uiOutput("sens_summary"),
-      tableOutput("sens_table"),
+      div(class = "table-scroll", style = "overflow-x: auto;", tableOutput("sens_table")),
       h5("Toxicity BED differences (do not depend on the tumor scenario)"),
       tableOutput("sens_tox")),
     nav_panel("Model and sources", uiOutput("about"))
@@ -281,11 +322,14 @@ server <- function(input, output, session) {
     list(m = m, d = checked("d"), T = time_for(m, input$auto_T, "T"))
   })
   coupled <- reactive(isTRUE(input$coupled))
-  anchor <- reactive({
-    if (coupled()) { r <- ref(); return(list(m = r$m, d = r$d, T = r$T)) }
+  fixed_anchor <- reactive({
     m <- checked_or("anchor_m", 35)
     list(m = m, d = checked_or("anchor_d", 2), T = overall_time(m))
   })
+  # The DD anchor of an analysis: the fixed anchor, or in legacy mode that
+  # analysis's own comparison regimen.
+  anchor_for <- function(r) if (coupled()) list(m = r$m, d = r$d, T = r$T) else fixed_anchor()
+  anchor <- reactive(anchor_for(ref()))
   calibration <- reactive({
     p <- params(); a <- anchor()
     dd_calibration(a, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk)
@@ -355,10 +399,13 @@ server <- function(input, output, session) {
 
   output$results <- renderTable({
     b <- both(); r <- regimen(); rf <- ref()
-    rows <- c("Overall time (days)" = "T", "Total dose (Gy)" = "total_dose",
-              "Tumor BED, DI model (Gy)" = "bed_di", "Tumor BED, DD model (Gy)" = "bed_dd",
-              "Early toxicity BED (Gy)" = "bed_early", "Early toxicity EQD2 (Gy)" = "eqd2_early",
-              "Late toxicity BED (Gy)" = "bed_late", "Late toxicity EQD2 (Gy)" = "eqd2_late")
+    pp <- params()
+    rows <- c("T", "total_dose", "bed_di", "bed_dd", "bed_early", "eqd2_early", "bed_late", "eqd2_late")
+    names(rows) <- c("Overall time (days)", "Total dose (Gy)",
+                     sprintf("Tumor BED, DI model (%s)", bed_unit(pp$ab)),
+                     sprintf("Tumor BED, DD model (%s)", bed_unit(pp$ab)),
+                     sprintf("Early toxicity BED (%s)", bed_unit(pp$ab_e)), "Early toxicity EQD2 (Gy)",
+                     sprintf("Late toxicity BED (%s)", bed_unit(pp$ab_l)), "Late toxicity EQD2 (Gy)")
     v1 <- unlist(b[1, rows]); v2 <- unlist(b[2, rows])
     out <- data.frame(Quantity = names(rows), `This regimen` = fmt(v1), Comparison = fmt(v2),
                       Difference = fmt(v1 - v2, plus = TRUE), check.names = FALSE)
@@ -386,10 +433,7 @@ server <- function(input, output, session) {
   })
 
   # Unit label for early BED: Gy10 only when the mucosal alpha/beta is 10 Gy.
-  early_unit <- reactive({
-    ab_e <- params()$ab_e
-    if (isTRUE(all.equal(ab_e, 10))) "Gy₁₀" else sprintf("Gy (α/β = %g Gy)", ab_e)
-  })
+  early_unit <- reactive(bed_unit(params()$ab_e))
 
   output$neg_warning <- renderUI({
     b <- both()
@@ -397,8 +441,8 @@ server <- function(input, output, session) {
     if (any(v < 0, na.rm = TRUE))
       div(class = "alert alert-warning",
           "Some BEDs are negative: with these parameters the repopulation loss exceeds the cell-killing term.",
-          "Check the inputs; comparisons between negative BEDs are not meaningful, and the search",
-          "does not use a model whose comparison BED is negative.")
+          "Check the inputs. Comparisons involving a BED that is not positive are not meaningful, and the",
+          "search, sensitivity and agreement tabs do not use them.")
   })
 
   fowler_defaults <- reactive({
@@ -461,16 +505,17 @@ server <- function(input, output, session) {
       helpText(paste("HYPNO (792 patients, 75% with weekly cisplatin 35 mg/m², HPV not tested):",
                      "3-year locoregional control 50.7% vs 51.2%; grade 3+ late effects 18.8% vs 20.2%;",
                      "both passed a 10-percentage-point non-inferiority margin. Grade 3+ acute mucositis",
-                     "50.9% (190/373) vs 54.7% (208/380). The margin does not support escalation beyond",
-                     "55 Gy in 20 fractions.")),
+                     "50.9% (190/373) vs 54.7% (208/380). HYPNO tested one schedule; its result does not",
+                     "by itself establish any other schedule.")),
       helpText(paste("HYHOPE (phase 1, 24 patients, favorable-risk HPV-positive oropharynx, reduced",
                      "elective volumes, 3 × weekly cisplatin 40 mg/m², designed against 60 Gy in 30",
                      "fractions): grade 3 oral mucositis 5/24, any acute grade 3 7/24, 2-year",
                      "locoregional recurrence 13.8% (95% CI 3.2–32%). Not a comparison for unselected HNSCC.")))
   })
 
+  # Toxicity BEDs do not depend on the DD anchor, so the default anchor is used.
   hypno_caps <- reactive({
-    a <- compute_all(20, 2.75, 26, params(), anchor())
+    a <- compute_all(20, 2.75, 26, params(), default_anchor())
     list(early = a$bed_early, late = a$bed_late)
   })
 
@@ -486,11 +531,10 @@ server <- function(input, output, session) {
                      e, u, if (e > cap + 1e-9) "above" else "within", cap, u))
   })
 
-  search_args <- reactive({
-    rf <- ref()
-    validate(need(input$m_range[1] < rf$m,
-                  "The fraction range must include numbers below the comparison regimen."))
-    m_hi <- min(input$m_range[2], rf$m - 1)
+  # Settings shared by the candidate and agreement tabs: dose grid and toxicity
+  # limits. A limit relative to the comparison is relative to each analysis's
+  # own comparison (suggest_regimens computes it).
+  tox_args <- reactive({
     early_mode <- input$early_mode
     late_mode <- choice_or("late_mode", "reference")
     cap <- switch(early_mode,
@@ -499,13 +543,21 @@ server <- function(input, output, session) {
       NULL)
     late_cap <- if (late_mode == "hypno") hypno_caps()$late else NULL
     fenwick <- identical(early_mode, "fenwick")
-    list(m_range = input$m_range[1]:m_hi, d_step = as.numeric(input$d_step),
-         d_max = checked("d_max"), criterion = input$criterion, rank_by = input$rank_by,
+    list(d_step = as.numeric(input$d_step), d_max = checked("d_max"),
          tol_early = if (is.null(cap) && !fenwick) checked("tol_early") else 0,
          tol_late = if (is.null(late_cap)) checked("tol_late") else 0,
-         early_cap = cap, late_cap = late_cap,
-         min_gain = checked("min_gain"), min_days_saved = checked("min_days"),
-         fenwick = fenwick)
+         early_cap = cap, late_cap = late_cap, fenwick = fenwick)
+  })
+
+  # Candidate-tab settings, which only the candidate search uses.
+  search_args <- reactive({
+    rf <- ref()
+    validate(need(input$m_range[1] < rf$m,
+                  "The fraction range must include numbers below the comparison regimen."))
+    m_hi <- min(input$m_range[2], rf$m - 1)
+    c(list(m_range = input$m_range[1]:m_hi, criterion = input$criterion, rank_by = input$rank_by,
+           min_gain = checked("min_gain"), min_days_saved = checked("min_days")),
+      tox_args())
   })
 
   search <- reactive({
@@ -525,16 +577,16 @@ server <- function(input, output, session) {
     if (isTRUE(sr$blocked)) return(NULL)
     early_txt <- if (identical(input$early_mode, "fenwick")) "cell-kill BED (α/β 10 Gy) at or below the Fenwick et al. 2008 boundary for its overall time" else
       if (is.null(sr$cap)) "early BED at most the comparison's plus the allowed excess" else
-      if (input$early_mode == "hypno") sprintf("early BED at most %.1f Gy₁₀ (HYPNO 55 Gy/20 fractions)", sr$cap) else
+      if (input$early_mode == "hypno") sprintf("early BED at most %.1f %s (HYPNO 55 Gy/20 fractions, same acute model)", sr$cap, early_unit()) else
       sprintf("early BED at most %g Gy₁₀ (Fowler zone, lower edge%s)", sr$cap,
               if (isTRUE(input$chemo)) ", with concurrent chemotherapy" else "")
     late_txt <- if (is.null(sr$late_cap)) "late BED at most the comparison's plus the allowed excess" else
-      sprintf("late BED at most %.1f Gy (HYPNO 55 Gy/20 fractions)", sr$late_cap)
+      sprintf("late BED at most %.1f %s (HYPNO 55 Gy/20 fractions)", sr$late_cap, bed_unit(p$ab_l))
     helpText(sprintf(paste("Searched: once-daily Mon-Fri regimens with a dose per fraction above the",
                            "comparison's (multiples of %s Gy, up to %g Gy), %s, and %s. For each number",
                            "of fractions, the highest-ranked dose per fraction is listed; the ZIP download",
                            "also holds every qualifying regimen. Δ = regimen minus comparison. Rows above",
-                           "%g Gy per fraction are beyond the fraction sizes of the benchmark trials.",
+                           "%g Gy per fraction are above the largest fraction size among the benchmark regimens shown on the Results tab.",
                            "The list depends strongly on the tumor repopulation settings (now %.2f Gy/day under DI)."),
                      input$d_step, checked("d_max"), early_txt, late_txt, PRECEDENT_MAX_D,
                      p$lambda_di / p$alpha))
@@ -548,7 +600,7 @@ server <- function(input, output, session) {
                `Δ BED DI` = s$d_di, `Δ BED DD` = dd_col, `Credited by` = s$credited_by,
                `Δ early BED` = s$d_early, `Δ late BED` = s$d_late,
                `Early EQD2` = s$eqd2_early, `Late EQD2` = s$eqd2_late,
-               `Beyond precedent` = ifelse(s$beyond_precedent, "yes", ""),
+               `Above benchmark fraction sizes (> 3.1 Gy)` = ifelse(s$beyond_precedent, "yes", ""),
                `Next dose step would exceed` = s$next_step, check.names = FALSE)
   })
 
@@ -557,27 +609,7 @@ server <- function(input, output, session) {
     if (nrow(s) > 0) return(NULL)
     reason <- attr(s, "reason")
     msg <- function(...) div(class = "alert alert-info", ...)
-    if (identical(reason, "dd_unavailable"))
-      return(msg("The DD model is unavailable with these parameters, so DD-based criteria and rankings",
-                 "(including 'smaller of ΔDI and ΔDD') cannot be used."))
-    if (identical(reason, "negative_reference_di") || identical(reason, "negative_reference_dd") ||
-        identical(reason, "negative_reference_both"))
-      return(msg("The comparison regimen's tumor BED is negative under the",
-                 switch(reason, negative_reference_di = "DI model", negative_reference_dd = "DD model",
-                        negative_reference_both = "DI and DD models"),
-                 "with these parameters, so a negative model cannot credit any regimen.",
-                 "Check the repopulation settings."))
-    if (identical(reason, "negative_reference_early") || identical(reason, "negative_reference_late"))
-      return(msg("The comparison regimen's toxicity BED is negative, so a limit relative to it is not meaningful.",
-                 "Check the toxicity parameters or choose an absolute limit."))
-    if (identical(reason, "empty_dose_range"))
-      return(msg("No dose per fraction lies between the comparison dose per fraction and the highest dose searched."))
-    if (identical(reason, "fowler_params_changed"))
-      return(msg("The Fowler tolerance zone applies only with Fowler's acute parameters",
-                 "(the defaults: α/β 10 Gy, α 0.35/Gy, doubling time 2.5 d, onset day 7 elapsed).",
-                 "Restore them or use another early limit."))
-    if (identical(reason, "no_shorter_regimen"))
-      return(msg("No number of fractions in the searched range saves the minimum number of days."))
+    if (!is.null(reason)) return(msg(reason_text(reason, input$criterion)))
     msg("No regimen in the searched range meets all limits with these settings.",
         "This is a result, not an error: with these parameters, shortening the course costs",
         "tumor BED faster than the limits allow.",
@@ -597,19 +629,25 @@ server <- function(input, output, session) {
       formatRound("Weeks saved", 1)
   })
 
+  # Interface choices saved with an export. They do not change the result, so
+  # an invalid Results-tab regimen is recorded as absent rather than blocking.
+  export_context <- function() {
+    list(comparator = choice_or("comparator", "custom"), preset = input$preset,
+         early_mode = input$early_mode, late_mode = choice_or("late_mode", "reference"),
+         chemo = isTRUE(input$chemo), coupled = coupled(),
+         regimen_evaluated = tryCatch(regimen(), error = function(e) NULL))
+  }
+  anchor_mode <- function() if (coupled()) "coupled" else "fixed"
+
   scenario <- reactive({
     sr <- search()
     validate(need(!isTRUE(sr$blocked), "Nothing to export with the current settings."))
     build_scenario(p = params(), ref = ref(), anchor = anchor(), search = search_args(),
-                   context = list(comparator = choice_or("comparator", "custom"),
-                                  preset = input$preset, early_mode = input$early_mode,
-                                  late_mode = choice_or("late_mode", "reference"),
-                                  chemo = isTRUE(input$chemo), coupled = coupled(),
-                                  regimen_evaluated = regimen()))
+                   context = export_context(), analysis = "candidate", anchor_mode = anchor_mode())
   })
 
   output$download <- downloadHandler(
-    filename = function() sprintf("bed_v2.1_%s_%s.zip", scenario_id(scenario()), format(Sys.Date())),
+    filename = function() export_filename("candidate", scenario_id(scenario())),
     content = function(file) {
       s <- suggestions()
       write_export_zip(file, scenario(), s, attr(s, "feasible"))
@@ -640,27 +678,35 @@ server <- function(input, output, session) {
     r <- comparator_presets()$hypno_test
     list(m = r$m, d = r$d, T = r$T)
   })
+  agree_anchor <- reactive(anchor_for(agree_ref()))
 
-  agreement <- reactive({
+  # Arguments of the agreement search: the shared toxicity settings and the
+  # agreement tab's own fraction range and days saved.
+  agree_args <- reactive({
     validate(need(!(input$early_mode == "fowler" && !fowler_defaults()),
                   "The Fowler limit needs Fowler's acute parameters. Restore them or choose another early limit."))
-    rf <- agree_ref(); args <- search_args()
+    rf <- agree_ref()
     validate(need(rf$m > 1, "The comparison needs at least 2 fractions."))
-    args$m_range <- 1:(rf$m - 1)
-    args$min_days_saved <- checked("agree_days")
-    args$min_gain <- NULL; args$criterion <- NULL; args$rank_by <- NULL
-    do.call(agreement_regimens, c(list(p = params(), ref = rf, anchor = anchor(),
-                                       margin = checked("agree_margin")), args))
+    c(list(m_range = 1:(rf$m - 1), min_days_saved = checked("agree_days")), tox_args())
+  })
+
+  agreement <- reactive({
+    do.call(agreement_regimens, c(list(p = params(), ref = agree_ref(), anchor = agree_anchor(),
+                                       margin = checked("agree_margin")), agree_args()))
   })
 
   output$agree_note <- renderUI({
-    rf <- agree_ref(); p <- params()
-    helpText(sprintf(paste("Comparison: %d × %g Gy in %g days. Toxicity limits: as chosen on the candidate tab",
-                           "(an early or late limit relative to the comparison is now relative to this regimen).",
-                           "DI repopulation starts on day %g; a course that ends earlier gets no DI credit for being",
-                           "shortened further, so under DI it can only lose dose. Under DD, repopulation starts at",
-                           "the day shown, so shortening saves some of it."),
-                     rf$m, rf$d, rf$T, p$Tk))
+    rf <- agree_ref(); p <- params(); an <- agree_anchor()
+    helpText(sprintf(paste("Comparison: %d × %g Gy in %g days. DD anchor: %d × %g Gy in %g days (%s).",
+                           "Toxicity limits: as chosen on the candidate tab (a limit relative to the comparison",
+                           "is relative to this regimen). DI accelerated repopulation starts on day %g, so a course",
+                           "ending well before that day gains little from further shortening under DI.%s Under DD,",
+                           "onset and rate depend on cell killing, so shortening can save part of the repopulation or",
+                           "cost more, depending on the regimen."),
+                     rf$m, rf$d, rf$T, an$m, an$d, an$T,
+                     if (coupled()) "legacy: calibrated at this tab's comparison" else "fixed", p$Tk,
+                     if (p$g > 0) sprintf(" Background growth g still gives %.3f %s per day saved, before and after that day.",
+                                          p$g / p$alpha, bed_unit(p$ab)) else ""))
   })
 
   output$agree_msg <- renderUI({
@@ -668,47 +714,82 @@ server <- function(input, output, session) {
     if (nrow(a) > 0) return(NULL)
     reason <- attr(a, "reason")
     div(class = "alert alert-info",
-        if (!is.null(reason)) paste0("No search was possible (", reason, "). See the candidate tab for the explanation.") else
-          paste("No regimen meets the margin under both models within the toxicity limits.",
-                "Try a more negative margin, fewer days saved, or another toxicity limit."))
+        if (!is.null(reason)) reason_text(reason, "both") else
+          paste("No regimen meets the allowed change under both models within the toxicity limits.",
+                "Try a more negative allowed change, fewer days saved, or another toxicity limit."))
   })
 
   output$agree_table <- renderTable({
     a <- agreement()
     validate(need(nrow(a) > 0, ""))
-    mg <- checked("agree_margin")
-    rng <- function(lo, hi) ifelse(is.na(lo), "not available", sprintf("%+.2f to %+.2f", lo, hi))
+    p <- params()
+    rng <- function(lo, hi) ifelse(is.na(lo), "not evaluable", sprintf("%+.2f to %+.2f", lo, hi))
+    counts <- ifelse(a$n_invalid > 0,
+                     sprintf("%d of %d evaluable (%d of %d not evaluable)", a$n_pass_both, a$n_valid_both,
+                             a$n_invalid, a$n_scenarios),
+                     sprintf("%d of %d", a$n_pass_both, a$n_valid_both))
     data.frame(Fractions = sprintf("%d", a$m), `Gy per fraction` = sprintf("%.2f", a$d),
                Days = sprintf("%g", a$T), `Total Gy` = sprintf("%.2f", a$total_dose),
                `Δ BED DI` = fmt(a$d_di, TRUE), `Δ BED DD` = fmt(a$d_dd, TRUE),
                `Δ DI over scenarios` = rng(a$d_di_min, a$d_di_max),
                `Δ DD over scenarios` = rng(a$d_dd_min, a$d_dd_max),
-               `Scenarios with both ≥ margin` = sprintf("%d of %d", a$n_both_within, a$n_scenarios),
-               `DD onset (day)` = sprintf("%.1f", a$dd_onset),
+               `Scenarios with both ≥ allowed change` = counts,
+               `DD onset (day)` = ifelse(is.finite(a$dd_onset), sprintf("%.1f", a$dd_onset), "none"),
                `Ends before DI onset` = ifelse(a$before_di_onset, "yes", "no"),
-               `Early BED` = sprintf("%.2f", a$bed_early), `Late BED` = sprintf("%.2f", a$bed_late),
-               `Beyond precedent` = ifelse(a$beyond_precedent, "yes", ""), check.names = FALSE)
+               `Early BED` = sprintf("%.2f %s", a$bed_early, bed_unit(p$ab_e)),
+               `Late BED` = sprintf("%.2f %s", a$bed_late, bed_unit(p$ab_l)),
+               `Above benchmark fraction sizes (> 3.1 Gy)` = ifelse(a$beyond_precedent, "yes", ""),
+               check.names = FALSE)
   }, striped = TRUE, bordered = TRUE)
+
+  scenario_agree <- reactive({
+    args <- c(agree_args(), list(criterion = "both", rank_by = "worst", min_gain = checked("agree_margin")))
+    build_scenario(p = params(), ref = agree_ref(), anchor = agree_anchor(), search = args,
+                   context = c(export_context(), list(agree_cmp = input$agree_cmp)),
+                   analysis = "agreement",
+                   agreement = list(margin = checked("agree_margin"), ab_values = SCENARIO_AB_VALUES),
+                   anchor_mode = anchor_mode())
+  })
+
+  output$download_agree <- downloadHandler(
+    filename = function() export_filename("agreement", scenario_id(scenario_agree())),
+    content = function(file) {
+      a <- agreement()
+      write_export_zip(file, scenario_agree(), a, attr(a, "feasible"))
+    },
+    contentType = "application/zip")
 
   sens <- reactive(sensitivity_table(regimen(), ref(), anchor(), params()))
 
   output$sens_summary <- renderUI({
     st <- sens(); mg <- checked("min_gain")
     n <- nrow(st)
-    di_n <- sum(st$d_di >= mg - 1e-9)
-    dd_ok <- !is.na(st$d_dd)
-    dd_n <- sum(st$d_dd[dd_ok] >= mg - 1e-9)
+    di_n <- sum(st$valid_di & st$d_di >= mg - 1e-9, na.rm = TRUE)
+    dd_n <- sum(st$valid_dd & st$d_dd >= mg - 1e-9, na.rm = TRUE)
+    bad <- n - sum(st$valid_di & st$valid_dd)
     tags$p(sprintf(paste("Tumor BED change at least %g Gy (the minimum set on the candidate tab):",
-                         "%d of %d scenarios under DI, %d of %d calibratable scenarios under DD."),
-                   mg, di_n, n, dd_n, sum(dd_ok)))
+                         "%d of %d evaluable scenarios under DI, %d of %d evaluable scenarios under DD.%s"),
+                   mg, di_n, sum(st$valid_di), dd_n, sum(st$valid_dd),
+                   if (bad > 0) sprintf(paste(" %d of %d scenarios are not evaluable under at least one model",
+                                              "(a comparison or regimen BED is not positive, or DD is unavailable)."),
+                                        bad, n) else ""))
   })
+
+  show_delta <- function(d, reason) {
+    ifelse(reason == "ok", sprintf("%+.2f", d),
+      ifelse(reason == "negative_reference", "not evaluable (comparison BED ≤ 0)",
+        ifelse(reason == "negative_candidate", "not evaluable (regimen BED ≤ 0)", "not available (no DD calibration)")))
+  }
 
   output$sens_table <- renderTable({
     st <- sens()
     data.frame(Scenario = unname(PRESET_SHORT[st$preset]), `Tumor α/β (Gy)` = sprintf("%g", st$ab),
                `α (1/Gy)` = sprintf("%.3g", st$alpha), `DI loss (Gy/day)` = sprintf("%.2f", st$lambda_di / st$alpha),
-               `DI onset (day, inclusive)` = sprintf("%g", st$Tk), `DD max rate (1/day)` = sprintf("%.3g", st$lambda_dd),
-               `Δ BED DI` = fmt(st$d_di, TRUE), `Δ BED DD` = fmt(st$d_dd, TRUE), check.names = FALSE)
+               `DI onset (day, inclusive)` = sprintf("%g", st$Tk),
+               `DD max rate (1/day)` = sprintf("%.3g%s", st$lambda_dd, ifelse(st$lambda_dd_inherited, " (sidebar)", "")),
+               `g (1/day)` = sprintf("%g", st$g),
+               `Δ BED DI` = show_delta(st$d_di, st$reason_di), `Δ BED DD` = show_delta(st$d_dd, st$reason_dd),
+               check.names = FALSE)
   }, striped = TRUE, bordered = TRUE)
 
   output$sens_tox <- renderTable({

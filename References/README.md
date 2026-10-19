@@ -18,7 +18,7 @@ should ever be committed. Paywalled items are recorded here and were NOT downloa
 ### A1. Fowler JF, Harari PM, Leborgne F, Leborgne JH (2003) - PRIMARY SOURCE for acute parameters
 - Citation: Fowler JF, Harari PM, Leborgne F, Leborgne JH. Acute radiation reactions in oral and pharyngeal mucosa: tolerable levels in altered fractionation schedules. Radiother Oncol. 2003;69(2):161-168.
 - DOI: 10.1016/s0167-8140(03)00231-7 · PMID: 14643953 · https://doi.org/10.1016/s0167-8140(03)00231-7
-- Status: PAYWALLED (Unpaywall: closed). Not downloaded. Full text not seen.
+- Status: PAYWALLED (Unpaywall: closed). Local copy obtained 2026-10-18 and read in full (section F); git-ignored. The verbatim quotes below were first taken from the PubMed abstract and were rechecked against the full text.
 - Supports: acute mucosal BED form and parameters; acute tolerance zone.
 - Verbatim, Abstract (PubMed), Methods: "The standard published form of BED with its linear overall time factor was used: BED=nd(1 + d/(alpha/beta) - Ln2(T - T(k))/alpha T(p) (see text for parameters)."
 - Verbatim, Abstract (PubMed), Results: "practical schedules used for treatment caused stimulated compensatory proliferation to start at about 7 days ... we suggest choosing a doubling time of 2.5 days as a datum. With these parameters a 'tolerance zone of uncertainty' could be identified which predicted acute-reaction acceptability or not of a schedule within a range of about 2-10 Gy in total BED. If concurrent chemoradiotherapy is used, our provisional suggestion is that this zone should be reduced by up to roughly 3-5 Gy10 in BED"
@@ -45,7 +45,7 @@ should ever be committed. Paywalled items are recorded here and were NOT downloa
 - Verbatim, Abstract (PubMed), Results: "A trend towards a correlation was seen between the percentage difference in amBED and the percentage difference in acute grade 3 mucositis (P=0.06). A significant correlation was observed between the percentage difference in lmBED and the percentage difference in grade 3 late mucosal toxicity (P=0.02). However, a 15% decrease in lmBED between control and experimental arms of the study was necessary for any sparing of late mucosal toxicity to be observed."
 
 ### A4. HYHOPE protocol (UTSW STU 2020-1079; NCT04580446)
-- Citation: Moon D (PI). HYHOPE: Phase I study of de-intensified hypofractionated radiation therapy for human papilloma virus-associated oropharynx cancer. Protocol STU 2020-1079, version 4.1 (document footer "Mod_17, 04-02-24"). UT Southwestern Simmons Comprehensive Cancer Center. ClinicalTrials.gov NCT04580446.
+- Citation: Moon D (PI). HYHOPE: Phase I study of de-intensified hypofractionated radiation therapy for human papilloma virus-associated oropharynx cancer. Protocol STU 2020-1079, version 4.2 (signature page "Amendment/Version # Version 4.2"; document footer "Mod_17, 04-02-24"; some body headers still say 4.1). UT Southwestern Simmons Comprehensive Cancer Center. ClinicalTrials.gov NCT04580446.
 - URL: https://cdn.clinicaltrials.gov/large-docs/46/NCT04580446/Prot_SAP_000.pdf
 - Status: DOWNLOADED -> `Moon_2024_HYHOPE_protocol_NCT04580446.pdf` (47 pp). Publicly posted on ClinicalTrials.gov. Note: page 1 carries a "CONFIDENTIAL ... property of the UTSW Simmons Comprehensive Cancer Center" template header despite public posting; do not commit to a public repository without checking.
 - Supports: an applied use of the Fowler acute parameters and of the "BED3 ≤ standard, BED10 ≥ standard" design rule (the same rule as calculator v2).
@@ -227,7 +227,7 @@ Free to read but bot-blocked; local copies now held, excluded from git (section 
 - Citation: Shuryak I, Hall EJ, Brenner DJ. Dose dependence of accelerated repopulation in head and neck cancer: supporting evidence and clinical implications. Radiother Oncol. 2018;127(1):20-26.
 - DOI: 10.1016/j.radonc.2018.02.015
 - Status: Elsevier, not redistributable. Local copy outside this folder: `Office/Publications/Articles/accelerated_repopulation.pdf` (the author's own paper). Not copied here.
-- Supports: the DI model (Eq. 1) and the DD model (Eqs. 2-5) used by the calculator; the background growth rate g = 0.0154 per day, which the calculator omits.
+- Supports: the DI model (Eq. 1) and the DD model (Eqs. 2-5) used by the calculator; the background growth rate g = 0.0154 per day, which the calculator implements as an option (default 0, version 2.1 and later). Dataset: 35 regimens from 16 publications, 7283 patients (p. 21, Table 1).
 - Checked 2026-10-18 against the local copy: the DD onset C = (αD + βD²/n)·TkDD/T and the rate γDD = γ·Pkill with Pkill = 1 − exp(−(αd + βd²)n/T) match `R/bed_models.R`.
 
 ## F. Full-text copies received 2026-10-18 (saved by the user, excluded from git)
@@ -242,8 +242,27 @@ These PDFs sit in this folder but are git-ignored (`References/*.pdf`), because 
 | Hartley_2011_mucosal_parameters.pdf | Hartley A, et al. Clin Oncol. 2011;23:29-33 | 20829006 | 10.1016/j.clon.2010.08.007 | Mucosal α 0.3 Gy⁻¹; acute BED vs grade 3 mucositis a trend only (p = 0.06) |
 | Moon_2025_HYHOPE_outcomes.pdf | Moon DH, et al. Int J Radiat Oncol Biol Phys. 2025;123:694-702 | 40383163 | 10.1016/j.ijrobp.2025.05.009 | 46.5 Gy/15 fx maximum tolerated dose; grade 3 oral mucositis 21% |
 | Bentzen_2026_HYPNO.pdf | Bentzen SM, et al. Int J Radiat Oncol Biol Phys. 2026;125:387-398 | 41711624 | 10.1016/j.ijrobp.2025.12.056 | Grade 3+ mucositis 50.9% vs 54.7%; 3-year LRC difference ≤ 1.4 points; design assumed 0.65 Gy/day in EQD2 units (0.78 Gy10/day) |
-| Fowler_2010_21_years_BED.pdf | Fowler JF. Br J Radiol. 2010;83:554-568 | 20603408 | 10.1259/bjr/31372149 | Tumor Tk 21-32 d, Tp 3 d, α 0.35 Gy⁻¹; repopulation "no more than about 0.7 Gy/day"; mucosal Tk 7 d from biopsy cell counts |
+| Fowler_2010_21_years_BED.pdf | Fowler JF. Br J Radiol. 2010;83:554-568 | 20603408 | 10.1259/bjr/31372149 | Tumor Tk 21-32 d, Tp 3 d, α 0.35 Gy⁻¹; repopulation "no more than about 0.7 Gy/day", stated elsewhere in the paper as about 0.7 Gy EQD2 per day (0.84 Gy₁₀ BED per day); mucosal Tk 7 d from biopsy cell counts |
 | Meade_2014_chemo_mucosal_tolerance.pdf | Meade S, et al. Tumour Biol. 2014;35:2017-2023 | 24104502 | 10.1007/s13277-013-1267-0 | Fowler ceiling 61 + 0.792(T − 7) with 46 d for 35 fx; cisplatin 300 mg/m² adds 4.4 Gy10, scaled by dose given |
 | Madhava_2006_carboplatin_hypofractionation.pdf | Madhava K, et al. Clin Oncol. 2006;18:77-81 | 16477924 | 10.1016/j.clon.2005.08.014 | 55 Gy/20 fx + carboplatin: grade 3 mucositis 16/19 (84%) |
 | Miller_2026_hypofractionation_cohort.pdf | Miller D, et al. Clin Oncol. 2026;59:104332 | 42759386 | 10.1016/j.clon.2026.104332 | Real-world 55 Gy/20 fx, almost all without chemotherapy: grade 3 mucositis 64% (72/113 completers) at end of treatment, RTOG grading |
 | Kirkpatrick_2010_QUANTEC_spinal_cord.pdf | Kirkpatrick JP, et al. Int J Radiat Oncol Biol Phys. 2010;76(3 Suppl):S42-S49 | 20171517 | 10.1016/j.ijrobp.2009.04.095 | Cord α/β 0.87 Gy (0.54-1.19); 50/60/69 Gy in 2-Gy fractions give 0.2/6/50% myelopathy |
+
+## G. Current parameter ledger (version 2.5)
+
+Every numeric input the app ships, with its origin. Direct = stated by the source; conversion = derived from a source value by the stated rule; chosen = a representative or completing value set for this calculator; analyst = a constructed scenario, not a source estimate. The same table, for the tumor presets, is on the app's "Model and sources" page.
+
+| Value | Origin | Source and locator |
+|---|---|---|
+| Acute α 0.35 Gy⁻¹, α/β 10 Gy, T_k 7 elapsed days, T_p 2.5 days | direct | Fowler 2003 (A1), Conclusions; elapsed-day clock per Fowler 2003 Table 1 and Fowler 2010 (A2) |
+| Fowler zone 59–61 Gy₁₀, chemotherapy decrement "possibly 3–5 Gy10" | direct | Fowler 2003 (A1), Conclusions |
+| Fenwick boundary 69.5 (T/32.2)/sin(T/32.2) − 3.5 Gy₁₀, T ≤ 50 inclusive days | direct | Fenwick 2008 (A5), Eq. 10, printed p. 630 |
+| Late α/β 3 Gy (default); 2 and 4 Gy shown | chosen (conventional) | Stuschke 1999 (B1) for 3.3–4.0 Gy; QUANTEC cord (B6) for lower values |
+| Withers λ_DI = α × 0.6 (1 + 2/(α/β)) | conversion of 0.6 Gy EQD2/day | Withers 1988 (D1), p. 140 |
+| Withers α 0.2 Gy⁻¹, T_k 28 days | chosen (version 1 α; 28 days representative of "4 ± 1 weeks") | Withers 1988 abstract, p. 131 |
+| Hartley α 0.3 Gy⁻¹, T_p 3 days, T_k 22 elapsed = 23 inclusive days | direct, clock converted | Hartley 2011 (A3), Table 1 |
+| HYHOPE α 0.35 Gy⁻¹, T_p 3 days, T_k 21 days | direct (protocol's inclusive clock) | HYHOPE protocol version 4.2 (A4), section 4.1.2, p. 10 |
+| D18 α 0.35, λ_DI 0.23, λ_DD 0.40 per day, T_k 28 | analyst (2026-10-18) | `docs/development/2026_10_18_dd_parameters/`; λ_DD is constructed, not a published DD estimate |
+| Version 1 α 0.2, λ_DI 0.2, λ_DD 0.5, T_k 28 | chosen (version 1 website) | version 1 app |
+| γ₅₀ 3.2 (1.6–4.8) and 0.8 ± 0.4 (About page illustration only) | direct | Stuschke 1999 (B1), Table 1 and Discussion 4.1 |
+| 2018 fitted DD (α 0.224, λ 1.17, C 14.5, g 0.0154) (About page only) | direct | Shuryak 2018 (E1), Table 2 |

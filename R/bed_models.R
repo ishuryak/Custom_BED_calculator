@@ -1,4 +1,4 @@
-# BED models for the HNSCC BED calculator, version 2.1.
+# BED models for the HNSCC BED calculator (version: APP_VERSION below).
 #
 # Notation: m = number of fractions, d = dose per fraction (Gy),
 # T = overall treatment time (days, first to last treatment day inclusive),
@@ -8,8 +8,14 @@
 # All max(0, x) terms use the same smooth version as the v1 website,
 # log(1 + exp(3x)) / 3, so v1 and v2 agree at the v1 defaults.
 
-APP_VERSION <- "2.4.0"
+APP_VERSION <- "2.5.0"
 EQUATION_VERSION <- "2.2"  # 2.1 + optional Fenwick 2008 acute boundary
+# Selection rules (filtering, validity, ranking), versioned apart from the
+# equations. 2.5: one validity rule for search, sensitivity and agreement.
+SELECTION_VERSION <- "2.5"
+# The sensitivity scenario set: every tumor preset at each tumor alpha/beta.
+SCENARIO_SET_VERSION <- "1"
+SCENARIO_AB_VALUES <- c(7, 10, 15)
 
 SMOOTH_K <- 3  # sharpness (1/day) of the smooth max(0, x), as in v1
 
@@ -35,8 +41,9 @@ fenwick_limit <- function(T) {
 
 fenwick_cell_kill <- function(m, d) bed_lq(m, d, FENWICK$ab)
 
-# Largest dose per fraction with curative precedent in the benchmark trials
-# (HYHOPE 46.5 Gy in 15 fractions). Larger fractions are flagged.
+# Largest dose per fraction among the benchmark regimens shown in the app
+# (HYHOPE 46.5 Gy in 15 fractions, favorable-risk HPV-positive oropharynx).
+# Larger fractions are flagged. The flag describes that benchmark set only.
 PRECEDENT_MAX_D <- 3.1
 
 # Smooth max(0, x); switches to x where exp() would overflow.
@@ -66,8 +73,9 @@ overall_time <- function(m) {
 }
 
 # Convert the app's inclusive overall time to the clock of a tissue model.
-# Fowler, Fenwick, Hartley and Meade count elapsed days (last day minus first
-# day), which is the inclusive count minus 1.
+# Fowler's acute parameters and zone count elapsed days (last day minus first
+# day), the inclusive count minus 1. Fenwick's boundary uses inclusive days
+# (see fenwick_limit) and is not converted.
 acute_model_time <- function(T, clock = "elapsed") {
   switch(clock, elapsed = T - 1, inclusive = T, stop("unknown clock: ", clock))
 }
@@ -160,6 +168,23 @@ fowler_zone <- function(chemo = FALSE) {
   if (chemo) FOWLER_ZONE - rev(FOWLER_CHEMO_REDUCTION) else FOWLER_ZONE
 }
 
+# One validity rule for a tumor-model comparison, used by the search, the
+# sensitivity table and the agreement tab. A model's difference from the
+# comparison is used only when the model is available (DD calibrated), the
+# comparison BED is finite and positive, and the candidate BED is finite and
+# positive. Otherwise delta is NA and reason says why: "dd_unavailable",
+# "negative_reference" or "negative_candidate". Raw BEDs are kept by callers.
+tumor_endpoint <- function(cand_bed, ref_bed, available = TRUE) {
+  ref_ok <- isTRUE(available) && length(ref_bed) == 1 && is.finite(ref_bed) && ref_bed > 0
+  cand_ok <- is.finite(cand_bed) & cand_bed > 0
+  valid <- ref_ok & cand_ok
+  reason <- if (!isTRUE(available)) rep("dd_unavailable", length(cand_bed)) else
+    if (!ref_ok) rep("negative_reference", length(cand_bed)) else
+      ifelse(cand_ok, "ok", "negative_candidate")
+  list(valid = valid, reason = reason, ref_valid = ref_ok,
+       delta = ifelse(valid, cand_bed - ref_bed, NA_real_))
+}
+
 # Search for hypofractionated regimens, given once daily Monday to Friday.
 # Dose per fraction runs over multiples of d_step above the comparison dose
 # per fraction, up to d_max. Overall time must be at least min_days_saved
@@ -195,8 +220,9 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   blocked <- function(reason) { attr(out, "reason") <- reason; out }
   cal <- dd_calibration(anchor, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk)
   r0 <- compute_all(ref$m, ref$d, ref$T, p, anchor)
-  di_usable <- is.finite(r0$bed_di) && r0$bed_di > 0
-  dd_usable <- cal$status != "infeasible" && is.finite(r0$bed_dd) && r0$bed_dd > 0
+  dd_available <- cal$status != "infeasible"
+  di_usable <- tumor_endpoint(1, r0$bed_di)$ref_valid
+  dd_usable <- tumor_endpoint(1, r0$bed_dd, dd_available)$ref_valid
   needs_di <- criterion %in% c("both", "di") || rank_by %in% c("worst", "di")
   needs_dd <- criterion %in% c("both", "dd") || rank_by %in% c("worst", "dd")
   if (cal$status == "infeasible" && needs_dd) return(blocked("dd_unavailable"))
@@ -220,12 +246,16 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
 
   evaluate <- function(m, d, T) {
     a <- compute_all(m, d, T, p, anchor)
-    a$d_di <- a$bed_di - r0$bed_di
-    a$d_dd <- a$bed_dd - r0$bed_dd
+    e_di <- tumor_endpoint(a$bed_di, r0$bed_di)
+    e_dd <- tumor_endpoint(a$bed_dd, r0$bed_dd, dd_available)
+    a$d_di <- e_di$delta
+    a$d_dd <- e_dd$delta
     a$d_early <- a$bed_early - r0$bed_early
     a$d_late <- a$bed_late - r0$bed_late
-    a$qual_di <- di_usable & a$bed_di > 0 & a$d_di >= min_gain - eps
-    a$qual_dd <- dd_usable & !is.na(a$d_dd) & a$bed_dd > 0 & a$d_dd >= min_gain - eps
+    a$qual_di <- e_di$valid & a$d_di >= min_gain - eps
+    a$qual_dd <- e_dd$valid & a$d_dd >= min_gain - eps
+    a$qual_di[is.na(a$qual_di)] <- FALSE
+    a$qual_dd[is.na(a$qual_dd)] <- FALSE
     a$tumor_ok <- switch(criterion,
       either = a$qual_di | a$qual_dd, both = a$qual_di & a$qual_dd,
       di = a$qual_di, dd = a$qual_dd,
@@ -240,11 +270,9 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   a <- evaluate(g$m, g$d, g$T)
   a <- a[a$tumor_ok & a$early_ok & a$late_ok, , drop = FALSE]
   if (nrow(a) == 0) return(out)
-  # A model that is not usable shows no difference at all (NA, not a number).
-  if (!di_usable) a$d_di <- NA_real_
-  if (!dd_usable) a$d_dd <- NA_real_
 
-  # A model that is not usable does not enter the score.
+  # A model that is not usable for a row has NA difference and does not enter
+  # the score.
   a$score <- switch(rank_by,
     best = pmax(a$d_di, a$d_dd, na.rm = TRUE),
     worst = pmin(a$d_di, a$d_dd, na.rm = TRUE),
@@ -306,9 +334,9 @@ comparator_presets <- function() {
                          label = "HYPNO control arm: 66 Gy in 33 fractions, 6 fractions/week (38 days)"))
 }
 
-# Published regimens shown for comparison, each with the regimen it is
-# compared against ("own_control" = the trial's own control arm, else the
-# user's comparison regimen). Overall times are inclusive, Monday start.
+# Published regimens shown for comparison. Differences are shown against the
+# user's comparison regimen. Overall times are inclusive, Monday start; the
+# HYPNO control arm is 6 fractions/week.
 benchmark_regimens <- function() {
   data.frame(
     name = c("HYPNO test arm: 55 Gy in 20 fractions, 5 fractions/week",
@@ -394,53 +422,91 @@ preset_matching <- function(alpha, lambda_di, Tk, ab = 10, lambda_dd = NULL) {
   "custom"
 }
 
-# Deterministic sensitivity: tumor BED differences of one regimen from the
-# comparison regimen, over the tumor presets and a few tumor alpha/beta
-# values. DI-only presets keep the current lambda_dd. These are selected
-# scenarios, not a probability distribution.
-sensitivity_table <- function(reg, ref, anchor, p, ab_values = c(7, 10, 15)) {
+# Definitions of the sensitivity scenarios: every tumor preset at each tumor
+# alpha/beta. Values a preset does not set (lambda_dd for the DI-only presets,
+# g, the toxicity values) are inherited from p; the anchor is shared. These
+# are selected scenarios, not a probability distribution.
+scenario_set <- function(p, ab_values = SCENARIO_AB_VALUES) {
   rows <- list()
   for (nm in names(tumor_presets())) for (ab in ab_values) {
-    q <- modifyList(p, resolve_preset(nm, ab))
+    pr <- resolve_preset(nm, ab)
+    q <- modifyList(p, pr)
     q$ab <- ab
-    cal <- dd_calibration(anchor, q$alpha, q$ab, q$lambda_di, q$lambda_dd, q$Tk)
-    a <- compute_all(c(reg$m, ref$m), c(reg$d, ref$d), c(reg$T, ref$T), q, anchor)
     rows[[length(rows) + 1]] <- data.frame(
-      preset = nm, ab = ab, alpha = q$alpha, lambda_di = q$lambda_di,
-      lambda_dd = q$lambda_dd, Tk = q$Tk, dd_status = cal$status,
-      d_di = a$bed_di[1] - a$bed_di[2], d_dd = a$bed_dd[1] - a$bed_dd[2],
+      preset = nm, ab = ab, alpha = q$alpha, lambda_di = q$lambda_di, lambda_dd = q$lambda_dd,
+      Tk = q$Tk, g = if (is.null(q$g)) 0 else q$g, lambda_dd_inherited = is.null(pr$lambda_dd),
       stringsAsFactors = FALSE)
   }
   do.call(rbind, rows)
 }
 
+# Deterministic sensitivity: tumor BED differences of one regimen from the
+# comparison regimen over scenario_set(). Raw BEDs are kept; a difference is
+# shown only when tumor_endpoint() finds it evaluable (valid_di, valid_dd),
+# otherwise it is NA with the reason.
+sensitivity_table <- function(reg, ref, anchor, p, ab_values = SCENARIO_AB_VALUES) {
+  ss <- scenario_set(p, ab_values)
+  rows <- lapply(seq_len(nrow(ss)), function(i) {
+    q <- modifyList(p, as.list(ss[i, c("alpha", "ab", "lambda_di", "lambda_dd", "Tk", "g")]))
+    cal <- dd_calibration(anchor, q$alpha, q$ab, q$lambda_di, q$lambda_dd, q$Tk)
+    a <- compute_all(c(reg$m, ref$m), c(reg$d, ref$d), c(reg$T, ref$T), q, anchor)
+    e_di <- tumor_endpoint(a$bed_di[1], a$bed_di[2])
+    e_dd <- tumor_endpoint(a$bed_dd[1], a$bed_dd[2], cal$status != "infeasible")
+    data.frame(dd_status = cal$status,
+               ref_di = a$bed_di[2], cand_di = a$bed_di[1], valid_di = e_di$valid,
+               reason_di = e_di$reason, d_di = e_di$delta,
+               ref_dd = a$bed_dd[2], cand_dd = a$bed_dd[1], valid_dd = e_dd$valid,
+               reason_dd = e_dd$reason, d_dd = e_dd$delta, stringsAsFactors = FALSE)
+  })
+  out <- cbind(ss, do.call(rbind, rows))
+  out$anchor_m <- anchor$m; out$anchor_d <- anchor$d; out$anchor_T <- anchor$T
+  out
+}
+
+# Counts and ranges over sensitivity scenarios for one regimen. A scenario is
+# evaluable when both models' differences are valid; only evaluable scenarios
+# can pass, and ranges use valid differences only (NA when there are none).
+scenario_summary <- function(st, margin) {
+  both <- st$valid_di & st$valid_dd
+  rng <- function(x, ok) if (any(ok)) range(x[ok]) else c(NA_real_, NA_real_)
+  di <- rng(st$d_di, st$valid_di); dd <- rng(st$d_dd, st$valid_dd)
+  data.frame(d_di_min = di[1], d_di_max = di[2], d_dd_min = dd[1], d_dd_max = dd[2],
+             n_scenarios = nrow(st), n_valid_both = sum(both), n_invalid = nrow(st) - sum(both),
+             n_pass_both = sum(both & st$d_di >= margin - 1e-9 & st$d_dd >= margin - 1e-9))
+}
+
 # Two-model agreement: regimens whose tumor BED change from the comparison is
-# at least `margin` under BOTH models with the current parameters (ranked by
-# the smaller change), plus how robust that is over the sensitivity
-# scenarios (tumor presets x ab_values): ranges of each model's change and
-# the number of scenarios in which both changes are at least `margin`.
-# dd_onset is the DD repopulation onset day of the regimen with the current
-# parameters; before_di_onset says whether the course ends before the DI
-# onset (then DI credits no saved repopulation for shortening it).
+# at least `margin` under BOTH models with the current parameters (one dose
+# per fraction per number of fractions, ranked by the smaller change), plus
+# how that holds over the sensitivity scenarios (scenario_summary()). The
+# margin is a BED margin applied at each scenario's tumor alpha/beta.
+# dd_onset is the DD repopulation onset day with the current parameters (Inf
+# when there is no accelerated repopulation); before_di_onset says whether
+# the course ends before the DI onset day. The candidate-by-scenario table is
+# attached as attribute "scenario_detail".
 # `...` passes toxicity limits and the search grid to suggest_regimens().
-agreement_regimens <- function(p, ref, anchor, margin = -3, ab_values = c(7, 10, 15), ...) {
+agreement_regimens <- function(p, ref, anchor, margin = -3, ab_values = SCENARIO_AB_VALUES, ...) {
   s <- suggest_regimens(p, ref, anchor = anchor, criterion = "both", rank_by = "worst",
                         min_gain = margin, ...)
   if (nrow(s) == 0) return(s)
+  feasible <- attr(s, "feasible")
   s <- s[order(s$m), , drop = FALSE]
   cal <- dd_calibration(anchor, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk)
   s$dd_onset <- dd_onset_rate(s$m, s$d, s$T, p$alpha, p$ab, p$lambda_dd, cal$c_over_alpha)$onset
   s$before_di_onset <- s$T < p$Tk
+  detail <- list()
   rob <- lapply(seq_len(nrow(s)), function(i) {
     st <- sensitivity_table(list(m = s$m[i], d = s$d[i], T = s$T[i]), ref, anchor, p, ab_values)
-    ok <- !is.na(st$d_dd)
-    data.frame(d_di_min = min(st$d_di), d_di_max = max(st$d_di),
-               d_dd_min = if (any(ok)) min(st$d_dd[ok]) else NA_real_,
-               d_dd_max = if (any(ok)) max(st$d_dd[ok]) else NA_real_,
-               n_both_within = sum(ok & st$d_di >= margin - 1e-9 & st$d_dd >= margin - 1e-9),
-               n_scenarios = nrow(st))
+    detail[[i]] <<- cbind(m = s$m[i], d = s$d[i], T = s$T[i], st,
+                          pass_both = st$valid_di & st$valid_dd &
+                            st$d_di >= margin - 1e-9 & st$d_dd >= margin - 1e-9)
+    scenario_summary(st, margin)
   })
   s <- cbind(s, do.call(rbind, rob))
   rownames(s) <- NULL
+  det <- do.call(rbind, detail)
+  rownames(det) <- NULL
+  attr(s, "scenario_detail") <- det
+  attr(s, "feasible") <- feasible
   s
 }

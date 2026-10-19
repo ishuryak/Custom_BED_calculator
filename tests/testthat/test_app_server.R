@@ -296,9 +296,10 @@ test_that("search table shows which model credits each row and flags large fract
   shiny::testServer(app_dir, {
     set_defaults(session, tol_early = 10, tol_late = 10, d_max = 4)
     x <- pretty_suggestions()
-    expect_true(all(c("Credited by", "Beyond precedent") %in% names(x)))
+    flag <- "Above benchmark fraction sizes (> 3.1 Gy)"      # renamed in 2.5 (F06)
+    expect_true(all(c("Credited by", flag) %in% names(x)))
     s <- suggestions()
-    expect_equal(x[["Beyond precedent"]] == "yes", s$d > 3.1 + 1e-9)
+    expect_equal(x[[flag]] == "yes", s$d > 3.1 + 1e-9)
   })
 })
 
@@ -340,7 +341,7 @@ test_that("model agreement tab lists the regimens both models support against HY
     expect_true(grepl("-2.79", tab, fixed = TRUE) && grepl("-1.96", tab, fixed = TRUE))
     session$setInputs(agree_margin = 0)
     expect_equal(nrow(agreement()), 0)
-    expect_true(grepl("No regimen meets the margin", output$agree_msg$html))
+    expect_true(grepl("No regimen meets the allowed change", output$agree_msg$html))
     session$setInputs(agree_cmp = "sidebar", agree_margin = -3, agree_days = 7)
     expect_true(all(agreement()$T <= 47 - 7))
   })
