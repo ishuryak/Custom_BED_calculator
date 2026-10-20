@@ -1,0 +1,54 @@
+Walkthrough 2026-10-20 12:04:06; target http://127.0.0.1:8795 (local app started by this script); local revision 436375adfe0cb928fe2db8e4a12a3445719e3e98; expected version 2.7.0
+PASS  1 title shows version 2.7
+PASS  1 opening criterion is both models  [both]
+PASS  1 opening ranking is the smaller change  [worst]
+PASS  1 opening minimum change is +1 Gy  [1]
+PASS  1 visible labels agree
+PASS  1 Results caveat visible
+PASS  1 Results: no output errors
+PASS  1 Candidate caveat visible
+PASS  1 opening candidate table is empty
+PASS  1 empty message: both models, valid outcome, separate agreement comparison  [No regimen in the searched range meets the selected minimum tumor BED change under both models and all other limits. An empty result is a valid outcome of this ]
+PASS  1 candidate context names the sidebar comparison  [Comparison: 35 × 2 Gy in 47 days (sidebar). DD anchor: 35 × 2 Gy in 47 days. Tumor α/β 10 Gy, mucosa 10 Gy, late tissue 3 Gy. Tumor criterion: change of at least 1 Gy, and at least 7 days saved.
+Early toxicity limit: 55.87 Gy₁₀ (HYPNO 55 Gy/20, fixed). Late toxicity limit: 116.67 Gy₃ (comparison 116.67 + 0). Dose grid: multiples of 0.05 Gy up to 5 Gy.]
+PASS  1 Agreement caveat visible, above the table
+PASS  1 agreement context names HYPNO, -3 Gy and 1 day
+PASS  1 agreement rows 17, 18, 19 with 15 of 15 settings
+PASS  1 agreement headers say settings
+PASS  2 all six sidebar panels open
+PASS  2 Results opens without output errors
+PASS  2 Candidate regimens opens without output errors
+PASS  2 Model agreement opens without output errors
+PASS  2 Sensitivity opens without output errors
+PASS  2 Model and sources opens without output errors
+PASS  2 equations rendered by MathJax
+PASS  2 source link targets the version 2 branch  [https://github.com/ishuryak/Custom_BED_calculator/tree/v2-toxicity-hypofractionation]
+PASS  2 version footer from the code
+PASS  3 both/smaller/-3 Gy lists 30, 29, 28 fractions in that order  [30x2.20,29x2.25,28x2.30]
+PASS  3 plot renders
+PASS  3 download has its four files
+PASS  3 download replays to full precision
+PASS  3 export records version, settings and selection rules
+PASS  3 export code unchanged since load
+PASS  3 either/larger/+1 Gy lists 29, 28, 30  [29x2.25,28x2.30,30x2.20]
+PASS  3 back to the opening settings: empty again, no stale rows
+PASS  3 empty-state download still has its files
+PASS  4 agreement download replays, 45 setting rows
+PASS  4 sidebar comparison switches the agreement context
+PASS  5 DD unavailable: DD-specific explanation, no generic text
+PASS  5 DD unavailable: no stale rows
+PASS  5 invalid fraction count gives a validation message
+PASS  6 chemotherapy lowers the Fowler zone
+PASS  6 chemotherapy leaves every BED unchanged
+PASS  6 chemotherapy leaves the HYPNO limit unchanged
+PASS  7 summary counts parameter settings and says what they are not  [Tumor BED change at least 1 Gy (the minimum set on the candidate tab): 3 of 15 evaluable parameter settings under DI, 0 of 15 evaluable parameter settings under DD. These selected parameter settings a]
+PASS  7 sensitivity: 15 rows
+PASS  7 summary follows the candidate threshold
+PASS  8 narrow 420 px: Results has no page-level horizontal scroll  [0 px]
+PASS  8 narrow 420 px: Candidate regimens has no page-level horizontal scroll  [0 px]
+PASS  8 narrow 420 px: Model agreement has no page-level horizontal scroll  [0 px]
+PASS  8 narrow 420 px: Sensitivity has no page-level horizontal scroll  [0 px]
+PASS  8 narrow 420 px: Model and sources has no page-level horizontal scroll  [0 px]
+PASS  8 narrow: caveat and criterion menu visible
+PASS  9 after reload: both, smaller change, +1 Gy, empty table  ["both" | "worst" | 1L | ""]
+PASS  browser console: no errors

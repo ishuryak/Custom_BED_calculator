@@ -159,3 +159,8 @@ Record, verification of each finding, and decisions: `docs/development/2026_10_2
 - **Suite:** `tools/run_tests.R` gave 2727 expectations, 0 failed, 0 errors, 0 skipped, 0 warnings (`docs/development/2026_10_20_v27/suite_96ec8ac.log`).
 - **Walkthrough:** `walkthrough_v27.R` in local mode passed 52 of 52 checks with exit 0, with no uncommitted app changes (`docs/development/2026_10_20_v27/walkthrough/20261020_113231_local/`).
 - **Not deployed:** the live site is still 2.6.0. Deployment and the live walkthrough wait for local inspection.
+
+**Deployed** 2026-10-20 from `436375a` (code identical to `96ec8ac`) with `Rscript tools/deploy.R`:
+- **Account:** the only configured shinyapps.io account, `ishuryak`. The bundle was `about.md`, `app.R`, `DESCRIPTION`, `LICENSE`, `R/bed_models.R`, `R/export.R` and `renv.lock`.
+- **First live walkthrough:** 50 of 51 checks. The −3 Gy row check read the table before the live server had re-rendered it. The context strip already showed −3 Gy, and the download replay of the same rows passed (`walkthrough/20261020_115952_live_first_run_timing_fail/`).
+- **Script fix:** the row checks now poll for up to 20 s. Rerun live: **51 of 51, exit 0** (`walkthrough/20261020_120129_live/`). The local rerun with the same script was 52 of 52 (`walkthrough/20261020_120255_local/`).

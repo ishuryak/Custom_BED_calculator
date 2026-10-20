@@ -10,9 +10,7 @@ It also screens shorter, hypofractionated regimens against a comparison regimen 
 
 It is a research tool for hypothesis generation, not for treatment decisions.
 
-**Release candidate 2.7.0** is on this branch and has not been deployed yet. Its changes are listed below.
-
-**Live:** https://ishuryak.shinyapps.io/custom_bed_calculator_v2/ (version 2.6.0, code `cd5d835`, deployed 2026-10-19 with `Rscript tools/deploy.R`, a separate app from version 1). The live site was checked in a headless browser after deployment: version 2.6, default candidate rows 29 × 2.25, 28 × 2.30 and 30 × 2.20 Gy, agreement 15 of 15, no output errors on any tab.
+**Live:** https://ishuryak.shinyapps.io/custom_bed_calculator_v2/ (version 2.7.0, code `436375a`, deployed 2026-10-20 with `Rscript tools/deploy.R`, a separate app from version 1). The live site was checked with `docs/development/2026_10_20_v27/walkthrough_v27.R --live`: 51 of 51 checks, including the opening defaults (both models, smaller change, +1 Gy, empty candidate table), the caveat line on three tabs, "15 of 15 settings", the source link, both downloads replayed locally, and no browser-console errors.
 
 **Version 1 warning.** Version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/, branch `main`) is unchanged and still carries the DD calibration error described below. Do not use version 1 DD results computed at a tumor α/β other than 10 Gy.
 

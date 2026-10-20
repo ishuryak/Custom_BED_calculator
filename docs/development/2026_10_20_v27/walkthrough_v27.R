@@ -81,6 +81,13 @@ main <- function(args) {
     for (i in 1:40) { if (isTRUE(js("!!document.querySelector('#suggest_table table') || document.getElementById('suggest_msg').innerText.length > 0"))) break; Sys.sleep(0.5) }
     v <- rows_now(); if (is.null(v)) "<not readable>" else v
   }
+  # Poll until the table shows the expected rows (a live server can lag behind
+  # the busy flag); returns what it last read, so a mismatch is still reported.
+  rows_until <- function(want, timeout = 20) {
+    v <- rows()
+    for (i in seq_len(timeout * 2)) { if (identical(v, want)) break; Sys.sleep(0.5); v <- rows_now() %||% "<not readable>" }
+    v
+  }
   rows_now <- function() js("Array.from(document.querySelectorAll('#suggest_table tbody tr')).filter(r => !r.querySelector('.dataTables_empty')).map(r => r.cells[0].innerText + 'x' + r.cells[1].innerText).join(',')")
   visible <- function(id) isTRUE(js(sprintf("(function(){var e=document.getElementById('%s'); if(!e) return false; var r=e.getBoundingClientRect(); return e.offsetParent !== null && r.width > 0 && r.height > 0;})()", id)))
   fetch <- function(id) {
@@ -141,7 +148,7 @@ main <- function(args) {
   # 3. Candidate fixtures, chosen explicitly ---------------------------------------------
   tab("Candidate regimens")
   set_val("min_gain", -3)
-  check("3 both/smaller/-3 Gy lists 30, 29, 28 fractions in that order", identical(rows(), "30x2.20,29x2.25,28x2.30"), rows())
+  check("3 both/smaller/-3 Gy lists 30, 29, 28 fractions in that order", identical(r3 <- rows_until("30x2.20,29x2.25,28x2.30"), "30x2.20,29x2.25,28x2.30"), r3)
   check("3 plot renders", isTRUE(js("!!document.querySelector('#suggest_plot img')")))
   z <- fetch("download")
   res <- read.csv(file.path(z$dir, "results.csv")); rr <- replay(z$dir)
@@ -154,9 +161,9 @@ main <- function(args) {
   if (!live) check("3 export code unchanged since load", identical(sc$code$changed_since_load, FALSE))
   shot("05_candidates_m3")
   set_val("min_gain", 1); set_val("criterion", "either"); set_val("rank_by", "best")
-  check("3 either/larger/+1 Gy lists 29, 28, 30", identical(rows(), "29x2.25,28x2.30,30x2.20"), rows())
+  check("3 either/larger/+1 Gy lists 29, 28, 30", identical(r4 <- rows_until("29x2.25,28x2.30,30x2.20"), "29x2.25,28x2.30,30x2.20"), r4)
   set_val("criterion", "both"); set_val("rank_by", "worst")
-  check("3 back to the opening settings: empty again, no stale rows", identical(rows(), ""), rows())
+  check("3 back to the opening settings: empty again, no stale rows", identical(r5 <- rows_until(""), ""), r5)
   ze <- fetch("download")
   check("3 empty-state download still has its files", setequal(ze$files, c("results.csv", "all_qualifying.csv", "scenario.json", "README.txt")))
 
