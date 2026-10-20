@@ -287,7 +287,7 @@ test_that("results show late BED at alpha/beta 2 and 4, and the sensitivity tab 
     st <- sens()
     expect_equal(nrow(st), 5 * 3)
     expect_setequal(unique(st$preset), c("calculator", "withers", "hartley", "hyhope", "d18"))
-    expect_true(grepl("scenarios under DI", output$sens_summary$html))
+    expect_true(grepl("parameter settings under DI", output$sens_summary$html))
     expect_true(grepl("+2.10", output$sens_tox, fixed = TRUE))      # 142.1 - 140 at alpha/beta 2
     expect_true(grepl("-2.60", output$sens_tox, fixed = TRUE))      # 114.07 - 116.67 at alpha/beta 3
   })

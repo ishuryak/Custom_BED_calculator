@@ -1,0 +1,17 @@
+M1 source link removed: 1 failing assertion(s)
+    line 91: E1: the Model and sources page li
+M2 criterion default either: 1 failing assertion(s)
+    line 53: E2: the page opens with both mode
+M3 ranking default best: 1 failing assertion(s)
+    line 54: E2: the page opens with both mode
+M4 old count labels: 1 failing assertion(s)
+    line 167: E3: agreement counts are labeled
+M5 agreement caveat removed: 3 failing assertion(s)
+    line 65: E4: one caveat line on each of th
+    line 66: E4: one caveat line on each of th
+    line 75: E4: one caveat line on each of th
+M6 helper in server scope: 10 failing assertion(s)
+    line 47: A: app.R builds its UI (a helper 
+    line 48: A: app.R builds its UI (a helper us
+    line 52: E2: the page opens with both models
+    line 63: E4: one caveat line on each of the 

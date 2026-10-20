@@ -8,7 +8,7 @@
 # All max(0, x) terms use the same smooth version as the v1 website,
 # log(1 + exp(3x)) / 3, so v1 and v2 agree at the v1 defaults.
 
-APP_VERSION <- "2.6.0"
+APP_VERSION <- "2.7.0"
 EQUATION_VERSION <- "2.2"  # 2.1 + optional Fenwick 2008 acute boundary
 # Selection rules (filtering, validity, ranking), versioned apart from the
 # equations. 2.5: one validity rule for search, sensitivity and agreement.

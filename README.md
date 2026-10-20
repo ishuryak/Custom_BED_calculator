@@ -1,4 +1,4 @@
-# Custom BED calculator, version 2.6
+# Custom BED calculator, version 2.7
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC). It computes three biologically effective doses (BEDs):
 
@@ -6,9 +6,11 @@ R Shiny app for head and neck squamous cell carcinoma (HNSCC). It computes three
 - early (acute mucosal) toxicity BED
 - late toxicity BED.
 
-It also screens shorter, hypofractionated regimens against a comparison regimen (default 35 × 2 Gy in 47 days, or either HYPNO arm): the tumor BED change must meet a chosen minimum, which may be negative (an allowed loss of modeled tumor BED, not a clinical non-inferiority margin), under the DI or DD model, while early and late toxicity BED stay within chosen limits. A sensitivity tab shows the tumor BED difference across tumor parameter sets. Results download as a ZIP with a scenario file that reruns the search.
+It also screens shorter, hypofractionated regimens against a comparison regimen (default 35 × 2 Gy in 47 days, or either HYPNO arm): the tumor BED change must meet a chosen minimum, which may be negative (an allowed loss of modeled tumor BED, not a clinical non-inferiority margin), under both models by default (or under either, or one of them), while early and late toxicity BED stay within chosen limits. A sensitivity tab shows the tumor BED difference across tumor parameter sets. Results download as a ZIP with a scenario file that reruns the search.
 
 It is a research tool for hypothesis generation, not for treatment decisions.
+
+**Release candidate 2.7.0** is on this branch and has not been deployed yet. Its changes are listed below.
 
 **Live:** https://ishuryak.shinyapps.io/custom_bed_calculator_v2/ (version 2.6.0, code `cd5d835`, deployed 2026-10-19 with `Rscript tools/deploy.R`, a separate app from version 1). The live site was checked in a headless browser after deployment: version 2.6, default candidate rows 29 × 2.25, 28 × 2.30 and 30 × 2.20 Gy, agreement 15 of 15, no output errors on any tab.
 
@@ -25,7 +27,7 @@ It is a research tool for hypothesis generation, not for treatment decisions.
 - `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`, `deploy.R` (publishes to shinyapps.io as `custom_bed_calculator_v2` only; refuses the version 1 name).
 - `.rscignore`: keeps `References/`, `tests/` and `docs/` out of a shinyapps.io deployment.
 - `docs/FIXES.md`: one row per landed change, with its evidence.
-- `docs/development/`: review records and plans. Start with `2026_10_19_v26_review_response.md`.
+- `docs/development/`: review records and plans. Start with `2026_10_20_v27_colleague_review.md`.
 - `renv.lock`: the release package versions (R 4.5.1), all from the Posit Package Manager snapshot of 2026-10-15, which serves binaries of exactly these versions for Windows, macOS and Linux.
 - `References/`: sources, with `References/README.md` giving each one's license and the quoted parameter values. Paywalled or non-redistributable PDFs are git-ignored.
 
@@ -46,6 +48,16 @@ run_app.bat                     # or: Rscript tools/launch.R
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
 
+## Changes in version 2.7
+
+Interface changes from a colleague's comments of 2026-10-20 and an independent review of the plan (`docs/development/2026_10_20_v27_colleague_review.md`). **A fresh page now shows a different candidate table:** it opens with both models required and the smaller change used for ranking, and at the defaults no regimen qualifies (before: three regimens that met +1 Gy under DI only, with DD losses of 2.05 to 2.86 Gy₁₀). No equation, parameter default, toxicity limit or selection rule changed, and the search function's own defaults are unchanged. Compatible 2.6 scenario files replay with the same numerical results and selection rules.
+
+- **Two-model default.** "Tumor BED criterion" defaults to both models and "Rank by" to the smaller change. The empty result explains itself and how the Model agreement tab differs. "DI or DD model" and the larger-change ranking remain available.
+- **Parameter settings.** Agreement and Sensitivity counts are labeled as selected parameter settings ("15 of 15 settings") and say they are not independent confirmations, confidence intervals or probabilities. Export field names are unchanged.
+- **Model limits beside the results.** A short line on the Results, Candidate and Model agreement tabs lists what is not modeled.
+- **Source link.** The Model and sources page links this branch.
+- **Corrected text.** Chemotherapy and treatment-gap limitations, and the history of the DD calibration anchor (below), are stated more precisely.
+
 ## Changes in version 2.6
 
 Fixes from the external review of 2.5.1 (`docs/development/2026_10_19_v26_review_response.md`). No equation and no default changed; the default candidate and agreement rows are unchanged.
@@ -61,7 +73,7 @@ Fixes from the external review of 2.5.1 (`docs/development/2026_10_19_v26_review
 
 Interface only; no result changes (`docs/development/2026_10_19_interface_clarity_and_input_audit.md`).
 
-- The legacy checkbox "calibrate at the comparison regimen" is removed. To reproduce versions 1 and 2.0, enter the comparison regimen as the DD anchor. The anchor note now explains in plain words what the anchor does.
+- The legacy checkbox "calibrate at the comparison regimen" is removed. To reproduce version 2.0, enter the comparison regimen as the DD anchor. Version 1 calibrated at a fixed 35 × 2 Gy, 47-day course (the default anchor), with an α/β error described below. The anchor note now explains in plain words what the anchor does.
 - The preset menu labels the default (scenario D18) and explains the selected preset: its source, its values, and that D18 is not fitted.
 - A browser audit changed every menu box one at a time and checked which outputs change and which must not.
 
@@ -92,7 +104,7 @@ Fixes from the 2026-10-19 review (`docs/development/2026_10_19_review_and_plan.m
 ## Changes in version 2.1
 
 - **Acute BED on Fowler's clock.** Fowler's acute parameters and tolerance zone count elapsed days. Acute BEDs are now 0.79 Gy₁₀ higher than in version 2.0 (35 × 2 Gy: 53.1 instead of 52.3), which makes the fixed Fowler limit stricter. Comparisons with a reference beyond the onset day do not change.
-- **Fixed DD calibration anchor.** The DD model is calibrated at an anchor regimen (default 35 × 2 Gy, 47 days) that no longer moves with the comparison regimen. To reproduce versions 1 and 2.0, which calibrated at the comparison regimen, enter that regimen as the anchor.
+- **Fixed DD calibration anchor.** The DD model is calibrated at an anchor regimen (default 35 × 2 Gy, 47 days) that no longer moves with the comparison regimen. To reproduce version 2.0, which calibrated at the comparison regimen, enter that regimen as the anchor. Version 1 calibrated at a fixed 35 × 2 Gy, 47-day course.
 - **Presets** set every value their source gives: version 1 defaults, Withers (follows the tumor α/β), Hartley 2011, the HYHOPE protocol, and scenario D18. Defaults are unchanged.
 - **Search:** blocks a model whose comparison BED is negative, shows which model credits each row, flags fraction sizes above 3.1 Gy, allows a negative minimum change, and offers HYPNO 55 Gy/20 fractions as an acute and as a late limit. Default maximum dose per fraction 5 Gy.
 - Optional background growth g, late BED at α/β 2 and 4 Gy, HYHOPE benchmark row, ZIP export with a rerunnable scenario, Sensitivity tab.

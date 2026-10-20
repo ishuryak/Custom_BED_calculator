@@ -1,0 +1,242 @@
+{
+  "schema_version": "2",
+  "app_version": "2.6.0",
+  "equation_version": "2.2",
+  "selection_version": "2.6",
+  "analysis": "agreement",
+  "hinge": {
+    "type": "softplus",
+    "k_per_day": 3
+  },
+  "clocks": {
+    "input": "inclusive calendar days, first to last treatment day",
+    "tumor": "inclusive",
+    "acute": "elapsed"
+  },
+  "params": {
+    "alpha": 0.35,
+    "ab": 10,
+    "lambda_di": 0.23,
+    "lambda_dd": 0.4,
+    "Tk": 28,
+    "g": 0,
+    "ab_e": 10,
+    "alpha_e": 0.35,
+    "lambda_e": 0.277258872223978,
+    "Tk_e": 7,
+    "ab_l": 3
+  },
+  "comparison": {
+    "m": 20,
+    "d": 2.75,
+    "T": 26
+  },
+  "anchor": {
+    "m": 35,
+    "d": 2,
+    "T": 47,
+    "mode": "fixed"
+  },
+  "calibration": {
+    "status": "ok",
+    "c_over_alpha": 42.0117045247141,
+    "onset_anchor": 23.5065489602567
+  },
+  "search": {
+    "m_range": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+    "min_days_saved": 1,
+    "d_step": 0.05,
+    "d_max": 5,
+    "tol_early": 0,
+    "tol_late": 0,
+    "early_cap": 55.865972285624,
+    "late_cap": null,
+    "fenwick": false,
+    "criterion": "both",
+    "rank_by": "worst",
+    "min_gain": -3
+  },
+  "agreement": {
+    "margin": -3,
+    "ab_values": [7, 10, 15],
+    "margin_meaning": "tumor BED change (Gy) at each scenario's own tumor alpha/beta",
+    "margin_eqd2": {
+      "ab_7": -2.33333333333333,
+      "ab_10": -2.5,
+      "ab_15": -2.64705882352941
+    },
+    "selection": "one dose per fraction per number of fractions, chosen with the current parameters by the smaller of the two changes; scenarios evaluated afterwards"
+  },
+  "scenario_set_version": "1",
+  "scenario_set": [
+    {
+      "preset": "calculator",
+      "ab": 7,
+      "alpha": 0.2,
+      "lambda_di": 0.2,
+      "lambda_dd": 0.5,
+      "Tk": 28,
+      "g": 0,
+      "lambda_dd_inherited": false
+    },
+    {
+      "preset": "calculator",
+      "ab": 10,
+      "alpha": 0.2,
+      "lambda_di": 0.2,
+      "lambda_dd": 0.5,
+      "Tk": 28,
+      "g": 0,
+      "lambda_dd_inherited": false
+    },
+    {
+      "preset": "calculator",
+      "ab": 15,
+      "alpha": 0.2,
+      "lambda_di": 0.2,
+      "lambda_dd": 0.5,
+      "Tk": 28,
+      "g": 0,
+      "lambda_dd_inherited": false
+    },
+    {
+      "preset": "withers",
+      "ab": 7,
+      "alpha": 0.2,
+      "lambda_di": 0.154285714285714,
+      "lambda_dd": 0.4,
+      "Tk": 28,
+      "g": 0,
+      "lambda_dd_inherited": true
+    },
+    {
+      "preset": "withers",
+      "ab": 10,
+      "alpha": 0.2,
+      "lambda_di": 0.144,
+      "lambda_dd": 0.4,
+      "Tk": 28,
+      "g": 0,
+      "lambda_dd_inherited": true
+    },
+    {
+      "preset": "withers",
+      "ab": 15,
+      "alpha": 0.2,
+      "lambda_di": 0.136,
+      "lambda_dd": 0.4,
+      "Tk": 28,
+      "g": 0,
+      "lambda_dd_inherited": true
+    },
+    {
+      "preset": "hartley",
+      "ab": 7,
+      "alpha": 0.3,
+      "lambda_di": 0.231049060186648,
+      "lambda_dd": 0.4,
+      "Tk": 23,
+      "g": 0,
+      "lambda_dd_inherited": true
+    },
+    {
+      "preset": "hartley",
+      "ab": 10,
+      "alpha": 0.3,
+      "lambda_di": 0.231049060186648,
+      "lambda_dd": 0.4,
+      "Tk": 23,
+      "g": 0,
+      "lambda_dd_inherited": true
+    },
+    {
+      "preset": "hartley",
+      "ab": 15,
+      "alpha": 0.3,
+      "lambda_di": 0.231049060186648,
+      "lambda_dd": 0.4,
+      "Tk": 23,
+      "g": 0,
+      "lambda_dd_inherited": true
+    },
+    {
+      "preset": "hyhope",
+      "ab": 7,
+      "alpha": 0.35,
+      "lambda_di": 0.231049060186648,
+      "lambda_dd": 0.4,
+      "Tk": 21,
+      "g": 0,
+      "lambda_dd_inherited": true
+    },
+    {
+      "preset": "hyhope",
+      "ab": 10,
+      "alpha": 0.35,
+      "lambda_di": 0.231049060186648,
+      "lambda_dd": 0.4,
+      "Tk": 21,
+      "g": 0,
+      "lambda_dd_inherited": true
+    },
+    {
+      "preset": "hyhope",
+      "ab": 15,
+      "alpha": 0.35,
+      "lambda_di": 0.231049060186648,
+      "lambda_dd": 0.4,
+      "Tk": 21,
+      "g": 0,
+      "lambda_dd_inherited": true
+    },
+    {
+      "preset": "d18",
+      "ab": 7,
+      "alpha": 0.35,
+      "lambda_di": 0.23,
+      "lambda_dd": 0.4,
+      "Tk": 28,
+      "g": 0,
+      "lambda_dd_inherited": false
+    },
+    {
+      "preset": "d18",
+      "ab": 10,
+      "alpha": 0.35,
+      "lambda_di": 0.23,
+      "lambda_dd": 0.4,
+      "Tk": 28,
+      "g": 0,
+      "lambda_dd_inherited": false
+    },
+    {
+      "preset": "d18",
+      "ab": 15,
+      "alpha": 0.35,
+      "lambda_di": 0.23,
+      "lambda_dd": 0.4,
+      "Tk": 28,
+      "g": 0,
+      "lambda_dd_inherited": false
+    }
+  ],
+  "code": {
+    "files": {
+      "R/bed_models.R": "b564048d413a3cc94c534b4480f341b89277e5815a40ccd672e9f09d68697a40",
+      "R/export.R": "d59c6510faf426b0bca3f4cab0d5e68aca1c6be58360a3d7114fde95bb1b0431",
+      "app.R": "912310bb8178980085542e43b4e7400395ca4afe6f8b44ab35653669a38fd5b1"
+    },
+    "r_version": "R version 4.5.1 (2025-06-13 ucrt)",
+    "packages": {
+      "shiny": "1.14.0",
+      "jsonlite": "2.0.0",
+      "zip": "3.0.2",
+      "digest": "0.6.39"
+    },
+    "changed_since_load": false
+  },
+  "context": {
+    "agree_cmp": "hypno_test"
+  },
+  "scenario_id": "83fd025ef121"
+}

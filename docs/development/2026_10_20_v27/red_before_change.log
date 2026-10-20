@@ -1,0 +1,111 @@
+v27_colleague_review: ..12..3456.789..abcdef.ghij..................klmnopqrstu.....................................................................................................................v.........w
+
+══ Failed ══════════════════════════════════════════════════════════════════════
+── 1. Failure ('test_v27_colleague_review.R:53:3'): E2: the page opens with both mode
+Expected `selected_value(html, "criterion")` to equal "both".
+Differences:
+1/1 mismatches
+x[1]: "either"
+y[1]: "both"
+
+── 2. Failure ('test_v27_colleague_review.R:54:3'): E2: the page opens with both mode
+Expected `selected_value(html, "rank_by")` to equal "worst".
+Differences:
+1/1 mismatches
+x[1]: "best"
+y[1]: "worst"
+
+── 3. Failure ('test_v27_colleague_review.R:65:3'): E4: one caveat line on each of th
+Expected `lengths(regmatches(html, gregexpr(sprintf("id=\"%s\"", id), html)))` to equal 1.
+Differences:
+1/1 mismatches
+[1] 0 - 1 == -1
+caveat-results
+
+── 4. Failure ('test_v27_colleague_review.R:65:3'): E4: one caveat line on each of th
+Expected `lengths(regmatches(html, gregexpr(sprintf("id=\"%s\"", id), html)))` to equal 1.
+Differences:
+1/1 mismatches
+[1] 0 - 1 == -1
+caveat-candidates
+
+── 5. Failure ('test_v27_colleague_review.R:65:3'): E4: one caveat line on each of th
+Expected `lengths(regmatches(html, gregexpr(sprintf("id=\"%s\"", id), html)))` to equal 1.
+Differences:
+1/1 mismatches
+[1] 0 - 1 == -1
+caveat-agreement
+
+── 6. Failure ('test_v27_colleague_review.R:66:3'): E4: one caveat line on each of th
+Expected `lengths(regmatches(html, gregexpr("class=\"bed-caveat", html)))` to equal 3.
+Differences:
+1/1 mismatches
+[1] 0 - 3 == -3
+
+── 7. Failure ('test_v27_colleague_review.R:72:3'): E4: one caveat line on each of th
+Expected `cav[1] > tabs[1] && cav[1] < tabs[2]` to be TRUE.
+Differences:
+`actual`:   FALSE
+`expected`: TRUE 
+
+
+── 8. Failure ('test_v27_colleague_review.R:73:3'): E4: one caveat line on each of th
+Expected `cav[2] > tabs[2] && cav[2] < tabs[3]` to be TRUE.
+Differences:
+`actual`:   FALSE
+`expected`: TRUE 
+
+
+── 9. Failure ('test_v27_colleague_review.R:74:3'): E4: one caveat line on each of th
+Expected `cav[3] > tabs[3] && cav[3] < tabs[4]` to be TRUE.
+Differences:
+`actual`:   FALSE
+`expected`: TRUE 
+
+
+── 10. Failure ('test_v27_colleague_review.R:79:3'): E4: one caveat line on each of t
+Expected `grepl(w, line, fixed = TRUE)` to be TRUE.
+Differences:
+`actual`:       
+`expected`: TRUE
+
+Chemotherapy effects
+  ... and 22 more
+
+
+Maximum number of 10 failures reached, some test results may be missing.
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+No one gets it right on their first try
+   test                                                                                          
+1  A: app.R builds its UI (a helper used by the UI must be defined at top level)                 
+2  E2: the page opens with both models, the smaller change and +1 Gy                             
+3  E4: one caveat line on each of the Results, Candidate and Model agreement tabs                
+4  E1: the Model and sources page links the version 2 source branch                              
+5  E2: at the opening settings no candidate qualifies and the message explains it                
+6  E2: an allowed loss of 3 Gy lists three regimens in conservative order                        
+7  E2: the either/larger screen is still available and unchanged                                 
+8  E2: with DD unavailable the DD-specific explanation is shown, not the generic one             
+9  E2: the Model agreement tab keeps its own comparison, threshold and days                      
+10 E3: agreement counts are labeled as selected parameter settings                               
+11 E3: with invalid settings the denominator is the evaluable count, shown with the invalid count
+12 E3: the Sensitivity summary qualifies what the settings are                                   
+13 D: compatible version 2.6 files replay to the same results                                    
+14 D: a new export records version 2.7.0 and the chosen settings, with unchanged identifiers     
+15 D: app and DESCRIPTION carry the same version                                                 
+   nb  failed error
+1    2  0     FALSE
+2    4  2     FALSE
+3   15 12     FALSE
+4    1  1     FALSE
+5    8  4     FALSE
+6    7  0     FALSE
+7    2  0     FALSE
+8    2  0     FALSE
+9    4  0     FALSE
+10   4  4     FALSE
+11   1  1     FALSE
+12   6  6     FALSE
+13 117  0     FALSE
+14   9  1     FALSE
+15   2  1     FALSE

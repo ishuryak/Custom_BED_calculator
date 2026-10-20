@@ -102,6 +102,18 @@ reason_text <- function(reason, criterion = "either") {
   paste(txt, collapse = " ")
 }
 
+# Short list of what the model leaves out, shown beside the main results of the
+# Results, Candidate and Model agreement tabs. Defined at top level because the
+# UI uses it.
+caveat_strip <- function(id) {
+  div(id = id, class = "bed-caveat alert alert-light", style = "padding: 0.5rem 0.75rem;",
+      tags$strong("Model limits: "),
+      "Chemotherapy effects, HPV status, stage, tumor volume, treatment volumes and organ-at-risk doses",
+      "are not modeled. Overall duration is included, but individual gap timing and interruption effects are",
+      "not modeled separately. Default tumor parameters are exploratory. Uncertainty intervals are not",
+      "calculated. See Model and sources.")
+}
+
 ui <- page_sidebar(
   fillable = FALSE,
   title = paste0("Biologically effective dose (BED) calculator for head and neck squamous cell carcinoma (HNSCC), version ",
@@ -180,6 +192,7 @@ ui <- page_sidebar(
                "depend on cell killing. EQD2 is the equivalent dose in 2-Gy fractions.",
                "Model outputs for hypothesis generation, not treatment recommendations."),
       div(class = "table-scroll", style = "overflow-x: auto;", tableOutput("results")),
+      caveat_strip("caveat-results"),
       uiOutput("verdicts"),
       uiOutput("acute_zone"),
       h5("Published regimens, recomputed with the current parameters"),
@@ -192,15 +205,16 @@ ui <- page_sidebar(
           "The calculator does not quantify parameter uncertainty, and a BED difference is not a",
           "difference in tumor control. A listed regimen is not shown to be safe or effective. Any trial regimen needs",
           "clinical precedent, organ-at-risk planning and toxicity stopping rules."),
+      caveat_strip("caveat-candidates"),
       layout_columns(
         col_widths = c(4, 4, 4),
         selectInput("criterion", "Tumor BED criterion applied under",
                     c("DI or DD model" = "either", "both models" = "both",
-                      "DI model" = "di", "DD model" = "dd")),
+                      "DI model" = "di", "DD model" = "dd"), selected = "both"),
         selectInput("rank_by", "Rank by",
                     c("larger of ΔDI and ΔDD (optimistic)" = "best",
                       "smaller of ΔDI and ΔDD (conservative)" = "worst",
-                      "ΔBED DI" = "di", "ΔBED DD" = "dd")),
+                      "ΔBED DI" = "di", "ΔBED DD" = "dd"), selected = "worst"),
         sliderInput("m_range", "Number of fractions searched", 5, 34, c(5, 34), step = 1),
         num("min_gain", "Minimum tumor BED change (Gy; negative = allowed loss)", 1, -20, 30, 0.5),
         num("min_days", "Minimum days saved", 7, 1, 140, 1),
@@ -234,12 +248,13 @@ ui <- page_sidebar(
     nav_panel("Model agreement",
       helpText("Regimens whose tumor BED change from the comparison is at least the allowed change",
                "under DI and under DD, with the toxicity limits chosen on the candidate tab (dose step,",
-               "highest dose, early and late limits). Each row also shows how the two changes vary over",
-               "the 15 scenarios of the Sensitivity tab, counting only scenarios in which both models can be",
-               "evaluated. It searches every number of fractions below its own comparison, whatever the fraction",
-               "range on the candidate tab. The two models share α and DD is calibrated to DI at the anchor, so their",
-               "agreement is not two independent confirmations. The allowed change is a BED screening",
-               "value, not a clinical non-inferiority margin."),
+               "highest dose, early and late limits). It searches every number of fractions below its own",
+               "comparison, whatever the fraction range on the candidate tab. The ranges and counts use 15",
+               "selected parameter settings: five tumor presets × three tumor α/β values. Only settings in which",
+               "both model differences are evaluable enter the joint count and ranges. Within each setting, the",
+               "models share α and DD is calibrated to DI at the anchor. These are sensitivity checks, not",
+               "independent confirmations, confidence intervals or probabilities. The allowed change is a BED",
+               "screening value, not a clinical non-inferiority margin."),
       layout_columns(
         col_widths = c(4, 4, 4),
         selectInput("agree_cmp", "Compare with",
@@ -247,6 +262,7 @@ ui <- page_sidebar(
                       "The comparison regimen in the sidebar" = "sidebar")),
         num("agree_margin", "Allowed tumor BED change for both models (Gy; negative = allowed loss)", -3, -20, 30, 0.5),
         num("agree_days", "Minimum days saved", 1, 1, 140, 1)),
+      caveat_strip("caveat-agreement"),
       uiOutput("agree_context"),
       uiOutput("agree_note"),
       uiOutput("agree_msg"),
@@ -254,15 +270,15 @@ ui <- page_sidebar(
       downloadButton("download_agree", "Download the agreement analysis (ZIP)")),
     nav_panel("Sensitivity",
       helpText("Tumor BED of the regimen being evaluated minus the comparison regimen, under",
-               "each tumor preset and three tumor α/β values. These are selected scenarios,",
-               "not a probability distribution: a count of scenarios is not a chance of benefit.",
+               "each tumor preset and three tumor α/β values. These are selected parameter settings,",
+               "not a probability distribution: a count of settings is not a chance of benefit.",
                "Presets that set only DI values keep the DD maximum rate entered in the sidebar, and every",
-               "scenario keeps the sidebar's background growth g and DD anchor. A difference is shown only",
+               "setting keeps the sidebar's background growth g and DD anchor. A difference is shown only",
                "when both BEDs are positive (and the DD model is calibrated)."),
       uiOutput("sens_context"),
       uiOutput("sens_summary"),
       div(class = "table-scroll", style = "overflow-x: auto;", tableOutput("sens_table")),
-      h5("Toxicity BED differences (do not depend on the tumor scenario)"),
+      h5("Toxicity BED differences (do not depend on the tumor setting)"),
       tableOutput("sens_tox")),
     nav_panel("Model and sources", uiOutput("about"))
   )
@@ -708,6 +724,16 @@ server <- function(input, output, session) {
     reason <- attr(s, "reason")
     msg <- function(...) div(class = "alert alert-info", ...)
     if (!is.null(reason)) return(msg(reason_text(reason, input$criterion)))
+    if (identical(input$criterion, "both"))
+      return(msg(paste(
+        "No regimen in the searched range meets the selected minimum tumor BED change under both models",
+        "and all other limits. An empty result is a valid outcome of this screen. The Model agreement tab",
+        "explores a separate comparison: by default HYPNO 55 Gy/20 fractions, an allowed change of \u22123 Gy",
+        "under each model, and at least 1 day saved. A limit defined relative to the comparison also uses",
+        "that tab's comparison. To explore an allowed loss here, explicitly enter a negative minimum change.",
+        "\u201cDI or DD model\u201d requires the threshold under at least one evaluable model. It can include",
+        "regimens that fail the threshold under the other model. Changing these settings changes the",
+        "hypothesis being screened.")))
     msg("No regimen in the searched range meets all limits with these settings.",
         "This is a result, not an error: with these parameters, shortening the course costs",
         "tumor BED faster than the limits allow.",
@@ -831,15 +857,15 @@ server <- function(input, output, session) {
     p <- params()
     rng <- function(lo, hi) ifelse(is.na(lo), "not evaluable", sprintf("%+.2f to %+.2f", lo, hi))
     counts <- ifelse(a$n_invalid > 0,
-                     sprintf("%d of %d evaluable (%d of %d not evaluable)", a$n_pass_both, a$n_valid_both,
+                     sprintf("%d of %d evaluable settings (%d of %d not evaluable)", a$n_pass_both, a$n_valid_both,
                              a$n_invalid, a$n_scenarios),
-                     sprintf("%d of %d", a$n_pass_both, a$n_valid_both))
+                     sprintf("%d of %d settings", a$n_pass_both, a$n_valid_both))
     data.frame(Fractions = sprintf("%d", a$m), `Gy per fraction` = sprintf("%.2f", a$d),
                Days = sprintf("%g", a$T), `Total Gy` = sprintf("%.2f", a$total_dose),
                `Δ BED DI` = fmt(a$d_di, TRUE), `Δ BED DD` = fmt(a$d_dd, TRUE),
-               `Δ DI over evaluable scenarios` = rng(a$d_di_min, a$d_di_max),
-               `Δ DD over evaluable scenarios` = rng(a$d_dd_min, a$d_dd_max),
-               `Scenarios with both ≥ allowed change` = counts,
+               `Δ DI over evaluable settings` = rng(a$d_di_min, a$d_di_max),
+               `Δ DD over evaluable settings` = rng(a$d_dd_min, a$d_dd_max),
+               `Selected parameter settings with both ≥ allowed change` = counts,
                `DD onset (day)` = ifelse(is.finite(a$dd_onset), sprintf("%.1f", a$dd_onset), "none"),
                `Ends before DI onset` = ifelse(a$before_di_onset, "yes", "no"),
                `Early BED` = sprintf("%.2f %s", a$bed_early, bed_unit(p$ab_e)),
@@ -874,9 +900,12 @@ server <- function(input, output, session) {
     dd_n <- sum(st$valid_dd & st$d_dd >= mg - 1e-9, na.rm = TRUE)
     bad <- n - sum(st$valid_di & st$valid_dd)
     tags$p(sprintf(paste("Tumor BED change at least %g Gy (the minimum set on the candidate tab):",
-                         "%d of %d evaluable scenarios under DI, %d of %d evaluable scenarios under DD.%s"),
+                         "%d of %d evaluable parameter settings under DI, %d of %d evaluable parameter settings under DD.%s",
+                         "These selected parameter settings are not independent confirmations or a probability sample.",
+                         "Within each setting, DI and DD share \u03b1 and DD is calibrated to DI at the anchor. \u03b1 and the",
+                         "calibrated constant can differ between settings. Uncertainty intervals are not calculated."),
                    mg, di_n, sum(st$valid_di), dd_n, sum(st$valid_dd),
-                   if (bad > 0) sprintf(paste(" %d of %d scenarios are not evaluable under at least one model",
+                   if (bad > 0) sprintf(paste(" %d of %d settings are not evaluable under at least one model",
                                               "(a comparison or regimen BED is not positive, or DD is unavailable)."),
                                         bad, n) else ""))
   })
@@ -889,7 +918,7 @@ server <- function(input, output, session) {
 
   output$sens_table <- renderTable({
     st <- sens()
-    data.frame(Scenario = unname(PRESET_SHORT[st$preset]), `Tumor α/β (Gy)` = sprintf("%g", st$ab),
+    data.frame(Preset = unname(PRESET_SHORT[st$preset]), `Tumor α/β (Gy)` = sprintf("%g", st$ab),
                `α (1/Gy)` = sprintf("%.3g", st$alpha), `DI loss (Gy/day)` = sprintf("%.2f", st$lambda_di / st$alpha),
                `DI onset (day, inclusive)` = sprintf("%g", st$Tk),
                `DD max rate (1/day)` = sprintf("%.3g%s", st$lambda_dd, ifelse(st$lambda_dd_inherited, " (sidebar)", "")),

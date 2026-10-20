@@ -80,7 +80,7 @@ test_that("F01: Sensitivity tab and its summary count evaluable scenarios only",
                       lambda_di = 0, lambda_dd = 0.4, Tk = 28, g = 0, ab_e = 10, alpha_e = 0.35,
                       Tp_e = 2.5, Tk_e = 7, ab_l = 3, min_gain = 1)
     txt <- output$sens_summary$html
-    expect_true(grepl("12 of 15 scenarios are not evaluable", txt, fixed = TRUE))
+    expect_true(grepl("12 of 15 settings are not evaluable", txt, fixed = TRUE))
     expect_true(grepl("not evaluable", output$sens_table))
     expect_false(grepl("+103", output$sens_table, fixed = TRUE))
   })
