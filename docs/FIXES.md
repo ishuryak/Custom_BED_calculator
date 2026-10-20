@@ -154,3 +154,8 @@ Record, verification of each finding, and decisions: `docs/development/2026_10_2
 - **Walkthrough:** `walkthrough_v27.R` (local) passed 52 of 52 checks and exits 1 when a check fails (`--self-test-fail`).
 - **Changed existing tests:** two assertions were updated because they pinned display wording changed on purpose, `test_app_server.R:290` and `test_v25_review_fixes.R:83`.
 - **Revision:** the tested revision is the commit that adds this row. Its SHA, and the rerun of the suite and walkthrough on it, are recorded in the next row.
+
+**Verification on the committed revision** `96ec8ac` (2026-10-20, clean tree, release library):
+- **Suite:** `tools/run_tests.R` gave 2727 expectations, 0 failed, 0 errors, 0 skipped, 0 warnings (`docs/development/2026_10_20_v27/suite_96ec8ac.log`).
+- **Walkthrough:** `walkthrough_v27.R` in local mode passed 52 of 52 checks with exit 0, with no uncommitted app changes (`docs/development/2026_10_20_v27/walkthrough/20261020_113231_local/`).
+- **Not deployed:** the live site is still 2.6.0. Deployment and the live walkthrough wait for local inspection.
