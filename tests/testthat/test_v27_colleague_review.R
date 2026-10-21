@@ -38,7 +38,7 @@ opening <- list(
   ab_e = 10, alpha_e = 0.35, Tp_e = 2.5, Tk_e = 7, chemo = FALSE, ab_l = 3,
   criterion = "both", rank_by = "worst", m_range = c(5, 34), min_gain = 1, min_days = 7,
   d_step = "0.05", d_max = 5, early_mode = "hypno", late_mode = "reference",
-  tol_early = 0, tol_late = 0, agree_cmp = "hypno_test", agree_margin = -3, agree_days = 1)
+  tol_early = 0, tol_late = 0, agree_cmp = "hypno_test", agree_threshold_mode = "own", agree_margin = -3, agree_days = 1)
 set_open <- function(session, ...) do.call(session$setInputs, modifyList(opening, list(...)))
 
 # --- A. UI defaults and startup --------------------------------------------
@@ -59,28 +59,28 @@ test_that("E2: the page opens with both models, the smaller change and +1 Gy", {
   expect_equal(opts, sprintf("value=\"%s\"", c("best", "worst", "di", "dd")))
 })
 
-test_that("E4: one caveat line on each of the Results, Candidate and Model agreement tabs", {
+test_that("E4 (version 3): one caveat line on each of the Report card, Results, Search and Both-model screen tabs", {
   html <- ui_html()
-  ids <- c("caveat-results", "caveat-candidates", "caveat-agreement")
+  ids <- c("caveat-report", "caveat-results", "caveat-candidates", "caveat-agreement")
   for (id in ids) expect_equal(lengths(regmatches(html, gregexpr(sprintf("id=\"%s\"", id), html))), 1, info = id)
-  expect_equal(lengths(regmatches(html, gregexpr("class=\"bed-caveat", html))), 3)
+  expect_equal(lengths(regmatches(html, gregexpr("class=\"bed-caveat", html))), 4)
   pos <- function(pat) regexpr(pat, html, fixed = TRUE)[1]
-  # each tab name appears in its nav link and again on its panel: use the panel
   pane <- function(v) max(gregexpr(sprintf("data-value=\"%s\"", v), html, fixed = TRUE)[[1]])
-  tabs <- c(pane("Results"), pane("Candidate regimens (model screen)"), pane("Model agreement"), pane("Sensitivity"))
+  tabs <- c(pane("Report card"), pane("Results"), pane("Compare regimens"), pane("Search"),
+            pane("Both-model screen"), pane("Sensitivity"))
   expect_true(all(tabs > 0))
   cav <- vapply(ids, function(id) pos(sprintf("id=\"%s\"", id)), numeric(1))
   expect_true(cav[1] > tabs[1] && cav[1] < tabs[2])
   expect_true(cav[2] > tabs[2] && cav[2] < tabs[3])
-  expect_true(cav[3] > tabs[3] && cav[3] < tabs[4])
-  # placed before the long tables, not under them
-  expect_true(cav[1] < pos("id=\"benchmarks\""))
-  expect_true(cav[3] < pos("id=\"agree_table\""))
+  expect_true(cav[3] > tabs[4] && cav[3] < tabs[5])
+  expect_true(cav[4] > tabs[5] && cav[4] < tabs[6])
+  expect_true(cav[2] < pos("id=\"benchmarks\""))
+  expect_true(cav[4] < pos("id=\"agree_table\""))
   line <- gsub("\\s+", " ", regmatches(html, regexpr("(?s)<div id=\"caveat-results\"[^>]*>.*?</div>", html, perl = TRUE)))
-  for (w in c("Chemotherapy effects", "organ-at-risk doses", "individual gap timing",
-              "Uncertainty intervals are not calculated"))
+  for (w in c("Chemotherapy effects", "HPV status", "Organ-at-risk doses", "individual gap timing",
+              "Parameter uncertainty is shown on the Uncertainty tab"))
     expect_true(grepl(w, line, fixed = TRUE), info = w)
-  expect_false(grepl("assumed equal", line, fixed = TRUE))
+  expect_false(grepl("Uncertainty intervals are not calculated", line, fixed = TRUE))
 })
 
 # --- E1. Source link ---------------------------------------------------------
@@ -145,7 +145,7 @@ test_that("E2: with DD unavailable the DD-specific explanation is shown, not the
   })
 })
 
-test_that("E2: the Model agreement tab keeps its own comparison, threshold and days", {
+test_that("E2 (version 3: explicit override): the both-model screen can take its own comparison, threshold and days", {
   shiny::testServer(app_dir, {
     set_open(session)
     a <- agreement()

@@ -237,6 +237,14 @@ check_inputs <- function(sc) {
     args$calendar <- list(fx_per_week = fpw,
                           start_weekday = check_num(s$calendar$start_weekday, "calendar start_weekday", 1, fpw, TRUE))
   }
+  if (!is.null(s$oar)) {
+    o <- s$oar
+    lib_name <- check_choice(o$library, "oar library", c("QUANTEC", "HYHOPE"))
+    pct <- lapply(o$percents, function(v) check_num(v, "organ percent", 0, 200))
+    if (length(pct) == 0 || any(!names(pct) %in% OAR_ORGANS$key)) replay_fail("oar percents must name known organs.")
+    ab <- c(cord = check_num(o$ab$cord, "oar ab cord", 0.01, 100), oar = check_num(o$ab$oar, "oar ab", 0.01, 100))
+    args$oar_check <- build_oar_check(load_constraints(), pct, lib_name, ab)
+  }
   n_d <- max(0, floor((args$d_max - ref$d) / args$d_step) + 1)
   if (n_d * length(mr) > MAX_GRID_ROWS)
     replay_fail("the search grid (", n_d * length(mr), " regimens) exceeds ", MAX_GRID_ROWS, ".")
@@ -434,4 +442,76 @@ write_export_zip <- function(file, sc, best, feasible) {
   writeLines(export_readme(sc, id), file.path(dir, "README.txt"))
   zip::zip(file, files = files, root = dir)
   invisible(id)
+}
+
+# --- uncertainty analysis (schema 3) -------------------------------------------
+
+# Scenario of an uncertainty analysis: the deterministic settings plus an
+# `uncertainty` block naming the draws files (SHA-256), the number of draws,
+# the toxicity prior and seed, the random-number generator and the search.
+uncertainty_scenario <- function(s, variant, tox_source, search = NULL, draws_dir = DRAWS_DIR) {
+  man <- jsonlite::fromJSON(file.path(draws_dir, "manifest.json"), simplifyVector = FALSE)
+  f <- c(di = sprintf("tumor_di_%s.csv", variant), dd = sprintf("tumor_dd_%s.csv", variant))
+  sc <- list(schema_version = SCHEMA_VERSION, app_version = APP_VERSION, equation_version = EQUATION_VERSION,
+             selection_version = SELECTION_VERSION, uncertainty_version = UNCERTAINTY_VERSION,
+             analysis = "uncertainty",
+             regimen = s$regimen[c("m", "d", "T")], comparison = s$ref[c("m", "d", "T")],
+             threshold = s$threshold,
+             limits = list(early = list(mode = s$early_mode, tol = s$tol_early),
+                           late = list(mode = s$late_mode, tol = s$tol_late)),
+             params_fixed_toxicity = if (identical(tox_source, "fixed")) s$p[c("ab_e", "alpha_e", "lambda_e", "Tk_e", "ab_l")] else NULL,
+             uncertainty = list(
+               variant = variant,
+               draws = lapply(f, function(x) list(file = x, sha256 = man$files[[x]]$sha256, n_draws = man$files[[x]]$n_draws)),
+               toxicity = list(source = tox_source, seed = 20261021,
+                               rng = paste(RNGkind(), collapse = "/"), prior = toxicity_prior()),
+               search_draws = SEARCH_DRAWS,
+               wording = "shares of simulated parameter draws under the stated models and priors"))
+  if (!is.null(search)) {
+    sc$search <- list(rule = search$rule, tox_share_min = search$tox_share / 100,
+                      m_range = s$m_range, d_step = s$d_step, d_max = s$d_max,
+                      min_days_saved = s$min_days, calendar = s$calendar)
+  }
+  sc$scenario_id <- substr(digest::digest(enc2utf8(as.character(scenario_json(canonicalize(sc), FALSE))),
+                                          algo = "sha256", serialize = FALSE), 1, 12)
+  sc
+}
+
+# Recompute the evaluated-regimen summary of an uncertainty scenario read back
+# with jsonlite::fromJSON(); the draws files must match the recorded SHA-256.
+rerun_uncertainty <- function(sc, draws_dir = DRAWS_DIR) {
+  if (!identical(sc$analysis, "uncertainty")) replay_fail("not an uncertainty analysis.")
+  if (!identical(as.character(sc$uncertainty_version), UNCERTAINTY_VERSION))
+    replay_fail("uncertainty version '", sc$uncertainty_version, "' is not this calculator's.")
+  u <- sc$uncertainty
+  di <- load_draws("di", u$variant, draws_dir); dd <- load_draws("dd", u$variant, draws_dir)
+  if (!identical(attr(di, "sha256"), u$draws$di$sha256) || !identical(attr(dd, "sha256"), u$draws$dd$sha256))
+    replay_fail("the draws files differ from those recorded (SHA-256).")
+  tx <- if (identical(u$toxicity$source, "fixed")) {
+    fixed_toxicity_draws(sc$params_fixed_toxicity, nrow(di))
+  } else toxicity_draws(nrow(di), u$toxicity$seed)
+  reg <- check_regimen(sc$regimen, "regimen"); ref <- check_regimen(sc$comparison, "comparison")
+  regs <- data.frame(m = reg$m, d = reg$d, T = reg$T)
+  td <- tumor_deltas(regs, ref, di, dd)
+  lim <- list(early = list(mode = sc$limits$early$mode, tol = sc$limits$early$tol),
+              late = list(mode = sc$limits$late$mode, tol = sc$limits$late$tol))
+  summarize_draws(regs, td, toxicity_ok_draws(regs, ref, tx, lim), check_num(sc$threshold, "threshold", -1000, 1000))
+}
+
+write_uncertainty_zip <- function(file, sc, summary, search_full = NULL) {
+  dir <- tempfile("bedunc"); dir.create(dir)
+  on.exit(unlink(dir, recursive = TRUE))
+  writeLines(scenario_json(sc), file.path(dir, "scenario.json"), useBytes = TRUE)
+  utils::write.csv(summary, file.path(dir, "evaluated_regimen_summary.csv"), row.names = FALSE)
+  if (!is.null(search_full)) utils::write.csv(search_full, file.path(dir, "search_with_neighbors.csv"), row.names = FALSE)
+  writeLines(c(sprintf("HNSCC BED calculator %s, uncertainty analysis, scenario %s", APP_VERSION, sc$scenario_id),
+               "",
+               "Values are shares and quantiles of simulated parameter draws under the stated models and priors,",
+               "not probabilities of tumor control or of safety. DI and DD are separate models, never averaged.",
+               "scenario.json records the draws files (SHA-256), toxicity prior and seed, limits and threshold.",
+               "Rerun in R from the app folder:",
+               "  source('R/bed_models.R'); source('R/schedule.R'); source('R/uncertainty.R'); source('R/oar.R'); source('R/export.R')",
+               "  rerun_uncertainty(jsonlite::fromJSON('scenario.json'))"),
+             file.path(dir, "README.txt"))
+  zip::zip(file, list.files(dir), root = dir)
 }

@@ -349,11 +349,12 @@ test_that("Fowler zone, presets and benchmark regimens match their sources", {
   expect_equal(b$T, c(o_calendar(20, 5), o_calendar(33, 6), o_calendar(15, 5)))
 })
 
-test_that("only 5 fractions per week (Mon-Fri) is offered", {
+test_that("version 3: overall_time() stays the Mon-Fri closed form; other calendars go through `calendar`", {
   expect_false("fx_per_week" %in% names(formals(overall_time)))
-  expect_false("fx_per_week" %in% names(formals(suggest_regimens)))
+  expect_true("calendar" %in% names(formals(suggest_regimens)))
   app_src <- readLines(testthat::test_path("..", "..", "app.R"))
-  expect_false(any(grepl("Mon-Sat|fpw", app_src)))
+  expect_true(any(grepl("6 (Mon-Sat)", app_src, fixed = TRUE)))   # decision 8a: 6 fractions/week offered
+  expect_false(any(grepl("twice.daily|BID", app_src, ignore.case = TRUE) & !grepl("not covered|not modeled", app_src)))
 })
 
 test_that("empty searches say why", {

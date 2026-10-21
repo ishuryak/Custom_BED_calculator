@@ -38,10 +38,11 @@ load_draws <- function(model = c("di", "dd"), variant = "primary", dir = DRAWS_D
     c("alpha", "ab", "lambda", "c_over_alpha", "g")
   if (!all(need %in% names(x))) stop("Draws file ", key, " lacks columns: ", paste(setdiff(need, names(x)), collapse = ", "))
   if (any(!is.finite(as.matrix(x[need])))) stop("Draws file ", key, " has non-finite values.")
+  x <- x[need]   # subset first: subsetting a data frame drops attributes
   attr(x, "sha256") <- sha
   attr(x, "file") <- key
   attr(x, "ess") <- man$files[[key]]$min_ess_bulk
-  x[need]
+  x
 }
 
 # --- vectorized BEDs: regimens (m, d, T vectors) x draws -------------------
@@ -176,15 +177,16 @@ summarize_draws <- function(regs, td, tox = NULL, threshold = 0) {
   meet_di <- td$valid_di & td$delta_di >= threshold - 1e-9; meet_di[is.na(meet_di)] <- FALSE
   meet_dd <- td$valid_dd & td$delta_dd >= threshold - 1e-9; meet_dd[is.na(meet_dd)] <- FALSE
   both <- meet_di & meet_dd
+  probs <- c(.025, .10, .5, .90, .975)
+  qs <- function(x) t(apply(x, 1, function(r) if (all(is.na(r))) rep(NA_real_, length(probs)) else
+    stats::quantile(r, probs, na.rm = TRUE, names = FALSE, type = 7)))
+  qi <- qs(td$delta_di); qd <- qs(td$delta_dd)
   dmin <- pmin(td$delta_di, td$delta_dd)
   out <- data.frame(m = regs$m, d = regs$d, T = regs$T, n_draws = n,
-    di_q025 = apply(td$delta_di, 1, q_or_na, .025), di_q10 = apply(td$delta_di, 1, q_or_na, .10),
-    di_median = apply(td$delta_di, 1, q_or_na, .5), di_q90 = apply(td$delta_di, 1, q_or_na, .90),
-    di_q975 = apply(td$delta_di, 1, q_or_na, .975),
-    dd_q025 = apply(td$delta_dd, 1, q_or_na, .025), dd_q10 = apply(td$delta_dd, 1, q_or_na, .10),
-    dd_median = apply(td$delta_dd, 1, q_or_na, .5), dd_q90 = apply(td$delta_dd, 1, q_or_na, .90),
-    dd_q975 = apply(td$delta_dd, 1, q_or_na, .975),
-    min_q10 = apply(dmin, 1, q_or_na, .10),
+    di_q025 = qi[, 1], di_q10 = qi[, 2], di_median = qi[, 3], di_q90 = qi[, 4], di_q975 = qi[, 5],
+    dd_q025 = qd[, 1], dd_q10 = qd[, 2], dd_median = qd[, 3], dd_q90 = qd[, 4], dd_q975 = qd[, 5],
+    min_q10 = apply(dmin, 1, function(r) if (all(is.na(r))) NA_real_ else
+      stats::quantile(r, .10, na.rm = TRUE, names = FALSE, type = 7)),
     share_di = rowMeans(meet_di), share_dd = rowMeans(meet_dd), share_both = rowMeans(both),
     n_invalid_di = rowSums(!td$valid_di), n_invalid_dd = rowSums(!td$valid_dd))
   if (!is.null(tox)) {
@@ -235,6 +237,14 @@ regimen_grid <- function(ref, m_range, d_step, d_max, min_days_saved, calendar =
 #   "share_joint" highest share of draws meeting the tumor threshold under both
 #                 models AND every toxicity limit
 SELECTION_RULES <- c("min_q10", "share_joint")
+# The interactive search uses a fixed subset of the draws (every 4th, so 1000
+# of 4000; Monte Carlo standard error of a share at most 1.6 points); the
+# listed regimens are then summarized with every draw.
+SEARCH_DRAWS <- 1000
+search_subset <- function(x, n = SEARCH_DRAWS) {
+  if (nrow(x) <= n) return(x)
+  x[round(seq(1, nrow(x), length.out = n)), , drop = FALSE]
+}
 
 # Uncertainty-aware search. For each number of fractions it lists the dose per
 # fraction chosen by `rule` among regimens whose share of draws meeting all

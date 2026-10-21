@@ -136,7 +136,7 @@ server_defaults <- list(
   ab_e = 10, alpha_e = 0.35, Tp_e = 2.5, Tk_e = 7, chemo = FALSE, ab_l = 3,
   criterion = "either", rank_by = "best", m_range = c(5, 34), min_gain = 1, min_days = 7,
   d_step = "0.05", d_max = 5, early_mode = "hypno", late_mode = "reference",
-  tol_early = 0, tol_late = 0, agree_cmp = "hypno_test", agree_margin = -3, agree_days = 1)
+  tol_early = 0, tol_late = 0, agree_cmp = "hypno_test", agree_threshold_mode = "own", agree_margin = -3, agree_days = 1)
 set_srv <- function(session, ...) do.call(session$setInputs, modifyList(server_defaults, list(...)))
 
 test_that("F03: agreement does not depend on candidate-only inputs", {

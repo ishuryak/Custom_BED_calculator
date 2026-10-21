@@ -305,14 +305,14 @@ test_that("R6: each analysis tab names its own comparison, anchor and numerical 
                       criterion = "either", rank_by = "best", m_range = c(5, 32), min_gain = 1,
                       min_days = 7, d_step = "0.05", d_max = 5, early_mode = "hypno",
                       late_mode = "reference", tol_early = 0, tol_late = 0, agree_cmp = "hypno_test",
-                      agree_margin = -3, agree_days = 1)
+                      agree_threshold_mode = "own", agree_margin = -3, agree_days = 1)
     sc <- output$search_context$html
     expect_true(grepl("Comparison: 33 × 2 Gy in 38 days (sidebar)", sc, fixed = TRUE))
     expect_true(grepl("DD anchor: 35 × 2 Gy in 47 days", sc, fixed = TRUE))
     expect_true(grepl("55.87 Gy₁₀ (HYPNO 55 Gy/20, fixed)", sc, fixed = TRUE))
     expect_true(grepl("110.00 Gy₃ (comparison 110.00 + 0)", sc, fixed = TRUE))
     ac <- output$agree_context$html
-    expect_true(grepl("Comparison: 20 × 2.75 Gy in 26 days (HYPNO test arm)", ac, fixed = TRUE))
+    expect_true(grepl("Comparison: 20 × 2.75 Gy in 26 days (override: HYPNO test arm)", ac, fixed = TRUE))
     expect_true(grepl("105.42 Gy₃ (comparison 105.42 + 0)", ac, fixed = TRUE))
     expect_true(grepl("at least 1 day saved", ac, fixed = TRUE))
     expect_true(grepl("at least 7 days saved", sc, fixed = TRUE))
@@ -327,7 +327,8 @@ test_that("R6: each analysis tab names its own comparison, anchor and numerical 
   })
   app_txt <- read_text("app.R")
   expect_false(grepl("All differences and toxicity limits are relative to this regimen", app_txt, fixed = TRUE))
-  expect_true(grepl("The Model agreement tab has its own comparison", app_txt, fixed = TRUE))
+  # version 3 (decision 7a): one comparison and one threshold for every tab
+  expect_true(grepl("One comparison and one threshold for every tab", app_txt, fixed = TRUE))
   ab <- read_text("about.md")
   expect_false(grepl("Versions 1 and 2.0 calibrated at the comparison regimen", ab, fixed = TRUE))
 })

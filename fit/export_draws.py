@@ -33,3 +33,26 @@ for model, cols in COLS.items():
             ppc_inside_90=s["ppc_inside_90"], variant=variant, model=model)
         print(name, len(x), man["files"][name]["sha256"][:12])
 json.dump(man, open(os.path.join(DRAWS, "manifest.json"), "w"), indent=1)
+
+# Point values for the deterministic "refit" presets: medians of the
+# quantities the data identify (alpha, lambda/alpha, g/alpha and Tk or C/alpha),
+# with lambda and g rebuilt from them, so the preset's daily BED losses equal
+# the posterior medians. alpha/beta is not identified by these data (its
+# posterior equals its prior), so the preset keeps 10 Gy.
+pts = {}
+for model in ("di", "dd"):
+    dr = pd.read_csv(os.path.join(DRAWS, f"tumor_{model}_primary.csv"))
+    a = float(dr["alpha"].median())
+    pt = dict(alpha=a, ab=10.0, lambda_=float((dr["lambda"] / dr["alpha"]).median()) * a,
+              g=float((dr["g"] / dr["alpha"]).median()) * a,
+              loss_per_day_after_onset=float((dr["lambda"] / dr["alpha"]).median()),
+              growth_loss_per_day=float((dr["g"] / dr["alpha"]).median()))
+    pt["lambda"] = pt.pop("lambda_")
+    if model == "di":
+        pt["Tk"] = float(dr["Tk"].median())
+    else:
+        pt["c_over_alpha"] = float(dr["c_over_alpha"].median())
+    pts[model] = pt
+json.dump(dict(source="draws/tumor_*_primary.csv", rule="medians of identified quantities", values=pts),
+          open(os.path.join(DRAWS, "refit_point_values.json"), "w"), indent=1)
+print(json.dumps(pts, indent=1))

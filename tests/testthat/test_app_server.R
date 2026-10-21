@@ -156,7 +156,8 @@ test_that("every preset in the menu exists, and each one calibrates", {
   old <- setwd(app_dir)
   on.exit(setwd(old))
   source("app.R", local = app_env)
-  menu <- setdiff(unname(app_env$PRESET_LABELS), "custom")
+  # "refit" (version 3) is an app-level preset outside the sensitivity set
+  menu <- setdiff(unname(app_env$PRESET_LABELS), c("custom", "refit"))
   expect_setequal(menu, names(app_env$tumor_presets()))
   presets <- app_env$tumor_presets()
   setwd(old)
@@ -183,7 +184,9 @@ test_that("a regimen equal to the reference is reported as the same", {
   shiny::testServer(app_dir, {
     set_defaults(session, m = 35, d = 2)
     v <- output$verdicts$html
-    expect_true(grepl("the same under DI", v) && grepl("the same under DD", v))
+    # version 3: differences under 0.5 Gy are "about the same" in words (plan C7)
+    expect_true(grepl("the same (within 0.5 Gy) under DI", v, fixed = TRUE) &&
+                grepl("the same (within 0.5 Gy) under DD", v, fixed = TRUE))
   })
 })
 
@@ -333,17 +336,17 @@ test_that("Fenwick acute limit reaches the search and the Results tab", {
 test_that("model agreement tab lists the regimens both models support against HYPNO", {
   shiny::testServer(app_dir, {
     set_defaults(session, alpha = 0.35, lambda_di = 0.23, lambda_dd = 0.4, Tk = 28,
-                 early_mode = "hypno", d_max = 5, agree_cmp = "hypno_test", agree_margin = -3, agree_days = 1)
+                 early_mode = "hypno", d_max = 5, agree_cmp = "hypno_test", agree_threshold_mode = "own", agree_margin = -3, agree_days = 1)
     a <- agreement()
     expect_equal(a$m, c(17, 18, 19))
     expect_equal(a$d, c(3.05, 2.90, 2.80), tolerance = 1e-12)
     tab <- output$agree_table
     expect_true(grepl("15 of 15", tab, fixed = TRUE))
     expect_true(grepl("-2.79", tab, fixed = TRUE) && grepl("-1.96", tab, fixed = TRUE))
-    session$setInputs(agree_margin = 0)
+    session$setInputs(agree_threshold_mode = "own", agree_margin = 0)
     expect_equal(nrow(agreement()), 0)
     expect_true(grepl("No regimen meets the allowed change", output$agree_msg$html))
-    session$setInputs(agree_cmp = "sidebar", agree_margin = -3, agree_days = 7)
+    session$setInputs(agree_cmp = "sidebar", agree_threshold_mode = "own", agree_margin = -3, agree_days = 7)
     expect_true(all(agreement()$T <= 47 - 7))
   })
 })

@@ -309,3 +309,27 @@ oar_draw_checker <- function(lib, percents, library = "QUANTEC") {
     ok
   }
 }
+
+# Deterministic organ check for suggest_regimens(): organs entered as % of the
+# prescription, fixed alpha/beta per class. Returns function(m, d) -> logical
+# (TRUE where every entered organ is within its converted constraint), with
+# its settings attached for the scenario record, or NULL when nothing is entered.
+build_oar_check <- function(lib, percents, library = "QUANTEC", ab = default_oar_ab()) {
+  percents <- percents[!vapply(percents, function(v) is.null(v) || is.na(v), logical(1))]
+  if (length(percents) == 0) return(NULL)
+  f <- function(m, d) {
+    ok <- rep(TRUE, length(m))
+    for (k in names(percents)) {
+      a <- ab[[OAR_ORGANS$ab_class[OAR_ORGANS$key == k]]]
+      for (i in seq_along(m)) {
+        row <- pick_constraint(lib, k, library, m[i])
+        if (is.null(row)) next
+        ok[i] <- ok[i] && eqd2_physical(percents[[k]] / 100 * m[i] * d[i], m[i], a) <=
+          constraint_eqd2(row$limit_gy, row$n_fractions, a) + 1e-9
+      }
+    }
+    ok
+  }
+  attr(f, "settings") <- list(library = library, ab = as.list(ab), percents = percents)
+  f
+}

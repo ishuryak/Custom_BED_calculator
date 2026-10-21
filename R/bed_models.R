@@ -245,7 +245,7 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
                              criterion = "either", rank_by = "best",
                              tol_early = 0, tol_late = 0, early_cap = NULL,
                              late_cap = NULL, min_gain = 0, min_days_saved = 1,
-                             fenwick = FALSE, calendar = NULL) {
+                             fenwick = FALSE, calendar = NULL, oar_check = NULL) {
   eps <- 1e-9
   out <- empty_suggestions()
   blocked <- function(reason) { attr(out, "reason") <- reason; out }
@@ -273,7 +273,8 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   g <- expand.grid(d = d_grid, m = m_range)
   # Candidate overall times: the Mon-Fri calendar from a Monday (versions 1-2),
   # or a version 3 calendar (R/schedule.R: fractions per week, start day).
-  g$T <- if (is.null(calendar)) overall_time(g$m) else
+  default_cal <- is.null(calendar) || (calendar$fx_per_week == 5 && calendar$start_weekday == 1)
+  g$T <- if (default_cal) overall_time(g$m) else
     schedule_time(m_range, calendar$fx_per_week, calendar$start_weekday)[match(g$m, m_range)]
   g <- g[g$T <= ref$T - min_days_saved, , drop = FALSE]
   if (nrow(g) == 0) return(blocked("no_shorter_regimen"))
@@ -299,6 +300,7 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
       !is.na(lim) & fenwick_cell_kill(m, d) <= lim + eps
     } else a$bed_early > 0 & a$bed_early <= cap_early + eps
     a$late_ok <- a$bed_late <= cap_late + eps
+    a$oar_ok <- if (is.null(oar_check)) rep(TRUE, length(m)) else oar_check(m, d)
     # Ranking score: evaluable only when the endpoints it needs are evaluable.
     ok_di <- is.finite(a$d_di); ok_dd <- is.finite(a$d_dd)
     a$score <- switch(rank_by,
@@ -311,7 +313,7 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
     a
   }
   a <- evaluate(g$m, g$d, g$T)
-  a <- a[a$tumor_ok & a$early_ok & a$late_ok, , drop = FALSE]
+  a <- a[a$tumor_ok & a$early_ok & a$late_ok & a$oar_ok, , drop = FALSE]
   if (nrow(a) == 0) return(out)
 
   # d_min is the smaller of the two differences, defined only when both are.
@@ -323,7 +325,7 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   a$fractions_saved <- ref$m - a$m
   a$early_slack <- if (fenwick) fenwick_limit(a$T) - fenwick_cell_kill(a$m, a$d) else cap_early - a$bed_early
   a$late_slack <- cap_late - a$bed_late
-  feasible <- a[order(a$m, !a$rank_eligible, -a$score), setdiff(names(a), c("tumor_ok", "early_ok", "late_ok")),
+  feasible <- a[order(a$m, !a$rank_eligible, -a$score), setdiff(names(a), c("tumor_ok", "early_ok", "late_ok", "oar_ok")),
                 drop = FALSE]
   rownames(feasible) <- NULL
 
@@ -340,15 +342,16 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   # What would the next dose step break?
   nxt_d <- round(a$d + d_step, 6)
   nx <- evaluate(a$m, nxt_d, a$T)
-  broken <- mapply(function(e, l, t, r) {
-    parts <- c(if (!e) "early toxicity", if (!l) "late toxicity", if (!t) "tumor criterion")
+  broken <- mapply(function(e, l, t, r, o) {
+    parts <- c(if (!e) "early toxicity", if (!l) "late toxicity", if (!o) "organ-at-risk limit", if (!t) "tumor criterion")
     if (length(parts) == 0 && !r) return("ranking not evaluable (a tumor BED is not positive)")
     if (length(parts) == 0) "none (a higher dose ranks lower)" else paste(parts, collapse = " and ")
-  }, nx$early_ok, nx$late_ok, nx$tumor_ok, nx$rank_eligible)
+  }, nx$early_ok, nx$late_ok, nx$tumor_ok, nx$rank_eligible, nx$oar_ok)
   a$next_step <- ifelse(nxt_d > d_max + eps, "end of dose search range", broken)
   a$tumor_ok <- NULL
   a$early_ok <- NULL
   a$late_ok <- NULL
+  a$oar_ok <- NULL
   a$rank_eligible <- NULL
   rownames(a) <- NULL
   a <- a[, names(empty_suggestions()), drop = FALSE]

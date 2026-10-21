@@ -56,3 +56,6 @@ parse_skip_days <- function(txt) {
     stop("Skipped days must be whole numbers from 2 to 400 (day 1 is the first treatment day).")
   sort(unique(as.integer(v)))
 }
+
+# "m × d Gy in T days" for messages and table headers.
+regimen_text <- function(r) sprintf("%d × %g Gy in %g days", as.integer(r$m), r$d, r$T)
