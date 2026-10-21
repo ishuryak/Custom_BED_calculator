@@ -1,6 +1,4 @@
-# Test-only workflow for version 2. It never deploys. (The nested
-# .github/workflows/.github/workflows/deploy.yml inherited from version 1 is
-# not in the path GitHub reads and stays inactive.)
+# Test-only workflow for version 2. It never deploys.
 # It restores the exact package versions of renv.lock (binaries from the same
 # dated Posit Package Manager snapshot, Linux build) with the same script a
 # user runs, then runs the suite in that library only.

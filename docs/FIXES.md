@@ -164,3 +164,15 @@ Record, verification of each finding, and decisions: `docs/development/2026_10_2
 - **Account:** the only configured shinyapps.io account, `ishuryak`. The bundle was `about.md`, `app.R`, `DESCRIPTION`, `LICENSE`, `R/bed_models.R`, `R/export.R` and `renv.lock`.
 - **First live walkthrough:** 50 of 51 checks. The −3 Gy row check read the table before the live server had re-rendered it. The context strip already showed −3 Gy, and the download replay of the same rows passed (`walkthrough/20261020_115952_live_first_run_timing_fail/`).
 - **Script fix:** the row checks now poll for up to 20 s. Rerun live: **51 of 51, exit 0** (`walkthrough/20261020_120129_live/`). The local rerun with the same script was 52 of 52 (`walkthrough/20261020_120255_local/`).
+
+## 2026-10-21: deployment safety (PLAN_v3 section 3), no app change
+
+**Changes published numbers:** no. `app.R`, `R/` and `about.md` are unchanged, so the live 2.7.0 app is unaffected.
+
+| Item | Record |
+|---|---|
+| What was wrong | (1) The tracked `.Rhistory` held a `rsconnect::setAccountInfo()` call with a full shinyapps.io token and secret, in this public repository since `2b30456` (2024-10-25). (2) `tools/deploy.R` deployed to whichever shinyapps.io account was listed first and did not check for uncommitted changes. (3) `DESCRIPTION` said MIT while `LICENSE` is Apache 2.0. (4) The inactive version 1 deploy workflow was still on this branch. |
+| Proof it was real | (1) `git log --oneline -- .Rhistory` lists `2b30456`; the file's line 1 is the `setAccountInfo` call (values not reproduced here). (2) `deploy.R` line 30 at `65e826f`: `account = acc$name[1]`. (3) `DESCRIPTION` line 10 vs `LICENSE` line 2. |
+| Test that pins it | `tests/testthat/test_deploy_preflight.R` (10 expectations). Against the previous `deploy.R`, `.rscignore` and `.gitignore`, 5 of them fail on the deploy.R and ignore-file assertions (checked 2026-10-21). |
+| Verification | `.Rhistory` untracked (`git rm --cached`), listed in `.gitignore` and `.rscignore`; `.Renviron` added to both. `deploy_preflight()` refuses another app name, the version 1 name, an unconfigured pinned account and uncommitted tracked changes. `DESCRIPTION` now names Apache 2.0, the licence text actually in `LICENSE`. |
+| What it moves | Nothing in any result. **Still required, by the account owner:** revoke the exposed token at shinyapps.io (Account > Tokens) and issue a new one, typed in the R console only. Untracking does not remove the old file from the history of this branch or of `main`; a history rewrite is a separate decision. |

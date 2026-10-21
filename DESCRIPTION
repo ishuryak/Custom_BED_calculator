@@ -7,7 +7,7 @@ Maintainer: Igor Shuryak <is144@cumc.columbia.edu>
 Description: A Shiny application computing tumor BED under dose-independent and
     dose-dependent repopulation models, early and late toxicity BED, and a search
     for hypofractionated regimens meeting tumor and toxicity criteria.
-License: MIT
+License: Apache License (== 2.0) | file LICENSE
 Imports:
     shiny,
     bslib,
