@@ -85,11 +85,12 @@ test_that("E4 (version 3): one caveat line on each of the Report card, Results, 
 
 # --- E1. Source link ---------------------------------------------------------
 
-test_that("E1: the Model and sources page links the version 2 source branch", {
+test_that("E1 (version 3): the Model and sources page links the v3 source branch and the live version 2", {
   shiny::testServer(app_dir, {
     set_open(session)
-    expect_true(grepl("href=\"https://github.com/ishuryak/Custom_BED_calculator/tree/v2-toxicity-hypofractionation\"",
+    expect_true(grepl("href=\"https://github.com/ishuryak/Custom_BED_calculator/tree/v3\"",
                       output$about$html, fixed = TRUE))
+    expect_true(grepl("custom_bed_calculator_v2", output$about$html, fixed = TRUE))
   })
 })
 
