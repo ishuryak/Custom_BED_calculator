@@ -1,4 +1,4 @@
-# Export of a complete, rerunnable analysis (scenario schema 2, app 2.6).
+# Export of a complete, rerunnable analysis (scenario schema 3, app 3.0).
 # One ZIP download holds:
 #   results.csv          the listed regimens (one per number of fractions), full precision
 #   all_qualifying.csv   every grid regimen that met all criteria
@@ -7,15 +7,20 @@
 #   README.txt           what the files are and how to rerun them
 # Requires R/bed_models.R to be sourced first.
 
-SCHEMA_VERSION <- "2"
+SCHEMA_VERSION <- "3"
+# Files that this engine replays exactly: schema 3 of this version, and
+# schema 2 of versions 2.6-2.7 (selection 2.6, equations 2.2), whose
+# calibrated-DD equations version 3.0 computes unchanged.
+REPLAYABLE <- list(c(schema = "3", selection = "2.6", equation = "3.0"),
+                   c(schema = "2", selection = "2.6", equation = "2.2"))
 # Exact replay needs the engine that wrote the file. This calculator keeps
 # only its own engine, so rerun_scenario() replays files of the current
 # schema, equation and selection versions and refuses others.
 # migrate_scenario() turns an older file (schema 1 of versions 2.1-2.4, or
 # schema 2 of version 2.5) into a new scenario under the current rules,
 # recording where it came from; its results may differ from the original.
-MIGRATABLE_SCHEMAS <- c("1", "2")
-MIGRATABLE_SELECTION <- c("2.5")          # schema 1 files carry none
+MIGRATABLE_SCHEMAS <- c("1", "2", "3")
+MIGRATABLE_SELECTION <- c("2.5", "2.6")   # schema 1 files carry none
 # Practical bound on the search grid of a replayed file (rows evaluated).
 MAX_GRID_ROWS <- 200000
 PARAM_NAMES <- c("alpha", "ab", "lambda_di", "lambda_dd", "Tk", "g",
@@ -26,8 +31,19 @@ PARAM_NAMES <- c("alpha", "ab", "lambda_di", "lambda_dd", "Tk", "g",
 # The bytes are read with readBin(): digest(file = ...) first calls
 # file.access(), which on some Windows and OneDrive setups reports a readable
 # file as unreadable. The SHA-256 is the same either way.
+# Version 3 hashes every R file, the app, the About page and the data and
+# draws files, so a new module cannot be invisible to the record (plan E).
+code_identity_files <- function(root = ".") {
+  f <- c(list.files(file.path(root, "R"), pattern = "\\.R$", full.names = FALSE),
+         list.files(file.path(root, "data"), pattern = "\\.(csv|json)$", full.names = FALSE),
+         list.files(file.path(root, "draws"), pattern = "\\.(csv|json)$", full.names = FALSE))
+  dirs <- c(rep("R", length(list.files(file.path(root, "R"), pattern = "\\.R$"))),
+            rep("data", length(list.files(file.path(root, "data"), pattern = "\\.(csv|json)$"))),
+            rep("draws", length(list.files(file.path(root, "draws"), pattern = "\\.(csv|json)$"))))
+  c(file.path(dirs, f), "app.R", "about.md")
+}
 code_identity <- function(root = ".") {
-  files <- c("R/bed_models.R", "R/export.R", "app.R")
+  files <- code_identity_files(root)
   sha <- vapply(files, function(f) {
     path <- file.path(root, f)
     if (!file.exists(path)) return(NA_character_)
@@ -48,7 +64,7 @@ code_identity <- function(root = ".") {
 # disk have changed since, code$changed_since_load is TRUE.
 build_scenario <- function(p, ref, anchor, search, context, analysis = "candidate",
                            agreement = NULL, anchor_mode = "fixed", code_root = ".", code = NULL) {
-  cal <- dd_calibration(anchor, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk)
+  cal <- dd_setup(p, anchor)
   pp <- lapply(setNames(PARAM_NAMES, PARAM_NAMES), function(n) {
     v <- p[[n]]
     if (is.null(v) && n == "g") 0 else v
@@ -63,6 +79,7 @@ build_scenario <- function(p, ref, anchor, search, context, analysis = "candidat
     clocks = list(input = "inclusive calendar days, first to last treatment day",
                   tumor = "inclusive", acute = if (is.null(p$clock_e)) "elapsed" else p$clock_e),
     params = pp,
+    dd = dd_block(p),
     comparison = ref[c("m", "d", "T")],
     anchor = c(anchor[c("m", "d", "T")], list(mode = anchor_mode)),
     calibration = list(status = cal$status,
@@ -85,6 +102,13 @@ build_scenario <- function(p, ref, anchor, search, context, analysis = "candidat
   sc$code <- code
   sc$context <- context
   sc
+}
+
+# The DD model's settings: calibrated (default) or fitted with its own values.
+dd_block <- function(p) {
+  if (!identical(p$dd_mode, "fitted")) return(list(mode = "calibrated"))
+  list(mode = "fitted", alpha_dd = p$alpha_dd, c_over_alpha_dd = p$c_over_alpha_dd,
+       g_dd = if (is.null(p$g_dd)) p$g else p$g_dd)
 }
 
 # Canonical form for the ID: names of every named list sorted recursively,
@@ -110,7 +134,7 @@ scenario_json <- function(sc, pretty = TRUE) {
 # scenario set. App version, calibration (derived), code identity and
 # interface context are excluded. SHA-256 of canonical UTF-8 JSON.
 SCIENTIFIC_FIELDS <- c("schema_version", "equation_version", "selection_version", "analysis",
-                       "hinge", "clocks", "params", "comparison", "anchor", "search",
+                       "hinge", "clocks", "params", "dd", "comparison", "anchor", "search",
                        "agreement", "scenario_set_version", "scenario_set")
 scenario_id <- function(sc) {
   x <- sc[intersect(SCIENTIFIC_FIELDS, names(sc))]
@@ -165,12 +189,22 @@ check_inputs <- function(sc) {
   p <- lapply(PARAM_NAMES, function(n) check_num(pr[[n]], n, lim[[n]][1], lim[[n]][2]))
   names(p) <- PARAM_NAMES
   p$clock_e <- sc$clocks$acute
+  ddb <- sc$dd
+  if (!is.null(ddb)) {
+    mode <- check_choice(ddb$mode, "dd mode", c("calibrated", "fitted"))
+    if (mode == "fitted") {
+      p$dd_mode <- "fitted"
+      p$alpha_dd <- check_num(ddb$alpha_dd, "alpha_dd", 1e-6, 10)
+      p$c_over_alpha_dd <- check_num(ddb$c_over_alpha_dd, "c_over_alpha_dd", 1e-6, 1e6)
+      p$g_dd <- check_num(ddb$g_dd, "g_dd", 0, 1)
+    }
+  }
 
   ref <- check_regimen(sc$comparison, "comparison")
   anchor <- check_regimen(sc$anchor, "anchor")
 
   # Every saved calibration field must describe the inputs.
-  cal <- dd_calibration(anchor, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk)
+  cal <- dd_setup(p, anchor)
   saved <- sc$calibration
   if (!is.null(saved)) {
     if (!identical(saved$status, cal$status))
@@ -198,6 +232,11 @@ check_inputs <- function(sc) {
                min_gain = check_num(s$min_gain, "min_gain", -1000, 1000),
                min_days_saved = check_num(s$min_days_saved, "min_days_saved", 0, 1000, TRUE),
                fenwick = check_flag(s$fenwick, "fenwick"))
+  if (!is.null(s$calendar)) {
+    fpw <- check_num(s$calendar$fx_per_week, "calendar fx_per_week", 5, 6, TRUE)
+    args$calendar <- list(fx_per_week = fpw,
+                          start_weekday = check_num(s$calendar$start_weekday, "calendar start_weekday", 1, fpw, TRUE))
+  }
   n_d <- max(0, floor((args$d_max - ref$d) / args$d_step) + 1)
   if (n_d * length(mr) > MAX_GRID_ROWS)
     replay_fail("the search grid (", n_d * length(mr), " regimens) exceeds ", MAX_GRID_ROWS, ".")
@@ -243,7 +282,11 @@ validate_scenario <- function(sc) {
   if (length(schema) != 1 || !schema %in% MIGRATABLE_SCHEMAS)
     replay_fail("unsupported schema version '", paste(schema, collapse = ","), "'.")
   old_sel <- if (is.null(sc$selection_version)) "none (schema 1)" else as.character(sc$selection_version)
-  if (schema != SCHEMA_VERSION || !identical(as.character(sc$selection_version), SELECTION_VERSION)) {
+  key <- c(schema = schema, selection = old_sel, equation = as.character(sc$equation_version)[1])
+  replayable <- any(vapply(REPLAYABLE, function(r) identical(unname(r), unname(key)), logical(1)))
+  if (!replayable && schema == SCHEMA_VERSION && identical(old_sel, SELECTION_VERSION))
+    replay_fail("equation version '", sc$equation_version, "' is not this calculator's (", EQUATION_VERSION, ").")
+  if (!replayable) {
     if (schema == SCHEMA_VERSION && !old_sel %in% MIGRATABLE_SELECTION)
       replay_fail("selection version '", old_sel, "' is not supported.")
     replay_fail("this file was written by version ", sc$app_version, " (schema ", schema, ", selection ",
@@ -251,8 +294,6 @@ validate_scenario <- function(sc) {
                 SELECTION_VERSION, ") does not include. To reanalyze it with the current rules, run ",
                 "rerun_scenario(migrate_scenario(sc)); its results may differ from the original export.")
   }
-  if (!identical(as.character(sc$equation_version), EQUATION_VERSION))
-    replay_fail("equation version '", sc$equation_version, "' is not this calculator's (", EQUATION_VERSION, ").")
   analysis <- check_choice(sc$analysis, "analysis", c("candidate", "agreement"))
   v <- check_inputs(sc)
   agree <- if (analysis == "agreement") check_agreement(sc, v$p, v$args) else NULL
@@ -273,6 +314,7 @@ migrate_scenario <- function(sc) {
   sel <- if (is.null(sc$selection_version)) NA_character_ else as.character(sc$selection_version)
   if (schema == SCHEMA_VERSION && identical(sel, SELECTION_VERSION))
     replay_fail("this file is already of the current versions; rerun it with rerun_scenario().")
+  if (schema == "3") replay_fail("schema 3 files of other selection versions cannot be migrated.")
   if (schema == "2" && !sel %in% MIGRATABLE_SELECTION)
     replay_fail("selection version '", sel, "' cannot be migrated.")
   eq <- as.character(sc$equation_version)
@@ -284,7 +326,7 @@ migrate_scenario <- function(sc) {
   if (identical(eq, "2.1")) {
     if (!identical(sc$search$fenwick, FALSE))
       replay_fail("equation 2.1 has no Fenwick boundary; this file cannot be migrated.")
-  } else if (!identical(eq, EQUATION_VERSION)) {
+  } else if (!eq %in% c("2.2", EQUATION_VERSION)) {
     replay_fail("equation version '", eq, "' cannot be migrated.")
   }
   old_id <- if (!is.null(sc$scenario_id)) as.character(sc$scenario_id) else NA_character_

@@ -8,8 +8,8 @@
 # All max(0, x) terms use the same smooth version as the v1 website,
 # log(1 + exp(3x)) / 3, so v1 and v2 agree at the v1 defaults.
 
-APP_VERSION <- "2.7.0"
-EQUATION_VERSION <- "2.2"  # 2.1 + optional Fenwick 2008 acute boundary
+APP_VERSION <- "3.0.0"
+EQUATION_VERSION <- "3.0"  # 2.2 + optional fitted DD model (own alpha, rate, onset constant)
 # Selection rules (filtering, validity, ranking), versioned apart from the
 # equations. 2.5: one validity rule for search, sensitivity and agreement.
 # 2.6: a row is ranked only when its ranking score is evaluable (rank_eligible),
@@ -117,6 +117,27 @@ dd_calibration <- function(anchor, alpha, ab, lambda_di, lambda_dd, Tk) {
   list(c_over_alpha = K0 * onset / T0, onset_ref = onset, status = "ok")
 }
 
+# The DD model used by every calculation. dd_mode "calibrated" (default, as in
+# version 2): DD shares alpha and g with DI and its onset constant is solved
+# so that DD = DI at the anchor. dd_mode "fitted" (version 3): DD has its own
+# alpha_dd, lambda_dd, c_over_alpha_dd (= C/alpha) and g_dd, as fitted to
+# outcome data; no calibration. Returns the calibration fields plus the alpha
+# and g the DD model uses. status "fitted" for fitted values.
+dd_setup <- function(p, anchor) {
+  g <- if (is.null(p$g)) 0 else p$g
+  if (identical(p$dd_mode, "fitted")) {
+    a <- p$alpha_dd; co <- p$c_over_alpha_dd
+    ok <- length(a) == 1 && length(co) == 1 && is.finite(a) && a > 0 && is.finite(co) && co > 0 &&
+      is.finite(p$lambda_dd) && p$lambda_dd >= 0
+    K0 <- bed_lq(anchor$m, anchor$d, p$ab)
+    return(list(c_over_alpha = if (ok) co else NA_real_,
+                onset_ref = if (ok) co * anchor$T / K0 else NA_real_,
+                status = if (ok) "fitted" else "infeasible",
+                alpha = a, g = if (is.null(p$g_dd)) g else p$g_dd))
+  }
+  c(dd_calibration(anchor, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk), list(alpha = p$alpha, g = g))
+}
+
 # Tumor BED, DD repopulation model (2018 paper, Eq. 2-5): the repopulation
 # rate is lambda_dd times the mean fraction of cells killed per day, and the
 # onset is reached at a fixed level of cumulative cell killing.
@@ -152,13 +173,13 @@ bed_late <- function(m, d, ab_l) bed_lq(m, d, ab_l)
 compute_all <- function(m, d, T, p, anchor) {
   g <- if (is.null(p$g)) 0 else p$g
   clock_e <- if (is.null(p$clock_e)) "elapsed" else p$clock_e
-  cal <- dd_calibration(anchor, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk)
+  cal <- dd_setup(p, anchor)
   early <- bed_early(m, d, acute_model_time(T, clock_e), p$ab_e, p$alpha_e, p$lambda_e, p$Tk_e)
   late <- bed_late(m, d, p$ab_l)
   data.frame(
     m = m, d = d, T = T, total_dose = m * d,
     bed_di = bed_di(m, d, T, p$alpha, p$ab, p$lambda_di, p$Tk, g),
-    bed_dd = bed_dd(m, d, T, p$alpha, p$ab, p$lambda_dd, cal$c_over_alpha, g),
+    bed_dd = bed_dd(m, d, T, cal$alpha, p$ab, p$lambda_dd, cal$c_over_alpha, cal$g),
     bed_early = early, eqd2_early = eqd2(early, p$ab_e),
     bed_late = late, eqd2_late = eqd2(late, p$ab_l)
   )
@@ -187,7 +208,9 @@ tumor_endpoint <- function(cand_bed, ref_bed, available = TRUE) {
        delta = ifelse(valid, cand_bed - ref_bed, NA_real_))
 }
 
-# Search for hypofractionated regimens, given once daily Monday to Friday.
+# Search for hypofractionated regimens, given once daily Monday to Friday
+# (or on `calendar`: list(fx_per_week, start_weekday); skipped days are not
+# applied to candidates).
 # Dose per fraction runs over multiples of d_step above the comparison dose
 # per fraction, up to d_max. Overall time must be at least min_days_saved
 # shorter than the comparison regimen `ref`. The DD model is calibrated at
@@ -222,11 +245,11 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
                              criterion = "either", rank_by = "best",
                              tol_early = 0, tol_late = 0, early_cap = NULL,
                              late_cap = NULL, min_gain = 0, min_days_saved = 1,
-                             fenwick = FALSE) {
+                             fenwick = FALSE, calendar = NULL) {
   eps <- 1e-9
   out <- empty_suggestions()
   blocked <- function(reason) { attr(out, "reason") <- reason; out }
-  cal <- dd_calibration(anchor, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk)
+  cal <- dd_setup(p, anchor)
   r0 <- compute_all(ref$m, ref$d, ref$T, p, anchor)
   dd_available <- cal$status != "infeasible"
   di_usable <- tumor_endpoint(1, r0$bed_di)$ref_valid
@@ -248,7 +271,10 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   if (d_start > d_max + eps) return(blocked("empty_dose_range"))
   d_grid <- round(seq(d_start, d_max + eps, by = d_step), 6)
   g <- expand.grid(d = d_grid, m = m_range)
-  g$T <- overall_time(g$m)
+  # Candidate overall times: the Mon-Fri calendar from a Monday (versions 1-2),
+  # or a version 3 calendar (R/schedule.R: fractions per week, start day).
+  g$T <- if (is.null(calendar)) overall_time(g$m) else
+    schedule_time(m_range, calendar$fx_per_week, calendar$start_weekday)[match(g$m, m_range)]
   g <- g[g$T <= ref$T - min_days_saved, , drop = FALSE]
   if (nrow(g) == 0) return(blocked("no_shorter_regimen"))
 
@@ -470,7 +496,7 @@ sensitivity_table <- function(reg, ref, anchor, p, ab_values = SCENARIO_AB_VALUE
   ss <- scenario_set(p, ab_values)
   rows <- lapply(seq_len(nrow(ss)), function(i) {
     q <- modifyList(p, as.list(ss[i, c("alpha", "ab", "lambda_di", "lambda_dd", "Tk", "g")]))
-    cal <- dd_calibration(anchor, q$alpha, q$ab, q$lambda_di, q$lambda_dd, q$Tk)
+    cal <- dd_setup(q, anchor)
     a <- compute_all(c(reg$m, ref$m), c(reg$d, ref$d), c(reg$T, ref$T), q, anchor)
     e_di <- tumor_endpoint(a$bed_di[1], a$bed_di[2])
     e_dd <- tumor_endpoint(a$bed_dd[1], a$bed_dd[2], cal$status != "infeasible")
@@ -515,8 +541,8 @@ agreement_regimens <- function(p, ref, anchor, margin = -3, ab_values = SCENARIO
   if (nrow(s) == 0) return(s)
   feasible <- attr(s, "feasible")
   s <- s[order(s$m), , drop = FALSE]
-  cal <- dd_calibration(anchor, p$alpha, p$ab, p$lambda_di, p$lambda_dd, p$Tk)
-  s$dd_onset <- dd_onset_rate(s$m, s$d, s$T, p$alpha, p$ab, p$lambda_dd, cal$c_over_alpha)$onset
+  cal <- dd_setup(p, anchor)
+  s$dd_onset <- dd_onset_rate(s$m, s$d, s$T, cal$alpha, p$ab, p$lambda_dd, cal$c_over_alpha)$onset
   s$before_di_onset <- s$T < p$Tk
   detail <- list()
   rob <- lapply(seq_len(nrow(s)), function(i) {

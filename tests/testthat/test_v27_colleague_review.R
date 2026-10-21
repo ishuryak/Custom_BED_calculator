@@ -227,14 +227,16 @@ test_that("D: compatible version 2.6 files replay to the same results", {
   expect_equal(nrow(rerun_scenario(jsonlite::fromJSON(fixture("v26_candidate_both_worst_p1.json")))), 0)
 })
 
-test_that("D: a new export records version 2.7.0 and the chosen settings, with unchanged identifiers", {
+test_that("D: a new export records the current version and the chosen settings (updated for version 3)", {
   sc <- jsonlite::fromJSON(fixture("v26_candidate_both_worst_p1.json"))
   new <- build_scenario(default_params(), list(m = 35, d = 2, T = 47), list(m = 35, d = 2, T = 47),
                         search = sc$search, context = list())
-  expect_equal(new$app_version, "2.7.0")
+  expect_equal(new$app_version, APP_VERSION)
   expect_equal(new$selection_version, sc$selection_version)
-  expect_equal(new$equation_version, sc$equation_version)
-  expect_equal(new$schema_version, sc$schema_version)
+  # version 3 writes schema 3 / equations 3.0 and still replays the 2.6 file exactly
+  expect_equal(c(new$schema_version, new$equation_version), c("3", "3.0"))
+  expect_equal(c(sc$schema_version, sc$equation_version), c("2", "2.2"))
+  expect_equal(new$dd$mode, "calibrated")
   expect_equal(new$search$criterion, "both")
   expect_equal(new$search$rank_by, "worst")
   expect_equal(new$search$min_gain, 1)
@@ -248,5 +250,5 @@ test_that("D: a new export records version 2.7.0 and the chosen settings, with u
 test_that("D: app and DESCRIPTION carry the same version", {
   desc <- read.dcf(file.path(app_abs, "DESCRIPTION"))
   expect_equal(unname(desc[1, "Version"]), APP_VERSION)
-  expect_equal(APP_VERSION, "2.7.0")
+  expect_equal(APP_VERSION, "3.0.0")
 })

@@ -1,0 +1,465 @@
+{
+ "model": "dd",
+ "divergences": 21,
+ "treedepth_hits": 0,
+ "max_rhat": 1.0035,
+ "min_ess_bulk": 879.372,
+ "n_draws": 8000,
+ "posterior": {
+  "alpha": {
+   "median": 0.0258613155,
+   "q2_5": 0.010414287825,
+   "q97_5": 0.05172946855,
+   "q10": 0.015246077700000001,
+   "q90": 0.0406739635
+  },
+  "ab": {
+   "median": 10.0,
+   "q2_5": 10.0,
+   "q97_5": 10.0,
+   "q10": 10.0,
+   "q90": 10.0
+  },
+  "lambda": {
+   "median": 0.47465839,
+   "q2_5": 0.02491579187500001,
+   "q97_5": 9.497403559999997,
+   "q10": 0.07163685770000001,
+   "q90": 3.259563800000001
+  },
+  "C": {
+   "median": 9.93421875,
+   "q2_5": 1.7411406950000001,
+   "q97_5": 71.30583202499994,
+   "q10": 2.9703629400000007,
+   "q90": 34.5266222
+  },
+  "c_over_alpha": {
+   "median": 402.25244999999995,
+   "q2_5": 54.2439891,
+   "q97_5": 3178.731284999997,
+   "q10": 99.01035530000001,
+   "q90": 1575.216340000001
+  },
+  "g": {
+   "median": 0.0154,
+   "q2_5": 0.0154,
+   "q97_5": 0.0154,
+   "q10": 0.0154,
+   "q90": 0.0154
+  },
+  "sigma": {
+   "median": 0.205085485,
+   "q2_5": 0.11513738025,
+   "q97_5": 0.3556209087499999,
+   "q10": 0.14130419400000002,
+   "q90": 0.29509270600000004
+  }
+ },
+ "ppc": [
+  {
+   "row": 1,
+   "author": "Bourhis",
+   "arm": "Standard",
+   "n": 129,
+   "obs_pct": 27.131782945736433,
+   "pred_median_pct": 32.55813953488372,
+   "pred_lo_pct": 15.503875968992247,
+   "pred_hi_pct": 51.16279069767442,
+   "inside_90": true
+  },
+  {
+   "row": 2,
+   "author": "Bourhis",
+   "arm": "Accelerated",
+   "n": 137,
+   "obs_pct": 45.25547445255474,
+   "pred_median_pct": 39.416058394160586,
+   "pred_lo_pct": 21.16788321167883,
+   "pred_hi_pct": 56.934306569343065,
+   "inside_90": true
+  },
+  {
+   "row": 3,
+   "author": "Dische",
+   "arm": "Standard",
+   "n": 366,
+   "obs_pct": 53.005464480874316,
+   "pred_median_pct": 51.09289617486339,
+   "pred_lo_pct": 34.15300546448088,
+   "pred_hi_pct": 66.66666666666667,
+   "inside_90": true
+  },
+  {
+   "row": 4,
+   "author": "Dische",
+   "arm": "TID",
+   "n": 552,
+   "obs_pct": 51.81159420289855,
+   "pred_median_pct": 53.6231884057971,
+   "pred_lo_pct": 36.41304347826087,
+   "pred_hi_pct": 67.7536231884058,
+   "inside_90": true
+  },
+  {
+   "row": 5,
+   "author": "Fu",
+   "arm": "Standard",
+   "n": 268,
+   "obs_pct": 42.53731343283582,
+   "pred_median_pct": 45.52238805970149,
+   "pred_lo_pct": 29.47761194029851,
+   "pred_hi_pct": 60.44776119402985,
+   "inside_90": true
+  },
+  {
+   "row": 6,
+   "author": "Fu",
+   "arm": "Hyper-fractionated",
+   "n": 268,
+   "obs_pct": 52.23880597014925,
+   "pred_median_pct": 48.507462686567166,
+   "pred_lo_pct": 33.208955223880594,
+   "pred_hi_pct": 62.6865671641791,
+   "inside_90": true
+  },
+  {
+   "row": 7,
+   "author": "Fu",
+   "arm": "Hyper-fractionated",
+   "n": 263,
+   "obs_pct": 52.47148288973384,
+   "pred_median_pct": 52.09125475285171,
+   "pred_lo_pct": 36.12167300380228,
+   "pred_hi_pct": 66.53992395437263,
+   "inside_90": true
+  },
+  {
+   "row": 8,
+   "author": "Fu",
+   "arm": "2 week gap",
+   "n": 274,
+   "obs_pct": 42.33576642335766,
+   "pred_median_pct": 43.7956204379562,
+   "pred_lo_pct": 27.37226277372263,
+   "pred_hi_pct": 58.75912408759124,
+   "inside_90": true
+  },
+  {
+   "row": 9,
+   "author": "Hansen",
+   "arm": "Standard",
+   "n": 310,
+   "obs_pct": 46.45161290322581,
+   "pred_median_pct": 46.774193548387096,
+   "pred_lo_pct": 30.0,
+   "pred_hi_pct": 61.935483870967744,
+   "inside_90": true
+  },
+  {
+   "row": 10,
+   "author": "Hansen",
+   "arm": "3 week gap",
+   "n": 191,
+   "obs_pct": 35.07853403141361,
+   "pred_median_pct": 35.07853403141361,
+   "pred_lo_pct": 18.32460732984293,
+   "pred_hi_pct": 52.35602094240838,
+   "inside_90": true
+  },
+  {
+   "row": 11,
+   "author": "Hliniak",
+   "arm": "Standard",
+   "n": 199,
+   "obs_pct": 75.87939698492463,
+   "pred_median_pct": 77.38693467336684,
+   "pred_lo_pct": 64.82412060301507,
+   "pred_hi_pct": 86.4321608040201,
+   "inside_90": true
+  },
+  {
+   "row": 12,
+   "author": "Hliniak",
+   "arm": "6 days/week",
+   "n": 196,
+   "obs_pct": 81.12244897959184,
+   "pred_median_pct": 79.59183673469387,
+   "pred_lo_pct": 67.85714285714286,
+   "pred_hi_pct": 88.26530612244898,
+   "inside_90": true
+  },
+  {
+   "row": 13,
+   "author": "Horiot",
+   "arm": "Standard",
+   "n": 159,
+   "obs_pct": 62.893081761006286,
+   "pred_median_pct": 59.74842767295598,
+   "pred_lo_pct": 42.138364779874216,
+   "pred_hi_pct": 73.58490566037736,
+   "inside_90": true
+  },
+  {
+   "row": 14,
+   "author": "Horiot",
+   "arm": "Hyper-fractionated",
+   "n": 166,
+   "obs_pct": 63.855421686746986,
+   "pred_median_pct": 66.86746987951807,
+   "pred_lo_pct": 51.204819277108435,
+   "pred_hi_pct": 79.51807228915662,
+   "inside_90": true
+  },
+  {
+   "row": 15,
+   "author": "Horiot",
+   "arm": "Standard",
+   "n": 253,
+   "obs_pct": 48.616600790513836,
+   "pred_median_pct": 49.40711462450593,
+   "pred_lo_pct": 32.015810276679844,
+   "pred_hi_pct": 64.82213438735178,
+   "inside_90": true
+  },
+  {
+   "row": 16,
+   "author": "Horiot",
+   "arm": "2 week gap",
+   "n": 247,
+   "obs_pct": 60.32388663967611,
+   "pred_median_pct": 59.51417004048583,
+   "pred_lo_pct": 42.91497975708502,
+   "pred_hi_pct": 72.8744939271255,
+   "inside_90": true
+  },
+  {
+   "row": 17,
+   "author": "Jackson",
+   "arm": "Standard",
+   "n": 41,
+   "obs_pct": 43.90243902439025,
+   "pred_median_pct": 41.46341463414634,
+   "pred_lo_pct": 19.51219512195122,
+   "pred_hi_pct": 63.41463414634146,
+   "inside_90": true
+  },
+  {
+   "row": 18,
+   "author": "Jackson",
+   "arm": "Accelerated",
+   "n": 41,
+   "obs_pct": 48.78048780487805,
+   "pred_median_pct": 53.65853658536585,
+   "pred_lo_pct": 31.70731707317073,
+   "pred_hi_pct": 73.17073170731707,
+   "inside_90": true
+  },
+  {
+   "row": 19,
+   "author": "Leclerc",
+   "arm": "High dose/fraction",
+   "n": 19,
+   "obs_pct": 78.94736842105263,
+   "pred_median_pct": 78.94736842105263,
+   "pred_lo_pct": 57.89473684210526,
+   "pred_hi_pct": 94.73684210526316,
+   "inside_90": true
+  },
+  {
+   "row": 20,
+   "author": "Leclerc",
+   "arm": "High dose/fraction",
+   "n": 19,
+   "obs_pct": 78.94736842105263,
+   "pred_median_pct": 84.21052631578948,
+   "pred_lo_pct": 63.1578947368421,
+   "pred_hi_pct": 94.73684210526316,
+   "inside_90": true
+  },
+  {
+   "row": 21,
+   "author": "Leclerc",
+   "arm": "High dose/fraction",
+   "n": 19,
+   "obs_pct": 84.21052631578948,
+   "pred_median_pct": 78.94736842105263,
+   "pred_lo_pct": 57.89473684210526,
+   "pred_hi_pct": 94.73684210526316,
+   "inside_90": true
+  },
+  {
+   "row": 22,
+   "author": "Overgard",
+   "arm": "Standard",
+   "n": 726,
+   "obs_pct": 64.32506887052341,
+   "pred_median_pct": 66.52892561983471,
+   "pred_lo_pct": 52.06611570247934,
+   "pred_hi_pct": 77.41046831955923,
+   "inside_90": true
+  },
+  {
+   "row": 23,
+   "author": "Overgard",
+   "arm": "6 days/week",
+   "n": 750,
+   "obs_pct": 71.33333333333333,
+   "pred_median_pct": 69.33333333333333,
+   "pred_lo_pct": 55.59333333333334,
+   "pred_hi_pct": 79.6,
+   "inside_90": true
+  },
+  {
+   "row": 24,
+   "author": "Pinto",
+   "arm": "Standard",
+   "n": 48,
+   "obs_pct": 16.666666666666668,
+   "pred_median_pct": 20.833333333333332,
+   "pred_lo_pct": 6.25,
+   "pred_hi_pct": 41.666666666666664,
+   "inside_90": true
+  },
+  {
+   "row": 25,
+   "author": "Pinto",
+   "arm": "Hyper-fractionated",
+   "n": 50,
+   "obs_pct": 26.0,
+   "pred_median_pct": 20.0,
+   "pred_lo_pct": 6.0,
+   "pred_hi_pct": 42.0,
+   "inside_90": true
+  },
+  {
+   "row": 26,
+   "author": "Poulsen",
+   "arm": "Standard",
+   "n": 171,
+   "obs_pct": 49.12280701754386,
+   "pred_median_pct": 52.63157894736842,
+   "pred_lo_pct": 35.08771929824562,
+   "pred_hi_pct": 69.00584795321637,
+   "inside_90": true
+  },
+  {
+   "row": 27,
+   "author": "Poulsen",
+   "arm": "Accelerated",
+   "n": 172,
+   "obs_pct": 57.55813953488372,
+   "pred_median_pct": 54.06976744186046,
+   "pred_lo_pct": 36.627906976744185,
+   "pred_hi_pct": 69.76744186046511,
+   "inside_90": true
+  },
+  {
+   "row": 28,
+   "author": "Skladowski",
+   "arm": "Standard",
+   "n": 49,
+   "obs_pct": 32.6530612244898,
+   "pred_median_pct": 53.06122448979592,
+   "pred_lo_pct": 30.612244897959183,
+   "pred_hi_pct": 71.42857142857143,
+   "inside_90": true
+  },
+  {
+   "row": 29,
+   "author": "Skladowski",
+   "arm": "7 days/week",
+   "n": 51,
+   "obs_pct": 78.43137254901961,
+   "pred_median_pct": 58.8235294117647,
+   "pred_lo_pct": 39.21568627450981,
+   "pred_hi_pct": 76.47058823529412,
+   "inside_90": false
+  },
+  {
+   "row": 30,
+   "author": "Skladowski",
+   "arm": "7 days/week",
+   "n": 173,
+   "obs_pct": 65.89595375722543,
+   "pred_median_pct": 65.89595375722543,
+   "pred_lo_pct": 49.71098265895954,
+   "pred_hi_pct": 78.61271676300578,
+   "inside_90": true
+  },
+  {
+   "row": 31,
+   "author": "Skladowski",
+   "arm": "5 days/week, BID",
+   "n": 172,
+   "obs_pct": 66.27906976744185,
+   "pred_median_pct": 66.27906976744185,
+   "pred_lo_pct": 50.55232558139537,
+   "pred_hi_pct": 78.48837209302326,
+   "inside_90": true
+  },
+  {
+   "row": 32,
+   "author": "Wang",
+   "arm": "Standard",
+   "n": 303,
+   "obs_pct": 45.87458745874587,
+   "pred_median_pct": 57.0957095709571,
+   "pred_lo_pct": 40.92409240924093,
+   "pred_hi_pct": 70.62706270627062,
+   "inside_90": true
+  },
+  {
+   "row": 33,
+   "author": "Wang",
+   "arm": "2 week gap",
+   "n": 321,
+   "obs_pct": 67.91277258566979,
+   "pred_median_pct": 57.94392523364486,
+   "pred_lo_pct": 41.43302180685358,
+   "pred_hi_pct": 71.33956386292834,
+   "inside_90": true
+  },
+  {
+   "row": 34,
+   "author": "Yamazaki",
+   "arm": "Standard",
+   "n": 88,
+   "obs_pct": 82.95454545454545,
+   "pred_median_pct": 88.63636363636364,
+   "pred_lo_pct": 78.4090909090909,
+   "pred_hi_pct": 95.45454545454545,
+   "inside_90": true
+  },
+  {
+   "row": 35,
+   "author": "Yamazaki",
+   "arm": "High dose/fraction",
+   "n": 92,
+   "obs_pct": 93.47826086956522,
+   "pred_median_pct": 89.1304347826087,
+   "pred_lo_pct": 79.34782608695652,
+   "pred_hi_pct": 95.65217391304348,
+   "inside_90": true
+  }
+ ],
+ "ppc_inside_90": 34,
+ "mean_log_lik": -110.36562871586248,
+ "correlations": {
+  "alpha~lambda": 0.012071876428345622,
+  "alpha~C": -0.05872289519226375,
+  "alpha~c_over_alpha": -0.43406702779196377,
+  "alpha~g": -1.1313722328499315e-15,
+  "alpha~sigma": 0.1570801766822116,
+  "lambda~C": 0.09933951757255705,
+  "lambda~c_over_alpha": 0.08504747610094067,
+  "lambda~g": -2.2682805892452027e-17,
+  "lambda~sigma": 0.009241128155239097,
+  "C~c_over_alpha": 0.9248156203716208,
+  "C~g": -1.1175334979521428e-16,
+  "C~sigma": 0.014130381194039771,
+  "c_over_alpha~g": 2.4708362152172506e-16,
+  "c_over_alpha~sigma": -0.04710726316795511,
+  "g~sigma": -9.146402913195877e-16
+ }
+}

@@ -250,7 +250,9 @@ test_that("R3: a version 2.4 file is refused by strict replay and reanalyzed onl
 
 test_that("R3: version 2.5 files need migration; unknown and Fenwick-2.1 files are refused", {
   sc <- jsonlite::fromJSON(scenario_json(agree_scenario()))
-  old <- sc; old$selection_version <- "2.5"; old$app_version <- "2.5.1"
+  # a version 2.5 file is schema 2 with equations 2.2 (version 3 writes schema 3)
+  as_v25 <- function(x) { x$selection_version <- "2.5"; x$schema_version <- "2"; x$equation_version <- "2.2"; x$dd <- NULL; x }
+  old <- as_v25(sc); old$app_version <- "2.5.1"
   expect_error(rerun_scenario(old), "migrate_scenario")
   expect_equal(rerun_scenario(migrate_scenario(old))$m, c(17, 18, 19))
   expect_error(migrate_scenario(sc), "already of the current versions")
@@ -260,7 +262,7 @@ test_that("R3: version 2.5 files need migration; unknown and Fenwick-2.1 files a
   f21 <- jsonlite::fromJSON(scenario_json(fenwick_scenario()))
   f21$schema_version <- "1"; f21$equation_version <- "2.1"; f21$selection_version <- NULL
   expect_error(migrate_scenario(f21), "no Fenwick boundary")
-  h <- sc; h$selection_version <- "2.5"; h$hinge$type <- "hard"
+  h <- as_v25(sc); h$hinge$type <- "hard"
   expect_error(migrate_scenario(h), "hinge")
 })
 

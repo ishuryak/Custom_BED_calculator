@@ -1,0 +1,6 @@
+// Smooth max(0, x) used by the calculator (R/bed_models.R smooth_max0, k = 3 per day).
+real smooth_max0(real x) {
+  real z = 3 * x;
+  if (z > 30) return x;
+  return log1p_exp(z) / 3;
+}

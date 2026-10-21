@@ -1,0 +1,86 @@
+{
+ "created_by": "fit/export_draws.py",
+ "data_sha256": "425dba0847935d202d658b02cbf1f7d2ba477a884281eb6bc8f854be28864087",
+ "fit": {
+  "data_sha256": "425dba0847935d202d658b02cbf1f7d2ba477a884281eb6bc8f854be28864087",
+  "seed": 20261021,
+  "chains": 4,
+  "warmup": 1500,
+  "samples": 2000,
+  "cmdstan": "2.40",
+  "cmdstanpy": "1.3.0",
+  "numpy": "2.4.3",
+  "variants": {
+   "primary": {
+    "prior_log_ab_sd": 0.354,
+    "fix_ab": 0,
+    "fix_g": 0,
+    "overdispersion": 1
+   },
+   "binomial": {
+    "prior_log_ab_sd": 0.354,
+    "fix_ab": 0,
+    "fix_g": 0,
+    "overdispersion": 0
+   },
+   "paper_restrictions": {
+    "prior_log_ab_sd": 0.354,
+    "fix_ab": 1,
+    "fix_g": 1,
+    "overdispersion": 1
+   },
+   "wide_ab": {
+    "prior_log_ab_sd": 0.707,
+    "fix_ab": 0,
+    "fix_g": 0,
+    "overdispersion": 1
+   }
+  }
+ },
+ "files": {
+  "tumor_di_primary.csv": {
+   "sha256": "8dd3443896a1545649c737d06f5d709e5c1189cb4aa9b82694c432e0ea8736ab",
+   "n_draws": 4000,
+   "thinning": 2,
+   "min_ess_bulk": 2075.93,
+   "max_rhat": 1.0021,
+   "divergences": 0,
+   "ppc_inside_90": 35,
+   "variant": "primary",
+   "model": "di"
+  },
+  "tumor_di_paper_restrictions.csv": {
+   "sha256": "d4533e01d2107b9a3e839dcc9bae322649639f767b2bd29af64c7dc98b25b1f1",
+   "n_draws": 4000,
+   "thinning": 2,
+   "min_ess_bulk": 2314.54,
+   "max_rhat": 1.00132,
+   "divergences": 0,
+   "ppc_inside_90": 35,
+   "variant": "paper_restrictions",
+   "model": "di"
+  },
+  "tumor_dd_primary.csv": {
+   "sha256": "5e94cd7da628321077c3e686331ae7980698034bc6d0a19289eb686353e1a355",
+   "n_draws": 4000,
+   "thinning": 2,
+   "min_ess_bulk": 1749.18,
+   "max_rhat": 1.00264,
+   "divergences": 28,
+   "ppc_inside_90": 34,
+   "variant": "primary",
+   "model": "dd"
+  },
+  "tumor_dd_paper_restrictions.csv": {
+   "sha256": "31832b093c8b7ebd177b9b5c466c1b4b6776d94a89442b4e64d2dd9005eb69d5",
+   "n_draws": 4000,
+   "thinning": 2,
+   "min_ess_bulk": 879.372,
+   "max_rhat": 1.0035,
+   "divergences": 21,
+   "ppc_inside_90": 34,
+   "variant": "paper_restrictions",
+   "model": "dd"
+  }
+ }
+}
