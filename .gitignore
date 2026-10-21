@@ -21,3 +21,6 @@ fit/stan/*.hpp
 fit/output/**/*-[0-9]*.csv
 fit/output/loto_*/
 fit/output/*/draws_params.csv
+.suite_passed
+deployed_revision.txt
+.stale_constant_record.json

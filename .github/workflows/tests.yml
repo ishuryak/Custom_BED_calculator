@@ -1,4 +1,4 @@
-# Test-only workflow for version 2. It never deploys.
+# Test-only workflow for versions 2 and 3. It never deploys.
 # It restores the exact package versions of renv.lock (binaries from the same
 # dated Posit Package Manager snapshot, Linux build) with the same script a
 # user runs, then runs the suite in that library only.
@@ -6,7 +6,7 @@ name: tests
 
 on:
   push:
-    branches: [v2-toxicity-hypofractionation]
+    branches: [v2-toxicity-hypofractionation, v3]
   pull_request:
   workflow_dispatch:
 

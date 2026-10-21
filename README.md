@@ -1,31 +1,38 @@
-# Custom BED calculator, version 2.7
+# Custom BED calculator, version 3 (branch `v3`, in development)
 
-R Shiny app for head and neck squamous cell carcinoma (HNSCC). It computes three biologically effective doses (BEDs):
+R Shiny app for head and neck squamous cell carcinoma (HNSCC), for designing hypofractionated trial regimens. It computes:
 
 - tumor BED under the dose-independent (DI) and dose-dependent (DD) repopulation models
-- early (acute mucosal) toxicity BED
-- late toxicity BED.
+- early (acute mucosal) and late toxicity BED
+- organ-at-risk doses converted from QUANTEC or HYHOPE constraints to any number of fractions (new in version 3)
+- the uncertainty of the tumor BED differences, from a Bayesian refit of both models to 35 randomized trial arms (new in version 3).
 
-It also screens shorter, hypofractionated regimens against a comparison regimen (default 35 × 2 Gy in 47 days, or either HYPNO arm): the tumor BED change must meet a chosen minimum, which may be negative (an allowed loss of modeled tumor BED, not a clinical non-inferiority margin), under both models by default (or under either, or one of them), while early and late toxicity BED stay within chosen limits. A sensitivity tab shows the tumor BED difference across tumor parameter sets. Results download as a ZIP with a scenario file that reruns the search.
+Every tab compares the evaluated regimen with one comparison regimen and one tumor threshold, shown in a banner. A search lists shorter regimens that meet the threshold within the toxicity and organ limits; a both-model screen requires the threshold under DI and DD. It is a research tool for hypothesis generation, not for treatment decisions.
 
-It is a research tool for hypothesis generation, not for treatment decisions.
+**Status (2026-10-21): not deployed.** Version 3 will be published as its own app, `custom_bed_calculator_v3`; `tools/deploy.R` refuses the names of the live version 1 and version 2 apps, an unconfigured account, uncommitted changes and a revision on which the full suite has not passed. The live version 2.7 (https://ishuryak.shinyapps.io/custom_bed_calculator_v2/) and version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/) are unchanged.
 
-**Live:** https://ishuryak.shinyapps.io/custom_bed_calculator_v2/ (version 2.7.0, code `436375a`, deployed 2026-10-20 with `Rscript tools/deploy.R`, a separate app from version 1). The live site was checked with `docs/development/2026_10_20_v27/walkthrough_v27.R --live`: 51 of 51 checks, including the opening defaults (both models, smaller change, +1 Gy, empty candidate table), the caveat line on three tabs, "15 of 15 settings", the source link, both downloads replayed locally, and no browser-console errors.
+**The refit is for review, not a default.** The DI refit is informed by the trial data (repopulation loss 0.47 Gy₁₀ per day, 95% interval 0.10–1.60, after about day 32, plus background growth). The DD refit is not: its rate and onset constant reproduce their priors, and leave-one-trial-out cross-validation does not distinguish DD from DI. The defaults therefore remain Scenario D18 with the DD model calibrated to DI, as in version 2.7. The report is `docs/development/2026_10_21_v3/fit_report.md`.
 
-**Version 1 warning.** Version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/, branch `main`) is unchanged and still carries the DD calibration error described below. Do not use version 1 DD results computed at a tumor α/β other than 10 Gy.
+**Version 1 warning.** Version 1 (branch `main`) still carries the DD calibration error described below. Do not use version 1 DD results computed at a tumor α/β other than 10 Gy.
 
 ## Files
 
-- `R/bed_models.R`: all formulas, as plain functions.
-- `R/export.R`: the scenario file and ZIP export, and `rerun_scenario()`.
+- `R/bed_models.R`: all formulas, as plain functions; `dd_setup()` chooses the calibrated or the fitted DD model.
+- `R/schedule.R`: treatment calendars (5 or 6 fractions per week, first day, days without treatment).
+- `R/uncertainty.R`: tumor and toxicity BEDs over regimens × parameter draws, shares and quantiles, the search under uncertainty.
+- `R/oar.R`: organ constraint library, LQ conversion, DVH reading (refuses identifier fields) and the feasibility table.
+- `R/mod_uncertainty.R`, `R/mod_oar.R`: the Uncertainty and Organs at risk tabs (Shiny modules).
+- `R/export.R`: the scenario file (schema 3) and ZIP exports, `rerun_scenario()` and `rerun_uncertainty()`.
+- `data/`: the 2018 Table 1 trial arms (two independent transcriptions, no disagreement) and the organ constraints, each with source, page and quotation.
+- `draws/`: 4000 joint posterior draws per model and fit variant, with SHA-256 manifest. Produced offline by `fit/` (CmdStan); Stan never runs in the app.
 - `app.R`: the user interface.
 - `about.md`: the "Model and sources" page.
 - `tests/testthat/`: tests of the formulas against an independent implementation and published values, of the server logic, and of the export round trip.
 - `run_app.bat`: double-click launcher for Windows. It uses `RSCRIPT` if set, else Rscript on the PATH, else the newest R under Program Files, and starts `tools/launch.R`, which uses the release library when it has been restored.
-- `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`, `deploy.R` (publishes to shinyapps.io as `custom_bed_calculator_v2` only; refuses the version 1 name).
-- `.rscignore`: keeps `References/`, `tests/` and `docs/` out of a shinyapps.io deployment.
+- `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`, `deploy.R` (publishes to shinyapps.io as `custom_bed_calculator_v3` only; refuses the version 1 and 2 names; pinned account; clean tree; suite passed on the same revision).
+- `.rscignore`: keeps `References/`, `tests/`, `docs/`, `fit/`, `.Rhistory` and `.Renviron` out of a shinyapps.io deployment.
 - `docs/FIXES.md`: one row per landed change, with its evidence.
-- `docs/development/`: review records and plans. Start with `2026_10_20_v27_colleague_review.md`.
+- `docs/development/`: review records and plans. For version 3 start with `2026_10_21_v3_build.md` and `2026_10_21_v3/fit_report.md`.
 - `renv.lock`: the release package versions (R 4.5.1), all from the Posit Package Manager snapshot of 2026-10-15, which serves binaries of exactly these versions for Windows, macOS and Linux.
 - `References/`: sources, with `References/README.md` giving each one's license and the quoted parameter values. Paywalled or non-redistributable PDFs are git-ignored.
 
@@ -45,6 +52,16 @@ run_app.bat                     # or: Rscript tools/launch.R
 ```
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
+
+## Changes in version 3.0
+
+- **What moves.** For the same inputs, every BED, search, sensitivity and both-model result is identical to version 2.7 (the full version 2 test suite passes unchanged except where a default or label changed on purpose, and version 2.6/2.7 scenario files replay exactly). Two defaults changed: the evaluated regimen is now HYPNO's 55 Gy in 20 fractions (was 20 × 2.65 Gy, not a published schedule), and the both-model screen now uses the global comparison and threshold (35 × 2 Gy, +1 Gy), so it opens empty instead of listing 17, 18 and 19 fractions against HYPNO at −3 Gy. Choosing HYPNO and −3 Gy (globally or as a highlighted override) restores that list.
+- **One comparison and one threshold** for every tab, in a banner (plan decision 7a).
+- **Report card** and **Compare regimens** tabs; each toxicity limit's value beside its control; differences labeled with their comparison and unit; "about the same" below 0.5 Gy; days instead of weeks; colorblind-safe colors.
+- **Uncertainty** tab from a Bayesian refit of the 2018 trial data (`fit/`, `draws/`), and an optional **fitted DD** model (decisions 1a and 3a; not the default).
+- **Organs at risk** tab with QUANTEC and HYHOPE constraint libraries (decision 4a/5a), and organ limits optionally applied in the searches.
+- **Calendars**: 6 fractions per week, a chosen first day and days without treatment (decision 8a).
+- **Records**: `docs/development/2026_10_21_v3_build.md`, `docs/development/2026_10_21_v3/`.
 
 ## Changes in version 2.7
 

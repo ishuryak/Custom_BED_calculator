@@ -8,3 +8,7 @@ README.md
 tools
 .Rhistory
 .Renviron
+fit
+data/README.md
+draws/README.md
+.suite_passed

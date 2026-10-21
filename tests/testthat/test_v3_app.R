@@ -247,3 +247,13 @@ test_that("the refit preset values come from the draws, as medians of identified
   expect_equal(rp$Tk, median(di$Tk), tolerance = 1e-6)
   expect_equal(rp$ab, 10)
 })
+
+test_that("README claim: at the version 3 defaults the both-model screen opens empty; HYPNO and -3 Gy restore 17-19 fractions", {
+  shiny::testServer(app_dir, {
+    set_v3(session)
+    expect_equal(nrow(agreement()), 0)
+    expect_equal(nrow(suggestions()), 0)
+    set_v3(session, comparator = "hypno_test", min_gain = -3)
+    expect_equal(agreement()$m, c(17, 18, 19))
+  })
+})

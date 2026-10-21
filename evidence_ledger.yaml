@@ -1,0 +1,116 @@
+# Evidence ledger for version 3 (draft). References that the organ-at-risk
+# library and the refit rest on, each with a proof held outside the repository
+# (external_proofs.yaml, gitignored). IDs follow the numbering of about.md;
+# references 2-5, 7-9 and 11-16 (version 2 sources, see References/README.md)
+# are not yet ledgered here. Numeric claims of about.md are not yet
+# ledgered one by one: they are pinned by tests (test_v3_oar_schedule.R,
+# test_v3_uncertainty.R) against data/ and draws/.
+document: "about.md"
+base_dir: "."
+references_dir: "References"
+claims:
+  - id: quantec_parotid_20gy
+    document_anchor: "Organs at risk (version 3)"
+    rendered_claim: "parotid mean 20 Gy to one gland"
+    source_kind: external_reference
+    reference_ids: [19]
+    support:
+      - reference_id: 19
+        locator: "Abstract"
+        rationale: "Severe xerostomia usually avoided if at least one parotid gland is spared to a mean dose of less than about 20 Gy."
+  - id: quantec_brainstem_54gy
+    document_anchor: "Organs at risk (version 3)"
+    rendered_claim: "brainstem 54 Gy"
+    source_kind: external_reference
+    reference_ids: [18]
+    support:
+      - reference_id: 18
+        locator: "Abstract"
+        rationale: "The entire brainstem may be treated to 54 Gy using conventional fractionation."
+  - id: trial_data_7283
+    document_anchor: "Parameter uncertainty (Bayesian refit, version 3)"
+    rendered_claim: "35 arms"
+    source_kind: external_reference
+    reference_ids: [1]
+    support:
+      - reference_id: 1
+        locator: "Table 1, p. 21"
+        rationale: "35 trial arms from 16 publications, 7283 patients."
+references:
+  - id: 1
+    citation: "Shuryak I, Hall EJ, Brenner DJ. Dose dependence of accelerated repopulation in head and neck cancer: supporting evidence and clinical implications. Radiother Oncol. 2018;127(1):20-26."
+    doi: "10.1016/j.radonc.2018.02.015"
+    url: "https://doi.org/10.1016/j.radonc.2018.02.015"
+    verified_on: "2026-10-21"
+    verified_by: "Igor Shuryak"
+    proof_id: shuryak2018
+    proof_sha256: "sha256:0c954415ba47aed9764f5e3f99b2642f0bb2002790efb06d1c1089a2f119e273"
+    source_basis: full_text
+  - id: 10
+    citation: "Bentzen SM, et al. Int J Radiat Oncol Biol Phys. 2026;125:387-398 (HYPNO)."
+    doi: "10.1016/j.ijrobp.2025.12.056"
+    url: "https://doi.org/10.1016/j.ijrobp.2025.12.056"
+    pmid: "41711624"
+    verified_on: "2026-10-21"
+    verified_by: "Igor Shuryak"
+    proof_id: bentzen2026
+    proof_sha256: "sha256:cb8902cfe36f661f13da659ea18e258068fca7a0913b84fda082655c776dcaaf"
+    source_basis: full_text
+  - id: 6
+    citation: "Moon DH, et al. HYHOPE protocol STU 2020-1079 version 4.1 (NCT04580446)."
+    url: "https://clinicaltrials.gov/study/NCT04580446"
+    verified_on: "2026-10-21"
+    verified_by: "Igor Shuryak"
+    proof_id: moon2024-hyhope-protocol
+    proof_sha256: "sha256:2ea14d407d8e10951b45964c2873ca85e3b2c1c0b446679f2a852c38f0b71758"
+    source_basis: full_text
+  - id: 17
+    citation: "Kirkpatrick JP, van der Kogel AJ, Schultheiss TE. Radiation dose-volume effects in the spinal cord. Int J Radiat Oncol Biol Phys. 2010;76(3 Suppl):S42-S49."
+    doi: "10.1016/j.ijrobp.2009.04.095"
+    url: "https://doi.org/10.1016/j.ijrobp.2009.04.095"
+    pmid: "20171517"
+    verified_on: "2026-10-21"
+    verified_by: "Igor Shuryak"
+    proof_id: kirkpatrick2010
+    proof_sha256: "sha256:4fd1496b747b6ccb3d3184c4611e9973e9331f6c1e71fbd4f3c2672e9bb6a092"
+    source_basis: full_text
+  - id: 19
+    citation: "Deasy JO, Moiseenko V, Marks L, Chao KS, Nam J, Eisbruch A. Radiotherapy dose-volume effects on salivary gland function. Int J Radiat Oncol Biol Phys. 2010;76(3 Suppl):S58-S63."
+    doi: "10.1016/j.ijrobp.2009.06.090"
+    url: "https://doi.org/10.1016/j.ijrobp.2009.06.090"
+    pmid: "20171519"
+    verified_on: "2026-10-21"
+    verified_by: "Igor Shuryak"
+    proof_id: deasy2010
+    proof_sha256: "sha256:8c2e14ce433d52d7e37e1230ea1e9c58c31dfed141492783d4acae6452a85cbf"
+    source_basis: full_text
+  - id: 18
+    citation: "Mayo C, Yorke E, Merchant TE. Radiation associated brainstem injury. Int J Radiat Oncol Biol Phys. 2010;76(3 Suppl):S36-S41."
+    doi: "10.1016/j.ijrobp.2009.08.078"
+    url: "https://doi.org/10.1016/j.ijrobp.2009.08.078"
+    pmid: "20171516"
+    verified_on: "2026-10-21"
+    verified_by: "Igor Shuryak"
+    proof_id: mayo2010
+    proof_sha256: "sha256:5abec97beb74aa3d4baed797dd02d715d4877758f184dc3678b44fa7fb6f1a25"
+    source_basis: full_text
+  - id: 20
+    citation: "Rancati T, Schwarz M, Allen AM, Feng F, Popovtzer A, Mittal B, Eisbruch A. Radiation dose-volume effects in the larynx and pharynx. Int J Radiat Oncol Biol Phys. 2010;76(3 Suppl):S64-S69."
+    doi: "10.1016/j.ijrobp.2009.03.079"
+    url: "https://doi.org/10.1016/j.ijrobp.2009.03.079"
+    pmid: "20171520"
+    verified_on: "2026-10-21"
+    verified_by: "Igor Shuryak"
+    proof_id: rancati2010
+    proof_sha256: "sha256:91b86819e2cda47f3c7fba35cd680b9614f87236b39746431fedecd79da005a8"
+    source_basis: full_text
+  - id: 21
+    citation: "Bhandare N, Jackson A, Eisbruch A, Pan CC, Flickinger JC, Antonelli P, Mendenhall WM. Radiation therapy and hearing loss. Int J Radiat Oncol Biol Phys. 2010;76(3 Suppl):S50-S57."
+    doi: "10.1016/j.ijrobp.2009.04.096"
+    url: "https://doi.org/10.1016/j.ijrobp.2009.04.096"
+    pmid: "20171518"
+    verified_on: "2026-10-21"
+    verified_by: "Igor Shuryak"
+    proof_id: bhandare2010
+    proof_sha256: "sha256:bb8fdcc340110b1d5ef6e7a2f0d45eaff7934c50dfe6a5347a30e47a8eed2d80"
+    source_basis: full_text

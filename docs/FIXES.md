@@ -176,3 +176,15 @@ Record, verification of each finding, and decisions: `docs/development/2026_10_2
 | Test that pins it | `tests/testthat/test_deploy_preflight.R` (10 expectations). Against the previous `deploy.R`, `.rscignore` and `.gitignore`, 5 of them fail on the deploy.R and ignore-file assertions (checked 2026-10-21). |
 | Verification | `.Rhistory` untracked (`git rm --cached`), listed in `.gitignore` and `.rscignore`; `.Renviron` added to both. `deploy_preflight()` refuses another app name, the version 1 name, an unconfigured pinned account and uncommitted tracked changes. `DESCRIPTION` now names Apache 2.0, the licence text actually in `LICENSE`. |
 | What it moves | Nothing in any result. **Still required, by the account owner:** revoke the exposed token at shinyapps.io (Account > Tokens) and issue a new one, typed in the R console only. Untracking does not remove the old file from the history of this branch or of `main`; a history rewrite is a separate decision. |
+
+## 2026-10-21: version 3.0.0 (branch `v3`, not deployed)
+
+**Changes published numbers:** no live number changes (version 3 is not deployed; versions 1 and 2 are untouched). Within the app, for the same inputs every BED, search, sensitivity and both-model result equals version 2.7. Two defaults moved: the evaluated regimen (20 × 2.65 Gy to HYPNO's 20 × 2.75 Gy) and the both-model screen's comparison and threshold (HYPNO and −3 Gy to the global 35 × 2 Gy and +1 Gy, so it opens empty instead of listing 17, 18 and 19 fractions).
+
+| Item | Record |
+|---|---|
+| What was wrong | (1) Parameter uncertainty was not quantified, organ-at-risk doses were not modeled, each tab had its own comparison and threshold, and only Mon-Fri courses from a Monday were covered (PLAN_v3 workstreams A-D). (2) About page reference 6 gave the HYHOPE protocol as "version 4.2"; the protocol PDF is version 4.1. (3) Found during development and fixed before commit: `load_draws()` dropped its SHA-256 and ESS attributes. |
+| Proof it was real | (2) The page header of the local protocol PDF (pages 13-14) reads "STU 2020-1079 version 4.1", footer "Mod_17, 04-02-24". (3) `attr(load_draws("di"), "sha256")` was `NULL`, and `rerun_uncertainty()` refused every file with "the draws files differ from those recorded". |
+| Test that pins it | `tests/testthat/test_v3_app.R`, `test_v3_uncertainty.R`, `test_v3_oar_schedule.R`, `test_deploy_preflight.R`. (3) `test_v3_uncertainty.R::draws files match the manifest, and a changed file is refused` fails when the attribute bug is restored (mutation M1). Twelve deliberate breaks of the new guards are all caught (`docs/development/2026_10_21_v3/mutation_checks.log`). |
+| Verification | See the verification line below this table. |
+| What it moves | No published number. The defaults listed above, and the About page reference 6 version. Reasoning and departures from the plan: `docs/development/2026_10_21_v3_build.md`; refit: `docs/development/2026_10_21_v3/fit_report.md`. |

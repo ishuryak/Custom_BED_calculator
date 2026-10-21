@@ -144,3 +144,10 @@ test_that("the binding constraint is the one with the smallest relative margin",
   t <- oar_table(lib, list(cord = list(mode = "gy", value = 30), parotid = list(mode = "gy", value = 22)), 20, 2.75)
   expect_equal(t$organ[t$binds_first], "Parotid (spared side)")
 })
+
+test_that("the 2018 Table 1 file has 35 arms, 16 trials and 7283 patients, as the paper states", {
+  x <- read.csv(file.path(app_abs, "data", "shuryak2018_table1.csv"))
+  expect_equal(nrow(x), 35)
+  expect_equal(length(unique(x$ref_no)), 16)
+  expect_equal(sum(x$n_patients), 7283)
+})

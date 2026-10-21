@@ -154,3 +154,13 @@ test_that("OAR draw checker: a cord dose within the constraint at every alpha/be
   expect_false(any(hi))
   expect_null(oar_draw_checker(lib, list(cord = NA)))
 })
+
+test_that("the refit numbers quoted on the About page match the shipped draws", {
+  di <- load_draws("di", dir = draws_dir)
+  q <- function(x) stats::quantile(x, c(.025, .5, .975), names = FALSE)
+  la <- q(di$lambda / di$alpha); ga <- q(di$g / di$alpha); tk <- q(di$Tk)
+  ab <- paste(readLines(file.path(app_abs, "about.md"), encoding = "UTF-8"), collapse = "\n")
+  expect_true(grepl(sprintf("%.2f Gy₁₀ per day (95%% interval %.2f–%.2f)", la[2], la[1], la[3]), ab, fixed = TRUE))
+  expect_true(grepl(sprintf("onset near day %.0f (%.0f–%.0f)", tk[2], tk[1], tk[3]), ab, fixed = TRUE))
+  expect_true(grepl(sprintf("%.2f Gy₁₀ per day (%.2f–%.2f) throughout", ga[2], ga[1], ga[3]), ab, fixed = TRUE))
+})

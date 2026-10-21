@@ -1,0 +1,205 @@
+# Parameters that drive the simulated parameter draws of version 3 (toxicity
+# priors in R/uncertainty.R, Stan priors in fit/stan/). All are stated
+# assumptions drafted by the analyst under PLAN_v3 decision 1a and await
+# review by the PI; none is a fitted or measured value.
+project:
+  name: "HNSCC BED calculator version 3"
+  contact_email: "is144@cumc.columbia.edu"
+references_dir: "References"
+seed_policy: "fixed (toxicity draws seed 20261021; Stan seed 20261021 plus offsets)"
+parameters:
+  - id: tox_ab_e
+    description: "Acute mucosa alpha/beta (toxicity draws). R/uncertainty.R toxicity_prior()"
+    units: "Gy"
+    source: user_supplied
+    value: 10
+    distribution:
+      family: lognormal
+      params: {meanlog: 2.302585, sdlog: 0.354}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [5, 20]
+      assumption_ack: true
+  - id: tox_alpha_e
+    description: "Mucosal alpha (toxicity draws). Hartley 2011 used 0.3/Gy, Fowler 2003 0.35/Gy; range assumed"
+    units: "1/Gy"
+    source: user_supplied
+    value: 0.35
+    distribution:
+      family: uniform
+      params: {low: 0.3, high: 0.4}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [0.3, 0.4]
+      assumption_ack: true
+  - id: tox_Tp_e
+    description: "Mucosal doubling time (toxicity draws). Fowler 2003 2.5 d; range assumed"
+    units: "day"
+    source: user_supplied
+    value: 2.5
+    distribution:
+      family: uniform
+      params: {low: 2.0, high: 4.0}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [2.0, 4.0]
+      assumption_ack: true
+  - id: tox_Tk_e
+    description: "Mucosal repopulation onset, elapsed days (toxicity draws). Fowler 2003 day 7; Pardo-Montero 2021 refit near day 19 as reported in the v3 plan review (to be re-checked)"
+    units: "day"
+    source: user_supplied
+    value: 7
+    distribution:
+      family: uniform
+      params: {low: 7, high: 19}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [7, 19]
+      assumption_ack: true
+  - id: tox_ab_l
+    description: "Late head and neck tissue alpha/beta (toxicity draws). Stuschke 1999 3.3-4.0 for grade 2+ late effects; centered at the app's 3 Gy"
+    units: "Gy"
+    source: user_supplied
+    value: 3
+    distribution:
+      family: lognormal
+      params: {meanlog: 1.098612, sdlog: 0.207}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [2, 4.5]
+      assumption_ack: true
+  - id: tox_ab_cord
+    description: "Spinal cord and brainstem alpha/beta (organ draws). Kirkpatrick 2010 0.87 Gy; HYPNO 2 Gy"
+    units: "Gy"
+    source: user_supplied
+    value: 1.32
+    distribution:
+      family: lognormal
+      params: {meanlog: 0.277632, sdlog: 0.212}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [0.87, 2]
+      assumption_ack: true
+  - id: tox_ab_oar
+    description: "Other organs alpha/beta (organ draws). HYPNO 3 Gy; range assumed"
+    units: "Gy"
+    source: user_supplied
+    value: 3
+    distribution:
+      family: lognormal
+      params: {meanlog: 1.098612, sdlog: 0.207}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [2, 4.5]
+      assumption_ack: true
+  - id: fit_prior_ab
+    description: "Stan prior: tumor alpha/beta. 2018 paper's plausible range 5-20 Gy"
+    units: "Gy"
+    source: user_supplied
+    value: 10
+    distribution:
+      family: lognormal
+      params: {meanlog: 2.302585, sdlog: 0.354}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [5, 20]
+      assumption_ack: true
+  - id: fit_prior_alpha
+    description: "Stan prior: tumor alpha. weakly informative"
+    units: "1/Gy"
+    source: user_supplied
+    value: 0.2
+    distribution:
+      family: lognormal
+      params: {meanlog: -1.609438, sdlog: 1.0}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [0.028, 1.42]
+      assumption_ack: true
+  - id: fit_prior_lambda_di
+    description: "Stan prior: DI repopulation rate. weakly informative"
+    units: "1/day"
+    source: user_supplied
+    value: 0.1
+    distribution:
+      family: lognormal
+      params: {meanlog: -2.302585, sdlog: 1.5}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [0.005, 1.9]
+      assumption_ack: true
+  - id: fit_prior_lambda_dd
+    description: "Stan prior: DD maximum repopulation rate. weakly informative"
+    units: "1/day"
+    source: user_supplied
+    value: 0.5
+    distribution:
+      family: lognormal
+      params: {meanlog: -0.693147, sdlog: 1.5}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [0.026, 9.4]
+      assumption_ack: true
+  - id: fit_prior_Tk
+    description: "Stan prior: DI onset day (truncated 0-60). centered on Withers 1988 (about 4 weeks)"
+    units: "day"
+    source: user_supplied
+    value: 28
+    distribution:
+      family: normal
+      params: {mean: 28, sd: 10}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [8, 48]
+      assumption_ack: true
+  - id: fit_prior_C
+    description: "Stan prior: DD onset constant C. weakly informative, around the 2018 fit (14.5)"
+    units: "1"
+    source: user_supplied
+    value: 10
+    distribution:
+      family: lognormal
+      params: {meanlog: 2.302585, sdlog: 1.0}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [1.4, 71]
+      assumption_ack: true
+  - id: fit_prior_g
+    description: "Stan prior: background growth g. 2018 paper's plausible range (doubling 33-150 days)"
+    units: "1/day"
+    source: user_supplied
+    value: 0.0154
+    distribution:
+      family: uniform
+      params: {low: 0.0046, high: 0.021}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [0.0046, 0.021]
+      assumption_ack: true
+  - id: fit_prior_sigma
+    description: "Stan prior: arm-level overdispersion sd (half-normal). weakly informative"
+    units: "1"
+    source: user_supplied
+    value: 0.5
+    distribution:
+      family: normal
+      params: {mean: 0, sd: 0.5}
+    user_supplied:
+      provided_by: "analyst draft (Claude), pending review by Igor Shuryak"
+      date: "2026-10-21"
+      range: [0, 1]
+      assumption_ack: true

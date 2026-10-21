@@ -1,0 +1,105 @@
+# Hard-coded analysis constants of the HNSCC BED calculator and what makes
+# each one true (stale-constant audit). Version 3, 2026-10-21.
+exclude_paths:
+  - "**/tests/**"
+  - "tests/**"
+  - "fit/**"
+  - "docs/**"
+  - "fit/output/**"
+  - "References/**"
+
+constants:
+  tumor_data_d_max:
+    value: 2.5
+    provenance: derived
+    why: >
+      Largest dose per fraction in the trial data the tumor models were fitted
+      to. Fractions above it are extrapolations and are flagged. The code reads
+      it from the data file (tumor_data_support()); this entry pins the value
+      quoted in documentation.
+    source: {kind: csv, file: data/shuryak2018_table1.csv, column: dose_per_fraction_gy, stat: max}
+    tolerance: 1e-9
+  tumor_data_d_min:
+    value: 1.1
+    provenance: derived
+    source: {kind: csv, file: data/shuryak2018_table1.csv, column: dose_per_fraction_gy, stat: min}
+    tolerance: 1e-9
+  smooth_hinge_k:
+    value: 3
+    provenance: design
+    why: Sharpness of the smooth max(0, x), as in version 1 and in the Stan models (fit/stan/common_functions.stanfunctions).
+    sites: ["R/bed_models.R:22"]
+  precedent_max_d:
+    value: 3.1
+    provenance: literature
+    why: Largest fraction size among the benchmark regimens (HYHOPE 46.5 Gy in 15 fractions).
+    sites: ["R/bed_models.R:49"]
+  fowler_zone:
+    value: [59, 61]
+    provenance: literature
+    why: Fowler et al. 2003 acute tolerance zone (Gy10, radiotherapy alone).
+    sites: ["R/bed_models.R:28"]
+  verdict_tolerance_gy:
+    value: 0.5
+    provenance: design
+    why: Differences below this are "about the same" in words (plan workstream C, item 7). Tables keep full values.
+    sites: ["app.R:89"]
+  oar_near_fraction:
+    value: 0.05
+    provenance: design
+    why: An organ dose within 5% of its converted limit is reported as "within 5% of" (plan section B5).
+    sites: ["R/oar.R:13"]
+  oar_lq_flag_gy:
+    value: 5
+    provenance: design
+    why: Point-dose conversions above 5 Gy per fraction are flagged as LQ extrapolation (plan section B2).
+    sites: ["R/oar.R:14"]
+  search_draws:
+    value: 1000
+    provenance: design
+    why: Draws used by the interactive uncertainty search (Monte Carlo standard error of a share at most 1.6 points); summaries use all draws.
+    sites: ["R/uncertainty.R:243"]
+  fenwick_boundary:
+    value: [69.5, 32.2, 3.5, 50]
+    provenance: literature
+    why: Fenwick et al. 2008 acute boundary 69.5 (T/32.2)/sin(T/32.2) - 3.5 Gy10, T up to 50 days.
+    sites: ["R/bed_models.R:35"]
+  max_days_input:
+    value: 140
+    provenance: design
+    why: Upper bound of the "minimum days saved" inputs (app.R LIMITS and controls).
+    sites: ["app.R:47"]
+  hypno_lrc_percent:
+    value: [50.7, 51.2]
+    provenance: literature
+    why: HYPNO 3-year locoregional control, test vs control arm (Bentzen 2026), quoted in app text.
+    sites: ["app.R:692"]
+  hyhope_total_dose:
+    value: 46.5
+    provenance: literature
+    why: HYHOPE regimen 46.5 Gy in 15 fractions (benchmark and comparison rows).
+    sites: ["R/bed_models.R:395"]
+  citation_year_2003:
+    value: 2003
+    provenance: literature
+    why: Publication year in labels (Fowler 2003); not an analysis constant.
+  citation_year_2008:
+    value: 2008
+    provenance: literature
+    why: Publication year in labels (Fenwick 2008); not an analysis constant.
+  citation_year_2010:
+    value: 2010
+    provenance: literature
+    why: Publication year in labels (QUANTEC 2010); not an analysis constant.
+  citation_year_2011:
+    value: 2011
+    provenance: literature
+    why: Publication year in labels (Hartley 2011); not an analysis constant.
+  citation_year_2018:
+    value: 2018
+    provenance: literature
+    why: Publication year in labels (Shuryak 2018); not an analysis constant.
+  citation_year_2026:
+    value: 2026
+    provenance: literature
+    why: Publication year in labels (HYPNO 2026); not an analysis constant.

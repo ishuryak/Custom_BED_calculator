@@ -1217,6 +1217,9 @@ server <- function(input, output, session) {
     txt <- gsub("{{VERSIONS}}", sprintf("Version %s of the Custom BED calculator (equations %s, selection rules %s, scenario set %s, uncertainty %s, organs %s).",
                                         APP_VERSION, EQUATION_VERSION, SELECTION_VERSION, SCENARIO_SET_VERSION, UNCERTAINTY_VERSION, OAR_VERSION),
                 txt, fixed = TRUE)
+    rev <- if (file.exists("deployed_revision.txt")) paste0("Deployed revision ", substr(readLines("deployed_revision.txt", n = 1), 1, 7), ".") else
+      "Local copy (not a deployed revision)."
+    txt <- gsub("{{REVISION}}", rev, txt, fixed = TRUE)
     withMathJax(HTML(markdown::mark(text = txt, options = "+latex_math")))
   })
 }
