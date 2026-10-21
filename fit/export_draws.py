@@ -32,7 +32,7 @@ for model, cols in COLS.items():
             min_ess_bulk=s["min_ess_bulk"], max_rhat=s["max_rhat"], divergences=s["divergences"],
             ppc_inside_90=s["ppc_inside_90"], variant=variant, model=model)
         print(name, len(x), man["files"][name]["sha256"][:12])
-json.dump(man, open(os.path.join(DRAWS, "manifest.json"), "w"), indent=1)
+json.dump(man, open(os.path.join(DRAWS, "draws_manifest.json"), "w"), indent=1)
 
 # Point values for the deterministic "refit" presets: medians of the
 # quantities the data identify (alpha, lambda/alpha, g/alpha and Tk or C/alpha),

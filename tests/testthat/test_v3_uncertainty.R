@@ -68,7 +68,7 @@ test_that("shared draws: a regimen compared with itself has zero difference in e
 test_that("draws files match the manifest, and a changed file is refused", {
   di <- load_draws("di", dir = draws_dir)
   expect_equal(nrow(di), 4000)
-  man <- jsonlite::fromJSON(file.path(draws_dir, "manifest.json"))
+  man <- jsonlite::fromJSON(file.path(draws_dir, "draws_manifest.json"))
   expect_equal(attr(di, "sha256"), man$files$tumor_di_primary.csv$sha256)   # attributes survive loading
   expect_equal(attr(di, "ess"), man$files$tumor_di_primary.csv$min_ess_bulk)
   expect_true(all(c("alpha", "ab", "lambda", "Tk", "g") %in% names(di)))
@@ -84,7 +84,7 @@ test_that("golden values: 50 shipped DI draws, HYPNO 55/20 vs 35 x 2 Gy (pinned 
   dd <- load_draws("dd", dir = draws_dir)[1:50, ]
   td <- tumor_deltas(data.frame(m = 20, d = 2.75, T = 26), ref, di, dd)
   g <- c(mean_di = mean(td$delta_di), sd_di = sd(td$delta_di[1, ]))
-  # R 4.5.1 (Windows, ucrt); draws SHA-256 in draws/manifest.json. Exact arithmetic, so 1e-10.
+  # R 4.5.1 (Windows, ucrt); draws SHA-256 in draws/draws_manifest.json. Exact arithmetic, so 1e-10.
   expect_equal(unname(g), c(1.74900111843193, 5.26011986832973), tolerance = 1e-10)
 })
 

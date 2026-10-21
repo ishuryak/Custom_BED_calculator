@@ -190,3 +190,15 @@ Record, verification of each finding, and decisions: `docs/development/2026_10_2
 | What it moves | No published number. The defaults listed above. Reasoning and departures from the plan: `docs/development/2026_10_21_v3_build.md`; refit: `docs/development/2026_10_21_v3/fit_report.md`. |
 
 **Verification (version 3.0.0, revision `8fa0b57`, 2026-10-21):** `Rscript tools/run_tests.R` gave 4956 expectations, 0 failed, 0 errors (version 2.7 baseline on `65e826f`: 2727, 0 failed). Version 2 tests were changed only where version 3 changes behavior on purpose (listed in the commit messages of `41f6659` and `8fa0b57`). Deliberate breaks: 12 of 12 caught. Local browser walkthrough on the same revision: 34 of 34 (`docs/development/2026_10_21_v3/walkthrough/20261021_155556_local/`), and the self-test run's deliberate failure gave exit status 1. Not deployed.
+
+## 2026-10-21: first version 3 deployment bundle lacked the draws manifest
+
+**Changes published numbers:** no. The first upload (from `9b29d15`) was replaced within minutes, before any walkthrough or announcement.
+
+| Item | Record |
+|---|---|
+| What was wrong | rsconnect skips files named `manifest.json`, so `draws/manifest.json` was not uploaded. Every draws load on the server would fail (Uncertainty tab, report card refit column). The bundle also carried local-only files: `external_proofs.yaml` (local paths of licensed PDFs, no PDF content), the audit registries and `.stale_constant_record.json`. |
+| Proof it was real | The deploy log's file list for `9b29d15` names `draws/refit_point_values.json` and the four draws CSVs but no manifest, and includes `external_proofs.yaml`. |
+| Test that pins it | `tests/testthat/test_deploy_preflight.R::the bundle check refuses a missing draws manifest and local-only files`. `tools/deploy.R` now runs `check_bundle(rsconnect::listDeploymentFiles("."))` before uploading. |
+| Verification | The manifest is renamed `draws/draws_manifest.json`; `listDeploymentFiles(".")` lists it and none of the local-only files (checked 2026-10-21). |
+| What it moves | Nothing in any result. |

@@ -27,12 +27,12 @@ tumor_data_support <- function(path = file.path("data", "shuryak2018_table1.csv"
 load_draws <- function(model = c("di", "dd"), variant = "primary", dir = DRAWS_DIR) {
   model <- match.arg(model)
   f <- file.path(dir, sprintf("tumor_%s_%s.csv", model, variant))
-  man <- jsonlite::fromJSON(file.path(dir, "manifest.json"), simplifyVector = FALSE)
+  man <- jsonlite::fromJSON(file.path(dir, "draws_manifest.json"), simplifyVector = FALSE)
   key <- basename(f)
   bytes <- readBin(f, "raw", n = file.size(f))
   sha <- digest::digest(bytes, algo = "sha256", serialize = FALSE)
   if (is.null(man$files[[key]]) || !identical(man$files[[key]]$sha256, sha))
-    stop("Draws file ", key, " does not match draws/manifest.json (SHA-256).")
+    stop("Draws file ", key, " does not match draws/draws_manifest.json (SHA-256).")
   x <- utils::read.csv(f)
   need <- if (model == "di") c("alpha", "ab", "lambda", "Tk", "g") else
     c("alpha", "ab", "lambda", "c_over_alpha", "g")

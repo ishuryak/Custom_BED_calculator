@@ -141,4 +141,4 @@ Points worth noting:
 - Data: `data/shuryak2018_table1.csv`, `data/shuryak2018_table2_published_fit.csv`, double entry in `double_entry/`.
 - Fitting: `fit/fit_refit.py`, `fit/stan/di.stan`, `fit/stan/dd.stan`, `fit/mle_check.py`, `fit/report_quantities.R`, `fit/make_fit_figures.py`.
 - Outputs: `fit/output/*/summary.json`, `fit/output/loto_*.json`, `fit/output/provenance.json`, `fit/output/run.log`.
-- Draws used by the app: `draws/tumor_{di,dd}_{primary,paper_restrictions}.csv` with `draws/manifest.json` (SHA-256), and `draws/refit_point_values.json`.
+- Draws used by the app: `draws/tumor_{di,dd}_{primary,paper_restrictions}.csv` with `draws/draws_manifest.json` (SHA-256), and `draws/refit_point_values.json`.

@@ -44,3 +44,13 @@ test_that(".Rhistory, .Renviron and the suite marker are neither tracked nor dep
   expect_true(all(c(".Rhistory", ".Renviron") %in% readLines(file.path(app_abs, ".rscignore"))))
   expect_true(all(c(".Rhistory", ".Renviron") %in% readLines(file.path(app_abs, ".gitignore"))))
 })
+
+test_that("the bundle check refuses a missing draws manifest and local-only files", {
+  need <- c("app.R", "about.md", file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+            file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
+  expect_true(check_bundle(need, app_abs))
+  expect_error(check_bundle(setdiff(need, "draws/draws_manifest.json"), app_abs), "missing from the bundle")
+  expect_error(check_bundle(c(need, "external_proofs.yaml"), app_abs), "Local-only files")
+  expect_false(any(basename(list.files(file.path(app_abs, c("data", "draws")))) == "manifest.json"))  # rsconnect skips that name
+  expect_true(any(grepl("check_bundle(files)", readLines(file.path(app_abs, "tools", "deploy.R")), fixed = TRUE)))
+})

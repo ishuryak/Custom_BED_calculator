@@ -450,7 +450,7 @@ write_export_zip <- function(file, sc, best, feasible) {
 # `uncertainty` block naming the draws files (SHA-256), the number of draws,
 # the toxicity prior and seed, the random-number generator and the search.
 uncertainty_scenario <- function(s, variant, tox_source, search = NULL, draws_dir = DRAWS_DIR) {
-  man <- jsonlite::fromJSON(file.path(draws_dir, "manifest.json"), simplifyVector = FALSE)
+  man <- jsonlite::fromJSON(file.path(draws_dir, "draws_manifest.json"), simplifyVector = FALSE)
   f <- c(di = sprintf("tumor_di_%s.csv", variant), dd = sprintf("tumor_dd_%s.csv", variant))
   sc <- list(schema_version = SCHEMA_VERSION, app_version = APP_VERSION, equation_version = EQUATION_VERSION,
              selection_version = SELECTION_VERSION, uncertainty_version = UNCERTAINTY_VERSION,

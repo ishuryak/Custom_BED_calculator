@@ -25,3 +25,19 @@ deploy_preflight <- function(app_name, expected_app, accounts, account, dirty,
          call. = FALSE)
   invisible(TRUE)
 }
+
+# The bundle rsconnect will upload must hold every file the app reads and none
+# of the local-only files. `files`: rsconnect::listDeploymentFiles(".").
+# (rsconnect silently skips files named manifest.json, which is how the draws
+# manifest was once left out of a bundle.)
+check_bundle <- function(files, root = ".") {
+  need <- c("app.R", "about.md",
+            file.path("R", list.files(file.path(root, "R"), pattern = "\\.R$")),
+            file.path("data", list.files(file.path(root, "data"))),
+            file.path("draws", list.files(file.path(root, "draws"))))
+  missing <- setdiff(need, files)
+  forbidden <- intersect(files, c(".Rhistory", ".Renviron", "external_proofs.yaml", ".suite_passed"))
+  if (length(missing)) stop("Files the app reads are missing from the bundle: ", paste(missing, collapse = ", "), call. = FALSE)
+  if (length(forbidden)) stop("Local-only files would be deployed: ", paste(forbidden, collapse = ", "), call. = FALSE)
+  invisible(TRUE)
+}

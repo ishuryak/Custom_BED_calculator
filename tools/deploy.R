@@ -27,7 +27,9 @@ deploy_preflight(APP_NAME, "custom_bed_calculator_v3", rsconnect::accounts(), AC
 writeLines(head, "deployed_revision.txt")   # shown on the Model and sources page
 cat("Deploying revision", head, "\n")
 environment_report()
-cat("Files:", rsconnect::listDeploymentFiles("."), "\n")
+files <- rsconnect::listDeploymentFiles(".")
+check_bundle(files)
+cat("Files:", files, "\n")
 rsconnect::deployApp(appDir = ".", appName = APP_NAME,
                      appTitle = "HNSCC BED calculator, version 3",
                      account = ACCOUNT, server = "shinyapps.io",
