@@ -202,3 +202,5 @@ Record, verification of each finding, and decisions: `docs/development/2026_10_2
 | Test that pins it | `tests/testthat/test_deploy_preflight.R::the bundle check refuses a missing draws manifest and local-only files`. `tools/deploy.R` now runs `check_bundle(rsconnect::listDeploymentFiles("."))` before uploading. |
 | Verification | The manifest is renamed `draws/draws_manifest.json`; `listDeploymentFiles(".")` lists it and none of the local-only files (checked 2026-10-21). |
 | What it moves | Nothing in any result. |
+
+**Deployed** 2026-10-21 from `f951cd3` (suite 4961 expectations, 0 failed, on that revision) as `custom_bed_calculator_v3` with `Rscript tools/deploy.R`, account `ishuryak`. Bundle: `about.md`, `app.R`, `DESCRIPTION`, `LICENSE`, `renv.lock`, `deployed_revision.txt`, `R/` (7 files), `data/` (3 files), `draws/` (6 files). Live walkthrough: 34 of 34 (`docs/development/2026_10_21_v3/walkthrough/20261021_162106_live/`). Versions 1 and 2 not redeployed.
