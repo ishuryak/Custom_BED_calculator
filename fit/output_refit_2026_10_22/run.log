@@ -1,0 +1,666 @@
+15:23:37 data /mnt/c/Users/ishur/OneDrive/Desktop/Office/HNSCC_BED_calculator/Custom_BED_calculator_v3/data/refit_trials_2026_10_22.csv sha256 d980ddc391a734c7e99e29409a3a967fdbd1a8f0b9027fe14f8e408892b9477a arms 47 trials 22 cmdstan (2, 40)
+15:23:37 - cmdstanpy - INFO - compiling stan file /home/ishuryak/.cache/bed_fit_raw_refit_2026_10_22/build/di.stan to exe file /home/ishuryak/.cache/bed_fit_raw_refit_2026_10_22/build/di
+15:23:57 - cmdstanpy - INFO - compiled model executable: /home/ishuryak/.cache/bed_fit_raw_refit_2026_10_22/build/di
+15:23:58 - cmdstanpy - INFO - compiling stan file /home/ishuryak/.cache/bed_fit_raw_refit_2026_10_22/build/dd.stan to exe file /home/ishuryak/.cache/bed_fit_raw_refit_2026_10_22/build/dd
+15:24:16 - cmdstanpy - INFO - compiled model executable: /home/ishuryak/.cache/bed_fit_raw_refit_2026_10_22/build/dd
+15:24:16 fitting di primary
+15:24:16 - cmdstanpy - INFO - CmdStan start processing
+15:24:16 - cmdstanpy - INFO - Chain [1] start processing
+15:24:16 - cmdstanpy - INFO - Chain [2] start processing
+15:24:16 - cmdstanpy - INFO - Chain [3] start processing
+15:24:16 - cmdstanpy - INFO - Chain [4] start processing
+15:24:27 - cmdstanpy - INFO - Chain [3] done processing
+15:24:28 - cmdstanpy - INFO - Chain [1] done processing
+15:24:30 - cmdstanpy - INFO - Chain [4] done processing
+15:24:30 - cmdstanpy - INFO - Chain [2] done processing
+15:24:30 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'di.stan', line 59, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+15:24:34 done di primary: div 0 rhat 1.004 ess 1161 ppc 47/47
+15:24:34 fitting di binomial
+15:24:34 - cmdstanpy - INFO - CmdStan start processing
+15:24:34 - cmdstanpy - INFO - Chain [1] start processing
+15:24:34 - cmdstanpy - INFO - Chain [2] start processing
+15:24:34 - cmdstanpy - INFO - Chain [3] start processing
+15:24:34 - cmdstanpy - INFO - Chain [4] start processing
+15:24:39 - cmdstanpy - INFO - Chain [4] done processing
+15:24:41 - cmdstanpy - INFO - Chain [3] done processing
+15:24:43 - cmdstanpy - INFO - Chain [1] done processing
+15:24:45 - cmdstanpy - INFO - Chain [2] done processing
+15:24:48 done di binomial: div 0 rhat 1.001 ess 1783 ppc 47/47
+15:24:48 fitting di paper_restrictions
+15:24:48 - cmdstanpy - INFO - CmdStan start processing
+15:24:48 - cmdstanpy - INFO - Chain [1] start processing
+15:24:48 - cmdstanpy - INFO - Chain [2] start processing
+15:24:48 - cmdstanpy - INFO - Chain [3] start processing
+15:24:48 - cmdstanpy - INFO - Chain [4] start processing
+15:24:59 - cmdstanpy - INFO - Chain [4] done processing
+15:25:00 - cmdstanpy - INFO - Chain [3] done processing
+15:25:01 - cmdstanpy - INFO - Chain [1] done processing
+15:25:05 - cmdstanpy - INFO - Chain [2] done processing
+15:25:08 done di paper_restrictions: div 0 rhat 1.002 ess 985 ppc 47/47
+15:25:08 fitting di wide_ab
+15:25:08 - cmdstanpy - INFO - CmdStan start processing
+15:25:08 - cmdstanpy - INFO - Chain [1] start processing
+15:25:08 - cmdstanpy - INFO - Chain [2] start processing
+15:25:08 - cmdstanpy - INFO - Chain [3] start processing
+15:25:08 - cmdstanpy - INFO - Chain [4] start processing
+15:25:20 - cmdstanpy - INFO - Chain [3] done processing
+15:25:21 - cmdstanpy - INFO - Chain [2] done processing
+15:25:22 - cmdstanpy - INFO - Chain [1] done processing
+15:25:22 - cmdstanpy - INFO - Chain [4] done processing
+15:25:25 done di wide_ab: div 0 rhat 1.003 ess 1237 ppc 47/47
+15:25:25 fitting dd primary
+15:25:25 - cmdstanpy - INFO - CmdStan start processing
+15:25:25 - cmdstanpy - INFO - Chain [1] start processing
+15:25:25 - cmdstanpy - INFO - Chain [2] start processing
+15:25:25 - cmdstanpy - INFO - Chain [3] start processing
+15:25:25 - cmdstanpy - INFO - Chain [4] start processing
+15:25:56 - cmdstanpy - INFO - Chain [1] done processing
+15:25:59 - cmdstanpy - INFO - Chain [2] done processing
+15:26:22 - cmdstanpy - INFO - Chain [3] done processing
+15:26:34 - cmdstanpy - INFO - Chain [4] done processing
+15:26:34 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 13 divergent transitions (0.7%)
+	Chain 2 had 61 divergent transitions (3.0%)
+	Chain 3 had 2 divergent transitions (0.1%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:26:37 done dd primary: div 76 rhat 1.016 ess 250 ppc 47/47
+15:26:37 fitting dd binomial
+15:26:37 - cmdstanpy - INFO - CmdStan start processing
+15:26:37 - cmdstanpy - INFO - Chain [1] start processing
+15:26:37 - cmdstanpy - INFO - Chain [2] start processing
+15:26:37 - cmdstanpy - INFO - Chain [3] start processing
+15:26:37 - cmdstanpy - INFO - Chain [4] start processing
+15:27:13 - cmdstanpy - INFO - Chain [4] done processing
+15:27:27 - cmdstanpy - INFO - Chain [1] done processing
+15:27:31 - cmdstanpy - INFO - Chain [2] done processing
+15:29:02 - cmdstanpy - INFO - Chain [3] done processing
+15:29:02 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.1%)
+	Chain 2 had 22 divergent transitions (1.1%)
+	Chain 4 had 16 divergent transitions (0.8%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:29:05 done dd binomial: div 39 rhat 1.118 ess 27 ppc 47/47
+15:29:05 fitting dd paper_restrictions
+15:29:05 - cmdstanpy - INFO - CmdStan start processing
+15:29:05 - cmdstanpy - INFO - Chain [1] start processing
+15:29:05 - cmdstanpy - INFO - Chain [2] start processing
+15:29:05 - cmdstanpy - INFO - Chain [3] start processing
+15:29:05 - cmdstanpy - INFO - Chain [4] start processing
+15:29:36 - cmdstanpy - INFO - Chain [4] done processing
+15:29:39 - cmdstanpy - INFO - Chain [2] done processing
+15:30:21 - cmdstanpy - INFO - Chain [3] done processing
+15:30:24 - cmdstanpy - INFO - Chain [1] done processing
+15:30:24 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 2 had 5 divergent transitions (0.2%)
+	Chain 4 had 6 divergent transitions (0.3%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:30:26 done dd paper_restrictions: div 11 rhat 1.004 ess 1191 ppc 47/47
+15:30:26 fitting dd wide_ab
+15:30:26 - cmdstanpy - INFO - CmdStan start processing
+15:30:26 - cmdstanpy - INFO - Chain [1] start processing
+15:30:26 - cmdstanpy - INFO - Chain [2] start processing
+15:30:26 - cmdstanpy - INFO - Chain [3] start processing
+15:30:26 - cmdstanpy - INFO - Chain [4] start processing
+15:31:05 - cmdstanpy - INFO - Chain [3] done processing
+15:31:09 - cmdstanpy - INFO - Chain [4] done processing
+15:31:26 - cmdstanpy - INFO - Chain [2] done processing
+15:31:31 - cmdstanpy - INFO - Chain [1] done processing
+15:31:31 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 7 divergent transitions (0.4%)
+	Chain 2 had 3 divergent transitions (0.1%)
+	Chain 3 had 3 divergent transitions (0.1%)
+	Chain 4 had 14 divergent transitions (0.7%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:31:34 done dd wide_ab: div 27 rhat 1.002 ess 1478 ppc 47/47
+15:31:36 - cmdstanpy - INFO - CmdStan start processing
+15:31:36 - cmdstanpy - INFO - Chain [1] start processing
+15:31:36 - cmdstanpy - INFO - Chain [2] start processing
+15:31:36 - cmdstanpy - INFO - Chain [3] start processing
+15:31:36 - cmdstanpy - INFO - Chain [4] start processing
+15:31:40 - cmdstanpy - INFO - Chain [4] done processing
+15:31:40 - cmdstanpy - INFO - Chain [3] done processing
+15:31:41 - cmdstanpy - INFO - Chain [1] done processing
+15:31:41 - cmdstanpy - INFO - Chain [2] done processing
+15:31:41 loto di trial ARTSCAN (1/22) elpd -5.32
+15:31:41 - cmdstanpy - INFO - CmdStan start processing
+15:31:41 - cmdstanpy - INFO - Chain [1] start processing
+15:31:41 - cmdstanpy - INFO - Chain [2] start processing
+15:31:41 - cmdstanpy - INFO - Chain [3] start processing
+15:31:41 - cmdstanpy - INFO - Chain [4] start processing
+15:31:47 - cmdstanpy - INFO - Chain [4] done processing
+15:31:47 - cmdstanpy - INFO - Chain [1] done processing
+15:31:47 - cmdstanpy - INFO - Chain [2] done processing
+15:31:48 - cmdstanpy - INFO - Chain [3] done processing
+15:31:48 loto di trial CAIR_2.0Gy (2/22) elpd -5.43
+15:31:48 - cmdstanpy - INFO - CmdStan start processing
+15:31:48 - cmdstanpy - INFO - Chain [1] start processing
+15:31:48 - cmdstanpy - INFO - Chain [2] start processing
+15:31:48 - cmdstanpy - INFO - Chain [3] start processing
+15:31:48 - cmdstanpy - INFO - Chain [4] start processing
+15:31:54 - cmdstanpy - INFO - Chain [2] done processing
+15:31:54 - cmdstanpy - INFO - Chain [1] done processing
+15:31:54 - cmdstanpy - INFO - Chain [3] done processing
+15:31:54 - cmdstanpy - INFO - Chain [4] done processing
+15:31:54 loto di trial CAIR_1.8Gy (3/22) elpd -6.43
+15:31:54 - cmdstanpy - INFO - CmdStan start processing
+15:31:54 - cmdstanpy - INFO - Chain [1] start processing
+15:31:54 - cmdstanpy - INFO - Chain [2] start processing
+15:31:54 - cmdstanpy - INFO - Chain [3] start processing
+15:31:54 - cmdstanpy - INFO - Chain [4] start processing
+15:31:58 - cmdstanpy - INFO - Chain [2] done processing
+15:31:59 - cmdstanpy - INFO - Chain [1] done processing
+15:31:59 - cmdstanpy - INFO - Chain [3] done processing
+15:32:00 - cmdstanpy - INFO - Chain [4] done processing
+15:32:00 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'di.stan', line 59, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+15:32:00 loto di trial CAIR_vs_CB (4/22) elpd -3.11
+15:32:00 - cmdstanpy - INFO - CmdStan start processing
+15:32:00 - cmdstanpy - INFO - Chain [1] start processing
+15:32:00 - cmdstanpy - INFO - Chain [2] start processing
+15:32:00 - cmdstanpy - INFO - Chain [3] start processing
+15:32:00 - cmdstanpy - INFO - Chain [4] start processing
+15:32:05 - cmdstanpy - INFO - Chain [2] done processing
+15:32:07 - cmdstanpy - INFO - Chain [1] done processing
+15:32:07 - cmdstanpy - INFO - Chain [3] done processing
+15:32:08 - cmdstanpy - INFO - Chain [4] done processing
+15:32:08 loto di trial CHART (5/22) elpd -4.37
+15:32:08 - cmdstanpy - INFO - CmdStan start processing
+15:32:08 - cmdstanpy - INFO - Chain [1] start processing
+15:32:08 - cmdstanpy - INFO - Chain [2] start processing
+15:32:08 - cmdstanpy - INFO - Chain [3] start processing
+15:32:08 - cmdstanpy - INFO - Chain [4] start processing
+15:32:13 - cmdstanpy - INFO - Chain [2] done processing
+15:32:13 - cmdstanpy - INFO - Chain [1] done processing
+15:32:14 - cmdstanpy - INFO - Chain [4] done processing
+15:32:14 - cmdstanpy - INFO - Chain [3] done processing
+15:32:14 loto di trial DAHANCA67 (6/22) elpd -4.85
+15:32:14 - cmdstanpy - INFO - CmdStan start processing
+15:32:14 - cmdstanpy - INFO - Chain [1] start processing
+15:32:14 - cmdstanpy - INFO - Chain [2] start processing
+15:32:14 - cmdstanpy - INFO - Chain [3] start processing
+15:32:14 - cmdstanpy - INFO - Chain [4] start processing
+15:32:18 - cmdstanpy - INFO - Chain [4] done processing
+15:32:19 - cmdstanpy - INFO - Chain [1] done processing
+15:32:19 - cmdstanpy - INFO - Chain [3] done processing
+15:32:19 - cmdstanpy - INFO - Chain [2] done processing
+15:32:19 loto di trial EORTC22791 (7/22) elpd -5.09
+15:32:19 - cmdstanpy - INFO - CmdStan start processing
+15:32:19 - cmdstanpy - INFO - Chain [1] start processing
+15:32:19 - cmdstanpy - INFO - Chain [2] start processing
+15:32:19 - cmdstanpy - INFO - Chain [3] start processing
+15:32:19 - cmdstanpy - INFO - Chain [4] start processing
+15:32:24 - cmdstanpy - INFO - Chain [2] done processing
+15:32:24 - cmdstanpy - INFO - Chain [4] done processing
+15:32:25 - cmdstanpy - INFO - Chain [1] done processing
+15:32:25 - cmdstanpy - INFO - Chain [3] done processing
+15:32:25 loto di trial EORTC22811 (8/22) elpd -3.49
+15:32:25 - cmdstanpy - INFO - CmdStan start processing
+15:32:25 - cmdstanpy - INFO - Chain [1] start processing
+15:32:25 - cmdstanpy - INFO - Chain [2] start processing
+15:32:25 - cmdstanpy - INFO - Chain [3] start processing
+15:32:25 - cmdstanpy - INFO - Chain [4] start processing
+15:32:30 - cmdstanpy - INFO - Chain [2] done processing
+15:32:31 - cmdstanpy - INFO - Chain [1] done processing
+15:32:31 - cmdstanpy - INFO - Chain [3] done processing
+15:32:32 - cmdstanpy - INFO - Chain [4] done processing
+15:32:33 loto di trial EORTC22851 (9/22) elpd -6.06
+15:32:33 - cmdstanpy - INFO - CmdStan start processing
+15:32:33 - cmdstanpy - INFO - Chain [1] start processing
+15:32:33 - cmdstanpy - INFO - Chain [2] start processing
+15:32:33 - cmdstanpy - INFO - Chain [3] start processing
+15:32:33 - cmdstanpy - INFO - Chain [4] start processing
+15:32:37 - cmdstanpy - INFO - Chain [4] done processing
+15:32:37 - cmdstanpy - INFO - Chain [1] done processing
+15:32:38 - cmdstanpy - INFO - Chain [3] done processing
+15:32:38 - cmdstanpy - INFO - Chain [2] done processing
+15:32:38 loto di trial Ghoshal (10/22) elpd -5.49
+15:32:38 - cmdstanpy - INFO - CmdStan start processing
+15:32:38 - cmdstanpy - INFO - Chain [1] start processing
+15:32:38 - cmdstanpy - INFO - Chain [2] start processing
+15:32:38 - cmdstanpy - INFO - Chain [3] start processing
+15:32:38 - cmdstanpy - INFO - Chain [4] start processing
+15:32:43 - cmdstanpy - INFO - Chain [2] done processing
+15:32:44 - cmdstanpy - INFO - Chain [4] done processing
+15:32:44 - cmdstanpy - INFO - Chain [1] done processing
+15:32:44 - cmdstanpy - INFO - Chain [3] done processing
+15:32:44 loto di trial Hliniak (11/22) elpd -2.88
+15:32:44 - cmdstanpy - INFO - CmdStan start processing
+15:32:44 - cmdstanpy - INFO - Chain [1] start processing
+15:32:44 - cmdstanpy - INFO - Chain [2] start processing
+15:32:44 - cmdstanpy - INFO - Chain [3] start processing
+15:32:44 - cmdstanpy - INFO - Chain [4] start processing
+15:32:49 - cmdstanpy - INFO - Chain [2] done processing
+15:32:49 - cmdstanpy - INFO - Chain [1] done processing
+15:32:50 - cmdstanpy - INFO - Chain [3] done processing
+15:32:52 - cmdstanpy - INFO - Chain [4] done processing
+15:32:52 loto di trial IAEA_ACC (12/22) elpd -4.29
+15:32:52 - cmdstanpy - INFO - CmdStan start processing
+15:32:52 - cmdstanpy - INFO - Chain [1] start processing
+15:32:52 - cmdstanpy - INFO - Chain [2] start processing
+15:32:52 - cmdstanpy - INFO - Chain [3] start processing
+15:32:52 - cmdstanpy - INFO - Chain [4] start processing
+15:32:56 - cmdstanpy - INFO - Chain [3] done processing
+15:32:57 - cmdstanpy - INFO - Chain [4] done processing
+15:32:57 - cmdstanpy - INFO - Chain [2] done processing
+15:33:00 - cmdstanpy - INFO - Chain [1] done processing
+15:33:00 loto di trial Jackson (13/22) elpd -3.44
+15:33:00 - cmdstanpy - INFO - CmdStan start processing
+15:33:00 - cmdstanpy - INFO - Chain [1] start processing
+15:33:00 - cmdstanpy - INFO - Chain [2] start processing
+15:33:00 - cmdstanpy - INFO - Chain [3] start processing
+15:33:00 - cmdstanpy - INFO - Chain [4] start processing
+15:33:04 - cmdstanpy - INFO - Chain [1] done processing
+15:33:04 - cmdstanpy - INFO - Chain [4] done processing
+15:33:04 - cmdstanpy - INFO - Chain [3] done processing
+15:33:05 - cmdstanpy - INFO - Chain [2] done processing
+15:33:05 loto di trial KROG0201 (14/22) elpd -2.80
+15:33:05 - cmdstanpy - INFO - CmdStan start processing
+15:33:05 - cmdstanpy - INFO - Chain [1] start processing
+15:33:05 - cmdstanpy - INFO - Chain [2] start processing
+15:33:05 - cmdstanpy - INFO - Chain [3] start processing
+15:33:05 - cmdstanpy - INFO - Chain [4] start processing
+15:33:10 - cmdstanpy - INFO - Chain [4] done processing
+15:33:10 - cmdstanpy - INFO - Chain [2] done processing
+15:33:11 - cmdstanpy - INFO - Chain [3] done processing
+15:33:11 - cmdstanpy - INFO - Chain [1] done processing
+15:33:12 loto di trial PMH_HF (15/22) elpd -3.72
+15:33:12 - cmdstanpy - INFO - CmdStan start processing
+15:33:12 - cmdstanpy - INFO - Chain [1] start processing
+15:33:12 - cmdstanpy - INFO - Chain [2] start processing
+15:33:12 - cmdstanpy - INFO - Chain [3] start processing
+15:33:12 - cmdstanpy - INFO - Chain [4] start processing
+15:33:16 - cmdstanpy - INFO - Chain [4] done processing
+15:33:16 - cmdstanpy - INFO - Chain [2] done processing
+15:33:17 - cmdstanpy - INFO - Chain [3] done processing
+15:33:17 - cmdstanpy - INFO - Chain [1] done processing
+15:33:17 loto di trial RTOG8313_A (16/22) elpd -6.65
+15:33:17 - cmdstanpy - INFO - CmdStan start processing
+15:33:17 - cmdstanpy - INFO - Chain [1] start processing
+15:33:17 - cmdstanpy - INFO - Chain [2] start processing
+15:33:17 - cmdstanpy - INFO - Chain [3] start processing
+15:33:17 - cmdstanpy - INFO - Chain [4] start processing
+15:33:22 - cmdstanpy - INFO - Chain [1] done processing
+15:33:22 - cmdstanpy - INFO - Chain [4] done processing
+15:33:22 - cmdstanpy - INFO - Chain [3] done processing
+15:33:23 - cmdstanpy - INFO - Chain [2] done processing
+15:33:23 loto di trial RTOG8809 (17/22) elpd -3.89
+15:33:23 - cmdstanpy - INFO - CmdStan start processing
+15:33:23 - cmdstanpy - INFO - Chain [1] start processing
+15:33:23 - cmdstanpy - INFO - Chain [2] start processing
+15:33:23 - cmdstanpy - INFO - Chain [3] start processing
+15:33:23 - cmdstanpy - INFO - Chain [4] start processing
+15:33:28 - cmdstanpy - INFO - Chain [3] done processing
+15:33:28 - cmdstanpy - INFO - Chain [4] done processing
+15:33:28 - cmdstanpy - INFO - Chain [2] done processing
+15:33:29 - cmdstanpy - INFO - Chain [1] done processing
+15:33:29 loto di trial RTOG9003 (18/22) elpd -11.73
+15:33:29 - cmdstanpy - INFO - CmdStan start processing
+15:33:29 - cmdstanpy - INFO - Chain [1] start processing
+15:33:29 - cmdstanpy - INFO - Chain [2] start processing
+15:33:29 - cmdstanpy - INFO - Chain [3] start processing
+15:33:29 - cmdstanpy - INFO - Chain [4] start processing
+15:33:33 - cmdstanpy - INFO - Chain [4] done processing
+15:33:35 - cmdstanpy - INFO - Chain [3] done processing
+15:33:35 - cmdstanpy - INFO - Chain [2] done processing
+15:33:35 - cmdstanpy - INFO - Chain [1] done processing
+15:33:35 loto di trial RTOG9512 (19/22) elpd -2.84
+15:33:35 - cmdstanpy - INFO - CmdStan start processing
+15:33:35 - cmdstanpy - INFO - Chain [1] start processing
+15:33:35 - cmdstanpy - INFO - Chain [2] start processing
+15:33:35 - cmdstanpy - INFO - Chain [3] start processing
+15:33:35 - cmdstanpy - INFO - Chain [4] start processing
+15:33:40 - cmdstanpy - INFO - Chain [4] done processing
+15:33:40 - cmdstanpy - INFO - Chain [2] done processing
+15:33:40 - cmdstanpy - INFO - Chain [1] done processing
+15:33:41 - cmdstanpy - INFO - Chain [3] done processing
+15:33:41 loto di trial TROG9101 (20/22) elpd -3.60
+15:33:41 - cmdstanpy - INFO - CmdStan start processing
+15:33:41 - cmdstanpy - INFO - Chain [1] start processing
+15:33:41 - cmdstanpy - INFO - Chain [2] start processing
+15:33:41 - cmdstanpy - INFO - Chain [3] start processing
+15:33:41 - cmdstanpy - INFO - Chain [4] start processing
+15:33:45 - cmdstanpy - INFO - Chain [1] done processing
+15:33:45 - cmdstanpy - INFO - Chain [4] done processing
+15:33:45 - cmdstanpy - INFO - Chain [2] done processing
+15:33:45 - cmdstanpy - INFO - Chain [3] done processing
+15:33:45 loto di trial Yamazaki_small (21/22) elpd -2.96
+15:33:45 - cmdstanpy - INFO - CmdStan start processing
+15:33:45 - cmdstanpy - INFO - Chain [1] start processing
+15:33:45 - cmdstanpy - INFO - Chain [2] start processing
+15:33:45 - cmdstanpy - INFO - Chain [3] start processing
+15:33:45 - cmdstanpy - INFO - Chain [4] start processing
+15:33:50 - cmdstanpy - INFO - Chain [3] done processing
+15:33:50 - cmdstanpy - INFO - Chain [4] done processing
+15:33:51 - cmdstanpy - INFO - Chain [2] done processing
+15:33:51 - cmdstanpy - INFO - Chain [1] done processing
+15:33:51 loto di trial Yamazaki_large (22/22) elpd -4.48
+15:33:51 - cmdstanpy - INFO - CmdStan start processing
+15:33:51 - cmdstanpy - INFO - Chain [1] start processing
+15:33:51 - cmdstanpy - INFO - Chain [2] start processing
+15:33:51 - cmdstanpy - INFO - Chain [3] start processing
+15:33:51 - cmdstanpy - INFO - Chain [4] start processing
+15:34:01 - cmdstanpy - INFO - Chain [4] done processing
+15:34:03 - cmdstanpy - INFO - Chain [1] done processing
+15:34:09 - cmdstanpy - INFO - Chain [2] done processing
+15:34:19 - cmdstanpy - INFO - Chain [3] done processing
+15:34:20 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 11 divergent transitions (2.2%)
+	Chain 4 had 2 divergent transitions (0.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:34:20 loto dd trial ARTSCAN (1/22) elpd -4.29
+15:34:20 - cmdstanpy - INFO - CmdStan start processing
+15:34:20 - cmdstanpy - INFO - Chain [1] start processing
+15:34:20 - cmdstanpy - INFO - Chain [2] start processing
+15:34:20 - cmdstanpy - INFO - Chain [3] start processing
+15:34:20 - cmdstanpy - INFO - Chain [4] start processing
+15:34:30 - cmdstanpy - INFO - Chain [4] done processing
+15:34:42 - cmdstanpy - INFO - Chain [3] done processing
+15:34:44 - cmdstanpy - INFO - Chain [2] done processing
+15:34:51 - cmdstanpy - INFO - Chain [1] done processing
+15:34:51 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 4 had 8 divergent transitions (1.6%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:34:51 loto dd trial CAIR_2.0Gy (2/22) elpd -6.90
+15:34:51 - cmdstanpy - INFO - CmdStan start processing
+15:34:51 - cmdstanpy - INFO - Chain [1] start processing
+15:34:51 - cmdstanpy - INFO - Chain [2] start processing
+15:34:51 - cmdstanpy - INFO - Chain [3] start processing
+15:34:51 - cmdstanpy - INFO - Chain [4] start processing
+15:35:02 - cmdstanpy - INFO - Chain [2] done processing
+15:35:04 - cmdstanpy - INFO - Chain [1] done processing
+15:35:09 - cmdstanpy - INFO - Chain [3] done processing
+15:35:10 - cmdstanpy - INFO - Chain [4] done processing
+15:35:10 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 8 divergent transitions (1.6%)
+	Chain 2 had 4 divergent transitions (0.8%)
+	Chain 3 had 1 divergent transitions (0.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:35:10 loto dd trial CAIR_1.8Gy (3/22) elpd -8.44
+15:35:10 - cmdstanpy - INFO - CmdStan start processing
+15:35:10 - cmdstanpy - INFO - Chain [1] start processing
+15:35:10 - cmdstanpy - INFO - Chain [2] start processing
+15:35:10 - cmdstanpy - INFO - Chain [3] start processing
+15:35:10 - cmdstanpy - INFO - Chain [4] start processing
+15:35:21 - cmdstanpy - INFO - Chain [4] done processing
+15:35:22 - cmdstanpy - INFO - Chain [3] done processing
+15:35:25 - cmdstanpy - INFO - Chain [2] done processing
+15:35:27 - cmdstanpy - INFO - Chain [1] done processing
+15:35:27 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 2 had 28 divergent transitions (5.6%)
+	Chain 3 had 21 divergent transitions (4.2%)
+	Chain 4 had 2 divergent transitions (0.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:35:27 loto dd trial CAIR_vs_CB (4/22) elpd -3.30
+15:35:27 - cmdstanpy - INFO - CmdStan start processing
+15:35:27 - cmdstanpy - INFO - Chain [1] start processing
+15:35:27 - cmdstanpy - INFO - Chain [2] start processing
+15:35:27 - cmdstanpy - INFO - Chain [3] start processing
+15:35:27 - cmdstanpy - INFO - Chain [4] start processing
+15:35:35 - cmdstanpy - INFO - Chain [3] done processing
+15:35:39 - cmdstanpy - INFO - Chain [1] done processing
+15:35:40 - cmdstanpy - INFO - Chain [2] done processing
+15:35:43 - cmdstanpy - INFO - Chain [4] done processing
+15:35:43 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 4 divergent transitions (0.8%)
+	Chain 2 had 4 divergent transitions (0.8%)
+	Chain 3 had 4 divergent transitions (0.8%)
+	Chain 4 had 1 divergent transitions (0.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:35:43 loto dd trial CHART (5/22) elpd -4.79
+15:35:43 - cmdstanpy - INFO - CmdStan start processing
+15:35:43 - cmdstanpy - INFO - Chain [1] start processing
+15:35:43 - cmdstanpy - INFO - Chain [2] start processing
+15:35:43 - cmdstanpy - INFO - Chain [3] start processing
+15:35:43 - cmdstanpy - INFO - Chain [4] start processing
+15:35:54 - cmdstanpy - INFO - Chain [1] done processing
+15:35:57 - cmdstanpy - INFO - Chain [4] done processing
+15:35:59 - cmdstanpy - INFO - Chain [2] done processing
+15:36:00 - cmdstanpy - INFO - Chain [3] done processing
+15:36:00 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 13 divergent transitions (2.6%)
+	Chain 2 had 1 divergent transitions (0.2%)
+	Chain 4 had 7 divergent transitions (1.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:36:00 loto dd trial DAHANCA67 (6/22) elpd -5.66
+15:36:00 - cmdstanpy - INFO - CmdStan start processing
+15:36:00 - cmdstanpy - INFO - Chain [1] start processing
+15:36:00 - cmdstanpy - INFO - Chain [2] start processing
+15:36:00 - cmdstanpy - INFO - Chain [3] start processing
+15:36:00 - cmdstanpy - INFO - Chain [4] start processing
+15:36:13 - cmdstanpy - INFO - Chain [1] done processing
+15:36:15 - cmdstanpy - INFO - Chain [4] done processing
+15:36:18 - cmdstanpy - INFO - Chain [3] done processing
+15:36:19 - cmdstanpy - INFO - Chain [2] done processing
+15:36:19 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd.stan', line 62, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+15:36:19 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 5 divergent transitions (1.0%)
+	Chain 2 had 5 divergent transitions (1.0%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:36:19 loto dd trial EORTC22791 (7/22) elpd -4.73
+15:36:19 - cmdstanpy - INFO - CmdStan start processing
+15:36:19 - cmdstanpy - INFO - Chain [1] start processing
+15:36:19 - cmdstanpy - INFO - Chain [2] start processing
+15:36:19 - cmdstanpy - INFO - Chain [3] start processing
+15:36:19 - cmdstanpy - INFO - Chain [4] start processing
+15:36:32 - cmdstanpy - INFO - Chain [1] done processing
+15:36:35 - cmdstanpy - INFO - Chain [4] done processing
+15:36:41 - cmdstanpy - INFO - Chain [2] done processing
+15:37:09 - cmdstanpy - INFO - Chain [3] done processing
+15:37:09 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 3 had 106 iterations at max treedepth (21.2%)
+	Chain 4 had 1 divergent transitions (0.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:37:09 loto dd trial EORTC22811 (8/22) elpd -3.42
+15:37:09 - cmdstanpy - INFO - CmdStan start processing
+15:37:09 - cmdstanpy - INFO - Chain [1] start processing
+15:37:09 - cmdstanpy - INFO - Chain [2] start processing
+15:37:09 - cmdstanpy - INFO - Chain [3] start processing
+15:37:09 - cmdstanpy - INFO - Chain [4] start processing
+15:37:20 - cmdstanpy - INFO - Chain [3] done processing
+15:37:20 - cmdstanpy - INFO - Chain [1] done processing
+15:37:22 - cmdstanpy - INFO - Chain [2] done processing
+15:37:26 - cmdstanpy - INFO - Chain [4] done processing
+15:37:27 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 9 divergent transitions (1.8%)
+	Chain 2 had 3 divergent transitions (0.6%)
+	Chain 3 had 8 divergent transitions (1.6%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:37:27 loto dd trial EORTC22851 (9/22) elpd -3.74
+15:37:27 - cmdstanpy - INFO - CmdStan start processing
+15:37:27 - cmdstanpy - INFO - Chain [1] start processing
+15:37:27 - cmdstanpy - INFO - Chain [2] start processing
+15:37:27 - cmdstanpy - INFO - Chain [3] start processing
+15:37:27 - cmdstanpy - INFO - Chain [4] start processing
+15:37:37 - cmdstanpy - INFO - Chain [1] done processing
+15:37:40 - cmdstanpy - INFO - Chain [4] done processing
+15:37:44 - cmdstanpy - INFO - Chain [3] done processing
+15:37:45 - cmdstanpy - INFO - Chain [2] done processing
+15:37:45 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 8 divergent transitions (1.6%)
+	Chain 4 had 1 divergent transitions (0.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:37:45 loto dd trial Ghoshal (10/22) elpd -6.15
+15:37:45 - cmdstanpy - INFO - CmdStan start processing
+15:37:45 - cmdstanpy - INFO - Chain [1] start processing
+15:37:45 - cmdstanpy - INFO - Chain [2] start processing
+15:37:45 - cmdstanpy - INFO - Chain [3] start processing
+15:37:45 - cmdstanpy - INFO - Chain [4] start processing
+15:37:59 - cmdstanpy - INFO - Chain [3] done processing
+15:38:00 - cmdstanpy - INFO - Chain [1] done processing
+15:38:00 - cmdstanpy - INFO - Chain [4] done processing
+15:38:01 - cmdstanpy - INFO - Chain [2] done processing
+15:38:01 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 2 had 2 divergent transitions (0.4%)
+	Chain 3 had 4 divergent transitions (0.8%)
+	Chain 4 had 4 divergent transitions (0.8%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:38:01 loto dd trial Hliniak (11/22) elpd -3.13
+15:38:01 - cmdstanpy - INFO - CmdStan start processing
+15:38:01 - cmdstanpy - INFO - Chain [1] start processing
+15:38:01 - cmdstanpy - INFO - Chain [2] start processing
+15:38:01 - cmdstanpy - INFO - Chain [3] start processing
+15:38:01 - cmdstanpy - INFO - Chain [4] start processing
+15:38:12 - cmdstanpy - INFO - Chain [4] done processing
+15:38:13 - cmdstanpy - INFO - Chain [1] done processing
+15:38:17 - cmdstanpy - INFO - Chain [3] done processing
+15:38:40 - cmdstanpy - INFO - Chain [2] done processing
+15:38:40 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 2 had 6 iterations at max treedepth (1.2%)
+	Chain 3 had 1 divergent transitions (0.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:38:40 loto dd trial IAEA_ACC (12/22) elpd -5.09
+15:38:40 - cmdstanpy - INFO - CmdStan start processing
+15:38:40 - cmdstanpy - INFO - Chain [1] start processing
+15:38:40 - cmdstanpy - INFO - Chain [2] start processing
+15:38:40 - cmdstanpy - INFO - Chain [3] start processing
+15:38:40 - cmdstanpy - INFO - Chain [4] start processing
+15:38:54 - cmdstanpy - INFO - Chain [3] done processing
+15:38:54 - cmdstanpy - INFO - Chain [1] done processing
+15:38:54 - cmdstanpy - INFO - Chain [2] done processing
+15:38:55 - cmdstanpy - INFO - Chain [4] done processing
+15:38:55 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 11 divergent transitions (2.2%)
+	Chain 2 had 2 divergent transitions (0.4%)
+	Chain 3 had 3 divergent transitions (0.6%)
+	Chain 4 had 7 divergent transitions (1.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:38:55 loto dd trial Jackson (13/22) elpd -2.85
+15:38:55 - cmdstanpy - INFO - CmdStan start processing
+15:38:55 - cmdstanpy - INFO - Chain [1] start processing
+15:38:55 - cmdstanpy - INFO - Chain [2] start processing
+15:38:55 - cmdstanpy - INFO - Chain [3] start processing
+15:38:55 - cmdstanpy - INFO - Chain [4] start processing
+15:39:05 - cmdstanpy - INFO - Chain [3] done processing
+15:39:07 - cmdstanpy - INFO - Chain [4] done processing
+15:39:09 - cmdstanpy - INFO - Chain [1] done processing
+15:39:16 - cmdstanpy - INFO - Chain [2] done processing
+15:39:16 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 7 divergent transitions (1.4%)
+	Chain 2 had 3 divergent transitions (0.6%)
+	Chain 3 had 16 divergent transitions (3.2%)
+	Chain 4 had 12 divergent transitions (2.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:39:16 loto dd trial KROG0201 (14/22) elpd -3.46
+15:39:16 - cmdstanpy - INFO - CmdStan start processing
+15:39:16 - cmdstanpy - INFO - Chain [1] start processing
+15:39:16 - cmdstanpy - INFO - Chain [2] start processing
+15:39:16 - cmdstanpy - INFO - Chain [3] start processing
+15:39:16 - cmdstanpy - INFO - Chain [4] start processing
+15:39:28 - cmdstanpy - INFO - Chain [1] done processing
+15:39:29 - cmdstanpy - INFO - Chain [4] done processing
+15:39:36 - cmdstanpy - INFO - Chain [3] done processing
+15:39:44 - cmdstanpy - INFO - Chain [2] done processing
+15:39:44 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 4 divergent transitions (0.8%)
+	Chain 4 had 5 divergent transitions (1.0%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:39:44 loto dd trial PMH_HF (15/22) elpd -3.73
+15:39:44 - cmdstanpy - INFO - CmdStan start processing
+15:39:44 - cmdstanpy - INFO - Chain [1] start processing
+15:39:44 - cmdstanpy - INFO - Chain [2] start processing
+15:39:44 - cmdstanpy - INFO - Chain [3] start processing
+15:39:44 - cmdstanpy - INFO - Chain [4] start processing
+15:39:57 - cmdstanpy - INFO - Chain [4] done processing
+15:40:00 - cmdstanpy - INFO - Chain [2] done processing
+15:40:01 - cmdstanpy - INFO - Chain [1] done processing
+15:40:02 - cmdstanpy - INFO - Chain [3] done processing
+15:40:02 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 3 had 1 divergent transitions (0.2%)
+	Chain 4 had 2 divergent transitions (0.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:40:02 loto dd trial RTOG8313_A (16/22) elpd -6.45
+15:40:02 - cmdstanpy - INFO - CmdStan start processing
+15:40:02 - cmdstanpy - INFO - Chain [1] start processing
+15:40:02 - cmdstanpy - INFO - Chain [2] start processing
+15:40:02 - cmdstanpy - INFO - Chain [3] start processing
+15:40:02 - cmdstanpy - INFO - Chain [4] start processing
+15:40:15 - cmdstanpy - INFO - Chain [2] done processing
+15:40:16 - cmdstanpy - INFO - Chain [1] done processing
+15:40:17 - cmdstanpy - INFO - Chain [3] done processing
+15:40:20 - cmdstanpy - INFO - Chain [4] done processing
+15:40:20 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 4 divergent transitions (0.8%)
+	Chain 2 had 2 divergent transitions (0.4%)
+	Chain 3 had 4 divergent transitions (0.8%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:40:20 loto dd trial RTOG8809 (17/22) elpd -3.50
+15:40:20 - cmdstanpy - INFO - CmdStan start processing
+15:40:20 - cmdstanpy - INFO - Chain [1] start processing
+15:40:20 - cmdstanpy - INFO - Chain [2] start processing
+15:40:20 - cmdstanpy - INFO - Chain [3] start processing
+15:40:20 - cmdstanpy - INFO - Chain [4] start processing
+15:40:31 - cmdstanpy - INFO - Chain [2] done processing
+15:40:31 - cmdstanpy - INFO - Chain [3] done processing
+15:40:32 - cmdstanpy - INFO - Chain [1] done processing
+15:40:32 - cmdstanpy - INFO - Chain [4] done processing
+15:40:32 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 2 had 1 divergent transitions (0.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:40:33 loto dd trial RTOG9003 (18/22) elpd -12.34
+15:40:33 - cmdstanpy - INFO - CmdStan start processing
+15:40:33 - cmdstanpy - INFO - Chain [1] start processing
+15:40:33 - cmdstanpy - INFO - Chain [2] start processing
+15:40:33 - cmdstanpy - INFO - Chain [3] start processing
+15:40:33 - cmdstanpy - INFO - Chain [4] start processing
+15:40:42 - cmdstanpy - INFO - Chain [2] done processing
+15:40:47 - cmdstanpy - INFO - Chain [4] done processing
+15:40:48 - cmdstanpy - INFO - Chain [3] done processing
+15:40:48 - cmdstanpy - INFO - Chain [1] done processing
+15:40:48 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 6 divergent transitions (1.2%)
+	Chain 2 had 5 divergent transitions (1.0%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:40:48 loto dd trial RTOG9512 (19/22) elpd -2.87
+15:40:48 - cmdstanpy - INFO - CmdStan start processing
+15:40:48 - cmdstanpy - INFO - Chain [1] start processing
+15:40:48 - cmdstanpy - INFO - Chain [2] start processing
+15:40:48 - cmdstanpy - INFO - Chain [3] start processing
+15:40:48 - cmdstanpy - INFO - Chain [4] start processing
+15:41:00 - cmdstanpy - INFO - Chain [1] done processing
+15:41:02 - cmdstanpy - INFO - Chain [4] done processing
+15:41:12 - cmdstanpy - INFO - Chain [2] done processing
+15:41:20 - cmdstanpy - INFO - Chain [3] done processing
+15:41:20 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 4 divergent transitions (0.8%)
+	Chain 4 had 10 divergent transitions (2.0%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:41:20 loto dd trial TROG9101 (20/22) elpd -4.04
+15:41:20 - cmdstanpy - INFO - CmdStan start processing
+15:41:20 - cmdstanpy - INFO - Chain [1] start processing
+15:41:20 - cmdstanpy - INFO - Chain [2] start processing
+15:41:20 - cmdstanpy - INFO - Chain [3] start processing
+15:41:20 - cmdstanpy - INFO - Chain [4] start processing
+15:41:31 - cmdstanpy - INFO - Chain [4] done processing
+15:41:33 - cmdstanpy - INFO - Chain [1] done processing
+15:41:38 - cmdstanpy - INFO - Chain [2] done processing
+15:41:44 - cmdstanpy - INFO - Chain [3] done processing
+15:41:44 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 2 divergent transitions (0.4%)
+	Chain 4 had 22 divergent transitions (4.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:41:45 loto dd trial Yamazaki_small (21/22) elpd -3.02
+15:41:45 - cmdstanpy - INFO - CmdStan start processing
+15:41:45 - cmdstanpy - INFO - Chain [1] start processing
+15:41:45 - cmdstanpy - INFO - Chain [2] start processing
+15:41:45 - cmdstanpy - INFO - Chain [3] start processing
+15:41:45 - cmdstanpy - INFO - Chain [4] start processing
+15:41:56 - cmdstanpy - INFO - Chain [2] done processing
+15:41:58 - cmdstanpy - INFO - Chain [3] done processing
+15:42:00 - cmdstanpy - INFO - Chain [1] done processing
+15:42:08 - cmdstanpy - INFO - Chain [4] done processing
+15:42:08 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 2 divergent transitions (0.4%)
+	Chain 2 had 6 divergent transitions (1.2%)
+	Chain 3 had 7 divergent transitions (1.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:42:08 loto dd trial Yamazaki_large (22/22) elpd -4.98
+15:42:08 all done

@@ -1,0 +1,32 @@
+[s1_no_figure] 15:42:20 data /mnt/c/Users/ishur/OneDrive/Desktop/Office/HNSCC_BED_calculator/Custom_BED_calculator_v3/data/refit_trials_2026_10_22_s1_no_figure.csv sha256 d7c6822e44ad3e3a839d26ee74d2b9ac4698c67bbb593abc5cb1a7f905b21761 arms 43 trials 20 cmdstan (2, 40)
+[s1_no_figure] 15:43:26 done di primary: div 0 rhat 1.003 ess 1299 ppc 43/43
+[s1_no_figure] 15:43:36 done di binomial: div 0 rhat 1.002 ess 2999 ppc 43/43
+[s1_no_figure] 15:43:51 done di paper_restrictions: div 0 rhat 1.002 ess 1118 ppc 43/43
+[s1_no_figure] 15:44:06 done di wide_ab: div 0 rhat 1.004 ess 1354 ppc 43/43
+[s1_no_figure] 15:44:48 done dd primary: div 83 rhat 1.006 ess 547 ppc 43/43
+[s1_no_figure] 15:45:30 done dd binomial: div 141 rhat 1.001 ess 2874 ppc 43/43
+[s1_no_figure] 15:46:21 done dd paper_restrictions: div 597 rhat 1.070 ess 41 ppc 43/43
+[s1_no_figure] 15:48:32 done dd wide_ab: div 58 rhat 1.003 ess 1272 ppc 43/43
+[s1_no_figure] 15:48:32 all done
+[s2_postop] 15:48:32 data /mnt/c/Users/ishur/OneDrive/Desktop/Office/HNSCC_BED_calculator/Custom_BED_calculator_v3/data/refit_trials_2026_10_22_s2_postop.csv sha256 5a8a0abc76c7da52dd10d28b9849732437a70af67e90e7ace9dee066455708d7 arms 55 trials 26 cmdstan (2, 40)
+[s2_postop] 15:49:36 done di primary: div 0 rhat 1.004 ess 1099 ppc 54/55
+[s2_postop] 15:49:50 done di binomial: div 0 rhat 1.003 ess 1871 ppc 53/55
+[s2_postop] 15:50:08 done di paper_restrictions: div 0 rhat 1.002 ess 1112 ppc 54/55
+[s2_postop] 15:50:35 done di wide_ab: div 0 rhat 1.006 ess 969 ppc 54/55
+[s2_postop] 15:51:15 done dd primary: div 56 rhat 1.002 ess 778 ppc 55/55
+[s2_postop] 15:52:10 done dd binomial: div 49 rhat 1.001 ess 2155 ppc 54/55
+[s2_postop] 15:53:09 done dd paper_restrictions: div 74 rhat 1.003 ess 1561 ppc 55/55
+[s2_postop] 15:53:56 done dd wide_ab: div 44 rhat 1.002 ess 1191 ppc 55/55
+[s2_postop] 15:53:56 all done
+[s3_postop_npc] 15:53:57 data /mnt/c/Users/ishur/OneDrive/Desktop/Office/HNSCC_BED_calculator/Custom_BED_calculator_v3/data/refit_trials_2026_10_22_s3_postop_npc.csv sha256 470932cb28fbdf1486021eb64e0692d0ba0ed67999a3f0ced3aa3e036205e060 arms 57 trials 27 cmdstan (2, 40)
+[s3_postop_npc] 15:54:59 done di primary: div 0 rhat 1.003 ess 934 ppc 56/57
+[s3_postop_npc] 15:55:16 done di binomial: div 0 rhat 1.002 ess 2399 ppc 55/57
+[s3_postop_npc] 15:55:43 done di paper_restrictions: div 0 rhat 1.006 ess 868 ppc 56/57
+[s3_postop_npc] 15:56:28 done di wide_ab: div 0 rhat 1.006 ess 1108 ppc 56/57
+[s3_postop_npc] 15:57:34 done dd primary: div 91 rhat 1.003 ess 1563 ppc 57/57
+[s3_postop_npc] 15:58:22 done dd binomial: div 76 rhat 1.004 ess 857 ppc 56/57
+[s3_postop_npc] 15:58:56 done dd paper_restrictions: div 121 rhat 1.008 ess 455 ppc 57/57
+[s3_postop_npc] 15:59:42 done dd wide_ab: div 108 rhat 1.005 ess 1268 ppc 57/57
+[s3_postop_npc] 15:59:42 all done
+[influence] Traceback (most recent call last):
+[influence] ModuleNotFoundError: No module named 'compare_fits'

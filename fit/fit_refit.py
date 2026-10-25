@@ -13,11 +13,13 @@ import cmdstanpy, logging
 logging.getLogger("cmdstanpy").setLevel(logging.WARNING)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "fit", "output")
+# BED_FIT_DATA / BED_FIT_OUT point a refit at another data file and output folder
+# (default: the 2018 Table 1 fit used by the app).
+OUT = os.environ.get("BED_FIT_OUT", os.path.join(ROOT, "fit", "output"))
 # Raw chain CSVs go to a local work folder: writing them inside a OneDrive
 # folder failed with "Operation not permitted" (file locking) on 2026-10-21.
 RAW = os.environ.get("BED_FIT_WORKDIR", os.path.expanduser("~/.cache/bed_fit_raw"))
-DATA = os.path.join(ROOT, "data", "shuryak2018_table1.csv")
+DATA = os.environ.get("BED_FIT_DATA", os.path.join(ROOT, "data", "shuryak2018_table1.csv"))
 SEED = 20261021
 CHAINS, WARMUP, SAMPLES = 4, 1500, 2000
 
@@ -200,7 +202,7 @@ def main():
             f = fit_one(m, name, stan_data(base, variant), SEED + 100 * k + (0 if name == "di" else 50), outdir)
             r = summarize(f, name, outdir, rows)
             log(f"done {name} {variant}: div {r['divergences']} rhat {r['max_rhat']:.3f} "
-                f"ess {r['min_ess_bulk']:.0f} ppc {r['ppc_inside_90']}/35")
+                f"ess {r['min_ess_bulk']:.0f} ppc {r['ppc_inside_90']}/{len(rows)}")
     if "--loto" in sys.argv:
         for name, m in models.items():
             loto(name, m, base, rows, trials)

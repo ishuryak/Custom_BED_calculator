@@ -1,0 +1,120 @@
+15:48:32 data /mnt/c/Users/ishur/OneDrive/Desktop/Office/HNSCC_BED_calculator/Custom_BED_calculator_v3/data/refit_trials_2026_10_22_s2_postop.csv sha256 5a8a0abc76c7da52dd10d28b9849732437a70af67e90e7ace9dee066455708d7 arms 55 trials 26 cmdstan (2, 40)
+15:48:33 - cmdstanpy - INFO - compiling stan file /home/ishuryak/.cache/bed_fit_raw_refit_s2_postop/build/di.stan to exe file /home/ishuryak/.cache/bed_fit_raw_refit_s2_postop/build/di
+15:48:52 - cmdstanpy - INFO - compiled model executable: /home/ishuryak/.cache/bed_fit_raw_refit_s2_postop/build/di
+15:48:52 - cmdstanpy - INFO - compiling stan file /home/ishuryak/.cache/bed_fit_raw_refit_s2_postop/build/dd.stan to exe file /home/ishuryak/.cache/bed_fit_raw_refit_s2_postop/build/dd
+15:49:11 - cmdstanpy - INFO - compiled model executable: /home/ishuryak/.cache/bed_fit_raw_refit_s2_postop/build/dd
+15:49:11 fitting di primary
+15:49:11 - cmdstanpy - INFO - CmdStan start processing
+15:49:11 - cmdstanpy - INFO - Chain [1] start processing
+15:49:11 - cmdstanpy - INFO - Chain [2] start processing
+15:49:11 - cmdstanpy - INFO - Chain [3] start processing
+15:49:11 - cmdstanpy - INFO - Chain [4] start processing
+15:49:30 - cmdstanpy - INFO - Chain [4] done processing
+15:49:31 - cmdstanpy - INFO - Chain [1] done processing
+15:49:32 - cmdstanpy - INFO - Chain [2] done processing
+15:49:32 - cmdstanpy - INFO - Chain [3] done processing
+15:49:32 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'di.stan', line 59, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+15:49:36 done di primary: div 0 rhat 1.004 ess 1099 ppc 54/55
+15:49:36 fitting di binomial
+15:49:36 - cmdstanpy - INFO - CmdStan start processing
+15:49:36 - cmdstanpy - INFO - Chain [1] start processing
+15:49:36 - cmdstanpy - INFO - Chain [2] start processing
+15:49:36 - cmdstanpy - INFO - Chain [3] start processing
+15:49:36 - cmdstanpy - INFO - Chain [4] start processing
+15:49:45 - cmdstanpy - INFO - Chain [2] done processing
+15:49:45 - cmdstanpy - INFO - Chain [3] done processing
+15:49:45 - cmdstanpy - INFO - Chain [1] done processing
+15:49:46 - cmdstanpy - INFO - Chain [4] done processing
+15:49:50 done di binomial: div 0 rhat 1.003 ess 1871 ppc 53/55
+15:49:50 fitting di paper_restrictions
+15:49:50 - cmdstanpy - INFO - CmdStan start processing
+15:49:50 - cmdstanpy - INFO - Chain [1] start processing
+15:49:50 - cmdstanpy - INFO - Chain [2] start processing
+15:49:50 - cmdstanpy - INFO - Chain [3] start processing
+15:49:50 - cmdstanpy - INFO - Chain [4] start processing
+15:50:03 - cmdstanpy - INFO - Chain [3] done processing
+15:50:03 - cmdstanpy - INFO - Chain [2] done processing
+15:50:04 - cmdstanpy - INFO - Chain [1] done processing
+15:50:05 - cmdstanpy - INFO - Chain [4] done processing
+15:50:08 done di paper_restrictions: div 0 rhat 1.002 ess 1112 ppc 54/55
+15:50:08 fitting di wide_ab
+15:50:08 - cmdstanpy - INFO - CmdStan start processing
+15:50:08 - cmdstanpy - INFO - Chain [1] start processing
+15:50:08 - cmdstanpy - INFO - Chain [2] start processing
+15:50:08 - cmdstanpy - INFO - Chain [3] start processing
+15:50:08 - cmdstanpy - INFO - Chain [4] start processing
+15:50:23 - cmdstanpy - INFO - Chain [3] done processing
+15:50:23 - cmdstanpy - INFO - Chain [1] done processing
+15:50:29 - cmdstanpy - INFO - Chain [2] done processing
+15:50:32 - cmdstanpy - INFO - Chain [4] done processing
+15:50:35 done di wide_ab: div 0 rhat 1.006 ess 969 ppc 54/55
+15:50:35 fitting dd primary
+15:50:35 - cmdstanpy - INFO - CmdStan start processing
+15:50:35 - cmdstanpy - INFO - Chain [1] start processing
+15:50:35 - cmdstanpy - INFO - Chain [2] start processing
+15:50:35 - cmdstanpy - INFO - Chain [3] start processing
+15:50:35 - cmdstanpy - INFO - Chain [4] start processing
+15:51:00 - cmdstanpy - INFO - Chain [4] done processing
+15:51:02 - cmdstanpy - INFO - Chain [1] done processing
+15:51:10 - cmdstanpy - INFO - Chain [3] done processing
+15:51:12 - cmdstanpy - INFO - Chain [2] done processing
+15:51:12 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 13 divergent transitions (0.7%)
+	Chain 2 had 7 divergent transitions (0.4%)
+	Chain 3 had 9 divergent transitions (0.4%)
+	Chain 4 had 27 divergent transitions (1.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:51:15 done dd primary: div 56 rhat 1.002 ess 778 ppc 55/55
+15:51:15 fitting dd binomial
+15:51:15 - cmdstanpy - INFO - CmdStan start processing
+15:51:15 - cmdstanpy - INFO - Chain [1] start processing
+15:51:15 - cmdstanpy - INFO - Chain [2] start processing
+15:51:15 - cmdstanpy - INFO - Chain [3] start processing
+15:51:15 - cmdstanpy - INFO - Chain [4] start processing
+15:51:46 - cmdstanpy - INFO - Chain [4] done processing
+15:51:49 - cmdstanpy - INFO - Chain [1] done processing
+15:51:50 - cmdstanpy - INFO - Chain [2] done processing
+15:52:07 - cmdstanpy - INFO - Chain [3] done processing
+15:52:07 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 7 divergent transitions (0.4%)
+	Chain 2 had 13 divergent transitions (0.7%)
+	Chain 4 had 29 divergent transitions (1.5%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:52:10 done dd binomial: div 49 rhat 1.001 ess 2155 ppc 54/55
+15:52:10 fitting dd paper_restrictions
+15:52:10 - cmdstanpy - INFO - CmdStan start processing
+15:52:10 - cmdstanpy - INFO - Chain [1] start processing
+15:52:10 - cmdstanpy - INFO - Chain [2] start processing
+15:52:10 - cmdstanpy - INFO - Chain [3] start processing
+15:52:10 - cmdstanpy - INFO - Chain [4] start processing
+15:52:36 - cmdstanpy - INFO - Chain [4] done processing
+15:52:41 - cmdstanpy - INFO - Chain [2] done processing
+15:53:00 - cmdstanpy - INFO - Chain [1] done processing
+15:53:06 - cmdstanpy - INFO - Chain [3] done processing
+15:53:07 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 2 divergent transitions (0.1%)
+	Chain 2 had 17 divergent transitions (0.9%)
+	Chain 3 had 1 divergent transitions (0.1%)
+	Chain 4 had 54 divergent transitions (2.7%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:53:09 done dd paper_restrictions: div 74 rhat 1.003 ess 1561 ppc 55/55
+15:53:09 fitting dd wide_ab
+15:53:09 - cmdstanpy - INFO - CmdStan start processing
+15:53:09 - cmdstanpy - INFO - Chain [1] start processing
+15:53:09 - cmdstanpy - INFO - Chain [2] start processing
+15:53:09 - cmdstanpy - INFO - Chain [3] start processing
+15:53:09 - cmdstanpy - INFO - Chain [4] start processing
+15:53:40 - cmdstanpy - INFO - Chain [2] done processing
+15:53:40 - cmdstanpy - INFO - Chain [1] done processing
+15:53:47 - cmdstanpy - INFO - Chain [4] done processing
+15:53:53 - cmdstanpy - INFO - Chain [3] done processing
+15:53:53 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 20 divergent transitions (1.0%)
+	Chain 2 had 17 divergent transitions (0.9%)
+	Chain 3 had 3 divergent transitions (0.1%)
+	Chain 4 had 4 divergent transitions (0.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+15:53:56 done dd wide_ab: div 44 rhat 1.002 ess 1191 ppc 55/55
+15:53:56 all done

@@ -24,3 +24,9 @@ fit/output/*/draws_params.csv
 .suite_passed
 deployed_revision.txt
 .stale_constant_record.json
+
+# Refit outputs: keep summaries and logs, ignore regenerable draws
+fit/output_refit_*/**/draws_params.csv
+fit/output_refit_*/**/di_draw_*.csv
+fit/output_refit_*/loto_*/
+__pycache__/

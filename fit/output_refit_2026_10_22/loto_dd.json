@@ -1,0 +1,112 @@
+{
+ "ARTSCAN": {
+  "elpd": -4.287969800609906,
+  "n_pred_arms": 1,
+  "divergences": 13
+ },
+ "CAIR_2.0Gy": {
+  "elpd": -6.904873849047882,
+  "n_pred_arms": 1,
+  "divergences": 8
+ },
+ "CAIR_1.8Gy": {
+  "elpd": -8.439394173000398,
+  "n_pred_arms": 1,
+  "divergences": 13
+ },
+ "CAIR_vs_CB": {
+  "elpd": -3.3023700028071015,
+  "n_pred_arms": 1,
+  "divergences": 51
+ },
+ "CHART": {
+  "elpd": -4.794317135775443,
+  "n_pred_arms": 1,
+  "divergences": 13
+ },
+ "DAHANCA67": {
+  "elpd": -5.656142249072238,
+  "n_pred_arms": 1,
+  "divergences": 21
+ },
+ "EORTC22791": {
+  "elpd": -4.731845525671432,
+  "n_pred_arms": 1,
+  "divergences": 10
+ },
+ "EORTC22811": {
+  "elpd": -3.4191745970394534,
+  "n_pred_arms": 1,
+  "divergences": 2
+ },
+ "EORTC22851": {
+  "elpd": -3.743256878808981,
+  "n_pred_arms": 1,
+  "divergences": 20
+ },
+ "Ghoshal": {
+  "elpd": -6.145693000147897,
+  "n_pred_arms": 1,
+  "divergences": 9
+ },
+ "Hliniak": {
+  "elpd": -3.1283502008767314,
+  "n_pred_arms": 1,
+  "divergences": 11
+ },
+ "IAEA_ACC": {
+  "elpd": -5.089701211168098,
+  "n_pred_arms": 1,
+  "divergences": 2
+ },
+ "Jackson": {
+  "elpd": -2.845300408173511,
+  "n_pred_arms": 1,
+  "divergences": 23
+ },
+ "KROG0201": {
+  "elpd": -3.4566802401093146,
+  "n_pred_arms": 1,
+  "divergences": 39
+ },
+ "PMH_HF": {
+  "elpd": -3.7331543962579934,
+  "n_pred_arms": 1,
+  "divergences": 9
+ },
+ "RTOG8313_A": {
+  "elpd": -6.447499182474322,
+  "n_pred_arms": 2,
+  "divergences": 4
+ },
+ "RTOG8809": {
+  "elpd": -3.5004104754386467,
+  "n_pred_arms": 1,
+  "divergences": 10
+ },
+ "RTOG9003": {
+  "elpd": -12.335344565935255,
+  "n_pred_arms": 3,
+  "divergences": 1
+ },
+ "RTOG9512": {
+  "elpd": -2.8735040052601653,
+  "n_pred_arms": 1,
+  "divergences": 11
+ },
+ "TROG9101": {
+  "elpd": -4.039641297391162,
+  "n_pred_arms": 1,
+  "divergences": 14
+ },
+ "Yamazaki_small": {
+  "elpd": -3.0203364009097093,
+  "n_pred_arms": 1,
+  "divergences": 24
+ },
+ "Yamazaki_large": {
+  "elpd": -4.984690416554467,
+  "n_pred_arms": 1,
+  "divergences": 15
+ }
+}

@@ -1,0 +1,112 @@
+{
+ "ARTSCAN": {
+  "elpd": -5.318752942839683,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CAIR_2.0Gy": {
+  "elpd": -5.427827000256783,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CAIR_1.8Gy": {
+  "elpd": -6.428387028633228,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CAIR_vs_CB": {
+  "elpd": -3.1149259197656436,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CHART": {
+  "elpd": -4.372665207412817,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "DAHANCA67": {
+  "elpd": -4.847242062063576,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "EORTC22791": {
+  "elpd": -5.091596202021791,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "EORTC22811": {
+  "elpd": -3.4894162958745634,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "EORTC22851": {
+  "elpd": -6.064467303058501,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Ghoshal": {
+  "elpd": -5.492731464335158,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Hliniak": {
+  "elpd": -2.8767257336939784,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "IAEA_ACC": {
+  "elpd": -4.288648228576953,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Jackson": {
+  "elpd": -3.4375623356096803,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "KROG0201": {
+  "elpd": -2.804664038063368,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "PMH_HF": {
+  "elpd": -3.7219240466393013,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "RTOG8313_A": {
+  "elpd": -6.64653027135308,
+  "n_pred_arms": 2,
+  "divergences": 0
+ },
+ "RTOG8809": {
+  "elpd": -3.8868307048658286,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "RTOG9003": {
+  "elpd": -11.725458059297605,
+  "n_pred_arms": 3,
+  "divergences": 0
+ },
+ "RTOG9512": {
+  "elpd": -2.8428109778446156,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "TROG9101": {
+  "elpd": -3.596363563385619,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Yamazaki_small": {
+  "elpd": -2.962325135473457,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Yamazaki_large": {
+  "elpd": -4.480505611829103,
+  "n_pred_arms": 1,
+  "divergences": 0
+ }
+}
