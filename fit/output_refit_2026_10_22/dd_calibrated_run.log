@@ -1,0 +1,102 @@
+21:14:33 data data/refit_trials_2026_10_22.csv arms 47 units 22 DI draws 40 onset_min 7.0 out fit/output_refit_2026_10_22/dd_calibrated_onset7
+21:14:36 DI draw 205 (2/40): lambda_dd median 0.37, onset_ref 37.8 d, divergences 0, rhat 0.999
+21:14:40 DI draw 410 (3/40): lambda_dd median 0.553, onset_ref 37.6 d, divergences 0, rhat 1.006
+21:14:44 DI draw 615 (4/40): lambda_dd median 0.399, onset_ref 42.0 d, divergences 0, rhat 1.001
+21:14:48 DI draw 820 (5/40): lambda_dd median 0.291, onset_ref 39.8 d, divergences 0, rhat 1.000
+21:14:52 DI draw 1026 (6/40): lambda_dd median 0.349, onset_ref 40.3 d, divergences 0, rhat 1.001
+21:14:57 DI draw 1231 (7/40): lambda_dd median 0.588, onset_ref 39.2 d, divergences 0, rhat 1.004
+21:15:01 DI draw 1436 (8/40): lambda_dd median 0.332, onset_ref 38.1 d, divergences 0, rhat 1.005
+21:15:05 DI draw 1641 (9/40): lambda_dd median 0.327, onset_ref 40.6 d, divergences 0, rhat 1.007
+21:15:11 DI draw 1846 (10/40): lambda_dd median 0.454, onset_ref 37.7 d, divergences 0, rhat 1.004
+21:15:15 DI draw 2051 (11/40): lambda_dd median 0.377, onset_ref 40.0 d, divergences 0, rhat 1.004
+21:15:19 DI draw 2256 (12/40): lambda_dd median 0.429, onset_ref 38.8 d, divergences 0, rhat 0.999
+21:15:24 DI draw 2461 (13/40): lambda_dd median 0.309, onset_ref 38.2 d, divergences 0, rhat 0.999
+21:15:29 DI draw 2666 (14/40): lambda_dd median 0.533, onset_ref 37.7 d, divergences 0, rhat 1.002
+21:15:33 DI draw 2871 (15/40): lambda_dd median 0.416, onset_ref 39.4 d, divergences 0, rhat 1.002
+21:15:37 DI draw 3077 (16/40): lambda_dd median 0.261, onset_ref 39.2 d, divergences 0, rhat 1.000
+21:15:40 DI draw 3282 (17/40): lambda_dd median 0.378, onset_ref 34.8 d, divergences 0, rhat 0.999
+21:15:45 DI draw 3487 (18/40): lambda_dd median 0.516, onset_ref 37.4 d, divergences 0, rhat 1.002
+21:15:49 DI draw 3692 (19/40): lambda_dd median 0.281, onset_ref 41.8 d, divergences 0, rhat 1.004
+21:15:53 DI draw 3897 (20/40): lambda_dd median 0.336, onset_ref 40.1 d, divergences 0, rhat 1.002
+21:15:58 DI draw 4102 (21/40): lambda_dd median 0.326, onset_ref 39.2 d, divergences 0, rhat 1.004
+21:16:02 DI draw 4307 (22/40): lambda_dd median 0.446, onset_ref 32.1 d, divergences 0, rhat 1.008
+21:16:06 DI draw 4512 (23/40): lambda_dd median 0.238, onset_ref 42.3 d, divergences 0, rhat 1.002
+21:16:10 DI draw 4717 (24/40): lambda_dd median 0.267, onset_ref 41.4 d, divergences 0, rhat 1.003
+21:16:15 DI draw 4922 (25/40): lambda_dd median 0.454, onset_ref 38.3 d, divergences 0, rhat 1.000
+21:16:18 DI draw 5128 (26/40): lambda_dd median 0.316, onset_ref 30.3 d, divergences 0, rhat 1.003
+21:16:22 DI draw 5333 (27/40): lambda_dd median 0.321, onset_ref 41.1 d, divergences 0, rhat 1.002
+21:16:27 DI draw 5538 (28/40): lambda_dd median 0.384, onset_ref 39.1 d, divergences 0, rhat 1.007
+21:16:31 DI draw 5743 (29/40): lambda_dd median 0.357, onset_ref 40.8 d, divergences 0, rhat 1.007
+21:16:35 DI draw 5948 (30/40): lambda_dd median 0.323, onset_ref 39.5 d, divergences 0, rhat 1.002
+21:16:41 DI draw 6153 (31/40): lambda_dd median 0.553, onset_ref 29.9 d, divergences 0, rhat 1.007
+21:16:45 DI draw 6358 (32/40): lambda_dd median 0.307, onset_ref 39.6 d, divergences 0, rhat 1.004
+21:16:49 DI draw 6563 (33/40): lambda_dd median 0.468, onset_ref 40.1 d, divergences 0, rhat 1.004
+21:16:52 DI draw 6768 (34/40): lambda_dd median 0.342, onset_ref 39.4 d, divergences 0, rhat 1.007
+21:16:56 DI draw 6973 (35/40): lambda_dd median 0.298, onset_ref 41.3 d, divergences 0, rhat 1.004
+21:17:00 DI draw 7179 (36/40): lambda_dd median 0.291, onset_ref 43.2 d, divergences 0, rhat 1.010
+21:17:04 DI draw 7384 (37/40): lambda_dd median 0.307, onset_ref 42.0 d, divergences 0, rhat 1.001
+21:17:09 DI draw 7589 (38/40): lambda_dd median 0.401, onset_ref 37.8 d, divergences 0, rhat 1.001
+21:17:14 DI draw 7794 (39/40): lambda_dd median 0.519, onset_ref 37.2 d, divergences 0, rhat 1.000
+21:17:14 lambda_dd {'median': 0.38792132, 'q10': 0.168690166, 'q90': 0.748144548, 'q2_5': 0.10644493025, 'q97_5': 1.0326590000000002} onset_ref {'median': 39.0210215, 'q10': 29.345484, 'q90': 43.3984023} divergences 0 pairwise order agreement 0.931
+21:17:14 HYPNO 55 Gy/20 (26 d)                  DI  -3.3 (-5.1,-0.9)  DD  -3.9 (-6.1,-1.7)  same sign 0.93  DD onset<7d 0.00
+21:17:14 HYHOPE-type 46.5 Gy/15 (19 d)          DI -10.6 (-12.8,-7.3)  DD -10.8 (-13.0,-7.6)  same sign 1.00  DD onset<7d 0.00
+21:17:14 17 x 3.05 Gy (23 d)                    DI  -5.0 (-7.2,-1.9)  DD  -5.3 (-7.8,-2.9)  same sign 0.95  DD onset<7d 0.00
+21:17:14 60 Gy/25 (33 d)                        DI  -0.9 (-2.6,+1.4)  DD  -2.4 (-4.3,-0.3)  same sign 0.73  DD onset<7d 0.00
+21:17:14 65 Gy/30 (40 d)                        DI  +0.8 (-0.3,+2.9)  DD  -1.2 (-2.2,+0.3)  same sign 0.30  DD onset<7d 0.00
+21:17:14 66 Gy/33 (45 d)                        DI  -3.0 (-3.6,-2.0)  DD  -2.5 (-3.4,-1.0)  same sign 0.97  DD onset<7d 0.00
+21:17:14 30 x 2 Gy (40 d), last week dropped    DI  -6.1 (-7.5,-4.3)  DD  -6.3 (-8.0,-3.9)  same sign 0.97  DD onset<7d 0.00
+21:17:14 33 x 2 Gy, 6 per week (38 d)           DI  +2.2 (+0.8,+3.9)  DD  -0.5 (-1.6,+1.0)  same sign 0.35  DD onset<7d 0.00
+21:17:14 70 Gy/35, 6 per week (40 d)            DI  +5.7 (+4.6,+7.8)  DD  +1.9 (+1.1,+2.7)  same sign 1.00  DD onset<7d 0.00
+21:17:14 68 x 1.2 Gy twice daily (47 d)         DI  +7.7 (+6.2,+8.5)  DD  +4.6 (+2.0,+6.5)  same sign 0.98  DD onset<7d 0.00
+21:17:15 data data/refit_trials_2026_10_22.csv arms 47 units 22 DI draws 40 onset_min -10000.0 out fit/output_refit_2026_10_22/dd_calibrated_onset-10000
+21:17:20 DI draw 0 (1/40): lambda_dd median 0.438, onset_ref 37.7 d, divergences 0, rhat 1.008
+21:17:26 DI draw 205 (2/40): lambda_dd median 0.309, onset_ref 36.0 d, divergences 0, rhat 1.004
+21:17:30 DI draw 410 (3/40): lambda_dd median 0.529, onset_ref 37.1 d, divergences 0, rhat 1.009
+21:17:34 DI draw 615 (4/40): lambda_dd median 0.375, onset_ref 41.7 d, divergences 0, rhat 1.004
+21:17:38 DI draw 820 (5/40): lambda_dd median 0.252, onset_ref 38.7 d, divergences 0, rhat 1.009
+21:17:42 DI draw 1026 (6/40): lambda_dd median 0.333, onset_ref 39.9 d, divergences 0, rhat 1.000
+21:17:46 DI draw 1231 (7/40): lambda_dd median 0.572, onset_ref 39.0 d, divergences 0, rhat 1.000
+21:17:50 DI draw 1436 (8/40): lambda_dd median 0.254, onset_ref 35.3 d, divergences 0, rhat 1.002
+21:17:54 DI draw 1641 (9/40): lambda_dd median 0.313, onset_ref 40.3 d, divergences 0, rhat 1.006
+21:17:59 DI draw 1846 (10/40): lambda_dd median 0.392, onset_ref 36.2 d, divergences 0, rhat 1.026
+21:18:03 DI draw 2051 (11/40): lambda_dd median 0.348, onset_ref 39.4 d, divergences 0, rhat 1.007
+21:18:06 DI draw 2256 (12/40): lambda_dd median 0.39, onset_ref 38.0 d, divergences 0, rhat 1.003
+21:18:11 DI draw 2461 (13/40): lambda_dd median 0.281, onset_ref 37.4 d, divergences 0, rhat 1.001
+21:18:15 DI draw 2666 (14/40): lambda_dd median 0.492, onset_ref 36.9 d, divergences 0, rhat 1.003
+21:18:19 DI draw 2871 (15/40): lambda_dd median 0.419, onset_ref 39.4 d, divergences 0, rhat 1.007
+21:18:23 DI draw 3077 (16/40): lambda_dd median 0.196, onset_ref 36.7 d, divergences 0, rhat 1.002
+21:18:27 DI draw 3282 (17/40): lambda_dd median 0.21, onset_ref 25.2 d, divergences 0, rhat 1.003
+21:18:32 DI draw 3487 (18/40): lambda_dd median 0.469, onset_ref 36.4 d, divergences 0, rhat 0.997
+21:18:36 DI draw 3692 (19/40): lambda_dd median 0.263, onset_ref 41.4 d, divergences 0, rhat 1.002
+21:18:40 DI draw 3897 (20/40): lambda_dd median 0.302, onset_ref 39.4 d, divergences 0, rhat 1.001
+21:18:45 DI draw 4102 (21/40): lambda_dd median 0.258, onset_ref 37.1 d, divergences 0, rhat 1.004
+21:18:49 DI draw 4307 (22/40): lambda_dd median 0.247, onset_ref 20.0 d, divergences 0, rhat 1.005
+21:18:53 DI draw 4512 (23/40): lambda_dd median 0.231, onset_ref 42.2 d, divergences 0, rhat 1.003
+21:18:57 DI draw 4717 (24/40): lambda_dd median 0.258, onset_ref 41.2 d, divergences 0, rhat 1.007
+21:19:03 DI draw 4922 (25/40): lambda_dd median 0.386, onset_ref 36.8 d, divergences 0, rhat 1.002
+21:19:07 DI draw 5128 (26/40): lambda_dd median 0.147, onset_ref 11.0 d, divergences 0, rhat 1.006
+21:19:11 DI draw 5333 (27/40): lambda_dd median 0.334, onset_ref 41.4 d, divergences 0, rhat 1.013
+21:19:17 DI draw 5538 (28/40): lambda_dd median 0.362, onset_ref 38.6 d, divergences 0, rhat 1.003
+21:19:21 DI draw 5743 (29/40): lambda_dd median 0.338, onset_ref 40.4 d, divergences 0, rhat 1.005
+21:19:25 DI draw 5948 (30/40): lambda_dd median 0.276, onset_ref 38.2 d, divergences 0, rhat 1.002
+21:19:30 DI draw 6153 (31/40): lambda_dd median 0.355, onset_ref 20.5 d, divergences 0, rhat 1.010
+21:19:34 DI draw 6358 (32/40): lambda_dd median 0.261, onset_ref 38.3 d, divergences 0, rhat 1.009
+21:19:38 DI draw 6563 (33/40): lambda_dd median 0.467, onset_ref 40.1 d, divergences 0, rhat 1.006
+21:19:42 DI draw 6768 (34/40): lambda_dd median 0.332, onset_ref 39.2 d, divergences 0, rhat 1.003
+21:19:46 DI draw 6973 (35/40): lambda_dd median 0.261, onset_ref 40.4 d, divergences 0, rhat 1.003
+21:19:50 DI draw 7179 (36/40): lambda_dd median 0.285, onset_ref 43.2 d, divergences 0, rhat 1.001
+21:19:55 DI draw 7384 (37/40): lambda_dd median 0.323, onset_ref 42.3 d, divergences 0, rhat 1.003
+21:19:59 DI draw 7589 (38/40): lambda_dd median 0.311, onset_ref 35.1 d, divergences 0, rhat 1.001
+21:20:04 DI draw 7794 (39/40): lambda_dd median 0.483, onset_ref 36.5 d, divergences 0, rhat 1.010
+21:20:09 DI draw 7999 (40/40): lambda_dd median 0.486, onset_ref 39.8 d, divergences 0, rhat 1.004
+21:20:09 lambda_dd {'median': 0.337097845, 'q10': 0.0935737799, 'q90': 0.7177456579999998, 'q2_5': 0.03514867715, 'q97_5': 1.0138293900000002} onset_ref {'median': 38.297771999999995, 'q10': 12.7590647, 'q90': 43.3343384} divergences 0 pairwise order agreement 0.928
+21:20:09 HYPNO 55 Gy/20 (26 d)                  DI  -3.3 (-5.1,-0.9)  DD  -4.3 (-7.0,-2.0)  same sign 0.91  DD onset<-10000d 0.00
+21:20:09 HYHOPE-type 46.5 Gy/15 (19 d)          DI -10.6 (-12.8,-7.3)  DD -10.9 (-13.5,-8.7)  same sign 1.00  DD onset<-10000d 0.00
+21:20:09 17 x 3.05 Gy (23 d)                    DI  -5.0 (-7.2,-1.9)  DD  -5.6 (-8.4,-3.3)  same sign 0.93  DD onset<-10000d 0.00
+21:20:09 60 Gy/25 (33 d)                        DI  -0.9 (-2.6,+1.4)  DD  -2.8 (-4.9,-0.8)  same sign 0.72  DD onset<-10000d 0.00
+21:20:09 65 Gy/30 (40 d)                        DI  +0.8 (-0.3,+2.9)  DD  -1.4 (-2.5,+0.2)  same sign 0.28  DD onset<-10000d 0.00
+21:20:09 66 Gy/33 (45 d)                        DI  -3.0 (-3.6,-2.0)  DD  -2.7 (-3.7,-1.1)  same sign 0.98  DD onset<-10000d 0.00
+21:20:09 30 x 2 Gy (40 d), last week dropped    DI  -6.1 (-7.5,-4.3)  DD  -6.7 (-8.8,-4.3)  same sign 0.97  DD onset<-10000d 0.00
+21:20:09 33 x 2 Gy, 6 per week (38 d)           DI  +2.2 (+0.8,+3.9)  DD  -0.7 (-1.9,+0.8)  same sign 0.30  DD onset<-10000d 0.00
+21:20:09 70 Gy/35, 6 per week (40 d)            DI  +5.7 (+4.6,+7.8)  DD  +1.9 (+1.0,+2.7)  same sign 1.00  DD onset<-10000d 0.00
+21:20:09 68 x 1.2 Gy twice daily (47 d)         DI  +7.7 (+6.2,+8.5)  DD  +5.0 (+2.3,+7.2)  same sign 0.98  DD onset<-10000d 0.00
