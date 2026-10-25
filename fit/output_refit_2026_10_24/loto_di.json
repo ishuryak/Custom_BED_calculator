@@ -1,0 +1,127 @@
+{
+ "ARTSCAN": {
+  "elpd": -5.423181526844561,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CAIR_2.0Gy": {
+  "elpd": -5.617055174069786,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CAIR_1.8Gy": {
+  "elpd": -6.5190111914892,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CAIR_vs_CB": {
+  "elpd": -3.08797279598286,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CHART": {
+  "elpd": -4.239502550957711,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "DAHANCA67": {
+  "elpd": -4.886690868181194,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "EORTC22791": {
+  "elpd": -5.322298453625633,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "EORTC22811": {
+  "elpd": -3.528613741205301,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "EORTC22851": {
+  "elpd": -6.095411552892199,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Ghoshal": {
+  "elpd": -5.741633422136829,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Hliniak": {
+  "elpd": -2.818373896224814,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "IAEA_ACC": {
+  "elpd": -4.232175995088711,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Jackson": {
+  "elpd": -3.3690481669059533,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "KROG0201": {
+  "elpd": -2.812575141292412,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "PMH_HF": {
+  "elpd": -3.7379959645382868,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "RTOG8313_A": {
+  "elpd": -6.858500930227727,
+  "n_pred_arms": 2,
+  "divergences": 0
+ },
+ "RTOG8809": {
+  "elpd": -3.870945868692346,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "RTOG9003": {
+  "elpd": -11.358112717383442,
+  "n_pred_arms": 3,
+  "divergences": 0
+ },
+ "RTOG9512": {
+  "elpd": -2.800822853567879,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "TROG9101": {
+  "elpd": -3.3962694032865532,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Yamazaki_small": {
+  "elpd": -2.949831799444757,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Yamazaki_large": {
+  "elpd": -4.512445012440304,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Vienna": {
+  "elpd": -3.1142361453606004,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "ELAN_RT": {
+  "elpd": -2.690133119191564,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Gupta2015": {
+  "elpd": -2.4096954407851845,
+  "n_pred_arms": 1,
+  "divergences": 0
+ }
+}

@@ -1,0 +1,41 @@
+23:17:46 data data/refit_trials_2026_10_24_drop_elan.csv sha256 7fa879858a174d97bd8e72bdb56db52e4b55605f16e4f5cd7cb59be7e6b6f96b arms 51 trials 24 cmdstan (2, 40)
+23:17:46 fitting di primary
+23:18:15 done di primary: div 0 rhat 1.006 ess 831 ppc 51/51
+23:18:15 fitting di binomial
+23:18:33 done di binomial: div 0 rhat 1.001 ess 2643 ppc 51/51
+23:18:33 fitting di paper_restrictions
+23:18:55 done di paper_restrictions: div 0 rhat 1.002 ess 1184 ppc 51/51
+23:18:55 fitting di wide_ab
+23:19:33 done di wide_ab: div 0 rhat 1.003 ess 1273 ppc 51/51
+23:19:33 fitting dd primary
+23:20:26 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 21 divergent transitions (1.1%)
+	Chain 2 had 25 divergent transitions (1.2%)
+	Chain 3 had 9 divergent transitions (0.4%)
+	Chain 4 had 85 divergent transitions (4.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+23:20:30 done dd primary: div 140 rhat 1.008 ess 310 ppc 51/51
+23:20:30 fitting dd binomial
+23:21:57 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 43 divergent transitions (2.1%)
+	Chain 2 had 17 divergent transitions (0.9%)
+	Chain 3 had 46 divergent transitions (2.3%)
+	Chain 4 had 1 divergent transitions (0.1%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+23:22:01 done dd binomial: div 107 rhat 1.014 ess 329 ppc 51/51
+23:22:01 fitting dd paper_restrictions
+23:23:02 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 17 divergent transitions (0.9%)
+	Chain 2 had 2 divergent transitions (0.1%)
+	Chain 3 had 6 divergent transitions (0.3%)
+	Chain 4 had 15 divergent transitions (0.8%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+23:23:05 done dd paper_restrictions: div 40 rhat 1.005 ess 777 ppc 51/51
+23:23:05 fitting dd wide_ab
+23:25:12 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 2 divergent transitions (0.1%)
+	Chain 2 had 29 divergent transitions (1.5%)
+	Chain 3 had 6 divergent transitions (0.3%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+23:25:16 done dd wide_ab: div 37 rhat 1.006 ess 514 ppc 51/51
+23:25:16 all done

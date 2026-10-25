@@ -1,0 +1,107 @@
+{
+ "CAIR_2.0Gy": {
+  "elpd": -5.277825886939114,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CAIR_1.8Gy": {
+  "elpd": -6.440111770402294,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CAIR_vs_CB": {
+  "elpd": -3.0888916872444367,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "CHART": {
+  "elpd": -4.385379299845042,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "DAHANCA67": {
+  "elpd": -4.7033635259175,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "EORTC22791": {
+  "elpd": -5.101908600411041,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "EORTC22811": {
+  "elpd": -3.4847665172553386,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "EORTC22851": {
+  "elpd": -7.433458618302472,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Ghoshal": {
+  "elpd": -5.377352906867152,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Hliniak": {
+  "elpd": -2.8493235172063565,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "IAEA_ACC": {
+  "elpd": -4.1510114140929435,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Jackson": {
+  "elpd": -3.637599823891402,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "KROG0201": {
+  "elpd": -2.825151394443499,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "PMH_HF": {
+  "elpd": -3.669838077199269,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "RTOG8313_A": {
+  "elpd": -6.67063916819874,
+  "n_pred_arms": 2,
+  "divergences": 0
+ },
+ "RTOG8809": {
+  "elpd": -3.9383223202207027,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "RTOG9003": {
+  "elpd": -11.739534570805194,
+  "n_pred_arms": 3,
+  "divergences": 0
+ },
+ "RTOG9512": {
+  "elpd": -2.862456550639461,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "TROG9101": {
+  "elpd": -3.453710081800507,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Yamazaki_small": {
+  "elpd": -2.9053600079422273,
+  "n_pred_arms": 1,
+  "divergences": 0
+ },
+ "Yamazaki_large": {
+  "elpd": -4.419342654810173,
+  "n_pred_arms": 1,
+  "divergences": 0
+ }
+}

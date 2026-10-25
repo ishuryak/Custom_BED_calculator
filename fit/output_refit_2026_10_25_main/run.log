@@ -1,0 +1,190 @@
+03:08:35 data data/refit_trials_2026_10_25_main.csv sha256 d4a98fc9f33e2950f14740bbb7604fe465a601fa39c80f9d87bc0f92572de974 arms 45 trials 21 cmdstan (2, 40)
+03:08:35 fitting di primary
+03:09:01 done di primary: div 0 rhat 1.002 ess 1502 ppc 45/45
+03:09:01 fitting di binomial
+03:09:16 done di binomial: div 0 rhat 1.001 ess 2078 ppc 45/45
+03:09:16 fitting di paper_restrictions
+03:09:42 done di paper_restrictions: div 0 rhat 1.003 ess 1090 ppc 45/45
+03:09:42 fitting di wide_ab
+03:10:11 done di wide_ab: div 0 rhat 1.001 ess 1239 ppc 45/45
+03:10:11 fitting dd primary
+03:11:22 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 3 had 3 divergent transitions (0.1%)
+	Chain 4 had 14 divergent transitions (0.7%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:11:26 done dd primary: div 17 rhat 1.003 ess 1282 ppc 45/45
+03:11:26 fitting dd binomial
+03:12:42 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 44 divergent transitions (2.2%)
+	Chain 2 had 9 divergent transitions (0.4%)
+	Chain 3 had 35 divergent transitions (1.8%)
+	Chain 4 had 1 divergent transitions (0.1%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:12:46 done dd binomial: div 89 rhat 1.005 ess 910 ppc 45/45
+03:12:46 fitting dd paper_restrictions
+03:14:30 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd.stan', line 62, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+03:14:30 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 2 had 28 divergent transitions (1.4%)
+	Chain 3 had 9 divergent transitions (0.4%)
+	Chain 4 had 3 divergent transitions (0.1%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:14:33 done dd paper_restrictions: div 40 rhat 1.004 ess 1020 ppc 45/45
+03:14:33 fitting dd wide_ab
+03:15:44 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 8 divergent transitions (0.4%)
+	Chain 2 had 80 divergent transitions (4.0%)
+	Chain 3 had 1 divergent transitions (0.1%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:15:48 done dd wide_ab: div 89 rhat 1.014 ess 588 ppc 45/45
+03:15:57 loto di trial CAIR_2.0Gy (1/21) elpd -5.28
+03:16:05 loto di trial CAIR_1.8Gy (2/21) elpd -6.44
+03:16:12 loto di trial CAIR_vs_CB (3/21) elpd -3.09
+03:16:22 loto di trial CHART (4/21) elpd -4.39
+03:16:30 loto di trial DAHANCA67 (5/21) elpd -4.70
+03:16:37 loto di trial EORTC22791 (6/21) elpd -5.10
+03:16:47 loto di trial EORTC22811 (7/21) elpd -3.48
+03:16:55 loto di trial EORTC22851 (8/21) elpd -7.43
+03:17:03 loto di trial Ghoshal (9/21) elpd -5.38
+03:17:13 loto di trial Hliniak (10/21) elpd -2.85
+03:17:21 loto di trial IAEA_ACC (11/21) elpd -4.15
+03:17:31 loto di trial Jackson (12/21) elpd -3.64
+03:17:40 loto di trial KROG0201 (13/21) elpd -2.83
+03:17:51 loto di trial PMH_HF (14/21) elpd -3.67
+03:17:59 loto di trial RTOG8313_A (15/21) elpd -6.67
+03:18:06 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'di.stan', line 59, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+03:18:06 loto di trial RTOG8809 (16/21) elpd -3.94
+03:18:16 loto di trial RTOG9003 (17/21) elpd -11.74
+03:18:24 loto di trial RTOG9512 (18/21) elpd -2.86
+03:18:32 loto di trial TROG9101 (19/21) elpd -3.45
+03:18:42 loto di trial Yamazaki_small (20/21) elpd -2.91
+03:18:50 loto di trial Yamazaki_large (21/21) elpd -4.42
+03:19:16 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 2 had 8 divergent transitions (1.6%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:19:16 loto dd trial CAIR_2.0Gy (1/21) elpd -6.87
+03:19:49 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 2 had 1 divergent transitions (0.2%)
+	Chain 3 had 2 divergent transitions (0.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:19:49 loto dd trial CAIR_1.8Gy (2/21) elpd -8.17
+03:20:10 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 2 had 3 divergent transitions (0.6%)
+	Chain 3 had 1 divergent transitions (0.2%)
+	Chain 4 had 5 divergent transitions (1.0%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:20:10 loto dd trial CAIR_vs_CB (3/21) elpd -3.32
+03:20:36 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 3 had 1 divergent transitions (0.2%)
+	Chain 4 had 2 divergent transitions (0.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:20:36 loto dd trial CHART (4/21) elpd -4.89
+03:21:15 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 3 had 3 divergent transitions (0.6%)
+	Chain 4 had 1 divergent transitions (0.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:21:15 loto dd trial DAHANCA67 (5/21) elpd -5.62
+03:21:53 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 2 had 1 divergent transitions (0.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:21:53 loto dd trial EORTC22791 (6/21) elpd -4.68
+03:22:17 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 2 had 2 divergent transitions (0.4%)
+	Chain 4 had 6 divergent transitions (1.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:22:17 loto dd trial EORTC22811 (7/21) elpd -3.43
+03:22:46 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 3 divergent transitions (0.6%)
+	Chain 3 had 4 divergent transitions (0.8%)
+	Chain 4 had 1 divergent transitions (0.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:22:46 loto dd trial EORTC22851 (8/21) elpd -3.74
+03:23:12 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 2 had 7 divergent transitions (1.4%)
+	Chain 3 had 3 divergent transitions (0.6%)
+	Chain 4 had 4 divergent transitions (0.8%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:23:12 loto dd trial Ghoshal (9/21) elpd -6.10
+03:23:38 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 2 had 3 divergent transitions (0.6%)
+	Chain 3 had 2 divergent transitions (0.4%)
+	Chain 4 had 3 divergent transitions (0.6%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:23:38 loto dd trial Hliniak (10/21) elpd -3.14
+03:23:58 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 10 divergent transitions (2.0%)
+	Chain 2 had 15 divergent transitions (3.0%)
+	Chain 3 had 4 divergent transitions (0.8%)
+	Chain 4 had 5 divergent transitions (1.0%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:23:58 loto dd trial IAEA_ACC (11/21) elpd -5.08
+03:24:25 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 2 divergent transitions (0.4%)
+	Chain 2 had 21 divergent transitions (4.2%)
+	Chain 3 had 1 divergent transitions (0.2%)
+	Chain 4 had 6 divergent transitions (1.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:24:25 loto dd trial Jackson (12/21) elpd -2.85
+03:24:51 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 2 had 1 divergent transitions (0.2%)
+	Chain 3 had 2 divergent transitions (0.4%)
+	Chain 4 had 6 divergent transitions (1.2%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:24:51 loto dd trial KROG0201 (13/21) elpd -3.45
+03:25:15 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 3 had 7 divergent transitions (1.4%)
+	Chain 4 had 4 divergent transitions (0.8%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:25:15 loto dd trial PMH_HF (14/21) elpd -3.74
+03:25:39 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 6 divergent transitions (1.2%)
+	Chain 2 had 4 divergent transitions (0.8%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:25:39 loto dd trial RTOG8313_A (15/21) elpd -6.46
+03:26:04 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 2 had 3 divergent transitions (0.6%)
+	Chain 4 had 3 divergent transitions (0.6%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:26:04 loto dd trial RTOG8809 (16/21) elpd -3.48
+03:26:33 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 2 had 6 divergent transitions (1.2%)
+	Chain 3 had 2 divergent transitions (0.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:26:33 loto dd trial RTOG9003 (17/21) elpd -12.37
+03:27:21 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 16 divergent transitions (3.2%)
+	Chain 2 had 2 iterations at max treedepth (0.4%)
+	Chain 4 had 3 divergent transitions (0.6%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:27:21 loto dd trial RTOG9512 (18/21) elpd -2.88
+03:27:52 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 12 divergent transitions (2.4%)
+	Chain 4 had 2 divergent transitions (0.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:27:52 loto dd trial TROG9101 (19/21) elpd -4.00
+03:28:14 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd.stan', line 62, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+03:28:14 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 2 divergent transitions (0.4%)
+	Chain 2 had 1 divergent transitions (0.2%)
+	Chain 3 had 3 divergent transitions (0.6%)
+	Chain 4 had 2 divergent transitions (0.4%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:28:15 loto dd trial Yamazaki_small (20/21) elpd -3.01
+03:28:56 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 1 had 1 divergent transitions (0.2%)
+	Chain 2 had 2 divergent transitions (0.4%)
+	Chain 3 had 3 divergent transitions (0.6%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+03:28:57 loto dd trial Yamazaki_large (21/21) elpd -4.95
+03:28:57 all done
