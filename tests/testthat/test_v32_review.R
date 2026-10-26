@@ -100,6 +100,10 @@ test_that("R10: NaN, Inf, missing and text values inside an Eclipse DVH block ar
   fx <- function(f) testthat::test_path("fixtures", "dvh", f)
   expect_silent(read_dvh_upload(fx("eclipse_synthetic.txt"), 1000))
   expect_silent(read_dvh_upload(fx("eclipse_gy_cc.txt"), 1000))
+  # metadata lines naming a dose in cGy before the table do not count as its header (audit 2026-10-26)
+  meta <- eclipse_lines(c("0 100", "40 1", "50 0"))
+  meta <- append(meta, c("Min Dose [Gy]: 0.0", "Max Dose [Gy]: 50.0", "Mean Dose [Gy]: 10.0"), after = 6)
+  expect_equal(nrow(read_dvh_upload(tmp_lines(meta), 1000)[[1]]), 3)
 })
 
 # --- R03: one organ-mapping validator for both replay paths and the direct checkers -------
@@ -107,7 +111,7 @@ test_that("R10: NaN, Inf, missing and text values inside an Eclipse DVH block ar
 test_that("R03: unnamed, duplicate, blank, unknown, non-scalar and non-finite organ mappings are refused", {
   bad <- list(unnamed = list(100), duplicate = list(cord = 10, cord = 100), blank = setNames(list(100), " "),
               unknown = list(liver = 50), vector = list(cord = c(50, 60)), nonfinite = list(cord = Inf),
-              text = list(cord = "50"), range = list(cord = 500))
+              text = list(cord = "50"), range = list(cord = 500), nan = list(cord = NaN))
   for (nm in names(bad)) {
     expect_error(validate_oar_percents(bad[[nm]]), info = nm)
     expect_error(build_oar_check(lib, bad[[nm]], "QUANTEC"), info = nm)
@@ -148,7 +152,9 @@ test_that("R03: both replay paths refuse a malformed organ mapping and replay a 
 
 test_that("an uncertainty replay grid above the app's largest is refused before any calculation", {
   expect_equal(grid_size(2, 5:34, 0.05, 5), nrow(regimen_grid(list(m = 35, d = 2, T = 47), 5:34, 0.05, 5, 0)))
-  expect_lte(grid_size(0.1, 5:34, 0.05, 30), UNC_MAX_GRID_ROWS)       # the largest the UI can ask for
+  expect_lte(grid_size(0.1, 1:99, 0.05, 30), UNC_MAX_GRID_ROWS)       # the largest the UI can ask for (audit 2026-10-26)
+  expect_lte(grid_size(0.5, 1:34, 0.05, 30), UNC_MAX_GRID_ROWS)       # the audit's refused example A
+  expect_lte(grid_size(2, 1:59, 0.05, 30), UNC_MAX_GRID_ROWS)         # the audit's refused example B
   expect_gt(grid_size(2.75, 1:100, 0.001, 30), UNC_MAX_GRID_ROWS)     # the review's 2.7-million probe
   shiny::testServer(app_dir, {
     set_32(session, comparator = "hypno_test", min_gain = -3, m_range = c(16, 18), d_max = 3.2)
@@ -200,6 +206,13 @@ test_that("R01: the app checks recorded draws diagnostics against the gate, ESS 
   jsonlite::write_json(man, file.path(td, "draws_manifest.json"), auto_unbox = TRUE, digits = NA)
   expect_error(load_draws("dd", "primary", td), "ess_bulk 151")
   expect_silent(load_draws("di", "primary", td))
+  # draws older than 3.2, or with no version, are refused (audit 2026-10-26)
+  for (v in list("3.1", NULL)) {
+    man$draws_version <- v
+    man$files$tumor_dd_primary.csv$diagnostics$min_ess_bulk_per_fit <- 420
+    jsonlite::write_json(man, file.path(td, "draws_manifest.json"), auto_unbox = TRUE, digits = NA)
+    expect_error(load_draws("di", "primary", td), "needs 3.2 or later")
+  }
 })
 
 # --- R07: wording ---------------------------------------------------------------------

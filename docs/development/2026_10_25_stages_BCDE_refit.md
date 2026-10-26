@@ -2,6 +2,8 @@
 
 Plan: `docs/development/PLAN_codex_review_2026_10_25.md` (approved by Igor Shuryak on 2026-10-25, all 12 recommendations). Stage A is recorded in `2026_10_25_stage_A_app_fixes.md`. Base revision 677ce21. All work below is uncommitted on that revision until Igor asks for a commit.
 
+**Correction (2026-10-26).** The first outcome line below is wrong for calibrated DD. The release gate of decision 9 includes bulk and tail ESS ≥ 400, and the calibrated-DD loop and its repair did not check ESS: 177 of 1000 primary and 272 of 1000 restricted conditional fits, and 299 in the sensitivity sets, were below bulk ESS 400 (minimum 151). An external review found it on 2026-10-26. Version 3.2 refits those 748 fits and regenerates the draws (`2026_10_26_review_v31_fixes.md`). The text below is kept as written.
+
 ## Outcome
 
 - The app (version 3.1.0) uses the verified-trial refit: DI posterior draws and DD calibrated to DI, with DD row i fitted on DI row i. D18 stays the default.

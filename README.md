@@ -11,7 +11,7 @@ Every tab compares the evaluated regimen with one comparison regimen and one tum
 
 **Live:** https://ishuryak.shinyapps.io/custom_bed_calculator_v3/ (version 3.1.0, revision `e4ff22f`, deployed 2026-10-26 with `Rscript tools/deploy.R` as its own app; previous release 3.0.0 at `f951cd3`, the rollback point). Live browser walkthrough `docs/development/2026_10_21_v3/walkthrough_v3.R --live`: 34 of 34 checks on 2026-10-26. `tools/deploy.R` refuses the names of the live version 1 and version 2 apps, an unconfigured account, uncommitted changes, a revision on which the full suite has not passed, a bundle missing any file the app reads, and a bundle holding any file not tracked by git. Version 2.7 (https://ishuryak.shinyapps.io/custom_bed_calculator_v2/) and version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/) are unchanged.
 
-**The refit is for review, not a default.** Version 3.1 uses the refit to 45 trial arms. The DI model is informed by the data (repopulation loss λ/α 0.63 Gy per day at each draw's α/β, 95% interval 0.21–1.19, after about day 37, plus background growth). A DD model fitted on its own does not sample reliably, so DD is calibrated to DI at 35 × 2 Gy in 47 days and its rate fitted given each DI draw (0.40 per day, 0.12–1.03). For HYPNO's 55 Gy in 20 fractions against 35 × 2 Gy the median tumor BED change is −2.0 Gy under DI and −3.3 Gy under DD. The defaults remain Scenario D18 with the DD model calibrated to DI. The record is `docs/development/2026_10_25_stages_BCDE_refit.md`.
+**The refit is for review, not a default.** Version 3.2 (this branch, `review_2026_10_26`, not yet deployed) uses the refit to 45 trial arms. The DI model is informed by the data (repopulation loss λ/α 0.63 Gy per day at each draw's α/β, 95% interval 0.21–1.19, after about day 37, plus background growth). A DD model fitted on its own does not sample reliably, so DD is calibrated to DI at 35 × 2 Gy in 47 days and its rate fitted given each DI draw (0.41 per day, 0.12–1.04). Every DI and conditional DD fit meets the full diagnostic gate, effective sample size included. For HYPNO's 55 Gy in 20 fractions against 35 × 2 Gy the median tumor BED change is −2.0 Gy under DI and −3.3 Gy under DD. The defaults remain Scenario D18 with the DD model calibrated to DI. The records are `docs/development/2026_10_25_stages_BCDE_refit.md` and `docs/development/2026_10_26_review_v31_fixes.md`.
 
 **Version 1 warning.** Version 1 (branch `main`) still carries the DD calibration error described below. Do not use version 1 DD results computed at a tumor α/β other than 10 Gy.
 
@@ -53,10 +53,26 @@ run_app.bat                     # or: Rscript tools/launch.R
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
 
+## Changes in version 3.2
+
+From the review of 2026-10-26 (plan `docs/development/PLAN_codex_review_2026_10_26.md`, record `docs/development/2026_10_26_review_v31_fixes.md`).
+
+- **What moves.**
+  - The default evaluated regimen is 18 × 2.9 Gy (52.2 Gy in 24 days) instead of HYPNO's 55 Gy in 20 fractions, so every tab opens on that regimen. The comparison (35 × 2 Gy) and DD anchor are unchanged.
+  - The DD draws are regenerated (the DI draws are unchanged). HYPNO against 35 × 2 Gy in the full fits: DI −1.95 Gy (80% range −4.42 to +1.19), DD −3.27 Gy (−5.92 to −0.53), against −2.0 and −3.3 in version 3.1.
+  - On the Results tab, the HYPNO control and HYHOPE benchmark rows now show their tumor BED differences (+1.11/−2.87 and −10.60/−15.14 Gy₁₀) instead of "not available".
+  - An organ maximum that is indeterminate at the DVH resolution is no longer reported as "within" over the α/β range.
+  - Uncertainty scenario files of version 3.1 are refused with a reason, because their draws were replaced. Deterministic scenario files replay as before.
+- **One diagnostic gate.** `fit/gate.py` is used by every fit, the repair, the export and (for draws version 3.2) the app. All 3600 conditional DD fits now pass it, 748 after refitting with longer chains (`fit/repair_dd_ess.py`).
+- **Identity chain.** The export checks every input byte and every pair's anchor equality, and replaces `draws/` only when the whole set passes.
+- **Inputs.** One organ-mapping validator for both replay paths. Malformed Eclipse DVH rows are refused with their line number. Replayed searches are bounded at the largest grid the app can request.
+- **Provenance.** `data/*_provenance.csv` keep source intervals, estimators, population exceptions and prescription categories beside the unchanged fitting files.
+- **Wording.** Cohort, chemotherapy sensitivity, α, tumor control, QUANTEC and mean-dose scope, acute onset prior and predictive-check statements corrected.
+
 ## Changes in version 3.1
 
 - **What moves.** The Uncertainty tab, the report card's refit column and the refit preset now come from the verified-trial refit (45 arms, 19 trials) instead of the 35 arms of the 2018 Table 1, and every DD draw is paired with the DI draw it was fitted on. Example: HYPNO 55 Gy/20 against 35 × 2 Gy, first 50 shipped DI draws, mean ΔDI changes from +1.75 to −2.28 Gy. Deterministic results with the D18 defaults are unchanged. Mean-dose organ limits are compared on physical dose, which changes those organ statuses (stage A).
-- **Fits gated.** Every fit behind the shipped draws passes 0 divergences, R-hat ≤ 1.01, bulk and tail ESS ≥ 400 (DI) and E-BFMI ≥ 0.3, and the app refuses draws whose manifest does not say so.
+- **Fits gated (corrected in 3.2).** The DI fits passed 0 divergences, R-hat ≤ 1.01, bulk and tail ESS ≥ 400 and E-BFMI ≥ 0.3. The conditional DD fits were not checked for ESS: 177 of 1000 primary and 272 of 1000 restricted fits had bulk ESS below 400 (minimum 151). Version 3.2 refits them.
 - **Units.** BED differences over draws are labeled Gy₁₀ only when α/β is 10 Gy in every draw.
 - **Records.** Plan `docs/development/PLAN_codex_review_2026_10_25.md`, stage A `docs/development/2026_10_25_stage_A_app_fixes.md`, stages B–E `docs/development/2026_10_25_stages_BCDE_refit.md`, `docs/FIXES.md`.
 

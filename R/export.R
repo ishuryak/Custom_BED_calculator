@@ -26,9 +26,10 @@ MAX_GRID_ROWS <- 200000
 
 # Number of raw candidate regimens a search grid holds (before the days-saved filter), shared by
 # both replay checks (review 2026-10-26). The uncertainty search evaluates SEARCH_DRAWS draws per
-# regimen, so its replay is bounded at UNC_MAX_GRID_ROWS: the largest grid the app can request is
-# 30 fraction counts (slider 5-34) x 599 doses (0.1 to 30 Gy in 0.05 Gy steps) = 17,970.
-UNC_MAX_GRID_ROWS <- 20000
+# regimen, so its replay is bounded at UNC_MAX_GRID_ROWS, just above the largest grid the app can
+# request: a comparison of up to 100 fractions lets the slider span 1-99 fractions, and doses run
+# from 0.15 Gy (comparison 0.1 Gy) to 30 Gy in 0.05 Gy steps, 99 x 598 = 59,202 regimens.
+UNC_MAX_GRID_ROWS <- 60000
 grid_size <- function(ref_d, m_range, d_step, d_max) {
   d_start <- ceiling((ref_d + 1e-9) / d_step) * d_step
   n_d <- if (d_start > d_max + 1e-9) 0 else floor((d_max + 1e-9 - d_start) / d_step) + 1

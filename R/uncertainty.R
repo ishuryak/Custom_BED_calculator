@@ -19,6 +19,7 @@
 # 3.2 (2026-10-26 review): draws regenerated after every conditional DD fit met the full gate
 # (ESS included, R01) with an enforced identity chain (R02); organ mappings validated (R03).
 UNCERTAINTY_VERSION <- "3.2"
+DRAWS_MIN_VERSION <- "3.2"
 DRAWS_DIR <- "draws"
 UNC_VARIANT_KEYS <- c("primary", "paper_restrictions")
 TOXICITY_SEED <- 20261021
@@ -57,7 +58,11 @@ load_draws <- function(model = c("di", "dd"), variant = "primary", dir = DRAWS_D
     stop("Draws file ", key, " failed the sampling-diagnostic gate and is not used.")
   # From draws version 3.2 the recorded diagnostics are checked here against the gate itself,
   # ESS included, rather than trusting the gate_pass flag (review R01, 2026-10-26).
-  if (!is.null(man$draws_version) && numeric_version(man$draws_version) >= "3.2") {
+  # Draws older than 3.2 were accepted under a gate without ESS (review R01) and are refused.
+  if (is.null(man$draws_version) || numeric_version(man$draws_version) < DRAWS_MIN_VERSION)
+    stop("Draws file ", key, " is from draws version ", if (is.null(man$draws_version)) "unknown" else man$draws_version,
+         "; this calculator needs ", DRAWS_MIN_VERSION, " or later (full diagnostic gate, ESS included).")
+  {
     why <- draws_gate_failures(man$files[[key]]$diagnostics)
     if (length(why)) stop("Draws file ", key, " does not meet the sampling-diagnostic gate: ", paste(why, collapse = "; "), ".")
   }

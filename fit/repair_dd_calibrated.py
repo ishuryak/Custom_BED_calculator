@@ -1,4 +1,8 @@
-"""Re-fit the calibrated-DD fits that failed the diagnostic gate, with longer chains.
+"""RETIRED 2026-10-26 (review R01): this first repair judged fits by a gate without ESS. It is
+kept as the record of the repair of 2026-10-26 02:12 (repair.json in each folder) and refuses to
+run. Use fit/repair_dd_ess.py, which applies the full gate of fit/gate.py.
+
+Re-fit the calibrated-DD fits that failed the diagnostic gate, with longer chains.
 
 fit_dd_calibrated.py tries each DI draw up to 3 times (chain length x1, x2, x4). A few fits still
 end with R-hat just above 1.01 (slow mixing of the overdispersion sigma_raw; no divergences). This
@@ -93,6 +97,7 @@ def fit_draw(m, r, base, onset_min, idx, out):
 
 
 def main():
+    sys.exit("REFUSED: fit/repair_dd_calibrated.py is retired (its gate omits ESS). Use fit/repair_dd_ess.py.")
     out, ndi, onset_min, v = folder()
     di_dir = os.path.join(F.OUT, f"di_{v}")
     ident = check_identity(out, di_dir)

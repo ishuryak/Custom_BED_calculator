@@ -212,7 +212,8 @@ parse_dvh_eclipse <- function(lines) {
   for (k in seq_along(starts)) {
     blk <- lines[starts[k]:ends[k]]
     name <- trimws(sub("^\\s*Structure\\s*:", "", blk[1]))
-    h <- grep("Dose \\[c?Gy\\]", blk)
+    # The table header names both columns; metadata lines such as "Max Dose [cGy]: ..." do not.
+    h <- grep("Dose \\[c?Gy\\].*Volume \\[", blk)
     if (length(h) == 0) next
     hdr <- blk[h[1]]
     scale <- dvh_unit_scale(regmatches(hdr, regexpr("Dose \\[c?Gy\\]", hdr)))
@@ -524,7 +525,7 @@ validate_oar_percents <- function(percents) {
   if (length(bad)) stop("unknown organ key(s): ", paste(bad, collapse = ", "), ".", call. = FALSE)
   out <- lapply(nm, function(k) {
     v <- percents[[k]]
-    if (is.null(v) || (length(v) == 1 && is.na(v))) return(NULL)
+    if (is.null(v) || (length(v) == 1 && is.na(v) && !is.nan(v))) return(NULL)
     if (!is.numeric(v) || length(v) != 1 || !is.finite(v) || v < 0 || v > 200)
       stop("organ '", k, "': the dose must be one number from 0 to 200% of the prescription.", call. = FALSE)
     v
