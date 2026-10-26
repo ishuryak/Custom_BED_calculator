@@ -66,6 +66,30 @@ def check_inputs(out, di_dir, pick):
     return ident
 
 
+def posterior_target(base, onset_min, variant, ndi):
+    """Every setting that defines the conditional posterior, as the Stan data of fit_draw will carry it."""
+    return dict(prior_c_sd=float(base["prior_c_sd"]), onset_min=float(onset_min), onset_scale=float(C.ONSET_SCALE),
+                prior_log_lambda=[float(x) for x in C.PRIOR_LOG_LAMBDA], di_variant=variant, n_di=int(ndi),
+                anchor=[float(base["anchor_dsum"]), float(base["anchor_d2sum"]), float(base["anchor_T"])])
+
+
+def check_target(ident, target):
+    """Refuse a repair whose posterior differs from the original fit (review F04 of 2026-10-26).
+
+    Longer chains and new seeds are allowed; a different prior, onset penalty, anchor, variant or
+    selection is a different scientific generation and needs its own output folder.
+    """
+    n0, d0, T0 = C.ANCHOR
+    recorded = {k: ident.get(k) for k in ("prior_c_sd", "onset_min", "onset_scale", "prior_log_lambda", "di_variant", "n_di")}
+    recorded["anchor"] = ident.get("anchor", [n0 * d0, n0 * d0 * d0, T0])
+    bad = [k for k, v in recorded.items() if v is None or json.dumps(v) != json.dumps(target[k])
+           and not (isinstance(v, (int, float)) and np.isclose(v, target[k], rtol=0, atol=1e-12))
+           and not (isinstance(v, list) and np.allclose(v, target[k], rtol=0, atol=1e-12))]
+    if bad:
+        sys.exit("REFUSED: the posterior to be repaired differs from the one fitted ("
+                 + ", ".join(f"{k}: fitted {recorded[k]}, now {target[k]}" for k in bad) + ").")
+
+
 def fit_draw(m, r, base, onset_min, idx, out):
     """Refit one outer draw at 4x, 8x, 16x length until it passes. Returns (rows, diagnostics, mult, ok)."""
     n0, d0, T0 = C.ANCHOR
@@ -114,6 +138,8 @@ def main():
     pick = np.linspace(0, len(di) - 1, ndi).round().astype(int)
     ident = check_inputs(out, di_dir, pick)
     rows, trials, base = F.load()
+    target = posterior_target(base, onset_min, v, ndi)
+    check_target(ident, target)
     failing = []
     for idx in pick:
         path = os.path.join(out, f"di_draw_{idx:05d}.csv")
@@ -127,6 +153,9 @@ def main():
         generation=GENERATION, gate_policy=G.POLICY, multipliers=list(MULTIPLIERS), seed_offset=SEED_OFFSET,
         folder_identity_sha256=ident["identity_sha256"], original_runner_sha256=ident.get("runner_sha256"),
         n_failing_at_start=len(failing), repairs=[])
+    if log_.get("posterior_target", target) != target:
+        sys.exit("REFUSED: repair_ess.json was written for another posterior target.")
+    log_["posterior_target"] = target
     log_["script_sha256"] = F.sha_file(os.path.abspath(__file__))
     log_["runner_sha256_now"] = F.sha_file(C.__file__)
     C.log(f"ess-repair {out}: {len(failing)} of {len(pick)} fits fail the gate")

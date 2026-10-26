@@ -52,7 +52,7 @@ def test_equal_outer_weights_ignore_chain_length():
 DATA = os.path.join(ROOT, "data", "refit_trials_2026_10_25c_main.csv")
 
 
-def setup(monkeypatch, tmp_path, ess=(900, 150, 900), tamper=None):
+def setup(monkeypatch, tmp_path, ess=(900, 150, 900), tamper=None, extra=None):
     out = tmp_path / "fitout"
     for k, v in dict(BED_FIT_DATA=DATA, BED_FIT_OUT=str(out), DDCAL_NDI="3", DDCAL_DI_VARIANT="primary").items():
         monkeypatch.setenv(k, v)
@@ -68,7 +68,10 @@ def setup(monkeypatch, tmp_path, ess=(900, 150, 900), tamper=None):
     ident = dict(identity_sha256="dd-x", parent_di_identity="di-x", parent_di_draws_sha256=F.sha_file(di_dir / "draws_params.csv"),
                  data_file_sha256=F.sha_file(DATA), stan_sha256=F.sha_file(os.path.join(ROOT, "fit", "stan", "dd_cal.stan")),
                  common_sha256=F.sha_file(os.path.join(ROOT, "fit", "stan", "common_functions.stanfunctions")),
-                 runner_sha256="an older runner", picks_sha256=hashlib.sha256(pick.tobytes()).hexdigest())
+                 runner_sha256="an older runner", picks_sha256=hashlib.sha256(pick.tobytes()).hexdigest(),
+                 prior_c_sd=3.0, onset_min=7.0, onset_scale=1.0, prior_log_lambda=[-0.6931471805599453, 1.5],
+                 di_variant="primary", n_di=3)
+    ident.update(extra or {})
     if tamper:
         ident[tamper] = "other"
     json.dump(ident, open(dd / "identity.json", "w"))
@@ -108,3 +111,30 @@ def test_ess_repair_refuses_changed_inputs(monkeypatch, tmp_path, field):
     with pytest.raises(SystemExit) as e:
         Rp.main()
     assert "REFUSED" in str(e.value) and field in str(e.value) and calls == []
+
+
+# Version 3.2.1, review F04: a repair must not change the posterior it repairs.
+@pytest.mark.parametrize("extra", [dict(prior_c_sd=10.0), dict(onset_min=5.0), dict(onset_scale=2.0),
+                                   dict(prior_log_lambda=[-0.69, 1.0]), dict(di_variant="paper_restrictions"),
+                                   dict(n_di=1000), dict(anchor=[66.0, 132.0, 45.0]), dict(prior_c_sd=None)])
+def test_ess_repair_refuses_a_changed_posterior_target(monkeypatch, tmp_path, extra):
+    Rp, dd, calls = setup(monkeypatch, tmp_path, extra=extra)
+    with pytest.raises(SystemExit) as e:
+        Rp.main()
+    assert "REFUSED" in str(e.value) and calls == []
+
+
+def test_ess_repair_with_prior_sd_10_matches_only_a_prior_10_folder(monkeypatch, tmp_path):
+    """Main (sd 3) rejects 10; a prior-c10 folder rejects 3 and accepts 10."""
+    monkeypatch.setenv("BED_FIT_PRIOR_C_SD", "10")
+    Rp, dd, calls = setup(monkeypatch, tmp_path)          # folder records sd 3
+    with pytest.raises(SystemExit):
+        Rp.main()
+    Rp, dd, calls = setup(monkeypatch, tmp_path / "c10", extra=dict(prior_c_sd=10.0))
+    Rp.main()
+    assert calls == [2]
+    assert json.load(open(dd / "repair_ess.json"))["posterior_target"]["prior_c_sd"] == 10.0
+    monkeypatch.setenv("BED_FIT_PRIOR_C_SD", "3")
+    Rp, dd, calls = setup(monkeypatch, tmp_path / "c10b", extra=dict(prior_c_sd=10.0))
+    with pytest.raises(SystemExit):
+        Rp.main()
