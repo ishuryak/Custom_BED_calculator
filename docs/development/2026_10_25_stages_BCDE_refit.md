@@ -110,5 +110,10 @@ The run's pooled summaries weight a retried fit by its larger number of rows. Re
 ## Open items
 
 - Igor to confirm stage A decision 3 (mean-dose limits on physical dose when the fractionation differs from the source's. Flagged per row).
-- Stage F: release identity hardening (S6), browser walkthrough, bundle check, deploy to `custom_bed_calculator_v3` only (rollback f951cd3), live re-check. Needs a commit first.
-- README "Live" and "refit" paragraphs describe 3.0.0 until the deploy.
+- Stage F, done 2026-10-26 (Igor approved all three decisions as recommended, including decision 12 on physical mean-dose limits):
+  - S6: `check_bundle()` refuses any bundled file not tracked by git (`deployed_revision.txt` excepted, written by the deploy). On its first real use it found `.pytest_cache/` in the upload list, now in `.rscignore`.
+  - Full suite on `e4ff22f`: 5269 expectations, 0 failed, 0 errors; pytest 38 passed.
+  - Local walkthrough 34 of 34 (first run 31 of 34: three checks still held 3.0 strings, kept as `walkthrough/20261026_071429_local_stale_3_0_checks_fail`).
+  - Bundle: 40 files (app, R, data, draws, DESCRIPTION, LICENSE, renv.lock).
+  - Deployed `e4ff22f` to `custom_bed_calculator_v3` only. Live walkthrough 34 of 34, including an exact replay of the uncertainty download. v1 and v2 respond unchanged. Rollback: redeploy `f951cd3`.
+  - Not pushed to GitHub (no decision taken on push).
