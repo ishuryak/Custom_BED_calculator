@@ -506,7 +506,7 @@ server <- function(input, output, session) {
       hartley = paste("Hartley et al. 2011: α 0.3/Gy, α/β 10 Gy, doubling time 3 days, onset on elapsed day 22",
                       "(day 23 in this calculator's count).", keeps_dd),
       hyhope = paste("HYHOPE protocol: α 0.35/Gy, α/β 10 Gy, doubling time 3 days, onset day 21.", keeps_dd),
-      refit = sprintf(paste("Medians of the Bayesian refit to randomized trials of radiotherapy alone, re-extracted from",
+      refit = sprintf(paste("Medians of the Bayesian refit to randomized fractionation trials (mainly without chemotherapy), re-extracted from",
                             "the trial publications (2026-10-25; one intercept per trial, overdispersion): α %.3f/Gy,",
                             "repopulation loss %.2f Gy₁₀/day after day %.0f, plus background growth %.2f Gy₁₀/day over the",
                             "whole course, and DD maximum rate %.2f per day (DD calibrated to DI at the anchor). α/β is not",

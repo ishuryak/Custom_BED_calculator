@@ -83,30 +83,65 @@ marker, the holdout cache and every call site of the shared helpers.
   A smoke run on a copy repaired two fits at 4x in about 10 s each.
 - Export: anchor residual at most 4.5e-8 Gy. DI draw files byte-identical to 3.1. Both DD files
   regenerated.
-- Full R suite 5379 expectations, 0 failed (3.1.0 baseline 5269). Python 70 passed (baseline 38).
+- Full R suite on b31db54: 5379 expectations, 0 failed, suite marker written for that revision (3.1.0 baseline 5269). Python 70 passed (baseline 38). Local browser walkthrough 35 of 35, including all three benchmark rows (`2026_10_21_v3/walkthrough/`).
 
 ## Results
 
-Full conditional fits, each outer DI draw weighted equally. HYPNO 55 Gy in 20 fractions against
-35 x 2 Gy in 47 days, median tumor BED change in Gy at each draw's α/β (80% range):
+HYPNO 55 Gy in 20 fractions against 35 x 2 Gy in 47 days, median tumor BED change in Gy at each
+draw's α/β (80% range). DI from the full DI posterior (8000 draws in the main set). DD from the
+conditional fits (1000 DI draws in the main sets, 200 in the sensitivity sets), each outer draw
+weighted equally.
 
 | Set | DI | DD | λ_DD median | Order agreement |
 |---|---|---|---|---|
-| main, primary | −1.95 (−4.42 to +1.19) | −3.27 (−5.92 to −0.53) | 0.405 | 0.919 |
-| main, paper restrictions | −2.00 (−4.00 to +0.41) | −2.91 (−4.74 to −0.66) | 0.361 | 0.940 |
-| ARTSCAN added | −2.54 | −3.66 | 0.379 | 0.926 |
-| common chemotherapy policy added | −1.16 | −2.39 | 0.427 | 0.912 |
-| effective N halved | −1.83 | −3.11 | 0.417 | 0.917 |
-| Kaplan-Meier rates only | −2.00 | −3.35 | 0.413 | 0.915 |
-| three later trials added | −1.48 | −2.90 | 0.434 | 0.919 |
-| nominal clock | +0.14 | −2.13 | 0.481 | 0.882 |
-| intercept prior sd 10 | −2.09 | −3.39 | 0.412 | 0.914 |
-| RTOG 9003 updated report | −1.88 | −3.32 | 0.429 | 0.916 |
+| main, primary | −2.02 (−4.31 to +0.97) | −3.27 (−5.92 to −0.53) | 0.405 | 0.919 |
+| main, paper restrictions | −2.01 (−3.87 to +0.37) | −2.91 (−4.74 to −0.66) | 0.361 | 0.940 |
+| ARTSCAN added | −2.69 | −3.66 | 0.379 | 0.926 |
+| common chemotherapy policy added | −1.03 | −2.39 (to +0.20) | 0.427 | 0.912 |
+| effective N halved | −1.89 | −3.11 | 0.417 | 0.917 |
+| Kaplan-Meier rates only | −1.88 | −3.35 | 0.413 | 0.915 |
+| three later trials added | −1.66 | −2.90 | 0.434 | 0.919 |
+| nominal clock | +0.26 | −2.13 (to +1.03) | 0.481 | 0.882 |
+| intercept prior sd 10 | −1.93 | −3.39 | 0.412 | 0.914 |
+| RTOG 9003 updated report | −1.89 | −3.32 | 0.429 | 0.916 |
 
-Version 3.1 reported −2.0 and −3.3 for the main set, sensitivity DI medians −2.7 to +0.3 and DD
-−3.7 to −2.1. The main results moved by less than 0.1 Gy, the sensitivity medians by up to
-0.2 Gy, partly from the change to equal weighting. The planned (nominal) clock still moves the DI
-result to about zero, so the sign of the DI conclusion depends on that timing choice.
+The DI results are unchanged from version 3.1, because the DI fits and draws are unchanged. The DD
+main median moved from −3.25 to −3.27, within its Monte Carlo standard error. Monte Carlo
+standard errors of the app's 4000-draw summaries, by resampling the 1000 DI draws: about 0.1 Gy
+for medians, up to 0.25 Gy for 95% limits, about 1.5 percentage points for threshold shares. The
+DI 80% range includes zero in every analysis. The planned (nominal) clock moves the DI median to
+about zero.
+
+## Statistical and clinical audits (2026-10-26, read-only subagents)
+
+Statistician. Confirmed and fixed in the text: the DI numbers I had first written for 3.2 came
+from the 1000-draw thinned subset, not the full posterior, and the claimed "sensitivity medians
+moved by up to 0.2 Gy" was Monte Carlo noise (the 3.1 figures were right and are restored).
+Background growth g is essentially its prior (posterior 0.005-0.020 per day, prior uniform
+0.0046-0.021), now stated. The predictive check uses a new arm-level effect, not the fitted one,
+and 45 of 45 inside 90% intervals shows the check has little power, now stated. "The sign of the
+DI result depends on the clock" overstated, because the DI 80% range spans zero in every
+analysis, now reworded. Monte Carlo errors are now quantified. Checked and correct: the repair is
+not a source of selection bias. ESS failures were correlated with lower λ_DD (Mann-Whitney
+p = 0.001), so dropping them would have biased DD (−3.32 instead of −3.27), but refitting them
+kept every outer draw and moved per-fit medians by about 0.01 Gy. Equal outer weighting matches
+the modular target. All 1000 main conditional fits needed more than the base chain length, which
+the 2026-10-25 record understated. Not changed (noted for Igor): the order agreement shares
+structure between the models, the DD rate interval is largely prior and penalty at its lower end,
+and the uncertainty search re-checks its pick on draws that share the same DI draws.
+
+Radiation oncologist and radiobiologist. Confirmed and fixed: four places still described the
+cohort as "radiotherapy alone", and the approved sentence on population exceptions had not been
+added, now both done, with the twice-daily arms (no incomplete-repair correction) and the single
+arm above 2.25 Gy per fraction stated. The claim that "every table flags" extrapolation was
+false, now corrected to the four tables that do. Reported for Igor's decision, not changed: the
+report card and organ benchmark table show organ status without the α/β-range result or mean-dose
+note; the "Limit, physical in this regimen" column label for mean limits; the extrapolation flag
+is absent from the banner and the Results tab; the default's help text gives no scope; the
+Results tab shows the radiotherapy-alone Fowler zone although the default acute limit is framed
+for chemoradiation. Checked and sound: no stale text naming HYPNO as the default, calendar, clock
+conventions, DD calibration description, α and α/β statements, HYPNO and HYHOPE descriptions,
+QUANTEC values, Fowler and Fenwick scope, no recommendation language, organ status logic.
 
 ## Deferred (not in this release)
 

@@ -14,7 +14,7 @@ unc_ui <- function(id) {
   tagList(
     div(class = "alert alert-secondary",
         tags$strong("What this tab shows. "),
-        "The DI tumor model was refitted with Bayesian methods to randomized trial arms of radiotherapy alone,",
+        "The DI tumor model was refitted with Bayesian methods to randomized fractionation trial arms, mainly without chemotherapy,",
         "re-extracted from the trial publications (one intercept per trial, so the fit is driven mainly by",
         "within-trial contrasts, plus between-arm overdispersion). The DD model is calibrated to DI at 35 × 2 Gy",
         "in 47 days and its rate was fitted to the same trials for each DI draw, so DD draw i belongs to DI draw i.",
@@ -97,7 +97,7 @@ unc_server <- function(id, settings, oar_policy) {
       la <- stats::quantile(d$di$lambda / d$di$alpha, c(.025, .975), names = FALSE)
       div(class = "alert alert-warning",
           tags$strong("About these draws. "),
-          sprintf(paste("Refit to %d arms of %d randomized trials of radiotherapy alone (data file %s), re-extracted from",
+          sprintf(paste("Refit to %d arms of %d randomized fractionation trials, mainly without chemotherapy (data file %s), re-extracted from",
                         "the trial publications. The DI refit is informed by the data (daily repopulation loss λ/α, 95%%",
                         "%.2f-%.2f Gy/day at each draw's α/β). DD's rate was fitted for each DI draw after calibration at",
                         "35 × 2 Gy in 47 days, with a soft preference for repopulation onset at or after day 7, so DD is not",

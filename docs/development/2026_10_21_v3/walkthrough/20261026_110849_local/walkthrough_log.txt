@@ -1,0 +1,44 @@
+Walkthrough 2026-10-26 11:10:40; target http://127.0.0.1:8796 (local app started by this script); local revision b31db5412a5cd504144919429f6755c527fd104f; expected version 3.2.0
+PASS  1 title shows version 3.2
+PASS  1 banner: 18 x 2.9 Gy evaluated against 35 x 2 Gy, +1 Gy, DD calibrated  [Evaluating 18 × 2.9 Gy in 24 days against 35 × 2 Gy in 47 days · tumor threshold +1 Gy · DD calibrated at 35 × 2 Gy in 47 days · tumor preset: Scenario D18]
+PASS  1 report card opens first, with a named difference and the refit column  [Quantity	This regimen	Comparison	Δ vs 35 × 2 Gy in 47 days	Verified-trial refit 2026-10-25: Δ median (80% range), Gy at each draw's α/β	Limit and status
+Tumor BED, DI (Gy₁₀)	67.34	71.51	-4.18	-4.0 (-6]
+PASS  1 report card flags the extrapolation (2.9 Gy above the tumor data)
+PASS  1 how-to-read card visible
+PASS  1 Report card: no output errors
+PASS  2 Results opens without output errors
+PASS  2 Compare regimens opens without output errors
+PASS  2 Search opens without output errors
+PASS  2 Both-model screen opens without output errors
+PASS  2 Sensitivity opens without output errors
+PASS  2 Uncertainty opens without output errors
+PASS  2 Organs at risk opens without output errors
+PASS  2 Model and sources opens without output errors
+PASS  2 all three benchmark rows show their DI and DD differences (review R04)  [Regimen	Days	Δ BED DI vs 35 × 2 Gy in 47 days (Gy₁₀)	Δ BED DD vs 35 × 2 Gy in 47 days (Gy₁₀)	Early BED	Δ early BED vs 35 × 2 Gy in 47 days (Gy₁₀)	Late BED	Δ late BED vs 35 × 2 Gy in 47 days (Gy₃)
+HYPNO test arm: 55 Gy in 20 fractions, 5 fractions/week	26	-1.39	-8.67	55.87	+2.76	105.42	-11.25
+HYPNO c]
+PASS  2 early-limit value shown beside its control  [Value now: 55.87 Gy₁₀.]
+PASS  2 search opens empty at the defaults
+PASS  2 both-model screen follows the global comparison (no override banner)
+PASS  3 HYPNO, -3 Gy: 17, 18, 19 fractions, 15 of 15 settings  [Fractions	Gy per fraction	Days	Total Gy	Δ BED DI vs the screen's comparison	Δ BED DD vs the screen's comparison	Δ DI over evaluable settings	Δ DD over evaluable]
+PASS  3 an override is highlighted  [Override on this tab: threshold 0 Gy instead of the global -3 Gy .]
+PASS  4 uncertainty summary against HYPNO  [Quantity	Value
+Δ tumor BED, DI, vs 20 × 2.75 Gy in 26 days (Gy, α/β varies by draw): median	-2.0
+80% range	-2.5 to -2.0
+95% range	-2.5 to -1.5
+Δ tumor BED, DD, ]
+PASS  4 refit status names the DD limitation
+PASS  4 search under uncertainty lists regimens and neighbors  [Row	Fractions	Gy per fraction	Days	Days saved	ΔDI median (80% range), Gy, α/β varies by draw	ΔDD median (80% range), Gy,]
+PASS  4 uncertainty ZIP has scenario, summary, search and README  [evaluated_regimen_summary.csv,README.txt,scenario.json,search_with_neighbors.csv]
+PASS  4 uncertainty download replays exactly
+PASS  5 organ table shows converted limits and statuses  [Organ	Metric	Source constraint	Source metric and fractionation	Compared as	α/β (Gy)	Limit, EQD2 (Gy)	Limit, physical in this regimen (Gy)	Planned, physical (Gy)]
+PASS  5 the binding constraint is named  [Binds first: Parotid (spared side), with a margin of -0.9 Gy (physical mean, -4% of its limit).
+These are selected constraint metrics, not full protocol compliance. Other source metrics not assessed here: Larynx V50Gy ≤ 27% (only the mean is checked); Parotid: both glands below about 25 Gy (the one-gland limit is used); Cochlea: the more conservative 35 Gy mean.]
+PASS  5 organ rows reach the report card
+PASS  5 a DVH file with patient identifiers is refused  [The file has patient identifier fields with values (lines 1, 2). It was not read. Remove or blank the patient name and ID fields, or use the local version of the calculator.]
+PASS  5 a synthetic DVH without identifiers is read  [Read 2 structures: Parotid_R, Constrictors. Assign them to organs below.]
+PASS  6 33 fractions at 6 per week take 38 days  [Used: 33 fractions, 38 days (6 fractions/week, starting Monday), total dose 66.00 Gy.]
+PASS  6 fitted DD named in the banner  [Evaluating 20 × 2.75 Gy in 26 days against 35 × 2 Gy in 47 days · tumor threshold +1 Gy · DD values entered directly (not calibrated) · tumor preset: Custom]
+PASS  6 no output errors after the calendar and DD changes
+PASS  7 narrow: no horizontal page scroll  [0]
+PASS  browser console: no errors
