@@ -15,8 +15,13 @@ for the evaluation regimens.
 Run identity: the output folder holds identity.json binding the parent DI fit (its identity and
 draws file hash), the data, dd_cal.stan, this file and all settings. Each DI draw's fit is saved
 as soon as it finishes, carries the DI values it used, and is reused only if those values match
-the parent file. A fit whose diagnostics fail (any divergence or tree-depth hit, R-hat > 1.01,
-E-BFMI < 0.3) is rerun with longer chains, up to two times.
+the parent file. A fit that fails the diagnostic gate (fit/gate.py: any divergence or tree-depth
+hit, R-hat > 1.01, bulk or tail ESS < 400, E-BFMI < 0.3) is rerun with longer chains, up to two
+times. Before 2026-10-26 this loop omitted ESS (review R01); fits made then are reclassified and
+repaired by fit/repair_dd_ess.py.
+
+Summaries weight every outer DI draw equally (1/N_DI), whatever the number of rows its fit
+produced, so a fit rerun with longer chains does not gain weight (review R06).
 
 Run:  BED_FIT_DATA=data/X.csv BED_FIT_OUT=fit/output_X python3 -I fit/fit_dd_calibrated.py
 Env:  DDCAL_NDI (default 200), DDCAL_ONSET_MIN (default 7), DDCAL_DI_VARIANT (default primary).
@@ -150,12 +155,10 @@ def main():
                          output_dir=os.path.join(F.RAW, "dd_cal", os.path.basename(F.OUT), os.path.basename(out), f"{idx}_{attempt}"),
                          inits=inits)
             dg = F.diagnostics(f, ["lambda_dd", "sigma_raw"])
-            ok = dg["divergences"] == 0 and dg["treedepth_hits"] == 0 and dg["max_rhat"] <= F.GATE["max_rhat"] \
-                and dg["min_ebfmi"] >= F.GATE["min_ebfmi"]
+            ok = F.G.passes(dg)
             if ok:
                 break
-            log(f"  DI draw {idx} attempt {attempt} failed diagnostics: div {dg['divergences']} rhat {dg['max_rhat']:.4f} "
-                f"({dg['worst_rhat']}) ebfmi {dg['min_ebfmi']:.2f}")
+            log(f"  DI draw {idx} attempt {attempt} failed the gate: {'; '.join(F.G.failures(dg))}")
         dr = f.draws_pd()
         # The calibration must hold exactly in every draw.
         err = float(np.max(np.abs(dr["rep_anchor"] - data["R0"])))
@@ -185,6 +188,35 @@ def outer_se(x, groups):
     return float(np.std(m, ddof=1) / np.sqrt(len(m)))
 
 
+def outer_weights(groups):
+    """Weight 1 / (N_outer x rows of that outer draw): each outer DI draw sums to 1/N_outer."""
+    g = np.unique(groups, return_inverse=True)[1]
+    cnt = np.bincount(g)
+    return 1.0 / (len(cnt) * cnt[g])
+
+
+def wquantile(x, w, p):
+    """Weighted quantile: smallest x whose weighted cumulative share reaches p (inverse of the
+    weighted empirical CDF). Exactly unchanged when one outer draw's rows are duplicated."""
+    x = np.asarray(x, float); o = np.argsort(x, kind="stable"); x, w = x[o], np.asarray(w, float)[o]
+    c = np.cumsum(w) / w.sum()
+    return float(x[min(np.searchsorted(c, p - 1e-12), len(x) - 1)])
+
+
+def fit_diagnostics(rows):
+    """One fit's diagnostics from its saved rows: the per-fit columns plus the divergence count."""
+    r = rows.iloc[0]
+    return dict(divergences=int(rows.divergent.astype(bool).sum()), treedepth_hits=r.get("treedepth_hits"),
+                max_rhat=r.get("max_rhat"), min_ess_bulk=r.get("min_ess_bulk"), min_ess_tail=r.get("min_ess_tail"),
+                min_ebfmi=r.get("min_ebfmi"))
+
+
+def per_fit_gate(dd):
+    """Gate verdict per outer fit, recomputed from saved diagnostics (never from a stored boolean)."""
+    cols = ["divergent", "treedepth_hits", "max_rhat", "min_ess_bulk", "min_ess_tail", "min_ebfmi"]
+    return dd.groupby("di_draw")[cols].apply(lambda x: F.G.passes(fit_diagnostics(x)))
+
+
 def summarize(di, pick, out, onset_min, base):
     import pandas as pd
     dd = pd.concat([pd.read_csv(os.path.join(out, f"di_draw_{i:05d}.csv")) for i in pick], ignore_index=True)
@@ -202,38 +234,45 @@ def summarize(di, pick, out, onset_min, base):
             - eff_bed(a, ab, g, rep_dd(a, ab, dd.lambda_dd.to_numpy(), dd.c_over_alpha.to_numpy(), n0, d0, T0), n0, d0, T0)
         assert np.max(np.abs(e_di - D_di[j])) < 1e-4 and np.max(np.abs(e_dd - D_dd[j])) < 1e-4, lab
     grp = dd.di_draw.to_numpy()
-    q = lambda x: dict(median=float(np.median(x)), q10=float(np.quantile(x, .1)), q90=float(np.quantile(x, .9)))
+    w = outer_weights(grp)
+    q = lambda x: dict(median=wquantile(x, w, .5), q10=wquantile(x, w, .1), q90=wquantile(x, w, .9))
+    wmean = lambda x: float(np.sum(w * x) / np.sum(w))
     regs = []
     for j, (lab, n, d, T) in enumerate(REGIMENS):
         same = (np.sign(D_di[j]) == np.sign(D_dd[j])).astype(float)
         on = dd[f"dd_onset_{j + 1}"].to_numpy()
         regs.append(dict(regimen=lab, di=q(D_di[j]), dd=q(D_dd[j]), dd_minus_di=q(D_dd[j] - D_di[j]),
-                         p_same_sign=float(same.mean()), p_same_sign_outer_se=outer_se(same, grp),
-                         n_dd_onset_before_min=int((on < onset_min).sum()), dd_onset=q(on)))
+                         p_same_sign=wmean(same), p_same_sign_outer_se=outer_se(same, grp),
+                         n_dd_onset_before_min=int((on < onset_min).sum()), share_dd_onset_before_min=wmean((on < onset_min).astype(float)), dd_onset=q(on)))
     Z = np.zeros((1, D_di.shape[1]))
     A, B = np.vstack([Z, D_di]), np.vstack([Z, D_dd])
     iu = np.triu_indices(A.shape[0], 1)
     agree = (np.sign(A[:, None, :] - A[None, :, :]) == np.sign(B[:, None, :] - B[None, :, :]))[iu[0], iu[1], :]
-    agree_draw = agree.mean(axis=0)
+    agree_draw = agree.mean(axis=0)   # per pooled row, averaged over regimen pairs
     lam = dd.lambda_dd.to_numpy()
     per = dd.groupby("di_draw").first()
+    gate_ok = per_fit_gate(dd).reindex(per.index)
     mid = di.iloc[[int(np.argsort(di.alpha.to_numpy())[len(di) // 2])]].iloc[0]
     res = dict(analysis="calibrated DD conditional on DI (modular); DD draws paired with their DI draw",
                onset_min=onset_min, onset_scale=ONSET_SCALE, onset_penalty="soft prior preference, not a bound",
                n_di_draws=len(pick), n_pooled=len(dd), divergences=int(dd.divergent.sum()),
-               outer_fits_failing_gate=int((~per.gate_pass.astype(bool)).sum()),
+               weighting="each outer DI draw weight 1/N_DI, split equally over its rows (review R06)",
+               gate_policy=F.G.POLICY,
+               outer_fits_failing_gate=int((~gate_ok).sum()),
+               outer_fits_failing_gate_ids=[int(i) for i in per.index[~gate_ok.to_numpy()]],
                outer_fits_retried=int((per.attempt > 1).sum()),
                max_rhat=float(per.max_rhat.max()), min_ess_bulk_per_fit=float(per.min_ess_bulk.min()),
                min_ess_tail_per_fit=float(per.min_ess_tail.min()), min_ebfmi=float(per.min_ebfmi.min()),
                treedepth_hits=int(per.treedepth_hits.sum()),
-               lambda_dd=dict(q(lam), q2_5=float(np.quantile(lam, .025)), q97_5=float(np.quantile(lam, .975))),
+               lambda_dd=dict(q(lam), q2_5=wquantile(lam, w, .025), q97_5=wquantile(lam, w, .975)),
                lambda_dd_prior=penalty_adjusted_prior(mid, base, onset_min),
                onset_ref=q(dd.onset_ref),
                fitted_onset_below_min=dict(n_draws=int((dd.onset_min_fitted < onset_min).sum()),
+                                           share=wmean((dd.onset_min_fitted < onset_min).to_numpy().astype(float)),
                                            n_outer_fits=int(dd[dd.onset_min_fitted < onset_min].di_draw.nunique()),
                                            minimum=float(dd.onset_min_fitted.min())),
                min_fitted_onset=q(dd.onset_min_fitted),
-               pairwise_order_agreement=float(agree.mean()),
+               pairwise_order_agreement=wmean(agree_draw),
                pairwise_order_agreement_outer_se=outer_se(agree_draw, grp),
                n_regimen_pairs=int(len(iu[0])),
                regimens=regs)

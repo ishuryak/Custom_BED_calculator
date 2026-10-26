@@ -38,7 +38,9 @@ CHAINS, WARMUP, SAMPLES = 4, 1500, 2000
 # BED_FIT_ITER="warmup,samples" shortens chains for a smoke test (recorded in each fit identity).
 if os.environ.get("BED_FIT_ITER"):
     WARMUP, SAMPLES = (int(x) for x in os.environ["BED_FIT_ITER"].split(","))
-GATE = dict(max_rhat=1.01, min_ess_bulk=400, min_ess_tail=400, min_ebfmi=0.3)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gate as G   # the one diagnostic gate (review R01, 2026-10-26)
+GATE = {k: G.POLICY[k] for k in ("max_rhat", "min_ess_bulk", "min_ess_tail", "min_ebfmi")}
 
 # Prior on tumor alpha/beta: lognormal, median 10 Gy; sd 0.354 puts 95% within
 # 5-20 Gy (the plausible range stated in the 2018 paper).
@@ -194,9 +196,8 @@ def diagnostics(f, sampled, max_treedepth=12):
                min_ess_bulk=float(sub[eb].min()), worst_ess_bulk=str(sub[eb].idxmin()),
                min_ess_tail=float(sub[et].min()), worst_ess_tail=str(sub[et].idxmin()),
                min_ebfmi=float(min(ebfmi)), n_quantities=int(len(sub)))
-    res["gate_pass"] = bool(div == 0 and tdh == 0 and res["max_rhat"] <= GATE["max_rhat"]
-                            and res["min_ess_bulk"] >= GATE["min_ess_bulk"] and res["min_ess_tail"] >= GATE["min_ess_tail"]
-                            and res["min_ebfmi"] >= GATE["min_ebfmi"])
+    res["gate_pass"] = G.passes(res)
+    res["gate_policy"] = G.POLICY["version"]
     return res
 
 
