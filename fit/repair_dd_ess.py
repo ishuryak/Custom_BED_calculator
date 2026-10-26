@@ -57,7 +57,7 @@ def check_inputs(out, di_dir, pick):
                data_file_sha256=F.sha_file(F.DATA),
                stan_sha256=F.sha_file(os.path.join(F.ROOT, "fit", "stan", "dd_cal.stan")),
                common_sha256=F.sha_file(os.path.join(F.ROOT, "fit", "stan", "common_functions.stanfunctions")),
-               picks_sha256=hashlib.sha256(pick.tobytes()).hexdigest())
+               picks_sha256=F.picks_sha256(pick))
     bad = [k for k, v in now.items() if ident.get(k) != v]
     if bad:
         sys.exit(f"REFUSED: {out} does not match the current {', '.join(bad)}.")

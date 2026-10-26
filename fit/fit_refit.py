@@ -76,6 +76,16 @@ def log(*a):
     print(time.strftime("%H:%M:%S"), *a, flush=True)
 
 
+def picks_sha256(pick):
+    """Hash of the selected outer-draw indices as explicit little-endian int64 bytes.
+
+    The same bytes NumPy 2 on 64-bit Linux wrote natively when the 2026-10-25c identities were
+    recorded, so those identities verify unchanged; the explicit dtype makes the hash portable to
+    platforms whose default integer is 32-bit (review F07 of 2026-10-26: Windows NumPy 1.26).
+    """
+    return hashlib.sha256(np.asarray(pick).astype("<i8").tobytes()).hexdigest()
+
+
 def sha_file(p):
     return hashlib.sha256(open(p, "rb").read()).hexdigest()
 

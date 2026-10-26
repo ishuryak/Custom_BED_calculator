@@ -114,3 +114,15 @@ def test_an_incomplete_stage_is_not_accepted_and_the_previous_release_survives(t
     with pytest.raises(RuntimeError):
         E.publish(str(stage), str(dest))
     assert (tmp_path / "draws.previous" / "draws_manifest.json").read_text() == "old"
+
+
+# --- Version 3.2.1, review F07: the outer-draw selection hash does not depend on the native int width --
+
+def test_selection_hash_is_the_same_for_int32_and_int64_and_matches_the_recorded_identity():
+    import json
+    import fit_refit as F
+    pick = np.linspace(0, 7999, 1000).round()
+    h32, h64 = F.picks_sha256(pick.astype(np.int32)), F.picks_sha256(pick.astype(np.int64))
+    assert h32 == h64
+    ident = json.load(open(os.path.join(ROOT, "fit", "output_refit_2026_10_25c_main", "dd_calibrated_onset7_n1000", "identity.json")))
+    assert h64 == ident["picks_sha256"]

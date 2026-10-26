@@ -118,7 +118,7 @@ def main():
                  data_file_sha256=F.sha_file(F.DATA), stan_sha256=F.sha_file(os.path.join(F.ROOT, "fit", "stan", "dd_cal.stan")),
                  common_sha256=F.sha_file(os.path.join(F.ROOT, "fit", "stan", "common_functions.stanfunctions")),
                  runner_sha256=F.sha_file(os.path.abspath(__file__)), fit_refit_sha256=F.sha_file(F.__file__),
-                 di_variant=di_variant, n_di=ndi, picks_sha256=hashlib.sha256(pick.tobytes()).hexdigest(), onset_min=onset_min,
+                 di_variant=di_variant, n_di=ndi, picks_sha256=F.picks_sha256(pick), onset_min=onset_min,
                  onset_scale=ONSET_SCALE, prior_log_lambda=list(PRIOR_LOG_LAMBDA), prior_c_sd=F.PRIOR_C_SD,
                  inner=INNER, max_attempts=MAX_ATTEMPTS, seed=F.SEED, software=F.versions())
     ident["identity_sha256"] = hashlib.sha256(json.dumps(ident, sort_keys=True).encode()).hexdigest()

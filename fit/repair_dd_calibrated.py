@@ -104,7 +104,7 @@ def main():
     rows, trials, base = F.load()
     di = pd.read_csv(os.path.join(di_dir, "draws_params.csv"))
     pick = np.linspace(0, len(di) - 1, ndi).round().astype(int)
-    if hashlib.sha256(pick.tobytes()).hexdigest() != ident["picks_sha256"]:
+    if F.picks_sha256(pick) != ident["picks_sha256"]:
         sys.exit("REFUSED: DI draw picks differ from the folder's identity.")
     failing = []
     for idx in pick:

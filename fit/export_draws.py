@@ -81,7 +81,7 @@ def check_identity_chain(variant, di_id, dd_id, picks):
         p.append(f"calibrated DD {variant}: parent DI draws differ from those it was fitted on")
     if dd_id.get("di_variant") != variant or di_id.get("variant") != variant:
         p.append(f"{variant}: variant label mismatch")
-    if dd_id.get("picks_sha256") != hashlib.sha256(picks.tobytes()).hexdigest():
+    if dd_id.get("picks_sha256") != C.F.picks_sha256(picks):
         p.append(f"calibrated DD {variant}: outer DI draw selection differs")
     for f, h in di_id["stan_sha256"].items():
         if sha(os.path.join(stan_dir, f)) != h:
