@@ -1,9 +1,19 @@
 {
  "created_by": "fit/export_draws.py",
- "draws_version": "3.1",
+ "draws_version": "3.2",
  "analysis": "verified-trial refit 2026-10-25 (corrected main set): DI posterior; DD calibrated to DI at 35 x 2 Gy in 47 days, fitted conditional on each DI draw",
  "dataset": "refit_trials_2026_10_25c_main.csv",
  "data_sha256": "51ed5d8a2cc60acb86feb2ca694132ed775c797f0e64afccc14714517caa8409",
+ "gate_policy": {
+  "version": "gate-2026-10-26",
+  "divergences": 0,
+  "treedepth_hits": 0,
+  "max_rhat": 1.01,
+  "min_ess_bulk": 400,
+  "min_ess_tail": 400,
+  "min_ebfmi": 0.3,
+  "quantities": "every sampled parameter (vectors included) and every regimen contrast and onset; quantities constant across draws (fixed parameters) have no R-hat or ESS and are excluded"
+ },
  "pairing": "row i of tumor_dd_<variant>.csv was fitted conditional on row i of tumor_di_<variant>.csv",
  "toxicity_pairing": "toxicity prior draws are independent of the tumor draws (assumption)",
  "likelihood": "binomial on rounded N x reported rate (approximation: most rates are KM or CIF estimates)",
@@ -27,14 +37,15 @@
     "min_ess_tail": 1559.58,
     "min_ebfmi": 0.8073911501355053,
     "n_quantities": 82,
+    "ppc_inside_90": 45,
     "gate_pass": true,
-    "ppc_inside_90": 45
+    "gate_policy": "gate-2026-10-26"
    },
    "fit_identity": "2c828af600ee3d7bafd971a00495d5ecbc9e8a47e56136783572995fbdb1a65e",
    "min_ess_bulk": 1489.29
   },
   "tumor_dd_primary.csv": {
-   "sha256": "652d1770ffae720e2adb757c7220a520e523cd87475f82a4291e4f22941f1786",
+   "sha256": "badda372c6297ff6502da9a90670e789959bbd6f43187386bbd16ddd2b0020b0",
    "n_draws": 4000,
    "n_distinct_di_draws": 1000,
    "variant": "primary",
@@ -44,20 +55,23 @@
     "divergences": 0,
     "treedepth_hits": 0,
     "max_rhat": 1.00999,
-    "min_ess_bulk_per_fit": 150.938,
-    "min_ess_tail_per_fit": 263.938,
-    "min_ebfmi": 0.5339924589,
+    "min_ess_bulk_per_fit": 400.094,
+    "min_ess_tail_per_fit": 419.925,
+    "min_ebfmi": 0.5635481042,
     "outer_fits_failing_gate": 0,
-    "outer_fits_retried": 967,
     "gate_pass": true,
-    "outer_fits_repaired": 9
+    "gate_policy": "gate-2026-10-26",
+    "outer_fits_repaired": 9,
+    "outer_fits_repaired_ess": 177,
+    "anchor_max_abs_residual_gy": 3.891356198382212e-08
    },
    "fit_identity": "2a1ab8937a623e1d962e997fa2530c84a22a70c0f2e4f442299be968defa813d",
    "parent_di_identity": "2c828af600ee3d7bafd971a00495d5ecbc9e8a47e56136783572995fbdb1a65e",
-   "min_ess_bulk": 150.938,
+   "min_ess_bulk": 400.094,
    "fitted_onset_below_7": {
-    "n_draws": 13506,
-    "n_outer_fits": 983,
+    "n_draws": 15519,
+    "share": 0.005216624999999999,
+    "n_outer_fits": 988,
     "minimum": 5.0607104
    }
   },
@@ -77,14 +91,15 @@
     "min_ess_tail": 2258.27,
     "min_ebfmi": 0.804976772820588,
     "n_quantities": 82,
+    "ppc_inside_90": 45,
     "gate_pass": true,
-    "ppc_inside_90": 45
+    "gate_policy": "gate-2026-10-26"
    },
    "fit_identity": "a9f4e19b5a3ad6050d629a09486b429248538de554224042e2562413efab3e69",
    "min_ess_bulk": 1304.03
   },
   "tumor_dd_paper_restrictions.csv": {
-   "sha256": "75ee9e8e730082b822b3be99b5385f687f29e7750e36f608dccf78da62193c9b",
+   "sha256": "e11773f2008e1bcf6a7b28ba3940976ed839f1bc63473cadbe94494644df049c",
    "n_draws": 4000,
    "n_distinct_di_draws": 1000,
    "variant": "paper_restrictions",
@@ -94,21 +109,24 @@
     "divergences": 0,
     "treedepth_hits": 0,
     "max_rhat": 1.00998,
-    "min_ess_bulk_per_fit": 160.224,
-    "min_ess_tail_per_fit": 206.262,
-    "min_ebfmi": 0.5952531699,
+    "min_ess_bulk_per_fit": 400.153,
+    "min_ess_tail_per_fit": 402.705,
+    "min_ebfmi": 0.6258758826,
     "outer_fits_failing_gate": 0,
-    "outer_fits_retried": 980,
     "gate_pass": true,
-    "outer_fits_repaired": 12
+    "gate_policy": "gate-2026-10-26",
+    "outer_fits_repaired": 12,
+    "outer_fits_repaired_ess": 272,
+    "anchor_max_abs_residual_gy": 4.482446366860238e-08
    },
    "fit_identity": "0dc103f61f42706c62d5f6e154b8153fdeb8ace1005b80e905cdacf13710e290",
    "parent_di_identity": "a9f4e19b5a3ad6050d629a09486b429248538de554224042e2562413efab3e69",
-   "min_ess_bulk": 160.224,
+   "min_ess_bulk": 400.153,
    "fitted_onset_below_7": {
-    "n_draws": 11393,
-    "n_outer_fits": 976,
-    "minimum": 4.7547276
+    "n_draws": 13884,
+    "share": 0.004221625,
+    "n_outer_fits": 982,
+    "minimum": 5.0523502
    }
   }
  }

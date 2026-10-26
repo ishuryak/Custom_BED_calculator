@@ -12,7 +12,7 @@ draws_dir <- file.path(app_abs, "draws")
 man <- jsonlite::fromJSON(file.path(draws_dir, "draws_manifest.json"), simplifyVector = FALSE)
 
 test_that("the shipped draws come from the corrected verified-trial refit and pass the gate", {
-  expect_identical(man$draws_version, "3.1")
+  expect_identical(man$draws_version, "3.2")   # 3.2: regenerated after the full-gate ESS repair (review R01)
   expect_identical(man$dataset, "refit_trials_2026_10_25c_main.csv")
   data_sha <- digest::digest(file.path(app_abs, "data", man$dataset), algo = "sha256", file = TRUE)
   expect_identical(man$data_sha256, data_sha)

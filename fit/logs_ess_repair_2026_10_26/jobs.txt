@@ -1,0 +1,10 @@
+main data/refit_trials_2026_10_25c_main.csv 1000 primary 3
+main data/refit_trials_2026_10_25c_main.csv 1000 paper_restrictions 3
+effn_half data/refit_trials_2026_10_25c_effn_half.csv 200 primary 3
+km_only data/refit_trials_2026_10_25c_km_only.csv 200 primary 3
+rtog9003_beitler data/refit_trials_2026_10_25c_rtog9003_beitler.csv 200 primary 3
+artscan data/refit_trials_2026_10_25c_artscan.csv 200 primary 3
+chemo data/refit_trials_2026_10_25c_chemo.csv 200 primary 3
+new_trials data/refit_trials_2026_10_25c_new_trials.csv 200 primary 3
+nominal_clock data/refit_trials_2026_10_25c_nominal_clock.csv 200 primary 3
+prior_c10 data/refit_trials_2026_10_25c_main.csv 200 primary 10

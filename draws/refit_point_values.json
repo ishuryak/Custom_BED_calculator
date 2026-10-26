@@ -15,11 +15,11 @@
   "dd": {
    "alpha": 0.0443303995,
    "ab": 10.0,
-   "lambda": 0.40796542,
-   "c_over_alpha": 68.36728440122236,
-   "onset_at_anchor_days": 38.25312341496966,
+   "lambda": 0.40783712,
+   "c_over_alpha": 68.36236656193562,
+   "onset_at_anchor_days": 38.25037176679731,
    "g": 0.012329340316015625,
-   "loss_per_day_after_onset": 9.202836532073212,
+   "lambda_over_alpha": 9.19994235558378,
    "growth_loss_per_day": 0.2781238259767008
   }
  }

@@ -104,6 +104,18 @@ def change_variant(root, src):
     json.dump(i, open(p, "w"))
 
 
+def drop_variant_key(root, src):
+    p = src / "dd_calibrated_onset7_n2" / "identity.json"; i = json.load(open(p)); del i["di_variant"]; json.dump(i, open(p, "w"))
+
+
+def negative_g(root, src):
+    p = src / "di_primary" / "draws_params.csv"; d = pd.read_csv(p); d["g"] = -0.01; d.to_csv(p, index=False)
+    q = src / "dd_calibrated_onset7_n2"
+    for f in q.glob("di_draw_*.csv"):
+        x = pd.read_csv(f); x["g"] = -0.01; x.to_csv(f, index=False)
+    i = json.load(open(q / "identity.json")); i["parent_di_draws_sha256"] = sha(p); json.dump(i, open(q / "identity.json", "w"))
+
+
 def change_pair_tk(root, src):
     p = src / "dd_calibrated_onset7_n2" / "di_draw_00005.csv"; d = pd.read_csv(p); d["Tk"] = 30.0; d.to_csv(p, index=False)
 
@@ -119,6 +131,8 @@ def break_anchor(root, src):
     (change_variant, "variant"),
     (change_pair_tk, "Tk differs from the parent"),
     (break_anchor, "at the anchor"),
+    (drop_variant_key, "variant"),
+    (negative_g, "negative g"),
 ])
 def test_export_refuses_a_broken_identity_chain_and_leaves_draws_untouched(monkeypatch, tmp_path, mutate, msg):
     with pytest.raises(SystemExit) as e:

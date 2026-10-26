@@ -30,3 +30,7 @@ fit/output_refit_*/**/draws_params.csv
 fit/output_refit_*/**/di_draw_*.csv
 fit/output_refit_*/loto_*/
 __pycache__/
+
+# export_draws.py staging folders (review 2026-10-26)
+draws.staging/
+draws.previous/

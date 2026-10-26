@@ -79,7 +79,7 @@ def check_identity_chain(variant, di_id, dd_id, picks):
         p.append(f"calibrated DD {variant} was fitted on another DI fit")
     if dd_id.get("parent_di_draws_sha256") != sha(di_file):
         p.append(f"calibrated DD {variant}: parent DI draws differ from those it was fitted on")
-    if dd_id.get("di_variant", variant) != variant or di_id.get("variant") != variant:
+    if dd_id.get("di_variant") != variant or di_id.get("variant") != variant:
         p.append(f"{variant}: variant label mismatch")
     if dd_id.get("picks_sha256") != hashlib.sha256(picks.tobytes()).hexdigest():
         p.append(f"calibrated DD {variant}: outer DI draw selection differs")
@@ -138,8 +138,9 @@ def export_variant(variant, stage):
     frames = dict(di=pd.DataFrame(rows_di), dd=pd.DataFrame(rows_dd))
     for model, d in frames.items():
         num = d.drop(columns=[c for c in ("di_draw", "dd_chain", "dd_iter") if c in d])
-        if not np.isfinite(num.to_numpy()).all() or (num[["alpha", "ab", "lambda"]] <= 0).any().any():
-            refuse([f"{model} {variant}: non-finite or non-positive alpha, alpha/beta or lambda in the export"])
+        pos = ["alpha", "ab", "lambda"] + (["Tk"] if model == "di" else ["c_over_alpha"])
+        if not np.isfinite(num.to_numpy()).all() or (num[pos] <= 0).any().any() or (num["g"] < 0).any():
+            refuse([f"{model} {variant}: non-finite, non-positive ({', '.join(pos)}) or negative g values in the export"])
         name = f"tumor_{model}_{variant}.csv"
         d.to_csv(os.path.join(stage, name), index=False, float_format="%.10g", lineterminator="\n")
     # Round trip: re-read what was written and check pairing and the anchor on those bytes.

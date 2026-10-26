@@ -1,0 +1,566 @@
+09:29:18 ess-repair fit/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200: 33 of 200 fits fail the gate
+09:29:19 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/0_x4
+09:29:19 - cmdstanpy - INFO - CmdStan start processing
+09:29:19 - cmdstanpy - INFO - Chain [1] start processing
+09:29:19 - cmdstanpy - INFO - Chain [2] start processing
+09:29:19 - cmdstanpy - INFO - Chain [3] start processing
+09:29:19 - cmdstanpy - INFO - Chain [4] start processing
+09:29:29 - cmdstanpy - INFO - Chain [4] done processing
+09:29:34 - cmdstanpy - INFO - Chain [3] done processing
+09:29:34 - cmdstanpy - INFO - Chain [1] done processing
+09:29:35 - cmdstanpy - INFO - Chain [2] done processing
+09:29:35 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:29:37   ess-repair DI draw 0 x4: PASS (ess bulk 609, tail 687, rhat 1.0082)
+09:29:39 ess-repair progress 1/33
+09:29:39 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/161_x4
+09:29:39 - cmdstanpy - INFO - CmdStan start processing
+09:29:39 - cmdstanpy - INFO - Chain [1] start processing
+09:29:39 - cmdstanpy - INFO - Chain [2] start processing
+09:29:39 - cmdstanpy - INFO - Chain [3] start processing
+09:29:39 - cmdstanpy - INFO - Chain [4] start processing
+09:29:47 - cmdstanpy - INFO - Chain [4] done processing
+09:29:52 - cmdstanpy - INFO - Chain [3] done processing
+09:29:55 - cmdstanpy - INFO - Chain [1] done processing
+09:29:58 - cmdstanpy - INFO - Chain [2] done processing
+09:29:58 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:30:02   ess-repair DI draw 161 x4: PASS (ess bulk 923, tail 1716, rhat 1.0029)
+09:30:04 ess-repair progress 2/33
+09:30:04 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/201_x4
+09:30:04 - cmdstanpy - INFO - CmdStan start processing
+09:30:04 - cmdstanpy - INFO - Chain [1] start processing
+09:30:04 - cmdstanpy - INFO - Chain [2] start processing
+09:30:04 - cmdstanpy - INFO - Chain [3] start processing
+09:30:04 - cmdstanpy - INFO - Chain [4] start processing
+09:30:15 - cmdstanpy - INFO - Chain [2] done processing
+09:30:18 - cmdstanpy - INFO - Chain [3] done processing
+09:30:21 - cmdstanpy - INFO - Chain [4] done processing
+09:30:25 - cmdstanpy - INFO - Chain [1] done processing
+09:30:25 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:30:29   ess-repair DI draw 201 x4: PASS (ess bulk 952, tail 1630, rhat 1.0060)
+09:30:31 ess-repair progress 3/33
+09:30:32 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/603_x4
+09:30:32 - cmdstanpy - INFO - CmdStan start processing
+09:30:32 - cmdstanpy - INFO - Chain [1] start processing
+09:30:32 - cmdstanpy - INFO - Chain [2] start processing
+09:30:32 - cmdstanpy - INFO - Chain [3] start processing
+09:30:32 - cmdstanpy - INFO - Chain [4] start processing
+09:30:46 - cmdstanpy - INFO - Chain [2] done processing
+09:30:47 - cmdstanpy - INFO - Chain [1] done processing
+09:30:49 - cmdstanpy - INFO - Chain [4] done processing
+09:30:53 - cmdstanpy - INFO - Chain [3] done processing
+09:30:53 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:30:56   ess-repair DI draw 603 x4: PASS (ess bulk 776, tail 1358, rhat 1.0041)
+09:30:59 ess-repair progress 4/33
+09:30:59 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/844_x4
+09:30:59 - cmdstanpy - INFO - CmdStan start processing
+09:30:59 - cmdstanpy - INFO - Chain [1] start processing
+09:30:59 - cmdstanpy - INFO - Chain [2] start processing
+09:30:59 - cmdstanpy - INFO - Chain [3] start processing
+09:30:59 - cmdstanpy - INFO - Chain [4] start processing
+09:31:15 - cmdstanpy - INFO - Chain [4] done processing
+09:31:17 - cmdstanpy - INFO - Chain [3] done processing
+09:31:21 - cmdstanpy - INFO - Chain [2] done processing
+09:31:21 - cmdstanpy - INFO - Chain [1] done processing
+09:31:21 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:31:26   ess-repair DI draw 844 x4: PASS (ess bulk 751, tail 1303, rhat 1.0028)
+09:31:28 ess-repair progress 5/33
+09:31:28 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/1286_x4
+09:31:28 - cmdstanpy - INFO - CmdStan start processing
+09:31:28 - cmdstanpy - INFO - Chain [1] start processing
+09:31:28 - cmdstanpy - INFO - Chain [2] start processing
+09:31:28 - cmdstanpy - INFO - Chain [3] start processing
+09:31:28 - cmdstanpy - INFO - Chain [4] start processing
+09:31:45 - cmdstanpy - INFO - Chain [4] done processing
+09:31:45 - cmdstanpy - INFO - Chain [2] done processing
+09:31:55 - cmdstanpy - INFO - Chain [3] done processing
+09:31:58 - cmdstanpy - INFO - Chain [1] done processing
+09:31:58 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:32:01   ess-repair DI draw 1286 x4: PASS (ess bulk 966, tail 1909, rhat 1.0035)
+09:32:03 ess-repair progress 6/33
+09:32:03 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/1447_x4
+09:32:03 - cmdstanpy - INFO - CmdStan start processing
+09:32:04 - cmdstanpy - INFO - Chain [1] start processing
+09:32:04 - cmdstanpy - INFO - Chain [2] start processing
+09:32:04 - cmdstanpy - INFO - Chain [3] start processing
+09:32:04 - cmdstanpy - INFO - Chain [4] start processing
+09:32:14 - cmdstanpy - INFO - Chain [3] done processing
+09:32:17 - cmdstanpy - INFO - Chain [2] done processing
+09:32:20 - cmdstanpy - INFO - Chain [1] done processing
+09:32:21 - cmdstanpy - INFO - Chain [4] done processing
+09:32:21 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:32:24   ess-repair DI draw 1447 x4: PASS (ess bulk 854, tail 1622, rhat 1.0037)
+09:32:27 ess-repair progress 7/33
+09:32:28 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/1487_x4
+09:32:28 - cmdstanpy - INFO - CmdStan start processing
+09:32:28 - cmdstanpy - INFO - Chain [1] start processing
+09:32:28 - cmdstanpy - INFO - Chain [2] start processing
+09:32:28 - cmdstanpy - INFO - Chain [3] start processing
+09:32:28 - cmdstanpy - INFO - Chain [4] start processing
+09:32:38 - cmdstanpy - INFO - Chain [3] done processing
+09:32:47 - cmdstanpy - INFO - Chain [4] done processing
+09:32:48 - cmdstanpy - INFO - Chain [1] done processing
+09:32:48 - cmdstanpy - INFO - Chain [2] done processing
+09:32:48 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:32:51   ess-repair DI draw 1487 x4: PASS (ess bulk 776, tail 1024, rhat 1.0047)
+09:32:53 ess-repair progress 8/33
+09:32:53 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/1688_x4
+09:32:53 - cmdstanpy - INFO - CmdStan start processing
+09:32:53 - cmdstanpy - INFO - Chain [1] start processing
+09:32:53 - cmdstanpy - INFO - Chain [2] start processing
+09:32:53 - cmdstanpy - INFO - Chain [3] start processing
+09:32:53 - cmdstanpy - INFO - Chain [4] start processing
+09:33:02 - cmdstanpy - INFO - Chain [3] done processing
+09:33:04 - cmdstanpy - INFO - Chain [1] done processing
+09:33:09 - cmdstanpy - INFO - Chain [2] done processing
+09:33:17 - cmdstanpy - INFO - Chain [4] done processing
+09:33:17 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:33:20   ess-repair DI draw 1688 x4: FAIL max_rhat 1.01086 (ess bulk 824, tail 1693, rhat 1.0109)
+09:33:20 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/1688_x8
+09:33:20 - cmdstanpy - INFO - CmdStan start processing
+09:33:20 - cmdstanpy - INFO - Chain [1] start processing
+09:33:20 - cmdstanpy - INFO - Chain [2] start processing
+09:33:20 - cmdstanpy - INFO - Chain [3] start processing
+09:33:20 - cmdstanpy - INFO - Chain [4] start processing
+09:33:39 - cmdstanpy - INFO - Chain [1] done processing
+09:33:45 - cmdstanpy - INFO - Chain [4] done processing
+09:33:52 - cmdstanpy - INFO - Chain [2] done processing
+09:33:54 - cmdstanpy - INFO - Chain [3] done processing
+09:33:54 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:33:59   ess-repair DI draw 1688 x8: PASS (ess bulk 1608, tail 2694, rhat 1.0033)
+09:34:03 ess-repair progress 9/33
+09:34:03 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/2050_x4
+09:34:03 - cmdstanpy - INFO - CmdStan start processing
+09:34:03 - cmdstanpy - INFO - Chain [1] start processing
+09:34:03 - cmdstanpy - INFO - Chain [2] start processing
+09:34:03 - cmdstanpy - INFO - Chain [3] start processing
+09:34:03 - cmdstanpy - INFO - Chain [4] start processing
+09:34:13 - cmdstanpy - INFO - Chain [1] done processing
+09:34:15 - cmdstanpy - INFO - Chain [2] done processing
+09:34:19 - cmdstanpy - INFO - Chain [3] done processing
+09:34:21 - cmdstanpy - INFO - Chain [4] done processing
+09:34:25   ess-repair DI draw 2050 x4: PASS (ess bulk 966, tail 1878, rhat 1.0034)
+09:34:28 ess-repair progress 10/33
+09:34:28 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/2171_x4
+09:34:28 - cmdstanpy - INFO - CmdStan start processing
+09:34:28 - cmdstanpy - INFO - Chain [1] start processing
+09:34:28 - cmdstanpy - INFO - Chain [2] start processing
+09:34:28 - cmdstanpy - INFO - Chain [3] start processing
+09:34:28 - cmdstanpy - INFO - Chain [4] start processing
+09:34:47 - cmdstanpy - INFO - Chain [4] done processing
+09:34:47 - cmdstanpy - INFO - Chain [3] done processing
+09:34:47 - cmdstanpy - INFO - Chain [1] done processing
+09:34:49 - cmdstanpy - INFO - Chain [2] done processing
+09:34:49 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:34:52   ess-repair DI draw 2171 x4: PASS (ess bulk 865, tail 1691, rhat 1.0044)
+09:34:53 ess-repair progress 11/33
+09:34:54 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/2613_x4
+09:34:54 - cmdstanpy - INFO - CmdStan start processing
+09:34:54 - cmdstanpy - INFO - Chain [1] start processing
+09:34:54 - cmdstanpy - INFO - Chain [2] start processing
+09:34:54 - cmdstanpy - INFO - Chain [3] start processing
+09:34:54 - cmdstanpy - INFO - Chain [4] start processing
+09:35:02 - cmdstanpy - INFO - Chain [1] done processing
+09:35:08 - cmdstanpy - INFO - Chain [4] done processing
+09:35:08 - cmdstanpy - INFO - Chain [3] done processing
+09:35:10 - cmdstanpy - INFO - Chain [2] done processing
+09:35:10 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:35:14   ess-repair DI draw 2613 x4: PASS (ess bulk 764, tail 1126, rhat 1.0038)
+09:35:17 ess-repair progress 12/33
+09:35:17 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/2653_x4
+09:35:17 - cmdstanpy - INFO - CmdStan start processing
+09:35:17 - cmdstanpy - INFO - Chain [1] start processing
+09:35:17 - cmdstanpy - INFO - Chain [2] start processing
+09:35:17 - cmdstanpy - INFO - Chain [3] start processing
+09:35:17 - cmdstanpy - INFO - Chain [4] start processing
+09:35:31 - cmdstanpy - INFO - Chain [2] done processing
+09:35:31 - cmdstanpy - INFO - Chain [1] done processing
+09:35:31 - cmdstanpy - INFO - Chain [4] done processing
+09:35:41 - cmdstanpy - INFO - Chain [3] done processing
+09:35:41 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:35:46   ess-repair DI draw 2653 x4: PASS (ess bulk 836, tail 1524, rhat 1.0028)
+09:35:48 ess-repair progress 13/33
+09:35:48 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/2814_x4
+09:35:48 - cmdstanpy - INFO - CmdStan start processing
+09:35:48 - cmdstanpy - INFO - Chain [1] start processing
+09:35:48 - cmdstanpy - INFO - Chain [2] start processing
+09:35:48 - cmdstanpy - INFO - Chain [3] start processing
+09:35:48 - cmdstanpy - INFO - Chain [4] start processing
+09:35:56 - cmdstanpy - INFO - Chain [2] done processing
+09:36:04 - cmdstanpy - INFO - Chain [4] done processing
+09:36:04 - cmdstanpy - INFO - Chain [3] done processing
+09:36:06 - cmdstanpy - INFO - Chain [1] done processing
+09:36:06 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:36:09   ess-repair DI draw 2814 x4: PASS (ess bulk 578, tail 810, rhat 1.0050)
+09:36:10 ess-repair progress 14/33
+09:36:10 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/3376_x4
+09:36:10 - cmdstanpy - INFO - CmdStan start processing
+09:36:10 - cmdstanpy - INFO - Chain [1] start processing
+09:36:10 - cmdstanpy - INFO - Chain [2] start processing
+09:36:10 - cmdstanpy - INFO - Chain [3] start processing
+09:36:10 - cmdstanpy - INFO - Chain [4] start processing
+09:36:20 - cmdstanpy - INFO - Chain [1] done processing
+09:36:21 - cmdstanpy - INFO - Chain [4] done processing
+09:36:23 - cmdstanpy - INFO - Chain [3] done processing
+09:36:26 - cmdstanpy - INFO - Chain [2] done processing
+09:36:26 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:36:30   ess-repair DI draw 3376 x4: PASS (ess bulk 824, tail 1401, rhat 1.0038)
+09:36:33 ess-repair progress 15/33
+09:36:33 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/3577_x4
+09:36:33 - cmdstanpy - INFO - CmdStan start processing
+09:36:33 - cmdstanpy - INFO - Chain [1] start processing
+09:36:33 - cmdstanpy - INFO - Chain [2] start processing
+09:36:33 - cmdstanpy - INFO - Chain [3] start processing
+09:36:33 - cmdstanpy - INFO - Chain [4] start processing
+09:36:42 - cmdstanpy - INFO - Chain [2] done processing
+09:36:43 - cmdstanpy - INFO - Chain [3] done processing
+09:36:43 - cmdstanpy - INFO - Chain [4] done processing
+09:36:47 - cmdstanpy - INFO - Chain [1] done processing
+09:36:47 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:36:50   ess-repair DI draw 3577 x4: FAIL max_rhat 1.01061 (ess bulk 558, tail 1091, rhat 1.0106)
+09:36:50 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/3577_x8
+09:36:50 - cmdstanpy - INFO - CmdStan start processing
+09:36:50 - cmdstanpy - INFO - Chain [1] start processing
+09:36:50 - cmdstanpy - INFO - Chain [2] start processing
+09:36:50 - cmdstanpy - INFO - Chain [3] start processing
+09:36:50 - cmdstanpy - INFO - Chain [4] start processing
+09:37:08 - cmdstanpy - INFO - Chain [3] done processing
+09:37:15 - cmdstanpy - INFO - Chain [2] done processing
+09:37:16 - cmdstanpy - INFO - Chain [1] done processing
+09:37:31 - cmdstanpy - INFO - Chain [4] done processing
+09:37:31 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:37:36   ess-repair DI draw 3577 x8: PASS (ess bulk 1357, tail 2290, rhat 1.0029)
+09:37:38 ess-repair progress 16/33
+09:37:38 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/3618_x4
+09:37:38 - cmdstanpy - INFO - CmdStan start processing
+09:37:38 - cmdstanpy - INFO - Chain [1] start processing
+09:37:38 - cmdstanpy - INFO - Chain [2] start processing
+09:37:38 - cmdstanpy - INFO - Chain [3] start processing
+09:37:38 - cmdstanpy - INFO - Chain [4] start processing
+09:37:46 - cmdstanpy - INFO - Chain [3] done processing
+09:37:49 - cmdstanpy - INFO - Chain [2] done processing
+09:37:51 - cmdstanpy - INFO - Chain [1] done processing
+09:37:51 - cmdstanpy - INFO - Chain [4] done processing
+09:37:51 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:37:55   ess-repair DI draw 3618 x4: PASS (ess bulk 652, tail 1316, rhat 1.0055)
+09:37:57 ess-repair progress 17/33
+09:37:57 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/3899_x4
+09:37:57 - cmdstanpy - INFO - CmdStan start processing
+09:37:57 - cmdstanpy - INFO - Chain [1] start processing
+09:37:57 - cmdstanpy - INFO - Chain [2] start processing
+09:37:57 - cmdstanpy - INFO - Chain [3] start processing
+09:37:57 - cmdstanpy - INFO - Chain [4] start processing
+09:38:07 - cmdstanpy - INFO - Chain [1] done processing
+09:38:10 - cmdstanpy - INFO - Chain [2] done processing
+09:38:11 - cmdstanpy - INFO - Chain [3] done processing
+09:38:13 - cmdstanpy - INFO - Chain [4] done processing
+09:38:13 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:38:16   ess-repair DI draw 3899 x4: PASS (ess bulk 882, tail 1260, rhat 1.0053)
+09:38:18 ess-repair progress 18/33
+09:38:18 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/3939_x4
+09:38:18 - cmdstanpy - INFO - CmdStan start processing
+09:38:18 - cmdstanpy - INFO - Chain [1] start processing
+09:38:18 - cmdstanpy - INFO - Chain [2] start processing
+09:38:18 - cmdstanpy - INFO - Chain [3] start processing
+09:38:18 - cmdstanpy - INFO - Chain [4] start processing
+09:38:28 - cmdstanpy - INFO - Chain [1] done processing
+09:38:36 - cmdstanpy - INFO - Chain [2] done processing
+09:38:37 - cmdstanpy - INFO - Chain [4] done processing
+09:38:38 - cmdstanpy - INFO - Chain [3] done processing
+09:38:38 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:38:40   ess-repair DI draw 3939 x4: PASS (ess bulk 920, tail 2006, rhat 1.0034)
+09:38:42 ess-repair progress 19/33
+09:38:42 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/4100_x4
+09:38:42 - cmdstanpy - INFO - CmdStan start processing
+09:38:42 - cmdstanpy - INFO - Chain [1] start processing
+09:38:42 - cmdstanpy - INFO - Chain [2] start processing
+09:38:42 - cmdstanpy - INFO - Chain [3] start processing
+09:38:42 - cmdstanpy - INFO - Chain [4] start processing
+09:38:49 - cmdstanpy - INFO - Chain [3] done processing
+09:38:49 - cmdstanpy - INFO - Chain [1] done processing
+09:38:50 - cmdstanpy - INFO - Chain [4] done processing
+09:38:54 - cmdstanpy - INFO - Chain [2] done processing
+09:38:58   ess-repair DI draw 4100 x4: PASS (ess bulk 881, tail 1521, rhat 1.0043)
+09:39:00 ess-repair progress 20/33
+09:39:00 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/4180_x4
+09:39:00 - cmdstanpy - INFO - CmdStan start processing
+09:39:00 - cmdstanpy - INFO - Chain [1] start processing
+09:39:00 - cmdstanpy - INFO - Chain [2] start processing
+09:39:00 - cmdstanpy - INFO - Chain [3] start processing
+09:39:00 - cmdstanpy - INFO - Chain [4] start processing
+09:39:10 - cmdstanpy - INFO - Chain [2] done processing
+09:39:13 - cmdstanpy - INFO - Chain [1] done processing
+09:39:14 - cmdstanpy - INFO - Chain [4] done processing
+09:39:15 - cmdstanpy - INFO - Chain [3] done processing
+09:39:15 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:39:18   ess-repair DI draw 4180 x4: PASS (ess bulk 787, tail 1231, rhat 1.0037)
+09:39:20 ess-repair progress 21/33
+09:39:20 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/4261_x4
+09:39:20 - cmdstanpy - INFO - CmdStan start processing
+09:39:20 - cmdstanpy - INFO - Chain [1] start processing
+09:39:20 - cmdstanpy - INFO - Chain [2] start processing
+09:39:20 - cmdstanpy - INFO - Chain [3] start processing
+09:39:20 - cmdstanpy - INFO - Chain [4] start processing
+09:39:28 - cmdstanpy - INFO - Chain [4] done processing
+09:39:33 - cmdstanpy - INFO - Chain [1] done processing
+09:39:37 - cmdstanpy - INFO - Chain [3] done processing
+09:39:38 - cmdstanpy - INFO - Chain [2] done processing
+09:39:42   ess-repair DI draw 4261 x4: PASS (ess bulk 788, tail 1263, rhat 1.0062)
+09:39:44 ess-repair progress 22/33
+09:39:44 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/4301_x4
+09:39:44 - cmdstanpy - INFO - CmdStan start processing
+09:39:44 - cmdstanpy - INFO - Chain [1] start processing
+09:39:44 - cmdstanpy - INFO - Chain [2] start processing
+09:39:44 - cmdstanpy - INFO - Chain [3] start processing
+09:39:44 - cmdstanpy - INFO - Chain [4] start processing
+09:39:54 - cmdstanpy - INFO - Chain [3] done processing
+09:39:55 - cmdstanpy - INFO - Chain [4] done processing
+09:39:56 - cmdstanpy - INFO - Chain [1] done processing
+09:39:57 - cmdstanpy - INFO - Chain [2] done processing
+09:40:00   ess-repair DI draw 4301 x4: PASS (ess bulk 790, tail 1495, rhat 1.0049)
+09:40:02 ess-repair progress 23/33
+09:40:02 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/4341_x4
+09:40:02 - cmdstanpy - INFO - CmdStan start processing
+09:40:02 - cmdstanpy - INFO - Chain [1] start processing
+09:40:02 - cmdstanpy - INFO - Chain [2] start processing
+09:40:02 - cmdstanpy - INFO - Chain [3] start processing
+09:40:02 - cmdstanpy - INFO - Chain [4] start processing
+09:40:14 - cmdstanpy - INFO - Chain [2] done processing
+09:40:15 - cmdstanpy - INFO - Chain [3] done processing
+09:40:16 - cmdstanpy - INFO - Chain [1] done processing
+09:40:25 - cmdstanpy - INFO - Chain [4] done processing
+09:40:25 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:40:27   ess-repair DI draw 4341 x4: PASS (ess bulk 763, tail 1572, rhat 1.0045)
+09:40:28 ess-repair progress 24/33
+09:40:28 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/4422_x4
+09:40:28 - cmdstanpy - INFO - CmdStan start processing
+09:40:28 - cmdstanpy - INFO - Chain [1] start processing
+09:40:28 - cmdstanpy - INFO - Chain [2] start processing
+09:40:28 - cmdstanpy - INFO - Chain [3] start processing
+09:40:28 - cmdstanpy - INFO - Chain [4] start processing
+09:40:38 - cmdstanpy - INFO - Chain [2] done processing
+09:40:44 - cmdstanpy - INFO - Chain [1] done processing
+09:40:49 - cmdstanpy - INFO - Chain [3] done processing
+09:40:49 - cmdstanpy - INFO - Chain [4] done processing
+09:40:49 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:40:53   ess-repair DI draw 4422 x4: PASS (ess bulk 753, tail 2005, rhat 1.0099)
+09:40:56 ess-repair progress 25/33
+09:40:56 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/5869_x4
+09:40:56 - cmdstanpy - INFO - CmdStan start processing
+09:40:56 - cmdstanpy - INFO - Chain [1] start processing
+09:40:56 - cmdstanpy - INFO - Chain [2] start processing
+09:40:56 - cmdstanpy - INFO - Chain [3] start processing
+09:40:56 - cmdstanpy - INFO - Chain [4] start processing
+09:41:05 - cmdstanpy - INFO - Chain [1] done processing
+09:41:10 - cmdstanpy - INFO - Chain [4] done processing
+09:41:12 - cmdstanpy - INFO - Chain [3] done processing
+09:41:14 - cmdstanpy - INFO - Chain [2] done processing
+09:41:15 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:41:17   ess-repair DI draw 5869 x4: PASS (ess bulk 902, tail 1734, rhat 1.0080)
+09:41:18 ess-repair progress 26/33
+09:41:18 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/5949_x4
+09:41:18 - cmdstanpy - INFO - CmdStan start processing
+09:41:18 - cmdstanpy - INFO - Chain [1] start processing
+09:41:18 - cmdstanpy - INFO - Chain [2] start processing
+09:41:18 - cmdstanpy - INFO - Chain [3] start processing
+09:41:18 - cmdstanpy - INFO - Chain [4] start processing
+09:41:28 - cmdstanpy - INFO - Chain [3] done processing
+09:41:30 - cmdstanpy - INFO - Chain [4] done processing
+09:41:31 - cmdstanpy - INFO - Chain [2] done processing
+09:41:35 - cmdstanpy - INFO - Chain [1] done processing
+09:41:35 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:41:38   ess-repair DI draw 5949 x4: PASS (ess bulk 731, tail 1234, rhat 1.0069)
+09:41:40 ess-repair progress 27/33
+09:41:40 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/5989_x4
+09:41:40 - cmdstanpy - INFO - CmdStan start processing
+09:41:40 - cmdstanpy - INFO - Chain [1] start processing
+09:41:40 - cmdstanpy - INFO - Chain [2] start processing
+09:41:40 - cmdstanpy - INFO - Chain [3] start processing
+09:41:40 - cmdstanpy - INFO - Chain [4] start processing
+09:41:49 - cmdstanpy - INFO - Chain [3] done processing
+09:41:53 - cmdstanpy - INFO - Chain [2] done processing
+09:41:54 - cmdstanpy - INFO - Chain [1] done processing
+09:41:56 - cmdstanpy - INFO - Chain [4] done processing
+09:41:56 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:42:00   ess-repair DI draw 5989 x4: PASS (ess bulk 914, tail 1915, rhat 1.0047)
+09:42:00 ess-repair progress 28/33
+09:42:01 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/6512_x4
+09:42:01 - cmdstanpy - INFO - CmdStan start processing
+09:42:01 - cmdstanpy - INFO - Chain [1] start processing
+09:42:01 - cmdstanpy - INFO - Chain [2] start processing
+09:42:01 - cmdstanpy - INFO - Chain [3] start processing
+09:42:01 - cmdstanpy - INFO - Chain [4] start processing
+09:42:08 - cmdstanpy - INFO - Chain [2] done processing
+09:42:09 - cmdstanpy - INFO - Chain [4] done processing
+09:42:09 - cmdstanpy - INFO - Chain [1] done processing
+09:42:14 - cmdstanpy - INFO - Chain [3] done processing
+09:42:17   ess-repair DI draw 6512 x4: PASS (ess bulk 694, tail 894, rhat 1.0048)
+09:42:19 ess-repair progress 29/33
+09:42:19 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/6753_x4
+09:42:19 - cmdstanpy - INFO - CmdStan start processing
+09:42:19 - cmdstanpy - INFO - Chain [1] start processing
+09:42:19 - cmdstanpy - INFO - Chain [2] start processing
+09:42:19 - cmdstanpy - INFO - Chain [3] start processing
+09:42:19 - cmdstanpy - INFO - Chain [4] start processing
+09:42:33 - cmdstanpy - INFO - Chain [1] done processing
+09:42:38 - cmdstanpy - INFO - Chain [4] done processing
+09:42:39 - cmdstanpy - INFO - Chain [2] done processing
+09:42:40 - cmdstanpy - INFO - Chain [3] done processing
+09:42:40 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:42:43   ess-repair DI draw 6753 x4: PASS (ess bulk 922, tail 1817, rhat 1.0026)
+09:42:45 ess-repair progress 30/33
+09:42:45 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/6914_x4
+09:42:45 - cmdstanpy - INFO - CmdStan start processing
+09:42:45 - cmdstanpy - INFO - Chain [1] start processing
+09:42:45 - cmdstanpy - INFO - Chain [2] start processing
+09:42:45 - cmdstanpy - INFO - Chain [3] start processing
+09:42:45 - cmdstanpy - INFO - Chain [4] start processing
+09:42:57 - cmdstanpy - INFO - Chain [1] done processing
+09:43:01 - cmdstanpy - INFO - Chain [4] done processing
+09:43:01 - cmdstanpy - INFO - Chain [2] done processing
+09:43:02 - cmdstanpy - INFO - Chain [3] done processing
+09:43:02 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:43:07   ess-repair DI draw 6914 x4: PASS (ess bulk 980, tail 2201, rhat 1.0040)
+09:43:09 ess-repair progress 31/33
+09:43:09 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/7115_x4
+09:43:09 - cmdstanpy - INFO - CmdStan start processing
+09:43:09 - cmdstanpy - INFO - Chain [1] start processing
+09:43:09 - cmdstanpy - INFO - Chain [2] start processing
+09:43:09 - cmdstanpy - INFO - Chain [3] start processing
+09:43:09 - cmdstanpy - INFO - Chain [4] start processing
+09:43:20 - cmdstanpy - INFO - Chain [3] done processing
+09:43:21 - cmdstanpy - INFO - Chain [1] done processing
+09:43:21 - cmdstanpy - INFO - Chain [2] done processing
+09:43:24 - cmdstanpy - INFO - Chain [4] done processing
+09:43:24 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:43:29   ess-repair DI draw 7115 x4: PASS (ess bulk 990, tail 1843, rhat 1.0037)
+09:43:30 ess-repair progress 32/33
+09:43:31 - cmdstanpy - INFO - created output directory: /home/ishuryak/.cache/bed_fit_raw/dd_cal_ess/output_refit_2026_10_25c_chemo/dd_calibrated_onset7_n200/7195_x4
+09:43:31 - cmdstanpy - INFO - CmdStan start processing
+09:43:31 - cmdstanpy - INFO - Chain [1] start processing
+09:43:31 - cmdstanpy - INFO - Chain [2] start processing
+09:43:31 - cmdstanpy - INFO - Chain [3] start processing
+09:43:31 - cmdstanpy - INFO - Chain [4] start processing
+09:43:43 - cmdstanpy - INFO - Chain [4] done processing
+09:43:43 - cmdstanpy - INFO - Chain [1] done processing
+09:43:51 - cmdstanpy - INFO - Chain [2] done processing
+09:43:51 - cmdstanpy - INFO - Chain [3] done processing
+09:43:51 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Exception: binomial_lpmf: Probability parameter is nan, but must be in the interval [0, 1] (in 'dd_cal.stan', line 76, column 17 to column 76)
+Consider re-running with show_console=True if the above output is unclear!
+09:43:53   ess-repair DI draw 7195 x4: PASS (ess bulk 1063, tail 1754, rhat 1.0050)
+09:43:55 ess-repair progress 33/33
+09:45:20 lambda_dd {'median': 0.42703278, 'q10': 0.20105916, 'q90': 0.76958441, 'q2_5': 0.1291735, 'q97_5': 1.0402315} divergences 0 failing fits 0 order agreement 0.9117 +- 0.0031
+09:45:20 HYPNO 55 Gy/20 (26 d)                  DI  -1.2 (-3.2,+1.7)  DD  -2.4 (-5.2,+0.2)  same sign 0.809 +- 0.021  onset<7d 0
+09:45:20 HYHOPE-type 46.5 Gy/15 (19 d)          DI  -8.3 (-10.6,-4.9)  DD  -8.6 (-11.2,-5.5)  same sign 1.000 +- 0.000  onset<7d 0
+09:45:20 17 x 3.05 Gy (23 d)                    DI  -2.7 (-4.9,+0.6)  DD  -3.6 (-6.5,-0.7)  same sign 0.922 +- 0.014  onset<7d 0
+09:45:20 60 Gy/25 (33 d)                        DI  +0.7 (-1.3,+3.6)  DD  -1.5 (-3.6,+0.8)  same sign 0.473 +- 0.024  onset<7d 0
+09:45:20 65 Gy/30 (40 d)                        DI  +1.4 (-0.4,+3.7)  DD  -0.8 (-1.9,+0.7)  same sign 0.343 +- 0.018  onset<7d 0
+09:45:20 66 Gy/33 (45 d)                        DI  -2.9 (-3.5,-2.1)  DD  -2.2 (-3.2,-0.8)  same sign 0.961 +- 0.003  onset<7d 0
+09:45:20 30 x 2 Gy (40 d), last week dropped    DI  -5.5 (-7.5,-3.3)  DD  -5.3 (-7.4,-2.7)  same sign 0.993 +- 0.002  onset<7d 0
+09:45:20 33 x 2 Gy, 6 per week (38 d)           DI  +3.1 (+1.0,+5.5)  DD  -0.1 (-1.3,+1.5)  same sign 0.482 +- 0.016  onset<7d 0
+09:45:20 70 Gy/35, 6 per week (40 d)            DI  +6.4 (+4.6,+8.6)  DD  +2.1 (+1.2,+3.1)  same sign 1.000 +- 0.000  onset<7d 0
+09:45:20 68 x 1.2 Gy twice daily (47 d)         DI  +7.5 (+5.9,+8.7)  DD  +4.3 (+1.9,+6.3)  same sign 0.975 +- 0.002  onset<7d 0
