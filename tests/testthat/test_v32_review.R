@@ -239,3 +239,57 @@ test_that("R07: the review's wording corrections are in place", {
   r <- oar_row(lib, "parotid", list(mode = "gy", value = 19), 5, 5, "QUANTEC", ab = 3)
   expect_match(r$flags, "physical source comparison only")
 })
+
+# --- audit decisions (Igor Shuryak, 2026-10-26, "as recommended") -----------------------
+
+test_that("audit 1: report card organ rows carry the alpha/beta-range result and the mean-dose note, with coverage", {
+  shiny::testServer(app_dir, {
+    # cord 84.3% of 52.2 Gy = 44.0 Gy in 18 fractions: within at alpha/beta 2 (limit 44.6), exceeds at 0.87 (43.6)
+    set_32(session, `oar-v_cord` = 84.3, `oar-v_parotid` = 30)
+    rc <- output$report
+    expect_true(grepl("over the α/β range: exceeds for α/β 0.87", rc, fixed = TRUE))
+    expect_true(grepl("physical source limit, the effect of the changed fractionation is not validated", rc, fixed = TRUE))
+    expect_true(grepl("not full protocol compliance", as.character(output$report_notes$html), fixed = TRUE))
+    b <- output$`oar-bench`
+    # the benchmark table lists the published regimens: cord 84.3% of HYPNO control's 66 Gy depends on alpha/beta
+    expect_true(grepl("Over the α/β range / note", b, fixed = TRUE) && grepl("exceeds for α/β 1.1-2 Gy (within otherwise)", b, fixed = TRUE))
+  })
+})
+
+test_that("audit 2: the banner flags a fraction size outside the tumor data, and only then", {
+  shiny::testServer(app_dir, {
+    set_32(session)
+    txt <- function() gsub("\\s+", " ", gsub("<[^>]+>", " ", as.character(output$banner$html)))
+    expect_true(grepl("Extrapolation: 2.9 Gy per fraction is outside the tumor data (1.15-2.55 Gy", txt(), fixed = TRUE))
+    session$setInputs(d = 2)
+    expect_false(grepl("Extrapolation", txt(), fixed = TRUE))
+  })
+})
+
+test_that("audit 3: the default's help text says it is an example, not a recommendation", {
+  h <- ui_html_32()
+  expect_true(grepl("an example schedule chosen by the developer", h, fixed = TRUE))
+  expect_true(grepl("not a recommendation", h, fixed = TRUE))
+})
+
+test_that("audit 4: the Results tab shows both Fowler zones and which one the search uses", {
+  shiny::testServer(app_dir, {
+    set_32(session)
+    z <- as.character(output$acute_zone$html)
+    expect_true(grepl("59–61 Gy₁₀ for radiotherapy alone", z, fixed = TRUE))
+    expect_true(grepl("54–58 Gy₁₀ with concurrent chemotherapy", z, fixed = TRUE))
+    expect_true(grepl("uses the radiotherapy-alone zone", z, fixed = TRUE))
+    session$setInputs(chemo = TRUE)
+    expect_true(grepl("uses the chemotherapy zone", as.character(output$acute_zone$html), fixed = TRUE))
+  })
+})
+
+test_that("audit 5: the organ table labels a mean limit as the source's and a maximum as converted", {
+  shiny::testServer(app_dir, {
+    set_32(session, `oar-v_cord` = 84.3, `oar-v_parotid` = 30)
+    t <- output$`oar-table`
+    expect_false(grepl("Limit, physical in this regimen", t, fixed = TRUE))
+    expect_true(grepl("(source fractionation)", t, fixed = TRUE))
+    expect_true(grepl("(converted to this regimen)", t, fixed = TRUE))
+  })
+})

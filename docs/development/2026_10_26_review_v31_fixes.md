@@ -143,6 +143,25 @@ for chemoradiation. Checked and sound: no stale text naming HYPNO as the default
 conventions, DD calibration description, α and α/β statements, HYPNO and HYHOPE descriptions,
 QUANTEC values, Fowler and Fenwick scope, no recommendation language, organ status logic.
 
+## Audit decisions (Igor Shuryak, 2026-10-26: "as recommended")
+
+All five display items from the clinical audit were approved and applied, each with a block in
+`test_v32_review.R` ("audit 1" to "audit 5") observed red against db4bd3a and green after:
+
+1. Report card organ rows add the α/β-range result for maxima and the cross-fractionation note
+   for physical means, and the coverage sentence ("selected constraint metrics, not full protocol
+   compliance") appears under the card. The organ benchmark table gains the same column. Example:
+   cord 44 Gy in 18 fractions reads "within 5%" at α/β 2 Gy but now also "exceeds for α/β 0.87-1.2 Gy".
+2. The banner flags a fraction size outside the tumor data (the default 2.9 Gy is flagged on every tab).
+3. The default's help text says it is an example schedule, not a published or trial-tested
+   regimen and not a recommendation.
+4. The Results tab shows both Fowler zones (59-61 Gy₁₀ radiotherapy alone, 54-58 Gy₁₀ with
+   chemotherapy) and names the one the search uses.
+5. The organ table's limit column is "Limit, physical (Gy)", each value marked "(source
+   fractionation)" for means or "(converted to this regimen)" for maxima.
+
+Deploy of 3.2.0 to `custom_bed_calculator_v3` (rollback e4ff22f) and push of this branch also approved.
+
 ## Deferred (not in this release)
 
 The optional tumor-share requirement in the uncertainty search, and the review's Phase 4

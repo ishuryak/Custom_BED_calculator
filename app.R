@@ -173,7 +173,8 @@ ui <- page_sidebar(
       accordion_panel("Regimen to evaluate",
         num("m", "Number of fractions", 18, 1, 100, 1),
         num("d", "Dose per fraction (Gy)", 2.9, 0.1, 30, 0.05),
-        helpText("Default: 18 × 2.9 Gy (52.2 Gy). HYPNO's test arm, 55 Gy in 20 fractions, is a benchmark on the Results tab."),
+        helpText("Default: 18 × 2.9 Gy (52.2 Gy), an example schedule chosen by the developer. It is not a published or",
+                 "trial-tested regimen and not a recommendation. HYPNO's tested 55 Gy in 20 fractions is a benchmark on the Results tab."),
         radioButtons("fx_week", "Fractions per week", c("5 (Mon-Fri)" = 5, "6 (Mon-Sat)" = 6), inline = TRUE),
         selectInput("start_day", "First treatment day", WEEKDAYS_IN, selected = 1),
         textInput("skip_days", "Days without treatment (holidays, gaps): calendar day numbers, day 1 = first treatment", ""),
@@ -641,13 +642,17 @@ server <- function(input, output, session) {
   })
 
   output$acute_zone <- renderUI({
-    z <- fowler_zone(isTRUE(input$chemo))
+    # Both zones are shown (audit 2026-10-26): the default acute limit is framed for chemoradiation,
+    # so the radiotherapy-alone zone alone would understate the concern. The checkbox sets which
+    # zone the search's Fowler limit uses.
+    z0 <- fowler_zone(FALSE); z1 <- fowler_zone(TRUE)
     b <- both()
     u <- early_unit()
-    txt <- sprintf(paste("Acute tolerance zone of Fowler et al. (2003): %g–%g Gy₁₀",
-                         "%s. This regimen: %.1f %s. Comparison: %.1f %s."),
-                   z[1], z[2],
-                   if (isTRUE(input$chemo)) "with concurrent chemotherapy (derived from Fowler's possible decrement of 3–5 Gy₁₀)" else "for radiotherapy alone (Fowler 2010 later gave a 59–63 Gy₁₀ gray zone)",
+    txt <- sprintf(paste("Acute tolerance zones of Fowler et al. (2003): %g–%g Gy₁₀ for radiotherapy alone (Fowler 2010",
+                         "later gave a 59–63 Gy₁₀ gray zone), and %g–%g Gy₁₀ with concurrent chemotherapy (derived from",
+                         "Fowler's possible decrement of 3–5 Gy₁₀). The search's Fowler limit uses the %s zone.",
+                         "This regimen: %.1f %s. Comparison: %.1f %s."),
+                   z0[1], z0[2], z1[1], z1[2], if (isTRUE(input$chemo)) "chemotherapy" else "radiotherapy-alone",
                    b$bed_early[1], u, b$bed_early[2], u)
     if (!fowler_defaults())
       txt <- paste(txt, "The zone applies only with Fowler's acute parameters (the defaults), which have been changed.")
@@ -1129,10 +1134,14 @@ server <- function(input, output, session) {
     p <- params(); an <- anchor()
     dd <- if (identical(p$dd_mode, "fitted")) "DD values entered directly (not calibrated)" else sprintf("DD calibrated at %s", regimen_text(an))
     pre <- names(PRESET_LABELS)[PRESET_LABELS == input$preset]
+    sup <- tumor_data_support()
+    extrap <- if (r$d > sup$d_max + 1e-9 || r$d < sup$d_min - 1e-9)
+      tags$div(tags$strong("Extrapolation: "), sprintf("%g Gy per fraction is outside the tumor data (%g-%g Gy per fraction).",
+                                                      r$d, sup$d_min, sup$d_max))
     div(class = "alert alert-primary", style = "padding:0.45rem 0.8rem; margin-bottom:0.5rem;",
         tags$strong("Evaluating "), regimen_text(r), tags$strong(" against "), regimen_text(rf),
         sprintf(" · tumor threshold %+g Gy · %s · tumor preset: %s", checked("min_gain"), dd,
-                if (length(pre)) sub(" \\(.*$", "", sub(":.*$", "", pre)) else input$preset))
+                if (length(pre)) sub(" \\(.*$", "", sub(":.*$", "", pre)) else input$preset), extrap)
   })
 
   limit_values <- reactive({
@@ -1206,8 +1215,13 @@ server <- function(input, output, session) {
                             sprintf("%s, maximum EQD2 (Gy, α/β %g)", o$organ, o$ab)),
           `This regimen` = ifelse(is.na(o$planned_physical), "", sprintf("%.1f", ifelse(mean_m, o$planned_physical, o$planned_eqd2))),
           Comparison = "", d = "", u = "",
-          `Limit and status` = ifelse(is.na(o$limit_physical), o$status,
-                                      sprintf("%s (limit %s%.1f)", o$status, o$operator, ifelse(mean_m, o$limit_physical, o$limit_eqd2))),
+          `Limit and status` = paste0(
+            ifelse(is.na(o$limit_physical), o$status,
+                   sprintf("%s (limit %s%.1f)", o$status, o$operator, ifelse(mean_m, o$limit_physical, o$limit_eqd2))),
+            # audit 2026-10-26: the status alone can hide an alpha/beta-dependent result or the
+            # cross-fractionation limitation of a physical mean comparison
+            ifelse(mean_m, "; physical source limit, the effect of the changed fractionation is not validated",
+                   ifelse(nzchar(o$flip), paste0("; over the α/β range: ", o$flip), ""))),
           check.names = FALSE) |>
           stats::setNames(names(rows)))
       }
@@ -1221,6 +1235,8 @@ server <- function(input, output, session) {
       if (r$d > sup$d_max + 1e-9 || r$d < sup$d_min - 1e-9)
         div(class = "alert alert-warning", sprintf(paste("%g Gy per fraction is outside the tumor data the models were fitted to (%g-%g Gy",
                                                          "per fraction): tumor BEDs at this fraction size are extrapolations."), r$d, sup$d_min, sup$d_max)),
+      if (isTRUE(tryCatch(any(oar()$table$entered), error = function(e) FALSE)))
+        helpText(oar_coverage_text(oar()$coverage)),
       helpText("Organ rows appear when organ doses are entered on the Organs at risk tab. The refit column applies the",
                sprintf(paste("refit's parameter draws (not the sidebar values) to the same two regimens: DI posterior draws and",
                              "calibrated-DD draws, fitted to %d arms of %d randomized trials (%s). Its BED differences use each",

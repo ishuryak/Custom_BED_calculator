@@ -136,7 +136,9 @@ oar_server <- function(id, settings) {
                  `Compared as` = ifelse(is.na(t$basis), "", t$basis),
                  `α/β (Gy)` = sprintf("%g", t$ab),
                  `Limit, EQD2 (Gy)` = num(t$limit_eqd2),
-                 `Limit, physical in this regimen (Gy)` = ifelse(is.na(t$limit_physical), "", sprintf("%s%.1f", t$operator, t$limit_physical)),
+                 `Limit, physical (Gy)` = ifelse(is.na(t$limit_physical), "",
+                                                 sprintf("%s%.1f %s", t$operator, t$limit_physical,
+                                                         ifelse(mean_m, "(source fractionation)", "(converted to this regimen)"))),
                  `Planned, physical (Gy)` = planned_phys,
                  `Planned, EQD2 (Gy)` = ifelse(mean_m & !is.na(t$planned_eqd2), paste(num(t$planned_eqd2), "(illustration)"), num(t$planned_eqd2)),
                  `Margin (Gy, in the compared quantity)` = num(t$margin_gy),
@@ -183,7 +185,9 @@ oar_server <- function(id, settings) {
                    `Compared as` = ifelse(mean_m, "physical mean", "EQD2"),
                    `Planned (Gy)` = sprintf("%.1f", ifelse(mean_m, t$planned_physical, t$planned_eqd2)),
                    `Limit (Gy)` = sprintf("%s%.1f", t$operator, ifelse(mean_m, t$limit_physical, t$limit_eqd2)),
-                   Status = t$status, check.names = FALSE)
+                   Status = t$status,
+                   `Over the α/β range / note` = ifelse(mean_m, "physical source limit; changed fractionation not validated", t$flip),
+                   check.names = FALSE)
       })
       do.call(rbind, rows)
     }, striped = TRUE, bordered = TRUE)
@@ -204,7 +208,7 @@ oar_server <- function(id, settings) {
       })
 
     reactive(list(
-      table = tab(), library = input$library, ab = ab(),
+      table = tab(), library = input$library, ab = ab(), coverage = coverage(),
       percents = if (input$mode == "percent") {
         p <- lapply(stats::setNames(OAR_ORGANS$key, OAR_ORGANS$key), function(k) input[[paste0("v_", k)]])
         p[vapply(p, function(v) is.numeric(v) && length(v) == 1 && is.finite(v), logical(1))]
