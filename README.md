@@ -54,6 +54,29 @@ run_app.bat                     # or: Rscript tools/launch.R
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
 
+## Changes in version 3.2.1
+
+Response to the independent review of version 3.2 (2026-10-26). No BED equation, selection rule,
+draw file or displayed tumor, acute or late number changes. Record: `docs/FIXES.md` and
+`docs/development/2026_10_26_v321_review_fixes.md`.
+
+- **DVH import (F01).** A DVH row with a missing or extra field, or two structures with the same
+  name, is now refused with its line number. Before, a three-column row missing one field was
+  recycled to fill the row and a repeated name replaced the first block, and both could turn an
+  exceeded organ limit into "within".
+- **Diagnostic gate (F02).** Every quantity's R-hat and ESS must be finite before minima are taken,
+  a sampled quantity may not be constant, and counts must be exactly 0, in Python and in R (shared
+  fixture table). Fits from before 3.2.1 kept only per-fit aggregates; only those were re-checked.
+- **Anchor residual (F03)** is now in Gy of BED (shipped maxima 9.8e-7 and 7.8e-7 Gy, tolerance
+  1e-4 Gy). **Repair (F04)** refuses a changed prior, onset penalty, anchor or variant.
+  **Draw publication (F05)** restores the previous release if it fails, and uses a lock.
+- **Text (F06, F07).** The Both-model screen lists regimens at the current settings and does not
+  require 15 of 15 (17 x 3.05 Gy is listed at 12 of 15). Repair count 752. Monte Carlo errors
+  re-measured for named scenarios. Selection hash portable across NumPy integer widths.
+- **Maintenance (M01-M04).** Deploy identity from checked git calls; unused DVH fraction input
+  removed; toxicity shares near the required share shown to one decimal with "meets" or "below";
+  the version 2.6 parts of `References/README.md` marked historical.
+
 ## Changes in version 3.2
 
 From the review of 2026-10-26 (plan `docs/development/PLAN_codex_review_2026_10_26.md`, record `docs/development/2026_10_26_review_v31_fixes.md`).
