@@ -294,6 +294,17 @@ fmt_share <- function(x) {
   ifelse(is.na(x), "not available",
     ifelse(x < 0.05, "<5%", ifelse(x > 0.95, ">95%", sprintf("%d%%", as.integer(round(x * 20) * 5)))))
 }
+# Share within the toxicity limits for the search table. At the ends, and within 5 points of the
+# required share, it also gives the count; near the requirement it gives one decimal and says which
+# side of it the row is on (review M03 of 2026-10-26: 88.7% and 90.3% both displayed as "90%").
+fmt_tox_share <- function(x, n, req) {
+  cnt <- round(x * n)
+  near <- !is.na(x) & abs(x - req) < 0.05
+  ends <- !is.na(x) & (x < 0.05 | x > 0.95) & !near
+  side <- ifelse(x >= req - 1e-12, "meets", "below")
+  ifelse(near, sprintf("%.1f%% (%d of %d; %s the required %g%%)", 100 * x, cnt, n, side, 100 * req),
+         ifelse(ends, sprintf("%s (%d of %d)", fmt_share(x), cnt, n), fmt_share(x)))
+}
 # BEDs in summaries to 0.5 Gy.
 round_half <- function(x) round(x * 2) / 2
 fmt_half <- function(x, plus = TRUE) ifelse(is.na(x), "n/a", sprintf(if (plus) "%+.1f" else "%.1f", round_half(x)))

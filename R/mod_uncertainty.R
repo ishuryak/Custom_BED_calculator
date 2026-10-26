@@ -228,11 +228,7 @@ unc_server <- function(id, settings, oar_policy) {
       f <- r$full
       f <- f[order(f$m, f$d), ]
       req_share <- r$tox_share / 100
-      share_count <- function(x) {
-        cnt <- round(x * f$n_draws)
-        ifelse(x < 0.05 | x > 0.95 | abs(x - req_share) < 0.05,
-               sprintf("%s (%d of %d)", fmt_share(x), cnt, f$n_draws), fmt_share(x))
-      }
+      share_count <- function(x) fmt_tox_share(x, f$n_draws, req_share)
       score <- if (identical(r$rule, "min_q10")) fmt_half(f$min_q10) else fmt_share(f$share_joint)
       data.frame(Row = c(listed = "listed", neighbor = "neighbor", failed_full_check = "failed the all-draw check")[f$role],
                  Fractions = f$m, `Gy per fraction` = sprintf("%.2f", f$d),
