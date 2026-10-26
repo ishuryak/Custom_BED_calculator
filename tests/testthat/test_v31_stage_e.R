@@ -64,7 +64,7 @@ test_that("the refit point values are the calibrated-DD model at the DI medians"
   cal <- dd_calibration(list(m = 35, d = 2, T = 47), pv$di$alpha, pv$di$ab, pv$di$lambda, pv$dd$lambda, pv$di$Tk)
   expect_identical(cal$status, "ok")
   expect_equal(cal$c_over_alpha, pv$dd$c_over_alpha, tolerance = 1e-8)
-  expect_identical(APP_VERSION, "3.2.0")   # 3.2.0: 2026-10-26 review
+  expect_identical(APP_VERSION, "3.2.1")   # 3.2.1: v3.2 review fixes; 3.2.0: 2026-10-26 review
 })
 
 test_that("superseded claims about the old fit are gone from the app text", {
