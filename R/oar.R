@@ -208,14 +208,27 @@ parse_dvh_eclipse <- function(lines) {
   starts <- grep("^\\s*Structure\\s*:", lines)
   if (length(starts) == 0) stop("No 'Structure:' line found: this does not look like an Eclipse DVH text export.")
   ends <- c(starts[-1] - 1, length(lines))
-  out <- list()
+  out <- list(); first_line <- integer()
   for (k in seq_along(starts)) {
     blk <- lines[starts[k]:ends[k]]
-    name <- trimws(sub("^\\s*Structure\\s*:", "", blk[1]))
+    name <- gsub("\\s+", " ", trimws(sub("^\\s*Structure\\s*:", "", blk[1])))
     # The table header names both columns; metadata lines such as "Max Dose [cGy]: ..." do not.
     h <- grep("Dose \\[c?Gy\\].*Volume \\[", blk)
     if (length(h) == 0) next
+    # A blank or repeated structure name is refused before anything is stored (review F01 of
+    # 2026-10-26): a second block of the same name used to replace the first silently.
+    if (!nzchar(name)) stop("Line ", starts[k], ": the structure has no name.")
+    if (name %in% names(out))
+      stop("Structure '", name, "' appears more than once (lines ", first_line[[name]], " and ", starts[k],
+           "). Export each structure once, or rename one of them.")
+    first_line[[name]] <- starts[k]
     hdr <- blk[h[1]]
+    # Columns are the header's bracketed units, in order: "Dose [Gy]", optional "Relative dose [%]",
+    # "... Volume [%]". Every data row must have exactly that many fields (review F01).
+    cols <- regmatches(hdr, gregexpr("[^\\[\\]]*\\[[^]]*\\]", hdr, perl = TRUE))[[1]]
+    n_fields <- length(cols)
+    dcol <- grep("(^|\\s)Dose \\[c?Gy\\]", cols)[1]
+    vcol <- grep("Volume \\[", cols)[1]
     scale <- dvh_unit_scale(regmatches(hdr, regexpr("Dose \\[c?Gy\\]", hdr)))
     vol_unit <- if (grepl("Volume \\[%\\]", hdr)) "%" else if (grepl("Volume \\[(cm\u00b3|cm3|cc)\\]", hdr)) "cc" else NA
     if (is.na(vol_unit)) stop("Structure '", name, "': volume column must be in % or cm\u00b3.")
@@ -228,10 +241,13 @@ parse_dvh_eclipse <- function(lines) {
       v <- suppressWarnings(as.numeric(tok))
       if (length(tok) < 2 || any(is.na(v)) || any(!is.finite(v)))
         stop("Structure '", name, "', line ", line_no[i], ": not a row of finite numbers ('", trimws(rows[i]), "').")
+      if (length(tok) != n_fields)
+        stop("Structure '", name, "', line ", line_no[i], ": ", length(tok), " fields where the column header has ",
+             n_fields, " fields ('", trimws(rows[i]), "').")
     }
     if (length(rows) < 2) stop("Structure '", name, "': fewer than two DVH rows.")
-    num <- suppressWarnings(do.call(rbind, lapply(strsplit(trimws(rows), "\\s+"), as.numeric)))
-    out[[name]] <- data.frame(dose = num[, 1] * scale, volume = num[, ncol(num)])
+    num <- matrix(as.numeric(unlist(strsplit(trimws(rows), "\\s+"))), ncol = n_fields, byrow = TRUE)
+    out[[name]] <- data.frame(dose = num[, dcol] * scale, volume = num[, vcol])
     validate_dvh(out[[name]]$dose, out[[name]]$volume, vol_unit, sprintf("Structure '%s'", name))
     attr(out[[name]], "volume_unit") <- vol_unit
   }
@@ -243,6 +259,14 @@ parse_dvh_eclipse <- function(lines) {
 # structure column. Units come from the header: "cGy" or "Gy"; "%" or
 # "cc"/"cm3". A generic format for exports from any planning system.
 parse_dvh_csv <- function(lines) {
+  # Every line must have the header's field count: read.csv would otherwise pad a short row with NA or
+  # wrap a long one into a new row (review F01 of 2026-10-26).
+  body <- lines[nzchar(trimws(lines))]
+  nf <- utils::count.fields(textConnection(body), sep = ",", quote = "\"", blank.lines.skip = FALSE)
+  bad <- which(is.na(nf) | nf != nf[1])
+  if (length(bad))
+    stop(sprintf("Line %d has %s fields where the header has %d.", which(nzchar(trimws(lines)))[bad[1]],
+                 if (is.na(nf[bad[1]])) "an unreadable number of" else nf[bad[1]], nf[1]))
   x <- utils::read.csv(text = paste(lines, collapse = "\n"), check.names = FALSE, stringsAsFactors = FALSE,
                        colClasses = "character")
   nm <- names(x)
@@ -261,7 +285,15 @@ parse_dvh_csv <- function(lines) {
   if (is.na(scale)) stop("The dose column header must give the unit, Gy or cGy (e.g. 'Dose (Gy)').")
   vol_unit <- if (grepl("%", nm[vcol])) "%" else if (grepl("cc|cm3|cm\u00b3", nm[vcol], ignore.case = TRUE)) "cc" else NA
   if (is.na(vol_unit)) stop("The volume column header must give the unit, % or cc (e.g. 'Volume (%)').")
-  groups <- if (length(scol) == 1) split(seq_len(nrow(x)), x[[scol]]) else list(structure = seq_len(nrow(x)))
+  if (length(scol) == 1) {
+    s <- gsub("\\s+", " ", trimws(x[[scol]]))
+    if (any(!nzchar(s))) stop("Data row ", which(!nzchar(s))[1], ": the structure has no name.")
+    runs <- rle(s)$values
+    dup <- unique(runs[duplicated(runs)])
+    if (length(dup)) stop("Structure '", dup[1], "' appears more than once, in separate blocks of rows. ",
+                          "Export each structure once, or rename one of them.")
+    groups <- split(seq_len(nrow(x)), factor(s, levels = unique(s)))
+  } else groups <- list(structure = seq_len(nrow(x)))
   lapply(stats::setNames(names(groups), names(groups)), function(g) {
     ix <- groups[[g]]
     d <- suppressWarnings(data.frame(dose = as.numeric(x[[dcol]][ix]) * scale, volume = as.numeric(x[[vcol]][ix])))
