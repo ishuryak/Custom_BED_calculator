@@ -172,3 +172,5 @@ Carlo precision study and validation against evidence not used in the fit.
 ## Release
 
 Deployed 2026-10-26 from 66027d5 to `custom_bed_calculator_v3` only (48-file bundle, every file tracked). Before: suite 5394 expectations, 0 failed, marker for 66027d5; Python 70 passed; local walkthrough 35 of 35. After: live walkthrough 35 of 35, title version 3.2; v1 and v2 respond unchanged. Rollback: redeploy e4ff22f (3.1.0).
+
+Correction after release: the clinical auditor described the 2.55 Gy arm as an early glottic trial, and that was copied into the About page. The extraction and the publication title (O'Sullivan 2020) show the Princess Margaret Hospital trial in T3-T4 or node-positive oropharynx, hypopharynx and larynx cancer (51 Gy in 20 once-daily fractions vs 58 Gy in 40 twice-daily). Corrected and redeployed the same day.
