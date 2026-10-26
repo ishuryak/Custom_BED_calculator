@@ -1,0 +1,16 @@
+revision f1a81edd3101c97a0cccb342b565ffbf262ddbae 2026-10-26T09:10:33-04:00
+5289517a57fd00919b60c5e7c5244f90b506b364eff2d0c5ae3bbc02721e4fa4  fit/repair_dd_ess.py
+403caf213e03f1c83bf0d16ffa3c6bf7fe12276d9dd6286d8ab26c9175e014ec  fit/fit_dd_calibrated.py
+e9e4c6fd04b87a675f4c36a4e0bfcbb868ea58e1f2aed1e9216d6357d8fef1c5  fit/fit_refit.py
+03a22c7e8920fc42de0f826aca1c7b91201b0fb08e3e875b6bcc2b1649a5bd88  fit/gate.py
+DONE rtog9003_beitler primary 2026-10-26T09:28:33-04:00
+DONE effn_half primary 2026-10-26T09:28:41-04:00
+DONE km_only primary 2026-10-26T09:29:41-04:00
+DONE new_trials primary 2026-10-26T09:43:29-04:00
+DONE chemo primary 2026-10-26T09:45:21-04:00
+DONE artscan primary 2026-10-26T09:46:07-04:00
+DONE nominal_clock primary 2026-10-26T10:00:14-04:00
+DONE prior_c10 primary 2026-10-26T10:07:42-04:00
+DONE main primary 2026-10-26T10:30:13-04:00
+DONE main paper_restrictions 2026-10-26T10:47:34-04:00
+ALLDONE 2026-10-26T10:47:34-04:00

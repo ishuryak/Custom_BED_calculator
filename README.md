@@ -32,6 +32,7 @@ Every tab compares the evaluated regimen with one comparison regimen and one tum
 - `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`, `deploy.R` (publishes to shinyapps.io as `custom_bed_calculator_v3` only; refuses the version 1 and 2 names; pinned account; clean tree; suite passed on the same revision).
 - `.rscignore`: keeps `References/`, `tests/`, `docs/`, `fit/`, `.Rhistory` and `.Renviron` out of a shinyapps.io deployment.
 - `docs/FIXES.md`: one row per landed change, with its evidence.
+- `docs/user_guide/`: user guide to version 3.2 (every tab and menu item, the model fitting and its literature, and the uncertainty estimation), as Word and Markdown.
 - `docs/development/`: review records and plans. For version 3 start with `2026_10_21_v3_build.md` and `2026_10_21_v3/fit_report.md`. For version 3.1, `PLAN_codex_review_2026_10_25.md` and `2026_10_25_stages_BCDE_refit.md`.
 - `renv.lock`: the release package versions (R 4.5.1), all from the Posit Package Manager snapshot of 2026-10-15, which serves binaries of exactly these versions for Windows, macOS and Linux.
 - `References/`: sources, with `References/README.md` giving each one's license and the quoted parameter values. Paywalled or non-redistributable PDFs are git-ignored.
