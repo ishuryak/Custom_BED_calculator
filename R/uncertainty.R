@@ -84,12 +84,20 @@ load_draws <- function(model = c("di", "dd"), variant = "primary", dir = DRAWS_D
 # or the per-fit minima of the conditional DD fits). Missing values fail.
 DRAWS_GATE <- list(max_rhat = 1.01, min_ess = 400, min_ebfmi = 0.3)
 draws_gate_failures <- function(dg) {
-  g <- function(...) { for (k in c(...)) if (!is.null(dg[[k]])) return(as.numeric(dg[[k]])); NA_real_ }
+  # One finite number per diagnostic, or NA (fails): +Inf ESS or -Inf R-hat used to satisfy the
+  # inequalities below, and a negative count is invalid, not better (review F02 of 2026-10-26).
+  g <- function(...) {
+    for (k in c(...)) if (!is.null(dg[[k]])) {
+      x <- suppressWarnings(as.numeric(dg[[k]]))
+      return(if (length(x) == 1 && !is.logical(dg[[k]]) && is.finite(x)) x else NA_real_)
+    }
+    NA_real_
+  }
   v <- c(divergences = g("divergences"), treedepth_hits = g("treedepth_hits"), max_rhat = g("max_rhat"),
          ess_bulk = g("min_ess_bulk", "min_ess_bulk_per_fit"), ess_tail = g("min_ess_tail", "min_ess_tail_per_fit"),
          ebfmi = g("min_ebfmi"))
   ok <- c(divergences = v[["divergences"]] == 0, treedepth_hits = v[["treedepth_hits"]] == 0,
-          max_rhat = v[["max_rhat"]] <= DRAWS_GATE$max_rhat, ess_bulk = v[["ess_bulk"]] >= DRAWS_GATE$min_ess,
+          max_rhat = v[["max_rhat"]] > 0 && v[["max_rhat"]] <= DRAWS_GATE$max_rhat, ess_bulk = v[["ess_bulk"]] >= DRAWS_GATE$min_ess,
           ess_tail = v[["ess_tail"]] >= DRAWS_GATE$min_ess, ebfmi = v[["ebfmi"]] >= DRAWS_GATE$min_ebfmi)
   ok[is.na(ok)] <- FALSE
   sprintf("%s %s", names(ok)[!ok], format(v[!ok], digits = 4))

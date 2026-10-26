@@ -185,8 +185,12 @@ def diagnostics(f, sampled, max_treedepth=12):
     rh, eb, et = col("r_hat"), col("ess_bulk"), col("ess_tail")
     names = [i for i in s.index if i.split("[")[0] in set(sampled) | {"c", "z", "delta_eval"}]
     sub = s.loc[names]
-    # Columns that are constant (e.g. a fixed parameter) have no defined R-hat or ESS.
-    sub = sub[sub["StdDev"] > 0] if "StdDev" in sub.columns else sub
+    # Every quantity is checked on its own before min/max, which skip NaN (review F02). A quantity
+    # constant across draws is a failure, not an exclusion: none of these models samples a fixed one.
+    import pandas as pd
+    tab = pd.DataFrame(dict(rhat=sub[rh], ess_bulk=sub[eb], ess_tail=sub[et],
+                            sd=sub["StdDev"] if "StdDev" in sub.columns else np.nan), index=sub.index)
+    bad = G.invalid_quantities(tab, list(sampled) + ["delta_eval"])
     mv = f.method_variables()
     div = int(mv["divergent__"].sum())
     tdh = int((mv["treedepth__"] >= max_treedepth).sum())
@@ -195,7 +199,7 @@ def diagnostics(f, sampled, max_treedepth=12):
     res = dict(divergences=div, treedepth_hits=tdh, max_rhat=float(sub[rh].max()), worst_rhat=str(sub[rh].idxmax()),
                min_ess_bulk=float(sub[eb].min()), worst_ess_bulk=str(sub[eb].idxmin()),
                min_ess_tail=float(sub[et].min()), worst_ess_tail=str(sub[et].idxmin()),
-               min_ebfmi=float(min(ebfmi)), n_quantities=int(len(sub)))
+               min_ebfmi=float(min(ebfmi)), n_quantities=int(len(sub)), invalid_quantities=bad)
     res["gate_pass"] = G.passes(res)
     res["gate_policy"] = G.POLICY["version"]
     return res

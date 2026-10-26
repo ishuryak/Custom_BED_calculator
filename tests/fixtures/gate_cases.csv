@@ -1,0 +1,16 @@
+case,divergences,treedepth_hits,max_rhat,min_ess_bulk,min_ess_tail,min_ebfmi,expect_pass
+good,0,0,1.001,900,800,0.9,TRUE
+ess_bulk_missing,0,0,1.001,,800,0.9,FALSE
+ess_bulk_nan,0,0,1.001,NaN,800,0.9,FALSE
+ess_bulk_pos_inf,0,0,1.001,Inf,800,0.9,FALSE
+ess_tail_json_1e999,0,0,1.001,900,1e999,0.9,FALSE
+ebfmi_pos_inf,0,0,1.001,900,800,Inf,FALSE
+rhat_neg_inf,0,0,-Inf,900,800,0.9,FALSE
+rhat_zero,0,0,0,900,800,0.9,FALSE
+rhat_text,0,0,abc,900,800,0.9,FALSE
+divergences_negative,-1,0,1.001,900,800,0.9,FALSE
+treedepth_negative,0,-2,1.001,900,800,0.9,FALSE
+divergences_fractional,0.5,0,1.001,900,800,0.9,FALSE
+divergences_one,1,0,1.001,900,800,0.9,FALSE
+ess_low,0,0,1.001,399.9,800,0.9,FALSE
+rhat_high,0,0,1.0101,900,800,0.9,FALSE
