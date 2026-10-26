@@ -1,5 +1,16 @@
 # References for the HNSCC BED calculator v2 (acute mucosal and late toxicity BED)
 
+**Status in version 3.2.1 (2026-10-26).** This ledger was written for version 2 and is kept as a
+historical record of how each source was found and checked. Two parts no longer describe the
+current app. (1) Section G lists the version 2.6 defaults. The current defaults are on the app's
+"Model and sources" page and in `docs/user_guide/HNSCC_BED_v321_user_guide.md`: evaluated regimen
+18 x 2.9 Gy, comparison 35 x 2 Gy in 47 days, tumor threshold +1 Gy, Search criterion "both
+models" ranked by the smaller change, and a Both-model screen using the global comparison and
+threshold with 1 day saved. (2) Sections F and "Files in this folder" say the full texts are held
+here. In this repository `References/` holds only this file. The local, git-ignored copies are
+in the project folder above the repository: its top level and `References/` (version 2 sources),
+`References_OAR/` (organ constraints) and `References_refit_trials/` (refit trials).
+
 Compiled 2026-10-18. Every entry below was confirmed to exist via PubMed E-utilities
 (esearch/esummary/efetch) and, for DOIs, Crossref and/or Unpaywall. Open-access status
 was taken from Unpaywall (queried 2026-10-18). Downloaded files were opened and their
@@ -260,7 +271,7 @@ These PDFs sit in this folder but are git-ignored (`References/*.pdf`), because 
 
 Still missing (not held): HYPNO Appendix E1 / Figure E1; HYHOPE outcomes supplements E1/E2; Miller 2026 Supplemental Table 1.
 
-## G. Current parameter ledger (version 2.6)
+## G. Current parameter ledger (version 2.6), historical since version 3 (see the status note at the top)
 
 Every numeric model input and default search setting the app ships, with its origin. Direct = stated by the source; conversion = derived from a source value by the stated rule; chosen = a representative or completing value set for this calculator; analyst = a constructed scenario, not a source estimate. The same table, for the tumor presets, is on the app's "Model and sources" page.
 
