@@ -20,7 +20,7 @@ deploy_preflight <- function(app_name, expected_app, accounts, account, dirty,
   if (length(dirty) > 0)
     stop("Tracked files have uncommitted changes; commit them first so the deployed revision is known:\n",
          paste(dirty, collapse = "\n"), call. = FALSE)
-  if (!is.null(head) && !identical(head, passed))
+  if (!is.null(head) && (length(head) != 1 || is.na(head) || !nzchar(head) || !identical(head, passed)))
     stop("The full test suite has not passed on this revision (", substr(head, 1, 7), "). Run Rscript tools/run_tests.R first.",
          call. = FALSE)
   invisible(TRUE)
@@ -66,4 +66,20 @@ release_revision <- function(git = git_run) {
   if (d$status != 0) return(list(ok = FALSE, why = "git status failed"))
   if (length(d$out[nzchar(d$out)]) > 0) return(list(ok = FALSE, why = "tracked files have uncommitted changes"))
   list(ok = TRUE, rev = rev)
+}
+
+# Everything deploy.R needs from git, checked before anything is written or uploaded (review M01
+# of the 2026-10-26 v3.2 review: deploy.R used unchecked system() calls). Returns list(rev, tracked)
+# or stops: HEAD must be one 40-character hash with a clean tracked tree (release_revision()), the
+# suite marker must name exactly that hash, and `git ls-files` must succeed and list files.
+deploy_identity <- function(git = git_run, marker = ".suite_passed") {
+  rr <- release_revision(git)
+  if (!rr$ok) stop("Cannot identify the revision to deploy: ", rr$why, ".", call. = FALSE)
+  passed <- if (file.exists(marker)) readLines(marker, warn = FALSE) else character()
+  if (length(passed) != 1 || !grepl("^[0-9a-f]{40}$", passed) || !identical(passed, rr$rev))
+    stop("The full test suite has not passed on this revision (", substr(rr$rev, 1, 7),
+         "). Run Rscript tools/run_tests.R first.", call. = FALSE)
+  ls <- git(c("ls-files"))
+  if (ls$status != 0 || !length(ls$out[nzchar(ls$out)])) stop("git ls-files failed or listed nothing.", call. = FALSE)
+  list(rev = rr$rev, passed = passed, tracked = ls$out[nzchar(ls$out)])
 }

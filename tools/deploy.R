@@ -19,16 +19,16 @@ if (!requireNamespace("rsconnect", quietly = TRUE)) {
   install.packages("rsconnect", lib = deploy_lib, repos = LOCK_REPO,
                    type = if (.Platform$OS.type == "windows") "win.binary" else getOption("pkgType"))
 }
-head <- system("git rev-parse HEAD", intern = TRUE)
-passed <- if (file.exists(".suite_passed")) readLines(".suite_passed", n = 1) else NA_character_
-dirty <- system("git status --porcelain --untracked-files=no", intern = TRUE)
-deploy_preflight(APP_NAME, "custom_bed_calculator_v3", rsconnect::accounts(), ACCOUNT, dirty,
+# Checked git calls only (review M01): stops before anything is written or uploaded.
+id <- deploy_identity()
+head <- id$rev; passed <- id$passed
+deploy_preflight(APP_NAME, "custom_bed_calculator_v3", rsconnect::accounts(), ACCOUNT, character(),
                  head = head, passed = passed)
 writeLines(head, "deployed_revision.txt")   # shown on the Model and sources page
 cat("Deploying revision", head, "\n")
 environment_report()
 files <- rsconnect::listDeploymentFiles(".")
-check_bundle(files, tracked = system("git ls-files", intern = TRUE))
+check_bundle(files, tracked = id$tracked)
 cat("Files:", files, "\n")
 rsconnect::deployApp(appDir = ".", appName = APP_NAME,
                      appTitle = "HNSCC BED calculator, version 3",
