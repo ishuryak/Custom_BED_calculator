@@ -147,3 +147,13 @@ def test_export_refuses_a_failing_gate(monkeypatch, tmp_path, kw):
     with pytest.raises(SystemExit) as e:
         run_export(monkeypatch, tmp_path, **kw)
     assert "REFUSED" in str(e.value) and "gate" in str(e.value)
+
+
+def test_v321_a_held_export_lock_refuses_and_leaves_draws_untouched(monkeypatch, tmp_path):
+    """Review F05: two exports must not publish into the same folder at once."""
+    (tmp_path / "draws.export.lock").write_text("held")
+    with pytest.raises(SystemExit) as e:
+        run_export(monkeypatch, tmp_path)
+    assert "export.lock" in str(e.value)
+    assert (tmp_path / "draws" / "sentinel.txt").read_text() == "previous generation"
+    assert not [p for p in tmp_path.iterdir() if ".staging" in p.name]

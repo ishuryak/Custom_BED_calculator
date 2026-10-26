@@ -5,15 +5,16 @@
  "dataset": "refit_trials_2026_10_25c_main.csv",
  "data_sha256": "51ed5d8a2cc60acb86feb2ca694132ed775c797f0e64afccc14714517caa8409",
  "gate_policy": {
-  "version": "gate-2026-10-26",
+  "version": "gate-2026-10-27",
   "divergences": 0,
   "treedepth_hits": 0,
   "max_rhat": 1.01,
   "min_ess_bulk": 400,
   "min_ess_tail": 400,
   "min_ebfmi": 0.3,
-  "quantities": "every sampled parameter (vectors included) and every regimen contrast and onset; quantities constant across draws (fixed parameters) have no R-hat or ESS and are excluded"
+  "quantities": "every sampled parameter (vectors included) and every regimen contrast; each one must have a finite R-hat and ESS of its own, checked before any minimum or maximum is taken, and none may be constant across draws (no model in this project samples a fixed quantity)"
  },
+ "per_quantity_check": "the per-quantity part of the gate (each quantity finite and non-constant before aggregation, gate-2026-10-27) runs inside the fitting code; fits made before version 3.2.1 kept only per-fit aggregates, so for them only the aggregate checks were re-applied here",
  "pairing": "row i of tumor_dd_<variant>.csv was fitted conditional on row i of tumor_di_<variant>.csv",
  "toxicity_pairing": "toxicity prior draws are independent of the tumor draws (assumption)",
  "likelihood": "binomial on rounded N x reported rate (approximation: most rates are KM or CIF estimates)",
@@ -39,7 +40,7 @@
     "n_quantities": 82,
     "ppc_inside_90": 45,
     "gate_pass": true,
-    "gate_policy": "gate-2026-10-26"
+    "gate_policy": "gate-2026-10-27"
    },
    "fit_identity": "2c828af600ee3d7bafd971a00495d5ecbc9e8a47e56136783572995fbdb1a65e",
    "min_ess_bulk": 1489.29
@@ -60,10 +61,10 @@
     "min_ebfmi": 0.5635481042,
     "outer_fits_failing_gate": 0,
     "gate_pass": true,
-    "gate_policy": "gate-2026-10-26",
+    "gate_policy": "gate-2026-10-27",
     "outer_fits_repaired": 9,
     "outer_fits_repaired_ess": 177,
-    "anchor_max_abs_residual_gy": 3.891356198382212e-08
+    "anchor_max_abs_residual_gy": 9.839974020407748e-07
    },
    "fit_identity": "2a1ab8937a623e1d962e997fa2530c84a22a70c0f2e4f442299be968defa813d",
    "parent_di_identity": "2c828af600ee3d7bafd971a00495d5ecbc9e8a47e56136783572995fbdb1a65e",
@@ -93,7 +94,7 @@
     "n_quantities": 82,
     "ppc_inside_90": 45,
     "gate_pass": true,
-    "gate_policy": "gate-2026-10-26"
+    "gate_policy": "gate-2026-10-27"
    },
    "fit_identity": "a9f4e19b5a3ad6050d629a09486b429248538de554224042e2562413efab3e69",
    "min_ess_bulk": 1304.03
@@ -114,10 +115,10 @@
     "min_ebfmi": 0.6258758826,
     "outer_fits_failing_gate": 0,
     "gate_pass": true,
-    "gate_policy": "gate-2026-10-26",
+    "gate_policy": "gate-2026-10-27",
     "outer_fits_repaired": 12,
     "outer_fits_repaired_ess": 272,
-    "anchor_max_abs_residual_gy": 4.482446366860238e-08
+    "anchor_max_abs_residual_gy": 7.751835982470001e-07
    },
    "fit_identity": "0dc103f61f42706c62d5f6e154b8153fdeb8ace1005b80e905cdacf13710e290",
    "parent_di_identity": "a9f4e19b5a3ad6050d629a09486b429248538de554224042e2562413efab3e69",

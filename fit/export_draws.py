@@ -43,7 +43,7 @@ N_OUTER = int(os.environ.get("BED_EXPORT_DD_N", "1000"))
 K = 4
 DRAWS = os.environ.get("BED_EXPORT_TO", os.path.join(ROOT, "draws"))
 DRAWS_VERSION = "3.2"
-ANCHOR_TOL = 1e-4   # Gy, after CSV round trip (actual residuals are recorded in the manifest)
+ANCHOR_TOL = 1e-4   # Gy of BED, after CSV round trip (actual residuals are recorded in the manifest)
 PARENT_COLS = ("alpha", "ab", "g", "lambda", "Tk")
 VARIANTS = {"primary": "alpha/beta and g estimated",
             "paper_restrictions": "alpha/beta fixed at 10 Gy and g at 0.0154 per day, as in the 2018 paper"}
@@ -93,12 +93,20 @@ def check_identity_chain(variant, di_id, dd_id, picks):
 
 
 def anchor_residual(di_rows, dd_rows):
-    """|DD - DI| repopulation at the anchor for every exported pair (Gy)."""
+    """|DD - DI| BED at the anchor for every exported pair, in Gy.
+
+    rep_di/rep_dd are repopulation in log cell units; dividing by the pair's alpha gives BED in Gy
+    (review F03 of 2026-10-26: the undivided log-cell value was compared with a Gy tolerance).
+    """
     n0, d0, T0 = C.ANCHOR
+    alpha = dd_rows.alpha.to_numpy()
+    if not (np.all(np.isfinite(alpha)) and np.all(alpha > 0)
+            and np.array_equal(alpha, di_rows.alpha.to_numpy())):
+        refuse(["anchor check: alpha must be finite, positive and the same in each DI/DD pair"])
     r_di = C.rep_di(di_rows["lambda"].to_numpy(), di_rows.Tk.to_numpy(), T0)
-    r_dd = C.rep_dd(dd_rows.alpha.to_numpy(), dd_rows.ab.to_numpy(), dd_rows["lambda"].to_numpy(),
+    r_dd = C.rep_dd(alpha, dd_rows.ab.to_numpy(), dd_rows["lambda"].to_numpy(),
                     dd_rows.c_over_alpha.to_numpy(), n0, d0, T0)
-    return np.abs(r_dd - r_di)
+    return np.abs(r_dd - r_di) / alpha
 
 
 def export_variant(variant, stage):
@@ -196,11 +204,54 @@ def point_values(stage):
     return dict(di=di, dd=dd)
 
 
-def main():
+def publish(stage, dest, rename=os.rename):
+    """Replace dest by the verified stage with rollback (review F05 of 2026-10-26).
+
+    Two renames, not one atomic swap: dest -> dest.previous, then stage -> dest. If the second fails,
+    the previous release is renamed back. The backup is deleted only once the new dest is complete.
+    A backup left by an interrupted run while dest is missing is restored first, never deleted.
+    """
     import shutil
-    stage = DRAWS.rstrip("/\\") + ".staging"
-    shutil.rmtree(stage, ignore_errors=True)
-    os.makedirs(stage)
+    dest = dest.rstrip("/\\")
+    backup = dest + ".previous"
+    if os.path.exists(backup):
+        if os.path.exists(dest):
+            shutil.rmtree(backup)
+        else:
+            rename(backup, dest)          # recover the only complete copy before anything else
+    had = os.path.exists(dest)
+    if had:
+        rename(dest, backup)
+    try:
+        rename(stage, dest)
+    except BaseException:
+        if had and not os.path.exists(dest):
+            rename(backup, dest)
+        raise
+    if not os.path.exists(os.path.join(dest, "draws_manifest.json")):
+        raise RuntimeError(f"{dest} is incomplete after publication; the previous release is kept in {backup}")
+    shutil.rmtree(backup, ignore_errors=True)
+
+
+def main():
+    import shutil, tempfile
+    parent, base = os.path.split(DRAWS.rstrip("/\\"))
+    lock = os.path.join(parent, base + ".export.lock")
+    try:
+        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        refuse([f"another export holds {lock}; remove it only if no export is running"])
+    os.close(fd)
+    stage = tempfile.mkdtemp(prefix=base + ".staging.", dir=parent)
+    try:
+        _export(stage)
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)   # gone already after a successful publication
+        os.remove(lock)
+
+
+def _export(stage):
+    import shutil
     files, ident = {}, None
     for v in VARIANTS:
         f, i = export_variant(v, stage)
@@ -211,6 +262,10 @@ def main():
                         "at 35 x 2 Gy in 47 days, fitted conditional on each DI draw",
                dataset=ident["data_file"], data_sha256=ident["data_file_sha256"],  # verified against the file above
                gate_policy=G.POLICY,
+               per_quantity_check=("the per-quantity part of the gate (each quantity finite and non-constant before "
+                                   "aggregation, gate-2026-10-27) runs inside the fitting code; fits made before "
+                                   "version 3.2.1 kept only per-fit aggregates, so for them only the aggregate checks "
+                                   "were re-applied here"),
                pairing="row i of tumor_dd_<variant>.csv was fitted conditional on row i of tumor_di_<variant>.csv",
                toxicity_pairing="toxicity prior draws are independent of the tumor draws (assumption)",
                likelihood="binomial on rounded N x reported rate (approximation: most rates are KM or CIF estimates)",
@@ -223,13 +278,8 @@ def main():
     json.dump(dict(source="draws/tumor_*_primary.csv", dataset=ident["data_file"], rule="medians of identified quantities; "
                    "DD lambda median calibrated at the anchor with the DI point values", values=pv),
               open(os.path.join(stage, "refit_point_values.json"), "w"), indent=1)
-    # The complete set has passed: replace draws/ in one step (the old folder is removed after).
-    old = DRAWS.rstrip("/\\") + ".previous"
-    shutil.rmtree(old, ignore_errors=True)
-    if os.path.exists(DRAWS):
-        os.rename(DRAWS, old)
-    os.rename(stage, DRAWS)
-    shutil.rmtree(old, ignore_errors=True)
+    # The complete set has passed: publish it with rollback (two renames, not an atomic swap).
+    publish(stage, DRAWS)
     for k, v in files.items():
         print(k, v["n_draws"], v["sha256"][:12], "anchor residual", v["diagnostics"].get("anchor_max_abs_residual_gy", ""))
     print(json.dumps(pv, indent=1))
