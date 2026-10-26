@@ -1,0 +1,175 @@
+{
+ "CAIR": {
+  "elpd": -12.583135971891274,
+  "n_pred_arms": 2,
+  "units": {
+   "CAIR_2.0Gy": -5.716408369628442,
+   "CAIR_1.8Gy": -6.866727602262831
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "CAIR_vs_CB": {
+  "elpd": -3.0736488807818128,
+  "n_pred_arms": 1,
+  "units": {
+   "CAIR_vs_CB": -3.0736488807818128
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "CHART": {
+  "elpd": -4.345740710438703,
+  "n_pred_arms": 1,
+  "units": {
+   "CHART": -4.345740710438703
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "DAHANCA67": {
+  "elpd": -4.752915219151626,
+  "n_pred_arms": 1,
+  "units": {
+   "DAHANCA67": -4.752915219151626
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "EORTC22791": {
+  "elpd": -5.02260199934663,
+  "n_pred_arms": 1,
+  "units": {
+   "EORTC22791": -5.02260199934663
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "EORTC22811": {
+  "elpd": -3.448272664983729,
+  "n_pred_arms": 1,
+  "units": {
+   "EORTC22811": -3.448272664983729
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "EORTC22851": {
+  "elpd": -7.410463028935727,
+  "n_pred_arms": 1,
+  "units": {
+   "EORTC22851": -7.410463028935727
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "Ghoshal": {
+  "elpd": -5.287382277113729,
+  "n_pred_arms": 1,
+  "units": {
+   "Ghoshal": -5.287382277113729
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "Hliniak": {
+  "elpd": -2.820549665762953,
+  "n_pred_arms": 1,
+  "units": {
+   "Hliniak": -2.820549665762953
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "IAEA_ACC": {
+  "elpd": -4.138392600161071,
+  "n_pred_arms": 1,
+  "units": {
+   "IAEA_ACC": -4.138392600161071
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "Jackson": {
+  "elpd": -3.7192797839803844,
+  "n_pred_arms": 1,
+  "units": {
+   "Jackson": -3.7192797839803844
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "KROG0201": {
+  "elpd": -2.8277237088014084,
+  "n_pred_arms": 1,
+  "units": {
+   "KROG0201": -2.8277237088014084
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "PMH_HF": {
+  "elpd": -3.6527586246451516,
+  "n_pred_arms": 1,
+  "units": {
+   "PMH_HF": -3.6527586246451516
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "RTOG8313": {
+  "elpd": -6.613079410683088,
+  "n_pred_arms": 2,
+  "units": {
+   "RTOG8313_A": -6.613079410683088
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "RTOG8809": {
+  "elpd": -4.0130750187311195,
+  "n_pred_arms": 1,
+  "units": {
+   "RTOG8809": -4.0130750187311195
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "RTOG9003": {
+  "elpd": -11.618911713190833,
+  "n_pred_arms": 3,
+  "units": {
+   "RTOG9003": -11.618911713190833
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "RTOG9512": {
+  "elpd": -2.8554862104651835,
+  "n_pred_arms": 1,
+  "units": {
+   "RTOG9512": -2.8554862104651835
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "TROG9101": {
+  "elpd": -3.4962515695032694,
+  "n_pred_arms": 1,
+  "units": {
+   "TROG9101": -3.4962515695032694
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ },
+ "Yamazaki": {
+  "elpd": -7.442578156806345,
+  "n_pred_arms": 2,
+  "units": {
+   "Yamazaki_small": -2.9303644220599354,
+   "Yamazaki_large": -4.5122137347464095
+  },
+  "divergences": 0,
+  "score": "conditional plug-in (first arm of each held-out unit fixes its intercept)"
+ }
+}

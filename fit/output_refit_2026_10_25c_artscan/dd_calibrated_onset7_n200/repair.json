@@ -1,0 +1,51 @@
+{
+ "script": "fit/repair_dd_calibrated.py",
+ "gate": "unchanged: no divergence or tree-depth hit, R-hat <= 1.01, E-BFMI >= 0.3",
+ "attempts": [
+  4,
+  5
+ ],
+ "chain_multipliers": [
+  8,
+  16
+ ],
+ "repairs": [
+  {
+   "di_draw": 3899,
+   "rhat_before": 1.01347,
+   "attempt_before": 3,
+   "rhat_after": 1.0013,
+   "worst_after": "sigma_raw",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 4582,
+   "rhat_before": 1.01288,
+   "attempt_before": 3,
+   "rhat_after": 1.00178,
+   "worst_after": "z[42]",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 5627,
+   "rhat_before": 1.01103,
+   "attempt_before": 3,
+   "rhat_after": 1.00189,
+   "worst_after": "sigma_raw",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 7195,
+   "rhat_before": 1.01056,
+   "attempt_before": 3,
+   "rhat_after": 1.00176,
+   "worst_after": "c[14]",
+   "attempt_after": 4,
+   "gate_pass": true
+  }
+ ],
+ "repair_script_sha256": "dff31ec48fa13972019291db5775fbdada86faa71aa0e959ea1b47e69ff5caf0"
+}

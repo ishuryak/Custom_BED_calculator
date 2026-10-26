@@ -1,0 +1,49 @@
+{
+ "data_file": "data/refit_trials_2026_10_25c_effn_half.csv",
+ "data_sha256": "69fec0e67d62d4631ac1379778986b41ace6895f8acd8e5cdfcd8341b018b308",
+ "prior_c_sd": 3.0,
+ "seed": 20261021,
+ "chains": 4,
+ "warmup": 1500,
+ "samples": 2000,
+ "variants": {
+  "primary": {
+   "prior_log_ab_sd": 0.354,
+   "fix_ab": 0,
+   "fix_g": 0,
+   "overdispersion": 1
+  },
+  "binomial": {
+   "prior_log_ab_sd": 0.354,
+   "fix_ab": 0,
+   "fix_g": 0,
+   "overdispersion": 0
+  },
+  "paper_restrictions": {
+   "prior_log_ab_sd": 0.354,
+   "fix_ab": 1,
+   "fix_g": 1,
+   "overdispersion": 1
+  },
+  "wide_ab": {
+   "prior_log_ab_sd": 0.707,
+   "fix_ab": 0,
+   "fix_g": 0,
+   "overdispersion": 1
+  }
+ },
+ "fit_identities": {
+  "di_primary": "36dca5a58347e60d1d044fb13397c82ebac47d5c53d7e1fd80f3c1eae06f255d",
+  "dd_primary": "694fc011a6fdc84e72bd37880522d609f77cddfbfdd5ec39cf28e7cd459aa9ba"
+ },
+ "gate": {
+  "max_rhat": 1.01,
+  "min_ess_bulk": 400,
+  "min_ess_tail": 400,
+  "min_ebfmi": 0.3
+ },
+ "cmdstan": "2.40",
+ "cmdstanpy": "1.3.0",
+ "numpy": "2.4.3",
+ "python": "3.12.3"
+}

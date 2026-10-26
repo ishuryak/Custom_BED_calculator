@@ -1,0 +1,33 @@
+{
+ "parent_di_identity": "2c828af600ee3d7bafd971a00495d5ecbc9e8a47e56136783572995fbdb1a65e",
+ "parent_di_draws_sha256": "646c8261c08341e42d4f12e4681e0166db25a7c68ce52bf6f1d4cfb424d40632",
+ "data_file_sha256": "51ed5d8a2cc60acb86feb2ca694132ed775c797f0e64afccc14714517caa8409",
+ "stan_sha256": "82a444b0c4743893efc4726ef5d20b174a50fdbe8393a81c91f9c8205d5a360a",
+ "common_sha256": "fd665c10c741bdd820079a09b2fc73332343ccf667028fad9dd89ac142f31ee8",
+ "runner_sha256": "fcafac4528e8ec283289494b846c98da7e4a1807ff9e47d2f498964f9b2df490",
+ "fit_refit_sha256": "bbbb7be2736ea94c1e76b71a978e5f12a6be600f805f0c35db47994148caeba0",
+ "di_variant": "primary",
+ "n_di": 1000,
+ "picks_sha256": "71e2655791007f967dc7a381e312ce0a49b97081807b71efa7f6d494052aaf2d",
+ "onset_min": 7.0,
+ "onset_scale": 1.0,
+ "prior_log_lambda": [
+  -0.6931471805599453,
+  1.5
+ ],
+ "prior_c_sd": 3.0,
+ "inner": {
+  "chains": 4,
+  "warmup": 600,
+  "samples": 250
+ },
+ "max_attempts": 3,
+ "seed": 20261021,
+ "software": {
+  "cmdstan": "2.40",
+  "cmdstanpy": "1.3.0",
+  "numpy": "2.4.3",
+  "python": "3.12.3"
+ },
+ "identity_sha256": "2a1ab8937a623e1d962e997fa2530c84a22a70c0f2e4f442299be968defa813d"
+}

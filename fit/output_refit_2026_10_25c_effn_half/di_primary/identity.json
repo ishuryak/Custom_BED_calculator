@@ -1,0 +1,25 @@
+{
+ "model": "di",
+ "data_file": "refit_trials_2026_10_25c_effn_half.csv",
+ "data_file_sha256": "69fec0e67d62d4631ac1379778986b41ace6895f8acd8e5cdfcd8341b018b308",
+ "stan_data_sha256": "5f9935e0bd276604db3e75e06cffa175b25e26d1b0503b98cd6d1ee732981d56",
+ "stan_sha256": {
+  "di.stan": "667737507b82b6e4e1f96a7b0a903779047c483f9534ab23b2f16ca31c7d0117",
+  "common_functions.stanfunctions": "fd665c10c741bdd820079a09b2fc73332343ccf667028fad9dd89ac142f31ee8"
+ },
+ "runner_sha256": "bbbb7be2736ea94c1e76b71a978e5f12a6be600f805f0c35db47994148caeba0",
+ "seed": 20261021,
+ "chains": 4,
+ "warmup": 1500,
+ "samples": 2000,
+ "adapt_delta": 0.99,
+ "max_treedepth": 12,
+ "software": {
+  "cmdstan": "2.40",
+  "cmdstanpy": "1.3.0",
+  "numpy": "2.4.3",
+  "python": "3.12.3"
+ },
+ "variant": "primary",
+ "identity_sha256": "36dca5a58347e60d1d044fb13397c82ebac47d5c53d7e1fd80f3c1eae06f255d"
+}

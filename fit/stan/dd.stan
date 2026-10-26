@@ -8,8 +8,8 @@ data {
   int<lower=1> N;
   int<lower=1> J;
   array[N] int<lower=1, upper=J> trial;
-  vector[N] d;
-  vector[N] nfx;
+  vector[N] dsum;
+  vector[N] d2sum;
   vector[N] T;
   array[N] int<lower=1> npat;
   array[N] int<lower=0> y;
@@ -17,6 +17,10 @@ data {
   int<lower=0, upper=1> fix_ab; real ab_fixed;
   int<lower=0, upper=1> fix_g;  real g_fixed;
   int<lower=0, upper=1> overdispersion;
+  int<lower=1> R;                 // evaluation regimens (contrast vs the anchor, generated quantities)
+  vector[R] eval_dsum; vector[R] eval_d2sum; vector<lower=0>[R] eval_T;
+  real anchor_dsum; real anchor_d2sum; real<lower=0> anchor_T;
+  real<lower=0> prior_c_sd;       // trial intercept prior sd (3 primary)
 }
 parameters {
   real log_ab_raw;
@@ -39,7 +43,7 @@ transformed parameters {
   vector[J] Tbar = rep_vector(0, J);
   vector[J] cnt = rep_vector(0, J);
   for (i in 1:N) {
-    bed[i] = nfx[i] * d[i] * (1 + d[i] / ab);
+    bed[i] = dsum[i] + d2sum[i] / ab;
     bedbar[trial[i]] += bed[i]; Tbar[trial[i]] += T[i]; cnt[trial[i]] += 1;
   }
   bedbar = bedbar ./ cnt; Tbar = Tbar ./ cnt;
@@ -56,12 +60,14 @@ model {
   alpha ~ lognormal(log(0.2), 1);
   lambda ~ lognormal(log(0.5), 1.5);
   C ~ lognormal(log(10), 1);
-  c ~ normal(0, 3);
+  c ~ normal(0, prior_c_sd);
   sigma_raw ~ normal(0, 0.5);
   z ~ std_normal();
   for (i in 1:N) target += binomial_lpmf(y[i] | npat[i], exp(-exp(eta[i])));
 }
 generated quantities {
+  // Effective BED (Gy, at this draw's alpha/beta) of each evaluation regimen minus the anchor's.
+  vector[R] delta_eval;
   vector[N] tcp_arm;
   array[N] int y_rep;
   vector[N] log_lik;
@@ -70,5 +76,15 @@ generated quantities {
     tcp_arm[i] = exp(-exp(eta[i]));
     y_rep[i] = binomial_rng(npat[i], exp(-exp(e_new)));
     log_lik[i] = binomial_lpmf(y[i] | npat[i], exp(-exp(eta[i])));
+  }
+  {
+    real KK = anchor_dsum + anchor_d2sum / ab;
+    real TT = anchor_T;
+    real e0 = KK - (lambda * (-expm1(-alpha * KK / TT)) * smooth_max0(TT - c_over_alpha * TT / KK) + g * TT) / alpha;
+    for (r in 1:R) {
+      KK = eval_dsum[r] + eval_d2sum[r] / ab;
+      TT = eval_T[r];
+      delta_eval[r] = KK - (lambda * (-expm1(-alpha * KK / TT)) * smooth_max0(TT - c_over_alpha * TT / KK) + g * TT) / alpha - e0;
+    }
   }
 }

@@ -17,8 +17,8 @@ data {
   int<lower=1> N;
   int<lower=1> J;
   array[N] int<lower=1, upper=J> trial;
-  vector[N] d;
-  vector[N] nfx;
+  vector[N] dsum;
+  vector[N] d2sum;
   vector[N] T;
   array[N] int<lower=1> npat;
   array[N] int<lower=0> y;
@@ -31,6 +31,10 @@ data {
   real onset_min;             // days
   real<lower=0> onset_scale;  // days
   real prior_log_lambda_mean; real<lower=0> prior_log_lambda_sd;
+  int<lower=1> R;                 // evaluation regimens (contrast vs the anchor, generated quantities)
+  vector[R] eval_dsum; vector[R] eval_d2sum; vector<lower=0>[R] eval_T;
+  real anchor_dsum; real anchor_d2sum; real<lower=0> anchor_T;
+  real<lower=0> prior_c_sd;       // trial intercept prior sd (3 primary)
 }
 transformed data {
   vector[N] bed;
@@ -39,7 +43,7 @@ transformed data {
   vector[J] cnt = rep_vector(0, J);
   real pkill0 = -expm1(-alpha * K0 / T0);
   for (i in 1:N) {
-    bed[i] = nfx[i] * d[i] * (1 + d[i] / ab);
+    bed[i] = dsum[i] + d2sum[i] / ab;
     bedbar[trial[i]] += bed[i]; Tbar[trial[i]] += T[i]; cnt[trial[i]] += 1;
   }
   bedbar = bedbar ./ cnt; Tbar = Tbar ./ cnt;
@@ -65,16 +69,30 @@ transformed parameters {
 }
 model {
   lambda_dd ~ lognormal(prior_log_lambda_mean, prior_log_lambda_sd);
-  c ~ normal(0, 3);
+  c ~ normal(0, prior_c_sd);
   sigma_raw ~ normal(0, 0.5);
   z ~ std_normal();
   target += -sum(exp((onset_min - onset) / onset_scale));
   for (i in 1:N) target += binomial_lpmf(y[i] | npat[i], exp(-exp(eta[i])));
 }
 generated quantities {
+  // Effective BED (Gy, at this draw's alpha/beta) of each evaluation regimen minus the anchor's.
+  vector[R] delta_eval;
+  vector[R] onset_eval;
   // Calibration check: DD repopulation at the anchor, which must equal R0.
   real rep_anchor = lambda_dd * pkill0 * smooth_max0(T0 - onset_ref);
   real onset_min_fitted = min(onset);
   vector[N] log_lik;
   for (i in 1:N) log_lik[i] = binomial_lpmf(y[i] | npat[i], exp(-exp(eta[i])));
+  {
+    real KK = anchor_dsum + anchor_d2sum / ab;
+    real TT = anchor_T;
+    real e0 = KK - (lambda_dd * (-expm1(-alpha * KK / TT)) * smooth_max0(TT - c_over_alpha * TT / KK) + g * TT) / alpha;
+    for (r in 1:R) {
+      KK = eval_dsum[r] + eval_d2sum[r] / ab;
+      TT = eval_T[r];
+      delta_eval[r] = KK - (lambda_dd * (-expm1(-alpha * KK / TT)) * smooth_max0(TT - c_over_alpha * TT / KK) + g * TT) / alpha - e0;
+      onset_eval[r] = c_over_alpha * TT / KK;
+    }
+  }
 }

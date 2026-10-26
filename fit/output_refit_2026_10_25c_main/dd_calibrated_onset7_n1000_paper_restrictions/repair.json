@@ -1,0 +1,123 @@
+{
+ "script": "fit/repair_dd_calibrated.py",
+ "gate": "unchanged: no divergence or tree-depth hit, R-hat <= 1.01, E-BFMI >= 0.3",
+ "attempts": [
+  4,
+  5
+ ],
+ "chain_multipliers": [
+  8,
+  16
+ ],
+ "repairs": [
+  {
+   "di_draw": 32,
+   "rhat_before": 1.01123,
+   "attempt_before": 3,
+   "rhat_after": 1.0035,
+   "worst_after": "sigma_raw",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 160,
+   "rhat_before": 1.01121,
+   "attempt_before": 3,
+   "rhat_after": 1.00202,
+   "worst_after": "z[35]",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 1049,
+   "rhat_before": 1.01144,
+   "attempt_before": 3,
+   "rhat_after": 1.00462,
+   "worst_after": "sigma_raw",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 1081,
+   "rhat_before": 1.01724,
+   "attempt_before": 3,
+   "rhat_after": 1.00198,
+   "worst_after": "c[2]",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 1257,
+   "rhat_before": 1.01403,
+   "attempt_before": 3,
+   "rhat_after": 1.00204,
+   "worst_after": "sigma_raw",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 1385,
+   "rhat_before": 1.01077,
+   "attempt_before": 3,
+   "rhat_after": 1.00146,
+   "worst_after": "c[5]",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 1633,
+   "rhat_before": 1.01674,
+   "attempt_before": 3,
+   "rhat_after": 1.00396,
+   "worst_after": "z[29]",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 2778,
+   "rhat_before": 1.01123,
+   "attempt_before": 3,
+   "rhat_after": 1.00186,
+   "worst_after": "c[15]",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 4460,
+   "rhat_before": 1.01228,
+   "attempt_before": 3,
+   "rhat_after": 1.00363,
+   "worst_after": "sigma_raw",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 5501,
+   "rhat_before": 1.01211,
+   "attempt_before": 3,
+   "rhat_after": 1.00257,
+   "worst_after": "z[33]",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 7094,
+   "rhat_before": 1.01195,
+   "attempt_before": 3,
+   "rhat_after": 1.00168,
+   "worst_after": "z[15]",
+   "attempt_after": 4,
+   "gate_pass": true
+  },
+  {
+   "di_draw": 7879,
+   "rhat_before": 1.01098,
+   "attempt_before": 3,
+   "rhat_after": 1.00256,
+   "worst_after": "sigma_raw",
+   "attempt_after": 4,
+   "gate_pass": true
+  }
+ ],
+ "repair_script_sha256": "dff31ec48fa13972019291db5775fbdada86faa71aa0e959ea1b47e69ff5caf0"
+}

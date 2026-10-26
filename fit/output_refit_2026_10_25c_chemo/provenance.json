@@ -1,0 +1,49 @@
+{
+ "data_file": "data/refit_trials_2026_10_25c_chemo.csv",
+ "data_sha256": "1c471f1dd00e71ea5d4bc0843c130734957d3ee77657300517c043ed402df6d9",
+ "prior_c_sd": 3.0,
+ "seed": 20261021,
+ "chains": 4,
+ "warmup": 1500,
+ "samples": 2000,
+ "variants": {
+  "primary": {
+   "prior_log_ab_sd": 0.354,
+   "fix_ab": 0,
+   "fix_g": 0,
+   "overdispersion": 1
+  },
+  "binomial": {
+   "prior_log_ab_sd": 0.354,
+   "fix_ab": 0,
+   "fix_g": 0,
+   "overdispersion": 0
+  },
+  "paper_restrictions": {
+   "prior_log_ab_sd": 0.354,
+   "fix_ab": 1,
+   "fix_g": 1,
+   "overdispersion": 1
+  },
+  "wide_ab": {
+   "prior_log_ab_sd": 0.707,
+   "fix_ab": 0,
+   "fix_g": 0,
+   "overdispersion": 1
+  }
+ },
+ "fit_identities": {
+  "di_primary": "1b0872b50cec80a10cfd6cb88547e05ae1ae5547d0f4c2608a7f7534d6d28dec",
+  "dd_primary": "0f3cf73e36b624ee5df8ab5d79b6947f577fdcd741fc0a3356608595534fc63e"
+ },
+ "gate": {
+  "max_rhat": 1.01,
+  "min_ess_bulk": 400,
+  "min_ess_tail": 400,
+  "min_ebfmi": 0.3
+ },
+ "cmdstan": "2.40",
+ "cmdstanpy": "1.3.0",
+ "numpy": "2.4.3",
+ "python": "3.12.3"
+}

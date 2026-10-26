@@ -8,8 +8,8 @@ data {
   int<lower=1> N;                 // arms
   int<lower=1> J;                 // trials
   array[N] int<lower=1, upper=J> trial;
-  vector[N] d;                    // dose per fraction (Gy)
-  vector[N] nfx;                  // number of fractions (trial averages may be non-integer)
+  vector[N] dsum;                 // total dose, sum of d_i (Gy)
+  vector[N] d2sum;                // sum of d_i^2 (Gy^2): BED_LQ = dsum + d2sum / ab
   vector[N] T;                    // overall time (days)
   array[N] int<lower=1> npat;
   array[N] int<lower=0> y;        // controlled = round(npat * TCP)
@@ -17,6 +17,10 @@ data {
   int<lower=0, upper=1> fix_ab; real ab_fixed;
   int<lower=0, upper=1> fix_g;  real g_fixed;
   int<lower=0, upper=1> overdispersion;
+  int<lower=1> R;                 // evaluation regimens (contrast vs the anchor, generated quantities)
+  vector[R] eval_dsum; vector[R] eval_d2sum; vector<lower=0>[R] eval_T;
+  real anchor_dsum; real anchor_d2sum; real<lower=0> anchor_T;
+  real<lower=0> prior_c_sd;       // trial intercept prior sd (3 primary)
 }
 parameters {
   real log_ab_raw;
@@ -38,7 +42,7 @@ transformed parameters {
   vector[J] Tbar = rep_vector(0, J);
   vector[J] cnt = rep_vector(0, J);
   for (i in 1:N) {
-    bed[i] = nfx[i] * d[i] * (1 + d[i] / ab);
+    bed[i] = dsum[i] + d2sum[i] / ab;
     bedbar[trial[i]] += bed[i]; Tbar[trial[i]] += T[i]; cnt[trial[i]] += 1;
   }
   bedbar = bedbar ./ cnt; Tbar = Tbar ./ cnt;
@@ -53,12 +57,14 @@ model {
   alpha ~ lognormal(log(0.2), 1);
   lambda ~ lognormal(log(0.1), 1.5);
   Tk ~ normal(28, 10);
-  c ~ normal(0, 3);
+  c ~ normal(0, prior_c_sd);
   sigma_raw ~ normal(0, 0.5);
   z ~ std_normal();
   for (i in 1:N) target += binomial_lpmf(y[i] | npat[i], exp(-exp(eta[i])));
 }
 generated quantities {
+  // Effective BED (Gy, at this draw's alpha/beta) of each evaluation regimen minus the anchor's.
+  vector[R] delta_eval;
   vector[N] tcp_arm;            // expected TCP of each arm including its own random effect
   array[N] int y_rep;           // replicate with a NEW arm-level effect (posterior predictive)
   vector[N] log_lik;
@@ -67,5 +73,15 @@ generated quantities {
     tcp_arm[i] = exp(-exp(eta[i]));
     y_rep[i] = binomial_rng(npat[i], exp(-exp(e_new)));
     log_lik[i] = binomial_lpmf(y[i] | npat[i], exp(-exp(eta[i])));
+  }
+  {
+    real KK = anchor_dsum + anchor_d2sum / ab;
+    real TT = anchor_T;
+    real e0 = KK - (lambda * smooth_max0(TT - Tk) + g * TT) / alpha;
+    for (r in 1:R) {
+      KK = eval_dsum[r] + eval_d2sum[r] / ab;
+      TT = eval_T[r];
+      delta_eval[r] = KK - (lambda * smooth_max0(TT - Tk) + g * TT) / alpha - e0;
+    }
   }
 }
