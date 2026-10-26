@@ -17,3 +17,4 @@ evidence_ledger.yaml
 constant_registry.yaml
 sim_provenance.yaml
 .stale_constant_record.json
+.pytest_cache

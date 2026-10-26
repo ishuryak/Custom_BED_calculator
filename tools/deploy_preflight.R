@@ -32,7 +32,8 @@ deploy_preflight <- function(app_name, expected_app, accounts, account, dirty,
 # manifest was once left out of a bundle.)
 # `tracked`: `git ls-files` output. Every bundled file must be tracked, so the
 # deployed code is exactly the recorded revision (an untracked file would ship
-# without being part of any commit).
+# without being part of any commit). deployed_revision.txt is the one exception:
+# deploy.R writes it just before upload to name the revision (it is gitignored).
 check_bundle <- function(files, root = ".", tracked = NULL) {
   need <- c("app.R", "about.md",
             file.path("R", list.files(file.path(root, "R"), pattern = "\\.R$")),
@@ -42,7 +43,7 @@ check_bundle <- function(files, root = ".", tracked = NULL) {
   forbidden <- intersect(files, c(".Rhistory", ".Renviron", "external_proofs.yaml", ".suite_passed"))
   if (length(missing)) stop("Files the app reads are missing from the bundle: ", paste(missing, collapse = ", "), call. = FALSE)
   if (length(forbidden)) stop("Local-only files would be deployed: ", paste(forbidden, collapse = ", "), call. = FALSE)
-  untracked <- if (is.null(tracked)) character() else setdiff(files, tracked)
+  untracked <- if (is.null(tracked)) character() else setdiff(files, c(tracked, "deployed_revision.txt"))
   if (length(untracked)) stop("Files not committed to git would be deployed: ", paste(untracked, collapse = ", "), call. = FALSE)
   invisible(TRUE)
 }

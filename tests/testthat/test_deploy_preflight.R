@@ -61,4 +61,6 @@ test_that("the bundle check refuses files that are not tracked by git", {
             file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
   expect_true(check_bundle(need, app_abs, tracked = need))
   expect_error(check_bundle(c(need, "R/scratch.R"), app_abs, tracked = need), "not committed to git.*R/scratch.R")
+  expect_true(check_bundle(c(need, "deployed_revision.txt"), app_abs, tracked = need))  # written by deploy.R itself
+  expect_true(".pytest_cache" %in% readLines(file.path(app_abs, ".rscignore")))
 })
