@@ -168,3 +168,7 @@ The optional tumor-share requirement in the uncertainty search, and the review's
 questions: estimator-aware uncertainty, prescription-mixture and exclusion sensitivity,
 population and systemic-modifier exclusions, incomplete repair in BID/TID trials, a nested Monte
 Carlo precision study and validation against evidence not used in the fit.
+
+## Release
+
+Deployed 2026-10-26 from 66027d5 to `custom_bed_calculator_v3` only (48-file bundle, every file tracked). Before: suite 5394 expectations, 0 failed, marker for 66027d5; Python 70 passed; local walkthrough 35 of 35. After: live walkthrough 35 of 35, title version 3.2; v1 and v2 respond unchanged. Rollback: redeploy e4ff22f (3.1.0).
