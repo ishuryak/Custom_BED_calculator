@@ -171,9 +171,9 @@ ui <- page_sidebar(
     accordion(
       open = c("Regimen to evaluate", "Comparison and tumor threshold"),
       accordion_panel("Regimen to evaluate",
-        num("m", "Number of fractions", 20, 1, 100, 1),
-        num("d", "Dose per fraction (Gy)", 2.75, 0.1, 30, 0.05),
-        helpText("Default: the HYPNO test arm, 55 Gy in 20 fractions."),
+        num("m", "Number of fractions", 18, 1, 100, 1),
+        num("d", "Dose per fraction (Gy)", 2.9, 0.1, 30, 0.05),
+        helpText("Default: 18 × 2.9 Gy (52.2 Gy). HYPNO's test arm, 55 Gy in 20 fractions, is a benchmark on the Results tab."),
         radioButtons("fx_week", "Fractions per week", c("5 (Mon-Fri)" = 5, "6 (Mon-Sat)" = 6), inline = TRUE),
         selectInput("start_day", "First treatment day", WEEKDAYS_IN, selected = 1),
         textInput("skip_days", "Days without treatment (holidays, gaps): calendar day numbers, day 1 = first treatment", ""),
@@ -181,7 +181,7 @@ ui <- page_sidebar(
                  "regular calendar (fractions per week and first day), without skipped days."),
         checkboxInput("auto_T", "Compute overall time from this calendar", TRUE),
         conditionalPanel("!input.auto_T",
-          num("T", "Overall treatment time (days)", 26, 1, 150, 1)),
+          num("T", "Overall treatment time (days)", 24, 1, 150, 1)),
         uiOutput("T_shown")),
       accordion_panel("Comparison and tumor threshold",
         selectInput("comparator", "Compare with (used by every tab)", COMPARATOR_LABELS),
@@ -572,7 +572,11 @@ server <- function(input, output, session) {
   }
   # Tumor BED difference under the shared validity rule (tumor_endpoint):
   # shown only when both BEDs are positive.
+  # y is one reference BED for every x, or one per x; any other length is an error (review R04:
+  # a scalar y indexed by row was NA after row 1, so benchmark rows 2-3 read "not available").
   tumor_delta_txt <- function(x, y) {
+    if (length(y) == 1) y <- rep(y, length(x))
+    if (length(y) != length(x)) stop("tumor_delta_txt: reference must have length 1 or length(x)")
     vapply(seq_along(x), function(i) {
       if (is.na(x[i]) || is.na(y[i])) return("not available")
       e <- tumor_endpoint(x[i], y[i])
@@ -855,10 +859,9 @@ server <- function(input, output, session) {
     if (identical(input$criterion, "both"))
       return(msg(paste(
         "No regimen in the searched range meets the selected minimum tumor BED change under both models",
-        "and all other limits. An empty result is a valid outcome of this screen. The Model agreement tab",
-        "explores a separate comparison: by default HYPNO 55 Gy/20 fractions, an allowed change of \u22123 Gy",
-        "under each model, and at least 1 day saved. A limit defined relative to the comparison also uses",
-        "that tab's comparison. To explore an allowed loss here, explicitly enter a negative minimum change.",
+        "and all other limits. An empty result is a valid outcome of this screen. The Both-model screen uses",
+        "the global comparison and threshold by default, and you can override them there. An allowed BED loss",
+        "changes the hypothesis being screened. To explore an allowed loss here, explicitly enter a negative minimum change.",
         "\u201cDI or DD model\u201d requires the threshold under at least one evaluable model. It can include",
         "regimens that fail the threshold under the other model. Changing these settings changes the",
         "hypothesis being screened.")))

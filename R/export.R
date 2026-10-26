@@ -23,6 +23,17 @@ MIGRATABLE_SCHEMAS <- c("1", "2", "3")
 MIGRATABLE_SELECTION <- c("2.5", "2.6")   # schema 1 files carry none
 # Practical bound on the search grid of a replayed file (rows evaluated).
 MAX_GRID_ROWS <- 200000
+
+# Number of raw candidate regimens a search grid holds (before the days-saved filter), shared by
+# both replay checks (review 2026-10-26). The uncertainty search evaluates SEARCH_DRAWS draws per
+# regimen, so its replay is bounded at UNC_MAX_GRID_ROWS: the largest grid the app can request is
+# 30 fraction counts (slider 5-34) x 599 doses (0.1 to 30 Gy in 0.05 Gy steps) = 17,970.
+UNC_MAX_GRID_ROWS <- 20000
+grid_size <- function(ref_d, m_range, d_step, d_max) {
+  d_start <- ceiling((ref_d + 1e-9) / d_step) * d_step
+  n_d <- if (d_start > d_max + 1e-9) 0 else floor((d_max + 1e-9 - d_start) / d_step) + 1
+  n_d * length(m_range)
+}
 PARAM_NAMES <- c("alpha", "ab", "lambda_di", "lambda_dd", "Tk", "g",
                  "ab_e", "alpha_e", "lambda_e", "Tk_e", "ab_l")
 
@@ -246,14 +257,14 @@ check_inputs <- function(sc) {
                   " (mean-dose limits on physical dose, strict HYHOPE limits), so the result could differ.",
                   " Run the search again in the app.")
     lib_name <- check_choice(o$library, "oar library", c("QUANTEC", "HYHOPE"))
-    pct <- lapply(o$percents, function(v) check_num(v, "organ percent", 0, 200))
-    if (length(pct) == 0 || any(!names(pct) %in% OAR_ORGANS$key)) replay_fail("oar percents must name known organs.")
+    pct <- tryCatch(validate_oar_percents(o$percents), error = function(e) replay_fail(conditionMessage(e)))
+    if (length(pct) == 0) replay_fail("the organ limits were recorded as applied but name no organ dose.")
     ab <- c(cord = check_num(o$ab$cord, "oar ab cord", 0.01, 100), oar = check_num(o$ab$oar, "oar ab", 0.01, 100))
     args$oar_check <- build_oar_check(load_constraints(), pct, lib_name, ab)
   }
-  n_d <- max(0, floor((args$d_max - ref$d) / args$d_step) + 1)
-  if (n_d * length(mr) > MAX_GRID_ROWS)
-    replay_fail("the search grid (", n_d * length(mr), " regimens) exceeds ", MAX_GRID_ROWS, ".")
+  n <- grid_size(ref$d, mr, args$d_step, args$d_max)
+  if (n > MAX_GRID_ROWS)
+    replay_fail("the search grid (", n, " regimens) exceeds ", MAX_GRID_ROWS, ".")
   list(p = p, ref = ref, anchor = anchor, args = args)
 }
 
@@ -508,6 +519,9 @@ validate_uncertainty_scenario <- function(sc, draws_dir = DRAWS_DIR) {
   if (identical(uv, "3.0"))
     replay_fail("uncertainty version 3.0 files did not record the applied organ limits or the fixed organ alpha/beta, ",
                 "so they cannot be replayed exactly. Run the analysis again in the app.")
+  if (identical(uv, "3.1"))
+    replay_fail("uncertainty version 3.1 files used the version 3.1 draws, which were replaced in version 3.2 after ",
+                "every conditional DD fit was brought up to the full diagnostic gate. Run the analysis again in the app.")
   if (!identical(uv, UNCERTAINTY_VERSION)) replay_fail("uncertainty version '", paste(uv, collapse = ","), "' is not this calculator's (", UNCERTAINTY_VERSION, ").")
   if (!identical(as.character(sc$schema_version), SCHEMA_VERSION)) replay_fail("schema version '", sc$schema_version, "' is not ", SCHEMA_VERSION, ".")
   if (!identical(as.character(sc$equation_version), EQUATION_VERSION)) replay_fail("equation version '", sc$equation_version, "' is not ", EQUATION_VERSION, ".")
@@ -556,8 +570,8 @@ validate_uncertainty_scenario <- function(sc, draws_dir = DRAWS_DIR) {
     lib_name <- check_choice(o$library, "oar library", c("QUANTEC", "HYHOPE"))
     if (!identical(as.character(o$oar_version), OAR_VERSION)) replay_fail("organ rules version '", o$oar_version, "' is not ", OAR_VERSION, ".")
     if (!identical(o$constraints_sha256, constraints_sha256())) replay_fail("the organ constraint library differs from the one recorded (SHA-256).")
-    pct <- lapply(o$percents, function(v) check_num(v, "organ percent", 0, 200))
-    if (length(pct) == 0 || any(!names(pct) %in% OAR_ORGANS$key)) replay_fail("oar percents must name known organs.")
+    pct <- tryCatch(validate_oar_percents(o$percents), error = function(e) replay_fail(conditionMessage(e)))
+    if (length(pct) == 0) replay_fail("the organ limits were recorded as applied but name no organ dose.")
     ab <- c(cord = check_num(o$ab$cord, "oar ab cord", 0.01, 100), oar = check_num(o$ab$oar, "oar ab", 0.01, 100))
     if (!is.null(pf) && !(same_num(pf$ab_cord, ab[["cord"]]) && same_num(pf$ab_oar, ab[["oar"]])))
       replay_fail("the fixed organ alpha/beta differs from the organ block.")
@@ -583,6 +597,9 @@ validate_uncertainty_scenario <- function(sc, draws_dir = DRAWS_DIR) {
                    d_max = check_num(s$d_max, "search d_max", 0.01, 30),
                    min_days_saved = check_num(s$min_days_saved, "search min_days_saved", 0, 1000, TRUE),
                    calendar = cal)
+    n <- grid_size(ref$d, search$m_range, search$d_step, search$d_max)
+    if (n > UNC_MAX_GRID_ROWS)
+      replay_fail("the search grid (", n, " regimens) exceeds ", UNC_MAX_GRID_ROWS, ", the largest the app can request.")
   }
   tx <- if (source == "fixed") fixed_toxicity_draws(pf, nrow(di), c(cord = pf$ab_cord, oar = pf$ab_oar)) else
     toxicity_draws(nrow(di), seed)

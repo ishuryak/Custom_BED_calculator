@@ -218,8 +218,16 @@ parse_dvh_eclipse <- function(lines) {
     scale <- dvh_unit_scale(regmatches(hdr, regexpr("Dose \\[c?Gy\\]", hdr)))
     vol_unit <- if (grepl("Volume \\[%\\]", hdr)) "%" else if (grepl("Volume \\[(cm\u00b3|cm3|cc)\\]", hdr)) "cc" else NA
     if (is.na(vol_unit)) stop("Structure '", name, "': volume column must be in % or cm\u00b3.")
-    rows <- blk[(h[1] + 1):length(blk)]
-    rows <- rows[grepl("^\\s*[0-9.eE+-]+(\\s+[0-9.eE+-]+)+\\s*$", rows)]
+    # Every non-blank line after the column header is a data row (review R10): a malformed or
+    # non-finite row is refused with its line number, never dropped.
+    idx <- if (h[1] < length(blk)) (h[1] + 1):length(blk) else integer()
+    rows <- blk[idx]; keep <- nzchar(trimws(rows)); rows <- rows[keep]; line_no <- starts[k] - 1 + idx[keep]
+    for (i in seq_along(rows)) {
+      tok <- strsplit(trimws(rows[i]), "\\s+")[[1]]
+      v <- suppressWarnings(as.numeric(tok))
+      if (length(tok) < 2 || any(is.na(v)) || any(!is.finite(v)))
+        stop("Structure '", name, "', line ", line_no[i], ": not a row of finite numbers ('", trimws(rows[i]), "').")
+    }
     if (length(rows) < 2) stop("Structure '", name, "': fewer than two DVH rows.")
     num <- suppressWarnings(do.call(rbind, lapply(strsplit(trimws(rows), "\\s+"), as.numeric)))
     out[[name]] <- data.frame(dose = num[, 1] * scale, volume = num[, ncol(num)])
@@ -290,6 +298,12 @@ oar_status <- function(planned, limit, op = "≤", basis = "EQD2") {
       ifelse(planned > limit * (1 - NEAR_FRACTION), paste("within 5% of", what), "within")))
 }
 status_exceeds <- function(status) grepl("^exceeds", status)
+# Four-way class of a status (review R05): an indeterminate or unassessed status is never "within".
+status_class <- function(status) {
+  ifelse(is.na(status) | status == "not assessed", "not assessed",
+    ifelse(grepl("^exceeds", status), "exceeds",
+      ifelse(grepl("^indeterminate", status), "indeterminate", "within")))
+}
 
 # Description of a source's fractionation and metric.
 source_fractionation_text <- function(row) {
@@ -349,8 +363,11 @@ oar_row <- function(lib, organ_key, input, m, d, library = "QUANTEC", ab = NULL,
     flags <- c(flags, sprintf("source gives a range %g-%g Gy; the upper end is this calculator's choice, not a single source limit",
                               row$limit_lo_gy, row$limit_gy))
   if (mean_metric) {
-    flags <- c(flags, sprintf("source physical mean stated for %s; compared with the planned physical mean, without conversion",
+    flags <- c(flags, sprintf(paste("source physical mean stated for %s; physical source comparison only: the effect of",
+                                    "changed fractionation is not validated and may understate hypofractionation toxicity"),
                               base$source_fractionation))
+    if (row$n_fractions > 0 && row$n_fractions != m)
+      flags <- c(flags, sprintf("the selected HYHOPE table is for %d fractions, not %g", row$n_fractions, m))
   } else if (row$n_fractions > 0 && row$n_fractions != m) {
     flags <- c(flags, sprintf("converted from HYHOPE's %d-fraction table", row$n_fractions))
   }
@@ -404,8 +421,8 @@ oar_row <- function(lib, organ_key, input, m, d, library = "QUANTEC", ab = NULL,
       grid <- seq(ab_range[1], ab_range[2], length.out = 41)
       st <- vapply(grid, function(a) {
         r <- oar_row(lib, organ_key, input, m, d, library, a, NULL)
-        status_exceeds(r$status)
-      }, logical(1))
+        status_class(r$status)
+      }, character(1))
       base$flip <- flip_text(grid, st)
     }
   }
@@ -413,14 +430,27 @@ oar_row <- function(lib, organ_key, input, m, d, library = "QUANTEC", ab = NULL,
   base
 }
 
-# Where over an alpha/beta grid a constraint is exceeded (st TRUE), in words.
+# The status over an alpha/beta grid, in words. st: status classes per grid value ("within",
+# "exceeds", "indeterminate", "not assessed"); a logical st is read as exceeds (TRUE) / within.
+# "within at every" is said only when every value is definitively within (review R05).
 flip_text <- function(grid, st) {
+  if (is.logical(st)) st <- ifelse(st, "exceeds", "within")
   rng <- sprintf("%.2g to %.2g Gy", min(grid), max(grid))
-  if (all(st)) return(paste("exceeds at every α/β from", rng))
-  if (!any(st)) return(paste("within at every α/β from", rng))
+  if (length(unique(st)) == 1) {
+    return(switch(st[1],
+      within = paste("within at every α/β from", rng),
+      exceeds = paste("exceeds at every α/β from", rng),
+      indeterminate = paste("indeterminate at this DVH resolution at every α/β from", rng),
+      paste("not assessed at any α/β from", rng)))
+  }
   r <- rle(st); hi <- cumsum(r$lengths); lo <- hi - r$lengths + 1
-  parts <- sprintf("%.2g-%.2g Gy", grid[lo[r$values]], grid[hi[r$values]])
-  paste("exceeds for α/β", paste(parts, collapse = " and "), "(within otherwise)")
+  seg <- function(cls) {
+    k <- which(r$values == cls)
+    if (!length(k)) return(NULL)
+    paste(cls, "for α/β", paste(sprintf("%.2g-%.2g Gy", grid[lo[k]], grid[hi[k]]), collapse = " and "))
+  }
+  parts <- unlist(lapply(c("exceeds", "indeterminate", "not assessed"), seg))
+  paste0(paste(parts, collapse = "; "), if (any(st == "within")) " (within otherwise)" else "")
 }
 
 # Feasibility table over organs. inputs: named list organ_key -> input.
@@ -479,8 +509,32 @@ oar_coverage_text <- function(cov) {
 # is TRUE where every entered organ meets its limit: a maximum under that
 # draw's organ alpha/beta (tx$ab_cord or tx$ab_oar), a mean on physical dose.
 # An entered organ without a constraint is an error, never a pass.
+# One organ-mapping validator (review R03, 2026-10-26), used by both replay paths and the
+# direct checkers: a named mapping of unique, nonblank, supported organ keys to one finite
+# percent of the prescription (0-200) each. An unnamed list, a duplicate or unknown key, or a
+# non-scalar value is refused, never read as "no organ limit". NULL or NA values are organs left
+# blank (not assessed) and are dropped after the names are checked.
+validate_oar_percents <- function(percents) {
+  if (is.null(percents) || length(percents) == 0) return(list())
+  nm <- names(percents)
+  if (is.null(nm) || any(is.na(nm) | !nzchar(trimws(nm))))
+    stop("organ limits must name each organ (an unnamed or blank organ key was given).", call. = FALSE)
+  if (anyDuplicated(nm)) stop("organ '", nm[anyDuplicated(nm)], "' is given more than once.", call. = FALSE)
+  bad <- setdiff(nm, OAR_ORGANS$key)
+  if (length(bad)) stop("unknown organ key(s): ", paste(bad, collapse = ", "), ".", call. = FALSE)
+  out <- lapply(nm, function(k) {
+    v <- percents[[k]]
+    if (is.null(v) || (length(v) == 1 && is.na(v))) return(NULL)
+    if (!is.numeric(v) || length(v) != 1 || !is.finite(v) || v < 0 || v > 200)
+      stop("organ '", k, "': the dose must be one number from 0 to 200% of the prescription.", call. = FALSE)
+    v
+  })
+  names(out) <- nm
+  out[!vapply(out, is.null, logical(1))]
+}
+
 oar_draw_checker <- function(lib, percents, library = "QUANTEC") {
-  percents <- percents[!vapply(percents, function(v) is.null(v) || is.na(v), logical(1))]
+  percents <- validate_oar_percents(percents)
   if (length(percents) == 0) return(NULL)
   function(regs, tx) {
     ok <- matrix(TRUE, nrow(regs), nrow(tx))
@@ -503,7 +557,7 @@ oar_draw_checker <- function(lib, percents, library = "QUANTEC") {
 # (TRUE where every entered organ meets its limit), with its settings attached
 # for the scenario record, or NULL when nothing is entered.
 build_oar_check <- function(lib, percents, library = "QUANTEC", ab = default_oar_ab()) {
-  percents <- percents[!vapply(percents, function(v) is.null(v) || is.na(v), logical(1))]
+  percents <- validate_oar_percents(percents)
   if (length(percents) == 0) return(NULL)
   f <- function(m, d) {
     ok <- rep(TRUE, length(m))

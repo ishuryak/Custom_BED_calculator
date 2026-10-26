@@ -16,7 +16,9 @@
 # invalid draws as failures (M3); the screen's choice re-checked on all draws
 # (M4); regular candidate calendar (S5); fixed toxicity uses the organ
 # alpha/beta of the Organs at risk tab (S8); the organ policy is exported (S2).
-UNCERTAINTY_VERSION <- "3.1"
+# 3.2 (2026-10-26 review): draws regenerated after every conditional DD fit met the full gate
+# (ESS included, R01) with an enforced identity chain (R02); organ mappings validated (R03).
+UNCERTAINTY_VERSION <- "3.2"
 DRAWS_DIR <- "draws"
 UNC_VARIANT_KEYS <- c("primary", "paper_restrictions")
 TOXICITY_SEED <- 20261021
@@ -53,6 +55,12 @@ load_draws <- function(model = c("di", "dd"), variant = "primary", dir = DRAWS_D
   # failed the release gate (divergences, R-hat, ESS, E-BFMI) is never used.
   if (!is.null(man$draws_version) && !isTRUE(man$files[[key]]$diagnostics$gate_pass))
     stop("Draws file ", key, " failed the sampling-diagnostic gate and is not used.")
+  # From draws version 3.2 the recorded diagnostics are checked here against the gate itself,
+  # ESS included, rather than trusting the gate_pass flag (review R01, 2026-10-26).
+  if (!is.null(man$draws_version) && numeric_version(man$draws_version) >= "3.2") {
+    why <- draws_gate_failures(man$files[[key]]$diagnostics)
+    if (length(why)) stop("Draws file ", key, " does not meet the sampling-diagnostic gate: ", paste(why, collapse = "; "), ".")
+  }
   x <- utils::read.csv(f)
   need <- if (model == "di") c("alpha", "ab", "lambda", "Tk", "g") else
     c("alpha", "ab", "lambda", "c_over_alpha", "g")
@@ -65,6 +73,21 @@ load_draws <- function(model = c("di", "dd"), variant = "primary", dir = DRAWS_D
   # each DI draw across its paired DD draws), else the fit's minimum bulk ESS.
   attr(x, "ess") <- if (!is.null(man$files[[key]]$n_distinct_di_draws)) man$files[[key]]$n_distinct_di_draws else man$files[[key]]$min_ess_bulk
   x
+}
+
+# The diagnostic gate of fit/gate.py, applied to a manifest's recorded diagnostics (DI keys,
+# or the per-fit minima of the conditional DD fits). Missing values fail.
+DRAWS_GATE <- list(max_rhat = 1.01, min_ess = 400, min_ebfmi = 0.3)
+draws_gate_failures <- function(dg) {
+  g <- function(...) { for (k in c(...)) if (!is.null(dg[[k]])) return(as.numeric(dg[[k]])); NA_real_ }
+  v <- c(divergences = g("divergences"), treedepth_hits = g("treedepth_hits"), max_rhat = g("max_rhat"),
+         ess_bulk = g("min_ess_bulk", "min_ess_bulk_per_fit"), ess_tail = g("min_ess_tail", "min_ess_tail_per_fit"),
+         ebfmi = g("min_ebfmi"))
+  ok <- c(divergences = v[["divergences"]] == 0, treedepth_hits = v[["treedepth_hits"]] == 0,
+          max_rhat = v[["max_rhat"]] <= DRAWS_GATE$max_rhat, ess_bulk = v[["ess_bulk"]] >= DRAWS_GATE$min_ess,
+          ess_tail = v[["ess_tail"]] >= DRAWS_GATE$min_ess, ebfmi = v[["ebfmi"]] >= DRAWS_GATE$min_ebfmi)
+  ok[is.na(ok)] <- FALSE
+  sprintf("%s %s", names(ok)[!ok], format(v[!ok], digits = 4))
 }
 
 # Unit of a tumor BED difference over draws: Gy at alpha/beta 10 only when every
@@ -117,7 +140,7 @@ toxicity_prior <- function() {
     Tp_e = list(dist = "uniform", lo = 2.0, hi = 4.0,
                 note = "Mucosal doubling time: Fowler 2003 2.5 d; range assumed."),
     Tk_e = list(dist = "uniform", lo = 7, hi = 19,
-                note = "Mucosal onset (elapsed days): Fowler 2003 day 7; Pardo-Montero 2021 refit near day 19 (as reported in the v3 plan review, to be re-checked)."),
+                note = "Mucosal onset (elapsed days), analyst sensitivity prior: Fowler 2003 day 7; Pardo-Montero 2021 refitted Tk 19.44 inclusive days (about 18.4 elapsed) jointly with other parameters. Neither is a direct biological range."),
     ab_l = list(dist = "lognormal", median = 3, sd_log = 0.207,
                 note = "Late head and neck tissue α/β, 95% 2-4.5 Gy around 3 Gy (Stuschke 1999 reported 3.3-4.0 for grade 2+ late effects)."),
     ab_cord = list(dist = "lognormal", median = 1.32, sd_log = 0.212,

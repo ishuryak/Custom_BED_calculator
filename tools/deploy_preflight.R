@@ -47,3 +47,23 @@ check_bundle <- function(files, root = ".", tracked = NULL) {
   if (length(untracked)) stop("Files not committed to git would be deployed: ", paste(untracked, collapse = ", "), call. = FALSE)
   invisible(TRUE)
 }
+
+# The revision a passing suite may certify (review R09, 2026-10-26). Fails closed: a git that
+# cannot run, a non-zero exit, output that is not one 40-character hash, or uncommitted tracked
+# changes all give ok = FALSE with the reason, and no suite marker is written.
+# git: function(args) -> list(status, out); replaceable in tests.
+git_run <- function(args) {
+  out <- tryCatch(suppressWarnings(system2("git", args, stdout = TRUE, stderr = TRUE)),
+                  error = function(e) structure(conditionMessage(e), status = 127L))
+  list(status = if (is.null(attr(out, "status"))) 0L else as.integer(attr(out, "status")), out = as.character(out))
+}
+release_revision <- function(git = git_run) {
+  h <- git(c("rev-parse", "HEAD"))
+  if (h$status != 0) return(list(ok = FALSE, why = "git rev-parse failed"))
+  rev <- trimws(h$out)
+  if (length(rev) != 1 || !grepl("^[0-9a-f]{40}$", rev)) return(list(ok = FALSE, why = "git did not return one revision hash"))
+  d <- git(c("status", "--porcelain", "--untracked-files=no"))
+  if (d$status != 0) return(list(ok = FALSE, why = "git status failed"))
+  if (length(d$out[nzchar(d$out)]) > 0) return(list(ok = FALSE, why = "tracked files have uncommitted changes"))
+  list(ok = TRUE, rev = rev)
+}

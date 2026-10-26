@@ -26,7 +26,7 @@ oar_ui <- function(id) {
         "selected constraint metrics, not full protocol compliance. No normal-tissue complication probability is calculated."),
     layout_columns(col_widths = c(4, 4, 4),
       radioButtons(ns("library"), "Constraint source",
-                   c("QUANTEC 2010 (2-Gy fractions, converted)" = "QUANTEC",
+                   c("QUANTEC 2010 (conventional fractionation: maxima converted, means physical)" = "QUANTEC",
                      "HYHOPE protocol tables (12, 15, 20 fractions; nearest converted)" = "HYHOPE")),
       div(numericInput(ns("ab_cord"), "α/β, spinal cord and brainstem (Gy)", 2, 0.5, 10, 0.1),
           helpText("HYPNO used 2 Gy; QUANTEC (Kirkpatrick 2010) gives 0.87 Gy. The status is also checked from 0.87 to 2 Gy.")),

@@ -107,14 +107,15 @@ main <- function(args) {
   fresh()
   check(sprintf("1 title shows version %s", short_ver), grepl(paste("version", short_ver), js("document.title + document.body.innerText"), fixed = TRUE))
   bn <- text_of("banner")
-  check("1 banner: HYPNO 55/20 evaluated against 35 x 2 Gy, +1 Gy, DD calibrated",
-        grepl("20 × 2.75 Gy in 26 days", bn, fixed = TRUE) && grepl("35 × 2 Gy in 47 days", bn, fixed = TRUE) &&
+  # 3.2 (2026-10-26): the default evaluated regimen is 18 x 2.9 Gy (Igor Shuryak).
+  check("1 banner: 18 x 2.9 Gy evaluated against 35 x 2 Gy, +1 Gy, DD calibrated",
+        grepl("18 × 2.9 Gy in 24 days", bn, fixed = TRUE) && grepl("35 × 2 Gy in 47 days", bn, fixed = TRUE) &&
           grepl("+1 Gy", bn, fixed = TRUE) && grepl("DD calibrated", bn, fixed = TRUE), bn)
   # 3.1 (2026-10-26): column name, DD status wording and fitted-DD banner text updated to the 3.1 app.
   rc <- table_text("report")
   check("1 report card opens first, with a named difference and the refit column",
         grepl("Δ vs 35 × 2 Gy in 47 days", rc, fixed = TRUE) && grepl("Verified-trial refit 2026-10-25", rc, fixed = TRUE), substr(rc, 1, 200))
-  check("1 report card flags the extrapolation (2.75 Gy > 2.5 Gy)", grepl("outside the tumor data", text_of("report_notes")))
+  check("1 report card flags the extrapolation (2.9 Gy above the tumor data)", grepl("outside the tumor data", text_of("report_notes")))
   check("1 how-to-read card visible", grepl("How to read this", js("document.body.innerText"), fixed = TRUE))
   check("1 Report card: no output errors", !nzchar(errors()), errors())
   shot("01_report_card")
@@ -124,6 +125,11 @@ main <- function(args) {
   for (t in c("Results", "Compare regimens", "Search", "Both-model screen", "Sensitivity", "Uncertainty", "Organs at risk", "Model and sources")) {
     tab(t); idle(2); check(sprintf("2 %s opens without output errors", t), !nzchar(errors()), errors())
   }
+  tab("Results"); idle(2)
+  bt <- table_text("benchmarks")
+  check("2 all three benchmark rows show their DI and DD differences (review R04)",
+        !grepl("not available", bt, fixed = TRUE) &&
+          all(vapply(c("-1.39", "-8.67", "+1.11", "-2.87", "-10.60", "-15.14"), grepl, logical(1), bt, fixed = TRUE)), substr(bt, 1, 300))
   tab("Search")
   check("2 early-limit value shown beside its control", grepl("Value now: 55.87", text_of("early_limit_value"), fixed = TRUE), text_of("early_limit_value"))
   check("2 search opens empty at the defaults", identical(rows(), ""), rows())

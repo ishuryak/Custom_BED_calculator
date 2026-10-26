@@ -103,7 +103,8 @@ test_that("E2: at the opening settings no candidate qualifies and the message ex
     msg <- output$suggest_msg$html
     expect_true(grepl("under both models", msg, fixed = TRUE))
     expect_true(grepl("valid outcome", msg, fixed = TRUE))
-    expect_true(grepl("Model agreement tab explores a separate comparison", msg, fixed = TRUE))
+    # 3.2 (review R07, 2026-10-26): the old "Model agreement tab ... separate comparison" text was wrong
+    expect_true(grepl("The Both-model screen uses", msg, fixed = TRUE) && grepl("global comparison and threshold", msg, fixed = TRUE))
     expect_true(grepl("can include regimens that fail the threshold under the other model", msg, fixed = TRUE))
     expect_false(grepl("only one model supports", msg, fixed = TRUE))
     # no stale rows after a nonempty search
@@ -251,5 +252,5 @@ test_that("D: a new export records the current version and the chosen settings (
 test_that("D: app and DESCRIPTION carry the same version", {
   desc <- read.dcf(file.path(app_abs, "DESCRIPTION"))
   expect_equal(unname(desc[1, "Version"]), APP_VERSION)
-  expect_equal(APP_VERSION, "3.1.0")   # 3.1.0: verified-trial refit in the app (plan 2026-10-25)
+  expect_equal(APP_VERSION, "3.2.0")   # 3.2.0: 2026-10-26 review (3.1.0 was the verified-trial refit)
 })
