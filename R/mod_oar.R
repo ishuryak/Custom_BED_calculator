@@ -18,10 +18,12 @@ oar_ui <- function(id) {
   })
   tagList(
     div(class = "alert alert-secondary",
-        "Constraints from conventional fractionation (QUANTEC) or from the HYHOPE protocol's hypofractionated tables",
-        "are converted to the evaluated regimen's number of fractions with the linear-quadratic model and an organ",
-        "α/β, the method the HYPNO trial describes. A status is a statement about the converted constraint under the",
-        "stated α/β, not about safety. Organs left blank are not assessed. No normal-tissue complication probability is calculated."),
+        "Maximum-dose constraints from conventional fractionation (QUANTEC) or from the HYHOPE protocol's",
+        "hypofractionated tables are converted to the evaluated regimen's number of fractions with the linear-quadratic",
+        "model and an organ α/β, the method the HYPNO trial describes. Mean-dose limits are physical means from their",
+        "source: they are compared with the planned physical mean, and the mean EQD2 is shown for illustration only.",
+        "A status is a statement about the source limit, not about safety. Organs left blank are not assessed. These are",
+        "selected constraint metrics, not full protocol compliance. No normal-tissue complication probability is calculated."),
     layout_columns(col_widths = c(4, 4, 4),
       radioButtons(ns("library"), "Constraint source",
                    c("QUANTEC 2010 (2-Gy fractions, converted)" = "QUANTEC",
@@ -40,8 +42,9 @@ oar_ui <- function(id) {
     conditionalPanel(sprintf("input['%s'] == 'dvh'", ns("mode")),
       div(class = "alert alert-warning",
           tags$strong("Do not upload identifiable patient data to the public website. "),
-          "Files containing patient name or ID fields with values are refused. The file is read in memory, never",
-          "stored, logged or included in downloads. For real patient plans use the local version (run_app.bat).",
+          "Files containing patient name or ID fields with values are refused. The upload is saved as a temporary file on the server,",
+          "read into memory and deleted at once. It is not kept, logged or included in downloads. For real patient plans",
+          "use the local version (run_app.bat).",
           "Use of real plans in a study may need institutional review board approval."),
       fileInput(ns("dvh_file"), "Cumulative DVH: Eclipse-style text export, or a CSV with dose and volume columns (max 2 MB)",
                 accept = c(".txt", ".csv", ".dvh")),
@@ -75,7 +78,7 @@ oar_server <- function(id, settings) {
     observeEvent(input$dvh_file, {
       f <- input$dvh_file
       res <- tryCatch(read_dvh_upload(f$datapath, f$size), error = function(e) e)
-      unlink(f$datapath)  # never kept on disk
+      unlink(f$datapath)  # delete Shiny's temporary upload file at once
       if (inherits(res, "error")) { dvh(NULL); dvh_error(conditionMessage(res)); return() }
       dvh(res); dvh_error(NULL)
       ch <- c("(not assessed)" = "", stats::setNames(names(res), names(res)))
@@ -123,40 +126,64 @@ oar_server <- function(id, settings) {
 
     pretty <- function(t, m) {
       num <- function(x) ifelse(is.na(x), "", sprintf("%.1f", x))
+      mean_m <- t$metric == "Dmean"
+      planned_phys <- ifelse(!is.na(t$planned_max_lo), sprintf("%.1f to %.1f (DVH bin)", t$planned_max_lo, t$planned_max_hi),
+                             num(t$planned_physical))
       data.frame(Organ = t$organ, Metric = ifelse(t$metric == "Dmax", "maximum", "mean"),
                  `Source constraint` = ifelse(is.na(t$source), "none verified", t$source),
+                 `Source metric and fractionation` = ifelse(is.na(t$source_metric), "",
+                                                            sprintf("%s; %s", t$source_metric, t$source_fractionation)),
+                 `Compared as` = ifelse(is.na(t$basis), "", t$basis),
                  `α/β (Gy)` = sprintf("%g", t$ab),
                  `Limit, EQD2 (Gy)` = num(t$limit_eqd2),
-                 `Limit, physical in this regimen (Gy)` = num(t$limit_physical),
-                 `Planned, physical (Gy)` = num(t$planned_physical),
-                 `Planned, EQD2 (Gy)` = num(t$planned_eqd2),
-                 `Margin, EQD2 (Gy)` = num(t$margin_gy),
+                 `Limit, physical in this regimen (Gy)` = ifelse(is.na(t$limit_physical), "", sprintf("%s%.1f", t$operator, t$limit_physical)),
+                 `Planned, physical (Gy)` = planned_phys,
+                 `Planned, EQD2 (Gy)` = ifelse(mean_m & !is.na(t$planned_eqd2), paste(num(t$planned_eqd2), "(illustration)"), num(t$planned_eqd2)),
+                 `Margin (Gy, in the compared quantity)` = num(t$margin_gy),
                  Status = t$status, `Over the α/β range` = t$flip, Notes = t$flags,
                  check.names = FALSE)
     }
+    coverage <- reactive({
+      t <- tab()
+      oar_coverage(lib, stats::setNames(as.list(ifelse(t$entered, 1, NA)), OAR_ORGANS$key), input$library)
+    })
     output$context <- renderUI({
       r <- settings()$regimen
       div(class = "alert alert-light", style = "padding:0.5rem 0.75rem;",
-          sprintf("Evaluated regimen: %d × %g Gy (%g Gy) in %g days. Constraint source: %s. α/β: %g Gy (cord, brainstem), %g Gy (other organs).",
-                  r$m, r$d, r$m * r$d, r$T, input$library, ab()[["cord"]], ab()[["oar"]]))
+          sprintf("Evaluated regimen: %d × %g Gy (%g Gy) in %g days. Constraint source: %s. %s α/β: %g Gy (cord, brainstem), %g Gy (other organs), the HYPNO assumptions.",
+                  r$m, r$d, r$m * r$d, r$T, OAR_LIBRARY_META[[input$library]]$version,
+                  OAR_LIBRARY_META[[input$library]]$scope, ab()[["cord"]], ab()[["oar"]]))
     })
     output$table <- renderTable(pretty(tab(), settings()$regimen$m), striped = TRUE, bordered = TRUE)
     output$binding <- renderUI({
       t <- tab()
-      if (!any(t$binds_first)) return(helpText("No organ dose is entered, so nothing is assessed."))
+      cov <- helpText(oar_coverage_text(coverage()))
+      unver <- t$organ[t$entered & is.na(t$source)]
+      unver_txt <- if (length(unver)) helpText(sprintf("Not assessed: %s %s no verified constraint in this library.",
+                                                       paste(unver, collapse = ", "), if (length(unver) > 1) "have" else "has"))
+      if (!any(t$binds_first)) {
+        return(tagList(helpText(if (any(t$entered)) "No entered organ has a verified constraint in this library, so nothing is assessed." else
+          "No organ dose is entered, so nothing is assessed."), unver_txt, cov))
+      }
       b <- t[t$binds_first, ]
-      helpText(sprintf("Binds first: %s, with an EQD2 margin of %.1f Gy (%.0f%% of its limit) under α/β %g Gy.",
-                       b$organ, b$margin_gy, 100 * b$margin_gy / b$limit_eqd2, b$ab))
+      lim <- if (b$metric == "Dmean") b$limit_physical else b$limit_eqd2
+      tagList(helpText(sprintf("Binds first: %s, with a margin of %.1f Gy (%s, %.0f%% of its limit).",
+                               b$organ, b$margin_gy, if (b$metric == "Dmean") "physical mean" else sprintf("EQD2 under α/β %g Gy", b$ab),
+                               100 * b$margin_gy / lim)), unver_txt, cov)
     })
     output$bench <- renderTable({
       validate(need(input$mode == "percent", "Enter organ doses as % of the prescription to compare regimens."))
       bm <- benchmark_regimens()
       rows <- lapply(seq_len(nrow(bm)), function(i) {
         t <- table_for(list(m = bm$m[i], d = bm$d[i], T = bm$T[i]))
-        t <- t[t$status != "no verified constraint in this library" & t$status != "not assessed", ]
+        t <- t[t$entered & !is.na(t$source), ]
         if (nrow(t) == 0) return(NULL)
-        data.frame(Regimen = bm$name[i], Organ = t$organ, `Planned EQD2 (Gy)` = sprintf("%.1f", t$planned_eqd2),
-                   `Limit EQD2 (Gy)` = sprintf("%.1f", t$limit_eqd2), Status = t$status, check.names = FALSE)
+        mean_m <- t$metric == "Dmean"
+        data.frame(Regimen = bm$name[i], Organ = t$organ,
+                   `Compared as` = ifelse(mean_m, "physical mean", "EQD2"),
+                   `Planned (Gy)` = sprintf("%.1f", ifelse(mean_m, t$planned_physical, t$planned_eqd2)),
+                   `Limit (Gy)` = sprintf("%s%.1f", t$operator, ifelse(mean_m, t$limit_physical, t$limit_eqd2)),
+                   Status = t$status, check.names = FALSE)
       })
       do.call(rbind, rows)
     }, striped = TRUE, bordered = TRUE)
@@ -168,8 +195,9 @@ oar_server <- function(id, settings) {
         t <- tab()
         hdr <- c(sprintf("# HNSCC BED calculator %s, organ-at-risk feasibility. Regimen %d x %g Gy in %g days.",
                          APP_VERSION, r$m, r$d, r$T),
-                 sprintf("# Library %s; alpha/beta cord %g Gy, other %g Gy. Status refers to the converted constraint under the stated alpha/beta; it is not a statement of safety.",
-                         input$library, ab()[["cord"]], ab()[["oar"]]),
+                 sprintf("# Library %s; alpha/beta cord %g Gy, other %g Gy. Organ rules %s. Maxima are compared as EQD2; mean-dose limits as physical means (EQD2 for illustration only). Status is not a statement of safety.",
+                         OAR_LIBRARY_META[[input$library]]$version, ab()[["cord"]], ab()[["oar"]], OAR_VERSION),
+                 paste("#", oar_coverage_text(coverage())),
                  "# Uploaded DVH content is not included in this file.")
         writeLines(hdr, file)
         suppressWarnings(utils::write.table(t, file, sep = ",", row.names = FALSE, append = TRUE))

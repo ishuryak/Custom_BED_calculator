@@ -1,28 +1,33 @@
 # Uncertainty tab (Shiny module). Requires R/uncertainty.R and R/oar.R.
 # settings(): list(regimen, ref, threshold, early_mode, late_mode, tol_early,
 #   tol_late, calendar, d_step, d_max, m_range, min_days).
-# oar(): the organ module's value (percents, search_check, library, ab).
+# oar_policy(): the applied organ policy, list(library, percents, ab,
+#   coverage), or NULL when organ limits are not applied. It raises a
+#   validation error when limits are applied but an organ input is invalid, so
+#   an applied check can block but never silently disappear.
 
-UNC_VARIANTS <- c("Primary refit (α/β prior 5-20 Gy, background growth estimated, overdispersion)" = "primary",
-                  "2018 paper's restrictions (α/β 10 Gy and g 0.0154/day fixed, overdispersion)" = "paper_restrictions")
+UNC_VARIANTS <- c("Verified-trial refit (α/β prior 5-20 Gy, background growth estimated)" = "primary",
+                  "Same refit with the 2018 paper's restrictions (α/β 10 Gy and g 0.0154/day fixed)" = "paper_restrictions")
 
 unc_ui <- function(id) {
   ns <- NS(id)
   tagList(
     div(class = "alert alert-secondary",
         tags$strong("What this tab shows. "),
-        "Each tumor model was refitted to the 35 randomized trial arms of Shuryak, Hall and Brenner (2018) with",
-        "Bayesian methods (one intercept per trial, so only within-trial contrasts inform the fit, plus",
-        "between-arm overdispersion). The refit's joint parameter draws are applied to the evaluated regimen and the",
-        "comparison together, so their difference carries the parameter correlations. Results are shares of",
-        "simulated parameter draws under the stated models and priors, not probabilities of tumor control or of",
-        "safety. DI and DD are shown separately and never averaged."),
+        "The DI tumor model was refitted with Bayesian methods to randomized trial arms of radiotherapy alone,",
+        "re-extracted from the trial publications (one intercept per trial, so the fit is driven mainly by",
+        "within-trial contrasts, plus between-arm overdispersion). The DD model is calibrated to DI at 35 × 2 Gy",
+        "in 47 days and its rate was fitted to the same trials for each DI draw, so DD draw i belongs to DI draw i.",
+        "The draws are applied to the evaluated regimen and the comparison together, so their difference carries the",
+        "parameter correlations. Toxicity draws are paired with tumor draws independently (an assumption). Results",
+        "are shares of simulated parameter draws under the stated models and priors, not probabilities of tumor",
+        "control or of safety. DI and DD are shown separately and never averaged."),
     uiOutput(ns("refit_status")),
     layout_columns(col_widths = c(4, 4, 4),
       selectInput(ns("variant"), "Refit used", UNC_VARIANTS),
       selectInput(ns("tumor_crit"), "Tumor criterion for the joint share",
-                  c("DI model (refit informed by data)" = "di", "both models" = "both",
-                    "DD model (refit prior-dominated)" = "dd")),
+                  c("DI model" = "di", "both models (paired draws)" = "both",
+                    "DD model (calibrated to DI)" = "dd")),
       radioButtons(ns("tox_source"), "Toxicity parameters",
                    c("Uncertain (stated priors)" = "prior", "Fixed (the sidebar values)" = "fixed"))),
     uiOutput(ns("context")),
@@ -35,13 +40,16 @@ unc_ui <- function(id) {
       numericInput(ns("tcp0"), "Tumor control of the comparison regimen (%)", 70, 1, 99, 1),
       helpText("With tumor control exp(−K S), a BED difference ΔBED multiplies S by exp(−α ΔBED), so the evaluated",
                "regimen's control is (control of the comparison)^exp(−α ΔBED), with α from the same draw. The refit's",
-               "α is population-level (it includes patient-to-patient variation), so these slopes are shallow. The",
-               "control rate is your input: the refit's trials did not use concurrent chemotherapy.")),
+               "α is small, so these slopes are shallow; a small aggregate α may reflect patient-to-patient variation,",
+               "mixed endpoints and the model's form. The control rate is your input, and its uncertainty is not",
+               "included: the refit's main trials did not use concurrent chemotherapy.")),
     div(style = "overflow-x:auto;", tableOutput(ns("tcp"))),
     h5("Search under uncertainty"),
-    helpText(sprintf("The search uses %d of the draws; the listed regimens are then summarized with all of them.", SEARCH_DRAWS),
-             "The selection rule is fixed before the search. The best value over draws is never reported, because it is",
-             "optimistic by construction. Each listed regimen is shown with its neighbors on the dose grid."),
+    helpText(sprintf("The search screens the grid with %d of the draws. The toxicity requirement of each listed dose is then", SEARCH_DRAWS),
+             "checked again on all draws, and all draws are used for the summaries. The selection rule is fixed before",
+             "the search. The best value over draws is never reported, because it is optimistic by construction. Each",
+             "listed regimen is shown with its neighbors on the dose grid. A listed dose meets the toxicity requirement;",
+             "it need not meet the tumor criterion. Candidates use the regular calendar, without skipped days."),
     layout_columns(col_widths = c(4, 4, 4),
       selectInput(ns("rule"), "Selection rule, per number of fractions",
                   c("Highest 10th percentile of the smaller of ΔDI and ΔDD" = "min_q10",
@@ -53,12 +61,16 @@ unc_ui <- function(id) {
     downloadButton(ns("download"), "Download the uncertainty analysis (ZIP)"))
 }
 
-unc_server <- function(id, settings, oar) {
+unc_server <- function(id, settings, oar_policy) {
   moduleServer(id, function(input, output, session) {
     draws <- reactive(list(di = load_draws("di", input$variant), dd = load_draws("dd", input$variant)))
+    # Fixed toxicity: the sidebar values and the organ alpha/beta of the
+    # Organs at risk tab (one effective parameter set, also exported).
     tx_all <- reactive({
       s <- settings()
-      if (identical(input$tox_source, "fixed")) fixed_toxicity_draws(s$p, nrow(draws()$di)) else toxicity_draws(nrow(draws()$di))
+      pol <- oar_policy()
+      organ_ab <- if (is.null(pol)) default_oar_ab() else pol$ab
+      if (identical(input$tox_source, "fixed")) fixed_toxicity_draws(s$p, nrow(draws()$di), organ_ab) else toxicity_draws(nrow(draws()$di))
     })
     limits <- reactive({
       s <- settings()
@@ -67,9 +79,9 @@ unc_server <- function(id, settings, oar) {
       list(early = list(mode = s$early_mode, tol = s$tol_early), late = list(mode = s$late_mode, tol = s$tol_late))
     })
     oar_fun <- reactive({
-      o <- oar()
-      if (!isTRUE(o$search_check) || length(o$percents) == 0) return(NULL)
-      oar_draw_checker(load_constraints(), o$percents, o$library)
+      pol <- oar_policy()
+      if (is.null(pol)) return(NULL)
+      oar_draw_checker(load_constraints(), pol$percents, pol$library)
     })
 
     one <- reactive({
@@ -84,12 +96,15 @@ unc_server <- function(id, settings, oar) {
       d <- draws(); sup <- tumor_data_support()
       la <- stats::quantile(d$di$lambda / d$di$alpha, c(.025, .975), names = FALSE)
       div(class = "alert alert-warning",
-          tags$strong("Status of the refit (for review, not yet the default). "),
-          sprintf(paste("The DI refit is informed by the data (daily repopulation loss λ/α, 95%% %.2f-%.2f Gy₁₀/day).",
-                        "The DD refit is not: its rate and onset constant reproduce their priors, so DD intervals here",
-                        "mostly reflect assumptions. Tumor α/β is not informed by these data (posterior = prior). The trial",
-                        "data cover %g-%g Gy per fraction; larger fractions are extrapolations. See Model and sources."),
-                  la[1], la[2], sup$d_min, sup$d_max))
+          tags$strong("About these draws. "),
+          sprintf(paste("Refit to %d arms of %d randomized trials of radiotherapy alone (data file %s), re-extracted from",
+                        "the trial publications. The DI refit is informed by the data (daily repopulation loss λ/α, 95%%",
+                        "%.2f-%.2f Gy/day at each draw's α/β). DD's rate was fitted for each DI draw after calibration at",
+                        "35 × 2 Gy in 47 days, with a soft preference for repopulation onset at or after day 7, so DD is not",
+                        "an independent check of DI. Tumor α/β is not informed by these data (posterior close to prior).",
+                        "The fit treats reported control rates, mostly Kaplan-Meier estimates, as counts (an approximation).",
+                        "The trial data cover %g-%g Gy per fraction; larger fractions are extrapolations. See Model and sources."),
+                  sup$n_arms, sup$n_studies, sup$file, la[1], la[2], sup$d_min, sup$d_max))
     })
 
     output$context <- renderUI({
@@ -99,8 +114,17 @@ unc_server <- function(id, settings, oar) {
                   regimen_text(s$regimen), regimen_text(s$ref), s$threshold,
                   if (s$early_mode == "hypno") "HYPNO 55 Gy/20 under the same draw" else sprintf("comparison + %g Gy under the same draw", s$tol_early),
                   if (s$late_mode == "hypno") "HYPNO 55 Gy/20" else sprintf("comparison + %g Gy", s$tol_late),
-                  if (is.null(oar_fun())) " Organ limits: not applied." else " Organ limits: applied (Organs at risk tab)."))
+                  oar_context_text()))
     })
+    oar_context_text <- function() {
+      pol <- oar_policy()
+      if (is.null(pol)) return(" Organ limits: not applied.")
+      ab_txt <- if (identical(input$tox_source, "fixed"))
+        sprintf("organ α/β from the Organs at risk tab (%g Gy cord and brainstem, %g Gy other organs)", pol$ab[["cord"]], pol$ab[["oar"]]) else
+        "organ α/β drawn from the stated priors, which replace the tab's values"
+      sprintf(" Organ limits: applied to %s (%s; %s). %s", paste(pol$coverage$entered, collapse = ", "), pol$library, ab_txt,
+              oar_coverage_text(pol$coverage))
+    }
 
     output$summary <- renderTable({
       x <- one()$sum; s <- settings()
@@ -114,7 +138,7 @@ unc_server <- function(id, settings, oar) {
                            both = !is.na(one()$td$delta_di[1, ]) & !is.na(one()$td$delta_dd[1, ]) &
                              one()$td$delta_di[1, ] >= s$threshold - 1e-9 & one()$td$delta_dd[1, ] >= s$threshold - 1e-9) &
                       one()$tox$ok[1, ])
-      u <- bed_unit(10)
+      u <- draws_bed_unit(draws()$di)
       data.frame(
         Quantity = c(sprintf("Δ tumor BED, DI, vs %s (%s): median", regimen_text(s$ref), u), "    80% range", "    95% range",
                      sprintf("Δ tumor BED, DD, vs %s (%s): median", regimen_text(s$ref), u), "    80% range", "    95% range",
@@ -122,27 +146,27 @@ unc_server <- function(id, settings, oar) {
                      "Share of draws within every toxicity limit",
                      sprintf("Share meeting the tumor criterion (%s) and every limit, draw by draw", input$tumor_crit),
                      "Draws not evaluable (a BED not positive): DI / DD",
-                     "Monte Carlo standard error of a share (at most)"),
+                     "Monte Carlo standard error of a share near 50% (approximate)"),
         Value = c(fmt_half(x$di_median), rng(x$di_q10, x$di_q90), rng(x$di_q025, x$di_q975),
                   fmt_half(x$dd_median), rng(x$dd_q10, x$dd_q90), rng(x$dd_q025, x$dd_q975),
                   fmt_share(x$share_di), fmt_share(x$share_dd), fmt_share(x$share_tox), fmt_share(joint),
                   sprintf("%d / %d of %d", x$n_invalid_di, x$n_invalid_dd, n),
-                  sprintf("%.1f percentage points (effective sample size %.0f)", 100 * share_mcse(0.5, min(n, ess)), min(n, ess))),
+                  sprintf("about %.1f percentage points, treating the %.0f distinct DI draws as independent", 100 * share_mcse(0.5, min(n, ess)), min(n, ess))),
         check.names = FALSE)
     }, striped = TRUE, bordered = TRUE)
 
     output$hist <- renderPlot({
       td <- one()$td; s <- settings()
       long <- rbind(data.frame(delta = td$delta_di[1, ], Model = "DI (refit)"),
-                    data.frame(delta = td$delta_dd[1, ], Model = "DD (refit, prior-dominated)"))
+                    data.frame(delta = td$delta_dd[1, ], Model = "DD (calibrated to DI)"))
       long <- long[is.finite(long$delta), ]
       validate(need(nrow(long) > 0, "No evaluable draws."))
       ggplot(long, aes(delta, fill = Model)) +
         geom_histogram(bins = 60, alpha = 0.6, position = "identity", colour = NA) +
         geom_vline(xintercept = 0, colour = "grey40") +
         geom_vline(xintercept = s$threshold, linetype = "dashed") +
-        scale_fill_manual(values = c("DI (refit)" = "#0072B2", "DD (refit, prior-dominated)" = "#D55E00")) +
-        labs(x = sprintf("Tumor BED of the evaluated regimen minus %s (Gy₁₀)", regimen_text(s$ref)),
+        scale_fill_manual(values = c("DI (refit)" = "#0072B2", "DD (calibrated to DI)" = "#D55E00")) +
+        labs(x = sprintf("Tumor BED of the evaluated regimen minus %s (%s)", regimen_text(s$ref), draws_bed_unit(draws()$di)),
              y = "Number of draws") +
         theme_minimal(base_size = 15) + theme(axis.title = element_text(face = "bold"), legend.position = "top")
     })
@@ -153,68 +177,90 @@ unc_server <- function(id, settings, oar) {
       q <- function(x) stats::quantile(x, c(.1, .5, .9), na.rm = TRUE, names = FALSE)
       di <- q(100 * tcp_given_control(td$delta_di, d$di$alpha, input$tcp0 / 100)[1, ] - input$tcp0)
       dd <- q(100 * tcp_given_control(td$delta_dd, d$dd$alpha, input$tcp0 / 100)[1, ] - input$tcp0)
-      data.frame(Model = c("DI (refit)", "DD (refit, prior-dominated)"),
+      data.frame(Model = c("DI (refit)", "DD (calibrated to DI)"),
                  `Change in tumor control, median (percentage points)` = sprintf("%+.1f", c(di[2], dd[2])),
                  `80% range` = sprintf("%+.1f to %+.1f", c(di[1], dd[1]), c(di[3], dd[3])), check.names = FALSE)
     }, striped = TRUE, bordered = TRUE)
 
+    # A search result is kept with the identity of the settings it was run
+    # with. When any effective input changes, the result is no longer shown or
+    # exported (S1): a download never mixes old rows with new settings.
     result <- reactiveVal(NULL)
+    run_key <- function(s, rule, tox_share) uncertainty_scenario(s, input$variant, input$tox_source,
+                                                                 list(rule = rule, tox_share = tox_share), oar_policy())$scenario_id
+    current_key <- reactive(tryCatch(run_key(settings(), input$rule, input$tox_share), error = function(e) NA_character_))
+    valid_result <- reactive({
+      r <- result()
+      if (is.null(r) || !identical(r$key, current_key())) NULL else r
+    })
+    stale <- reactive(!is.null(result()) && is.null(valid_result()))
     observeEvent(input$run, {
       s <- settings()
       validate(need(is.numeric(input$tox_share) && input$tox_share >= 50 && input$tox_share <= 100, "Required share must be 50-100%."))
       withProgress(message = "Searching under uncertainty", value = 0.2, {
-        d <- draws(); tx <- tx_all()
-        sub <- list(di = search_subset(d$di), dd = search_subset(d$dd), tx = search_subset(tx))
-        res <- uncertain_search(s$ref, sub$di, sub$dd, sub$tx, limits(), s$threshold, input$rule,
-                                m_range = s$m_range, d_step = s$d_step, d_max = s$d_max,
-                                min_days_saved = s$min_days, calendar = s$calendar,
-                                tox_share_min = input$tox_share / 100, oar_fun = oar_fun())
+        d <- draws()
+        out <- run_uncertainty_search(s$ref, d$di, d$dd, tx_all(), limits(), s$threshold, input$rule,
+                                      m_range = s$m_range, d_step = s$d_step, d_max = s$d_max,
+                                      min_days_saved = s$min_days, calendar = s$calendar,
+                                      tox_share_min = input$tox_share / 100, oar_fun = oar_fun())
         incProgress(0.5)
-        full <- if (nrow(res) > 0) {
-          grid <- attr(res, "grid")
-          nb <- do.call(rbind, lapply(seq_len(nrow(res)), function(i) {
-            g <- grid_neighbors(grid, res$m[i], res$d[i], s$d_step)
-            g$listed <- abs(g$d - res$d[i]) < 1e-9
-            g
-          }))
-          regs <- nb[, c("m", "d", "T")]
-          td <- tumor_deltas(regs, s$ref, d$di, d$dd)
-          tox <- toxicity_ok_draws(regs, s$ref, tx, limits(), if (is.null(oar_fun())) NULL else oar_fun()(regs, tx))
-          cbind(summarize_draws(regs, td, tox, s$threshold), listed = nb$listed,
-                outside_data = nb$d > tumor_data_support()$d_max + 1e-9)
-        } else NULL
-        result(list(res = res, full = full, settings = s, rule = input$rule, tox_share = input$tox_share,
-                     variant = input$variant, tox_source = input$tox_source))
+        result(list(res = out$res, full = out$full, n_failed = out$n_failed, settings = s, rule = input$rule,
+                    tox_share = input$tox_share, key = run_key(s, input$rule, input$tox_share)))
       })
     })
     output$search_msg <- renderUI({
-      r <- result()
-      if (is.null(r)) return(helpText("Press 'Run the search' to start (about 2 seconds)."))
+      if (stale()) return(div(class = "alert alert-warning",
+        "The settings changed after the search, so its results are not shown or exported. Run the search again."))
+      r <- valid_result()
+      if (is.null(r)) return(helpText("Press 'Run the search' to start (a few seconds)."))
       if (nrow(r$res) == 0)
-        return(div(class = "alert alert-info", "No regimen in the grid reaches the required share of draws within every toxicity limit."))
-      helpText(sprintf("%d numbers of fractions have an eligible regimen. Listed rows are marked; their neighbors (one dose step either side) follow. Summaries use all %d draws.",
-                       nrow(r$res), r$full$n_draws[1]))
+        return(div(class = "alert alert-info", "No regimen in the grid reaches the required share of draws within every toxicity limit, checked on all draws."))
+      failed <- r$full[r$full$role == "failed_full_check", ]
+      helpText(sprintf(paste("Each listed row is the best-ranked dose for this fraction count among regimens meeting the selected",
+                             "modeled toxicity-share requirement (%g%% of draws); tumor criterion may fail. %d fraction counts are listed.",
+                             "The requirement was checked again on all draws (%d).%s Neighbors (one dose step either side) follow."),
+                       r$tox_share, nrow(r$res), r$full$n_draws[1],
+                       if (nrow(failed)) sprintf(" The screen's choice failed that check for %s, so the next-ranked dose was used (rows marked 'failed the all-draw check').",
+                                                 paste(sprintf("%d × %.2f Gy", failed$m, failed$d), collapse = ", ")) else ""))
     })
     output$search_table <- renderTable({
-      r <- result(); req(r, !is.null(r$full))
+      r <- valid_result(); req(r, !is.null(r$full))
       f <- r$full
       f <- f[order(f$m, f$d), ]
-      data.frame(Listed = ifelse(f$listed, "listed", "neighbor"), Fractions = f$m, `Gy per fraction` = sprintf("%.2f", f$d),
+      req_share <- r$tox_share / 100
+      share_count <- function(x) {
+        cnt <- round(x * f$n_draws)
+        ifelse(x < 0.05 | x > 0.95 | abs(x - req_share) < 0.05,
+               sprintf("%s (%d of %d)", fmt_share(x), cnt, f$n_draws), fmt_share(x))
+      }
+      score <- if (identical(r$rule, "min_q10")) fmt_half(f$min_q10) else fmt_share(f$share_joint)
+      data.frame(Row = c(listed = "listed", neighbor = "neighbor", failed_full_check = "failed the all-draw check")[f$role],
+                 Fractions = f$m, `Gy per fraction` = sprintf("%.2f", f$d),
                  Days = f$T, `Days saved` = r$settings$ref$T - f$T,
                  `ΔDI median (80% range)` = sprintf("%s (%s to %s)", fmt_half(f$di_median), fmt_half(f$di_q10), fmt_half(f$di_q90)),
                  `ΔDD median (80% range)` = sprintf("%s (%s to %s)", fmt_half(f$dd_median), fmt_half(f$dd_q10), fmt_half(f$dd_q90)),
-                 `Within toxicity limits` = fmt_share(f$share_tox),
+                 `Ranking score (all draws)` = ifelse(is.na(f$min_q10) & identical(r$rule, "min_q10"), "unavailable", score),
+                 `Tumor threshold met (share of draws): DI / DD / both` = sprintf("%s / %s / %s", fmt_share(f$share_di), fmt_share(f$share_dd), fmt_share(f$share_both)),
+                 `Within toxicity limits` = share_count(f$share_tox),
                  `Both models ≥ threshold and within limits` = fmt_share(f$share_joint),
+                 `Draws evaluable under both models` = sprintf("%d of %d", f$n_valid_both, f$n_draws),
                  `Outside the tumor data's dose per fraction` = ifelse(f$outside_data, sprintf("yes (> %g Gy)", tumor_data_support()$d_max), ""),
-                 check.names = FALSE)
+                 check.names = FALSE) |>
+        stats::setNames(c("Row", "Fractions", "Gy per fraction", "Days", "Days saved",
+                          sprintf("ΔDI median (80%% range), %s", draws_bed_unit(draws()$di)),
+                          sprintf("ΔDD median (80%% range), %s", draws_bed_unit(draws()$di)),
+                          "Ranking score (all draws)", "Tumor threshold met (share of draws): DI / DD / both",
+                          "Within toxicity limits", "Both models ≥ threshold and within limits",
+                          "Draws evaluable under both models", "Outside the tumor data's dose per fraction"))
     }, striped = TRUE, bordered = TRUE)
 
     output$download <- downloadHandler(
       filename = function() sprintf("bed_v%s_uncertainty_%s.zip", APP_VERSION, format(Sys.Date())),
       content = function(file) {
-        r <- result()
+        r <- valid_result()
         s <- settings()
-        sc <- uncertainty_scenario(s, input$variant, input$tox_source, if (is.null(r)) NULL else r)
+        sc <- uncertainty_scenario(s, input$variant, input$tox_source,
+                                   if (is.null(r)) NULL else list(rule = r$rule, tox_share = r$tox_share), oar_policy())
         write_uncertainty_zip(file, sc, one()$sum, if (is.null(r)) NULL else r$full)
       }, contentType = "application/zip")
   })

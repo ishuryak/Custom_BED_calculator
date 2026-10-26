@@ -56,8 +56,10 @@ test_that("report card: values, named differences, limit status and the refit co
     set_v3(session)
     r <- output$report
     expect_true(grepl("Δ vs 35 × 2 Gy in 47 days", r, fixed = TRUE))
-    expect_true(grepl("Bayesian refit (for review)", r, fixed = TRUE))
-    expect_true(grepl("prior-dominated", r, fixed = TRUE))
+    # Version 3.1: the column shows the verified-trial refit with calibrated DD
+    # (was "Bayesian refit (for review)" ... "prior-dominated" for the 2018-table fit).
+    expect_true(grepl("Verified-trial refit 2026-10-25", r, fixed = TRUE))
+    expect_true(grepl("(calibrated DD)", r, fixed = TRUE))
     b <- both()
     expect_true(grepl(sprintf("%.2f", b$bed_di[1]), r, fixed = TRUE))
     expect_true(grepl("within (limit 55.9)", r, fixed = TRUE))  # HYPNO acute limit, HYPNO itself is within
@@ -74,7 +76,7 @@ test_that("organ rows reach the report card, and blank organs are not assessed",
     session$setInputs(`oar-v_cord` = 80, `oar-v_parotid` = 40)
     r <- output$report
     expect_true(grepl("Spinal cord, maximum EQD2", r, fixed = TRUE))
-    expect_true(grepl("Parotid (spared side), mean EQD2", r, fixed = TRUE))
+    expect_true(grepl("Parotid (spared side), mean physical dose", r, fixed = TRUE))   # OAR-01 (stage A): a mean limit is physical
   })
 })
 
@@ -85,7 +87,8 @@ test_that("fitted DD: the DD BED uses the fitted values, the anchor is not used"
     b <- both()
     expect_equal(b$bed_dd[1], bed_dd(20, 2.75, 26, 0.0272, 10, 0.467, 392.8, 0.0171))
     expect_equal(calibration()$status, "fitted")
-    expect_true(grepl("DD fitted", output$banner$html, fixed = TRUE))
+    # 3.1 (stage E): the values in this mode are typed by the user (they start at the refit's), so the banner names the mode
+    expect_true(grepl("DD values entered directly (not calibrated)", output$banner$html, fixed = TRUE))
     expect_true(grepl("does not use the anchor|instead, so the anchor is not used", output$anchor_note$html))
     expect_false(grepl("equal to DI by calibration", output$report, fixed = TRUE))
   })

@@ -9,12 +9,29 @@
 
 WEEKDAY_NAMES <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
+# One validation contract for skipped days, shared by the interface parser,
+# the direct API and replayed files: finite whole numbers from 2 to 400,
+# duplicates removed. An empty value (NULL, integer(0), an empty JSON array)
+# means no skipped days.
+check_skip_days <- function(x) {
+  if (is.null(x) || length(x) == 0) return(integer())
+  if (is.list(x)) x <- unlist(x)
+  if (!is.numeric(x) || any(!is.finite(x)) || any(x != round(x)))
+    stop("Skipped days must be whole numbers from 2 to 400 (day 1 is the first treatment day).")
+  if (any(x == 1)) stop("Day 1 is the first treatment day by definition and cannot be skipped.")
+  if (any(x < 2) || any(x > 400))
+    stop("Skipped days must be whole numbers from 2 to 400 (day 1 is the first treatment day).")
+  sort(unique(as.integer(x)))
+}
+
 # Calendar day numbers (1 = first treatment day) of the m treatment days.
 treatment_days <- function(m, fx_per_week = 5, start_weekday = 1, skip_days = integer()) {
-  stopifnot(length(m) == 1, m >= 1, m == round(m), fx_per_week %in% c(5, 6),
-            start_weekday %in% 1:fx_per_week)
-  skip_days <- unique(as.integer(skip_days))
-  if (1L %in% skip_days) stop("Day 1 is the first treatment day by definition and cannot be skipped.")
+  one_whole <- function(x) is.numeric(x) && length(x) == 1 && is.finite(x) && x == round(x)
+  if (!one_whole(m) || m < 1) stop("The number of fractions must be one whole number of at least 1.")
+  if (!one_whole(fx_per_week) || !fx_per_week %in% c(5, 6)) stop("Fractions per week must be 5 or 6.")
+  if (!one_whole(start_weekday) || !start_weekday %in% seq_len(fx_per_week))
+    stop("The first treatment day must be a weekday number from 1 to ", fx_per_week, ".")
+  skip_days <- check_skip_days(skip_days)
   days <- integer(m); k <- 0L; day <- 0L
   while (k < m) {
     day <- day + 1L
@@ -30,6 +47,13 @@ schedule_time <- function(m, fx_per_week = 5, start_weekday = 1, skip_days = int
     d <- treatment_days(mm, fx_per_week, start_weekday, skip_days)
     as.numeric(d[length(d)])
   }, numeric(1))
+}
+
+# Candidate calendars of both searches (deterministic and uncertainty): the
+# regular calendar of the sidebar (fractions per week and start day). Skipped
+# days describe the evaluated regimen only and are never applied to candidates.
+candidate_calendar <- function(cal) {
+  list(fx_per_week = cal$fx_per_week, start_weekday = cal$start_weekday, skip_days = integer())
 }
 
 # The default calendar of versions 1 and 2 (5 per week from a Monday) has a
@@ -52,9 +76,9 @@ parse_skip_days <- function(txt) {
   parts <- strsplit(txt, "[,; ]+")[[1]]
   parts <- parts[nzchar(parts)]
   v <- suppressWarnings(as.numeric(parts))
-  if (any(is.na(v)) || any(v != round(v)) || any(v < 2) || any(v > 400))
+  if (any(is.na(v)) || any(v == 1))
     stop("Skipped days must be whole numbers from 2 to 400 (day 1 is the first treatment day).")
-  sort(unique(as.integer(v)))
+  check_skip_days(v)
 }
 
 # "m × d Gy in T days" for messages and table headers.

@@ -251,5 +251,5 @@ test_that("D: a new export records the current version and the chosen settings (
 test_that("D: app and DESCRIPTION carry the same version", {
   desc <- read.dcf(file.path(app_abs, "DESCRIPTION"))
   expect_equal(unname(desc[1, "Version"]), APP_VERSION)
-  expect_equal(APP_VERSION, "3.0.0")
+  expect_equal(APP_VERSION, "3.1.0")   # 3.1.0: verified-trial refit in the app (plan 2026-10-25)
 })

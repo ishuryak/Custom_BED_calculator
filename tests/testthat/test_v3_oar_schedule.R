@@ -92,7 +92,8 @@ test_that("cGy and Gy, % and cc are read; a uniform dose gives its own mean", {
   expect_equal(dvh_means(cumulative_to_differential(x$Parotid_R$dose, x$Parotid_R$volume), 20, 3)$mean_dose, 20, tolerance = 1e-3)
   y <- read_dvh_upload(dvh("eclipse_gy_cc.txt"), 1000)
   expect_equal(attr(y$Cord, "volume_unit"), "cc")
-  expect_equal(dvh_means(cumulative_to_differential(y$Cord$dose, y$Cord$volume), 20, 2)$max_dose, 30, tolerance = 1e-2)
+  mx <- dvh_means(cumulative_to_differential(y$Cord$dose, y$Cord$volume), 20, 2)   # D1 (stage A): the top occupied bin, not a midpoint
+  expect_equal(c(mx$max_lo, mx$max_hi), c(29.99, 30), tolerance = 1e-9)
   z <- read_dvh_upload(dvh("generic.csv"), 1000)
   expect_equal(dvh_means(cumulative_to_differential(z$Constrictors$dose, z$Constrictors$volume), 20, 3)$mean_dose, 30, tolerance = 1e-4)
 })
@@ -124,7 +125,7 @@ test_that("status words follow the converted limit, with a 5% band", {
 })
 test_that("organs without a verified QUANTEC constraint say so, and HYHOPE fills them", {
   q <- oar_row(lib, "mandible", list(mode = "gy", value = 50), 20, 2.75, "QUANTEC")
-  expect_equal(q$status, "no verified constraint in this library")
+  expect_equal(q$status, "not assessed: no verified constraint in this library")   # S9 (stage A): an entered organ is named as unassessed
   h <- oar_row(lib, "mandible", list(mode = "gy", value = 50), 20, 2.75, "HYHOPE")
   expect_equal(h$limit_physical, 54.6, tolerance = 1e-9)   # 20 fractions: HYHOPE's own value
   h17 <- oar_row(lib, "mandible", list(mode = "gy", value = 50), 17, 2.75, "HYHOPE")

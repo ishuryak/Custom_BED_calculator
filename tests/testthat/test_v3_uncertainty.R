@@ -70,7 +70,8 @@ test_that("draws files match the manifest, and a changed file is refused", {
   expect_equal(nrow(di), 4000)
   man <- jsonlite::fromJSON(file.path(draws_dir, "draws_manifest.json"))
   expect_equal(attr(di, "sha256"), man$files$tumor_di_primary.csv$sha256)   # attributes survive loading
-  expect_equal(attr(di, "ess"), man$files$tumor_di_primary.csv$min_ess_bulk)
+  # 3.1 (review M8): the Monte Carlo error counts distinct DI draws, not the fit's ESS
+  expect_equal(attr(di, "ess"), man$files$tumor_di_primary.csv$n_distinct_di_draws)
   expect_true(all(c("alpha", "ab", "lambda", "Tk", "g") %in% names(di)))
   tmp <- file.path(tempdir(), "draws_tamper"); dir.create(tmp, showWarnings = FALSE)
   file.copy(list.files(draws_dir, full.names = TRUE), tmp, overwrite = TRUE)
@@ -79,13 +80,14 @@ test_that("draws files match the manifest, and a changed file is refused", {
   expect_error(load_draws("di", dir = tmp), "does not match")
 })
 
-test_that("golden values: 50 shipped DI draws, HYPNO 55/20 vs 35 x 2 Gy (pinned 2026-10-21)", {
+test_that("golden values: 50 shipped DI draws, HYPNO 55/20 vs 35 x 2 Gy (pinned 2026-10-26, draws 3.1)", {
   di <- load_draws("di", dir = draws_dir)[1:50, ]
   dd <- load_draws("dd", dir = draws_dir)[1:50, ]
   td <- tumor_deltas(data.frame(m = 20, d = 2.75, T = 26), ref, di, dd)
   g <- c(mean_di = mean(td$delta_di), sd_di = sd(td$delta_di[1, ]))
   # R 4.5.1 (Windows, ucrt); draws SHA-256 in draws/draws_manifest.json. Exact arithmetic, so 1e-10.
-  expect_equal(unname(g), c(1.74900111843193, 5.26011986832973), tolerance = 1e-10)
+  # Repinned 2026-10-26: draws replaced by the 3.1 verified-trial refit (was 1.749, 5.260 on the 10-21 draws).
+  expect_equal(unname(g), c(-2.28476945801911, 1.44023467546532), tolerance = 1e-10)
 })
 
 test_that("Monte Carlo: toxicity shares from two seeds agree within 4 standard errors", {
@@ -156,11 +158,12 @@ test_that("OAR draw checker: a cord dose within the constraint at every alpha/be
 })
 
 test_that("the refit numbers quoted on the About page match the shipped draws", {
+  # 3.1: alpha/beta varies by draw, so lambda/alpha and g/alpha are in Gy at each draw's alpha/beta, not Gy10
   di <- load_draws("di", dir = draws_dir)
   q <- function(x) stats::quantile(x, c(.025, .5, .975), names = FALSE)
   la <- q(di$lambda / di$alpha); ga <- q(di$g / di$alpha); tk <- q(di$Tk)
   ab <- paste(readLines(file.path(app_abs, "about.md"), encoding = "UTF-8"), collapse = "\n")
-  expect_true(grepl(sprintf("%.2f Gy₁₀ per day (95%% interval %.2f–%.2f)", la[2], la[1], la[3]), ab, fixed = TRUE))
+  expect_true(grepl(sprintf("%.2f Gy per day (95%% interval %.2f–%.2f)", la[2], la[1], la[3]), ab, fixed = TRUE))
   expect_true(grepl(sprintf("onset near day %.0f (%.0f–%.0f)", tk[2], tk[1], tk[3]), ab, fixed = TRUE))
-  expect_true(grepl(sprintf("%.2f Gy₁₀ per day (%.2f–%.2f) throughout", ga[2], ga[1], ga[3]), ab, fixed = TRUE))
+  expect_true(grepl(sprintf("%.2f Gy per day (%.2f–%.2f) throughout", ga[2], ga[1], ga[3]), ab, fixed = TRUE))
 })

@@ -1,24 +1,26 @@
 {
  "source": "draws/tumor_*_primary.csv",
- "rule": "medians of identified quantities",
+ "dataset": "refit_trials_2026_10_25c_main.csv",
+ "rule": "medians of identified quantities; DD lambda median calibrated at the anchor with the DI point values",
  "values": {
   "di": {
-   "alpha": 0.0323948575,
+   "alpha": 0.0443303995,
    "ab": 10.0,
-   "g": 0.012768844716762796,
-   "loss_per_day_after_onset": 0.4710461447147065,
-   "growth_loss_per_day": 0.3941627067432785,
-   "lambda": 0.015259472733957296,
-   "Tk": 31.978213
+   "lambda": 0.027990281512611643,
+   "Tk": 37.2890565,
+   "g": 0.012329340316015625,
+   "loss_per_day_after_onset": 0.6314015174307563,
+   "growth_loss_per_day": 0.2781238259767008
   },
   "dd": {
-   "alpha": 0.0272484325,
+   "alpha": 0.0443303995,
    "ab": 10.0,
-   "g": 0.01711843821549468,
-   "loss_per_day_after_onset": 17.153658131750802,
-   "growth_loss_per_day": 0.6282357055032315,
-   "lambda": 0.46741029573108783,
-   "c_over_alpha": 392.761435
+   "lambda": 0.40796542,
+   "c_over_alpha": 68.36728440122236,
+   "onset_at_anchor_days": 38.25312341496966,
+   "g": 0.012329340316015625,
+   "loss_per_day_after_onset": 9.202836532073212,
+   "growth_loss_per_day": 0.2781238259767008
   }
  }
 }

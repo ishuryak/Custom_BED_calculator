@@ -12,27 +12,47 @@
 # for that model: it is counted, reported, and never counted as meeting a
 # criterion.
 
-UNCERTAINTY_VERSION <- "3.0"
+# 3.1 (2026-10-25 review): conservative score over the full ensemble with
+# invalid draws as failures (M3); the screen's choice re-checked on all draws
+# (M4); regular candidate calendar (S5); fixed toxicity uses the organ
+# alpha/beta of the Organs at risk tab (S8); the organ policy is exported (S2).
+UNCERTAINTY_VERSION <- "3.1"
 DRAWS_DIR <- "draws"
+UNC_VARIANT_KEYS <- c("primary", "paper_restrictions")
+TOXICITY_SEED <- 20261021
+TOXICITY_RNG <- "Mersenne-Twister/Inversion/Rejection"
+
+draws_manifest <- function(dir = DRAWS_DIR)
+  jsonlite::fromJSON(file.path(dir, "draws_manifest.json"), simplifyVector = FALSE)
 
 # Range of dose per fraction in the tumor data the draws were fitted to,
-# derived from the data file (not typed), so a change of data moves it.
-tumor_data_support <- function(path = file.path("data", "shuryak2018_table1.csv")) {
+# derived from the data file named in the draws manifest (not typed), so a
+# change of data moves it.
+tumor_data_support <- function(path = NULL, dir = DRAWS_DIR) {
+  if (is.null(path)) {
+    ds <- draws_manifest(dir)$dataset
+    path <- file.path("data", if (is.null(ds)) "shuryak2018_table1.csv" else ds)
+  }
   x <- utils::read.csv(path)
   list(d_min = min(x$dose_per_fraction_gy), d_max = max(x$dose_per_fraction_gy),
-       T_min = min(x$total_time_days), T_max = max(x$total_time_days))
+       T_min = min(x$total_time_days), T_max = max(x$total_time_days),
+       n_arms = nrow(x), n_studies = length(unique(x$first_author)), file = basename(path))
 }
 
 # Read a draws file and check its columns and SHA-256 against the manifest.
 load_draws <- function(model = c("di", "dd"), variant = "primary", dir = DRAWS_DIR) {
   model <- match.arg(model)
   f <- file.path(dir, sprintf("tumor_%s_%s.csv", model, variant))
-  man <- jsonlite::fromJSON(file.path(dir, "draws_manifest.json"), simplifyVector = FALSE)
+  man <- draws_manifest(dir)
   key <- basename(f)
   bytes <- readBin(f, "raw", n = file.size(f))
   sha <- digest::digest(bytes, algo = "sha256", serialize = FALSE)
   if (is.null(man$files[[key]]) || !identical(man$files[[key]]$sha256, sha))
     stop("Draws file ", key, " does not match draws/draws_manifest.json (SHA-256).")
+  # Draws from version 3.1 on carry their sampling diagnostics; a file whose fit
+  # failed the release gate (divergences, R-hat, ESS, E-BFMI) is never used.
+  if (!is.null(man$draws_version) && !isTRUE(man$files[[key]]$diagnostics$gate_pass))
+    stop("Draws file ", key, " failed the sampling-diagnostic gate and is not used.")
   x <- utils::read.csv(f)
   need <- if (model == "di") c("alpha", "ab", "lambda", "Tk", "g") else
     c("alpha", "ab", "lambda", "c_over_alpha", "g")
@@ -41,8 +61,16 @@ load_draws <- function(model = c("di", "dd"), variant = "primary", dir = DRAWS_D
   x <- x[need]   # subset first: subsetting a data frame drops attributes
   attr(x, "sha256") <- sha
   attr(x, "file") <- key
-  attr(x, "ess") <- man$files[[key]]$min_ess_bulk
+  # Monte Carlo benchmark size: the number of distinct DI draws (3.1 files repeat
+  # each DI draw across its paired DD draws), else the fit's minimum bulk ESS.
+  attr(x, "ess") <- if (!is.null(man$files[[key]]$n_distinct_di_draws)) man$files[[key]]$n_distinct_di_draws else man$files[[key]]$min_ess_bulk
   x
+}
+
+# Unit of a tumor BED difference over draws: Gy at alpha/beta 10 only when every
+# draw has alpha/beta 10; otherwise the threshold applies at each draw's alpha/beta.
+draws_bed_unit <- function(dr) {
+  if (all(abs(dr$ab - 10) < 1e-9)) "Gy\u2081\u2080" else "Gy, \u03b1/\u03b2 varies by draw"
 }
 
 # --- vectorized BEDs: regimens (m, d, T vectors) x draws -------------------
@@ -106,7 +134,7 @@ draw_from <- function(spec, n) {
 }
 
 # n toxicity draws with a fixed seed and generator (recorded in exports).
-toxicity_draws <- function(n, seed = 20261021, prior = toxicity_prior()) {
+toxicity_draws <- function(n, seed = TOXICITY_SEED, prior = toxicity_prior()) {
   old <- if (exists(".Random.seed", envir = globalenv())) get(".Random.seed", envir = globalenv()) else NULL
   on.exit(if (is.null(old)) rm(".Random.seed", envir = globalenv()) else assign(".Random.seed", old, envir = globalenv()))
   RNGkind("Mersenne-Twister", "Inversion", "Rejection")
@@ -120,10 +148,13 @@ toxicity_draws <- function(n, seed = 20261021, prior = toxicity_prior()) {
 }
 
 # Toxicity draws that reproduce one deterministic parameter set exactly
-# (used for the "fixed toxicity" option and for tests).
-fixed_toxicity_draws <- function(p, n) {
+# (used for the "fixed toxicity" option and for tests). organ_ab: the organ
+# alpha/beta values (cord and brainstem, other organs) of the Organs at risk
+# tab, so a fixed draw gives the tab's own organ check.
+fixed_toxicity_draws <- function(p, n, organ_ab = c(cord = 2, oar = 3)) {
   data.frame(ab_e = rep(p$ab_e, n), alpha_e = p$alpha_e, Tp_e = log(2) / p$lambda_e,
-             Tk_e = p$Tk_e, ab_l = p$ab_l, ab_cord = 2, ab_oar = 3, lambda_e = p$lambda_e)
+             Tk_e = p$Tk_e, ab_l = p$ab_l, ab_cord = organ_ab[["cord"]], ab_oar = organ_ab[["oar"]],
+             lambda_e = p$lambda_e)
 }
 
 # --- propagation -------------------------------------------------------------
@@ -169,9 +200,26 @@ toxicity_ok_draws <- function(regs, ref, tx, limits, oar = NULL) {
 
 q_or_na <- function(x, p) if (all(is.na(x))) NA_real_ else unname(stats::quantile(x, p, na.rm = TRUE, type = 7))
 
+# Lower quantile of the FULL ensemble, with not-evaluable draws (NA) counted
+# as failures below every evaluable value. Type 7 interpolates between the
+# sorted values at floor(h) and floor(h) + 1, h = (n - 1) p + 1. The result is
+# defined only when both lie among the evaluable draws; otherwise it is NA
+# ("unavailable"). Raw values, negative ones included, are never floored.
+q_full_ensemble <- function(x, p) {
+  n <- length(x); k <- sum(is.na(x))
+  h <- (n - 1) * p + 1
+  if (n == 0 || floor(h) <= k) return(NA_real_)
+  v <- sort(x[!is.na(x)])
+  lo <- floor(h) - k; hi <- min(lo + 1, length(v))
+  v[lo] + (h - floor(h)) * (v[hi] - v[lo])
+}
+
 # Summary per regimen. threshold: minimum tumor BED change (Gy) under each
 # model. Shares are over ALL draws: a draw that is not evaluable does not
-# meet any criterion and is counted in n_invalid_*.
+# meet any criterion and is counted in n_invalid_*. min_q10, the conservative
+# score, is the 10th percentile of min(dDI, dDD) over ALL draws, with a draw
+# not evaluable under either model counted as a failure (q_full_ensemble);
+# n_valid_both counts the draws evaluable under both models.
 summarize_draws <- function(regs, td, tox = NULL, threshold = 0) {
   n <- ncol(td$delta_di)
   meet_di <- td$valid_di & td$delta_di >= threshold - 1e-9; meet_di[is.na(meet_di)] <- FALSE
@@ -185,10 +233,10 @@ summarize_draws <- function(regs, td, tox = NULL, threshold = 0) {
   out <- data.frame(m = regs$m, d = regs$d, T = regs$T, n_draws = n,
     di_q025 = qi[, 1], di_q10 = qi[, 2], di_median = qi[, 3], di_q90 = qi[, 4], di_q975 = qi[, 5],
     dd_q025 = qd[, 1], dd_q10 = qd[, 2], dd_median = qd[, 3], dd_q90 = qd[, 4], dd_q975 = qd[, 5],
-    min_q10 = apply(dmin, 1, function(r) if (all(is.na(r))) NA_real_ else
-      stats::quantile(r, .10, na.rm = TRUE, names = FALSE, type = 7)),
+    min_q10 = apply(dmin, 1, q_full_ensemble, p = .10),
     share_di = rowMeans(meet_di), share_dd = rowMeans(meet_dd), share_both = rowMeans(both),
-    n_invalid_di = rowSums(!td$valid_di), n_invalid_dd = rowSums(!td$valid_dd))
+    n_invalid_di = rowSums(!td$valid_di), n_invalid_dd = rowSums(!td$valid_dd),
+    n_valid_both = rowSums(td$valid_di & td$valid_dd))
   if (!is.null(tox)) {
     out$share_tox <- rowMeans(tox$ok)
     out$share_joint <- rowMeans(both & tox$ok)
@@ -219,8 +267,10 @@ share_mcse <- function(p, ess) sqrt(p * (1 - p) / ess)
 
 # --- search under uncertainty ------------------------------------------------
 
-# Candidate grid like suggest_regimens(), on any calendar.
+# Candidate grid like suggest_regimens(), on the regular candidate calendar
+# (candidate_calendar(): skipped days are never applied to candidates).
 regimen_grid <- function(ref, m_range, d_step, d_max, min_days_saved, calendar = default_calendar()) {
+  calendar <- candidate_calendar(calendar)
   d_start <- ceiling((ref$d + 1e-9) / d_step) * d_step
   if (d_start > d_max + 1e-9) return(data.frame(m = integer(), d = numeric(), T = numeric()))
   d_grid <- round(seq(d_start, d_max + 1e-9, by = d_step), 6)
@@ -237,9 +287,9 @@ regimen_grid <- function(ref, m_range, d_step, d_max, min_days_saved, calendar =
 #   "share_joint" highest share of draws meeting the tumor threshold under both
 #                 models AND every toxicity limit
 SELECTION_RULES <- c("min_q10", "share_joint")
-# The interactive search uses a fixed subset of the draws (every 4th, so 1000
-# of 4000; Monte Carlo standard error of a share at most 1.6 points); the
-# listed regimens are then summarized with every draw.
+# The interactive search screens with a fixed subset of the draws (every 4th,
+# so 1000 of 4000); the screen's choice is then re-checked on every draw
+# (run_uncertainty_search()).
 SEARCH_DRAWS <- 1000
 search_subset <- function(x, n = SEARCH_DRAWS) {
   if (nrow(x) <= n) return(x)
@@ -285,4 +335,58 @@ uncertain_search <- function(ref, di, dd, tx, limits, threshold = 0, rule = "min
 # The listed regimen's neighbors on the dose grid (one step either side).
 grid_neighbors <- function(grid, m, d, d_step) {
   grid[grid$m == m & abs(grid$d - d) <= d_step + 1e-9, , drop = FALSE]
+}
+
+# The search as the app runs it. 1) Screen the grid with SEARCH_DRAWS draws
+# (uncertain_search). 2) For each number of fractions, re-check the
+# toxicity-share requirement of the screen's choice on ALL draws; when it
+# fails, the next-ranked dose of the screen is checked, and so on. 3) Summarize
+# the listed doses, their grid neighbors and the failed choices with all draws.
+# Returns list(res = listed rows (screen values), full = summary rows with
+# column role "listed", "neighbor" or "failed_full_check").
+run_uncertainty_search <- function(ref, di, dd, tx, limits, threshold = 0, rule = "min_q10",
+                                   m_range = 5:34, d_step = 0.05, d_max = 5, min_days_saved = 1,
+                                   calendar = default_calendar(), tox_share_min = 0.9, oar_fun = NULL) {
+  screen <- uncertain_search(ref, search_subset(di), search_subset(dd), search_subset(tx), limits, threshold, rule,
+                             m_range = m_range, d_step = d_step, d_max = d_max, min_days_saved = min_days_saved,
+                             calendar = calendar, tox_share_min = tox_share_min, oar_fun = oar_fun)
+  grid <- attr(screen, "grid")
+  if (is.null(grid) || nrow(screen) == 0) return(list(res = screen, full = NULL))
+  tox_all <- function(r) {
+    oar <- if (is.null(oar_fun)) NULL else oar_fun(r, tx)
+    rowMeans(toxicity_ok_draws(r, ref, tx, limits, oar)$ok)
+  }
+  cand <- grid[grid$eligible, , drop = FALSE]
+  cand <- cand[order(cand$m, -cand$score, cand$d), , drop = FALSE]
+  chosen <- list(); failed <- list()
+  for (m in unique(cand$m)) {
+    cm <- cand[cand$m == m, , drop = FALSE]
+    for (j in seq_len(nrow(cm))) {
+      if (tox_all(cm[j, c("m", "d", "T")]) >= tox_share_min - 1e-12) { chosen[[length(chosen) + 1]] <- cm[j, ]; break }
+      failed[[length(failed) + 1]] <- cm[j, c("m", "d", "T")]
+    }
+  }
+  res <- if (length(chosen)) do.call(rbind, chosen) else grid[0, , drop = FALSE]
+  res <- res[order(-res$score), , drop = FALSE]
+  rownames(res) <- NULL
+  attr(res, "grid") <- grid; attr(res, "rule") <- rule
+  if (nrow(res) == 0) { attr(res, "reason") <- "no_regimen_passes_all_draws" }
+  rows <- list()
+  for (i in seq_len(nrow(res))) {
+    g <- grid_neighbors(grid, res$m[i], res$d[i], d_step)[, c("m", "d", "T")]
+    g$role <- ifelse(abs(g$d - res$d[i]) < 1e-9, "listed", "neighbor")
+    rows[[length(rows) + 1]] <- g
+  }
+  if (length(failed)) rows[[length(rows) + 1]] <- cbind(do.call(rbind, failed), role = "failed_full_check")
+  nb <- do.call(rbind, rows)
+  rank <- c(listed = 1, failed_full_check = 2, neighbor = 3)[nb$role]
+  nb <- nb[order(nb$m, nb$d, rank), , drop = FALSE]
+  nb <- nb[!duplicated(paste(nb$m, round(nb$d, 6))), , drop = FALSE]
+  regs <- nb[, c("m", "d", "T")]
+  rownames(regs) <- NULL
+  td <- tumor_deltas(regs, ref, di, dd)
+  tox <- toxicity_ok_draws(regs, ref, tx, limits, if (is.null(oar_fun)) NULL else oar_fun(regs, tx))
+  full <- cbind(summarize_draws(regs, td, tox, threshold), role = nb$role, listed = nb$role == "listed",
+                outside_data = nb$d > tumor_data_support()$d_max + 1e-9, stringsAsFactors = FALSE)
+  list(res = res, full = full, n_failed = length(failed))
 }

@@ -239,6 +239,12 @@ check_inputs <- function(sc) {
   }
   if (!is.null(s$oar)) {
     o <- s$oar
+    if (!identical(as.character(o$oar_version), OAR_VERSION))
+      replay_fail("its organ limits were applied under organ rules ",
+                  if (is.null(o$oar_version)) "3.0" else as.character(o$oar_version)[1],
+                  ". This calculator applies organ rules ", OAR_VERSION,
+                  " (mean-dose limits on physical dose, strict HYHOPE limits), so the result could differ.",
+                  " Run the search again in the app.")
     lib_name <- check_choice(o$library, "oar library", c("QUANTEC", "HYHOPE"))
     pct <- lapply(o$percents, function(v) check_num(v, "organ percent", 0, 200))
     if (length(pct) == 0 || any(!names(pct) %in% OAR_ORGANS$key)) replay_fail("oar percents must name known organs.")
@@ -408,7 +414,7 @@ export_readme <- function(sc, id) {
     "reason under result$empty_reason (no value means the limits excluded every regimen).",
     "",
     "To rerun in R from the app folder (refused if the versions, hinge or clocks differ):",
-    "  source('R/bed_models.R'); source('R/export.R')",
+    "  source('R/bed_models.R'); source('R/schedule.R'); source('R/oar.R'); source('R/export.R')",
     "  sc <- jsonlite::fromJSON('scenario.json', simplifyVector = TRUE); rerun_scenario(sc)",
     "A file from an older version is refused by rerun_scenario(). rerun_scenario(migrate_scenario(sc))",
     "reanalyzes it with the current rules and records the original versions; results may differ.",
@@ -448,10 +454,14 @@ write_export_zip <- function(file, sc, best, feasible) {
 
 # Scenario of an uncertainty analysis: the deterministic settings plus an
 # `uncertainty` block naming the draws files (SHA-256), the number of draws,
-# the toxicity prior and seed, the random-number generator and the search.
-uncertainty_scenario <- function(s, variant, tox_source, search = NULL, draws_dir = DRAWS_DIR) {
+# the toxicity prior and seed, the random-number generator; the applied organ
+# policy (`oar`); and, when a search was run with exactly these settings, the
+# search. search: list(rule, tox_share) or NULL. oar: the applied organ policy
+# (list(library, percents, ab)) or NULL when organ limits are not applied.
+uncertainty_scenario <- function(s, variant, tox_source, search = NULL, oar = NULL, draws_dir = DRAWS_DIR) {
   man <- jsonlite::fromJSON(file.path(draws_dir, "draws_manifest.json"), simplifyVector = FALSE)
   f <- c(di = sprintf("tumor_di_%s.csv", variant), dd = sprintf("tumor_dd_%s.csv", variant))
+  organ_ab <- if (is.null(oar)) c(cord = 2, oar = 3) else c(cord = oar$ab[["cord"]], oar = oar$ab[["oar"]])
   sc <- list(schema_version = SCHEMA_VERSION, app_version = APP_VERSION, equation_version = EQUATION_VERSION,
              selection_version = SELECTION_VERSION, uncertainty_version = UNCERTAINTY_VERSION,
              analysis = "uncertainty",
@@ -459,43 +469,146 @@ uncertainty_scenario <- function(s, variant, tox_source, search = NULL, draws_di
              threshold = s$threshold,
              limits = list(early = list(mode = s$early_mode, tol = s$tol_early),
                            late = list(mode = s$late_mode, tol = s$tol_late)),
-             params_fixed_toxicity = if (identical(tox_source, "fixed")) s$p[c("ab_e", "alpha_e", "lambda_e", "Tk_e", "ab_l")] else NULL,
+             params_fixed_toxicity = if (identical(tox_source, "fixed"))
+               c(s$p[c("ab_e", "alpha_e", "lambda_e", "Tk_e", "ab_l")], list(ab_cord = organ_ab[["cord"]], ab_oar = organ_ab[["oar"]])) else NULL,
+             oar = if (is.null(oar)) list(applied = FALSE) else
+               list(applied = TRUE, library = oar$library, percents = oar$percents,
+                    ab = list(cord = organ_ab[["cord"]], oar = organ_ab[["oar"]]),
+                    organ_ab_used = if (identical(tox_source, "fixed")) "fixed: the Organs at risk tab's values" else
+                      "drawn from the toxicity prior (ab_cord, ab_oar); the tab's values are not used",
+                    oar_version = OAR_VERSION, constraints_sha256 = constraints_sha256()),
              uncertainty = list(
                variant = variant,
                draws = lapply(f, function(x) list(file = x, sha256 = man$files[[x]]$sha256, n_draws = man$files[[x]]$n_draws)),
-               toxicity = list(source = tox_source, seed = 20261021,
-                               rng = paste(RNGkind(), collapse = "/"), prior = toxicity_prior()),
+               toxicity = list(source = tox_source, seed = TOXICITY_SEED, rng = TOXICITY_RNG, prior = toxicity_prior()),
                search_draws = SEARCH_DRAWS,
                wording = "shares of simulated parameter draws under the stated models and priors"))
   if (!is.null(search)) {
     sc$search <- list(rule = search$rule, tox_share_min = search$tox_share / 100,
                       m_range = s$m_range, d_step = s$d_step, d_max = s$d_max,
-                      min_days_saved = s$min_days, calendar = s$calendar)
+                      min_days_saved = s$min_days, candidate_calendar = candidate_calendar(s$calendar),
+                      screen_draws = SEARCH_DRAWS,
+                      confirmation = "the screen's choice is re-checked on all draws; if it fails, the next-ranked dose is checked")
   }
   sc$scenario_id <- substr(digest::digest(enc2utf8(as.character(scenario_json(canonicalize(sc), FALSE))),
                                           algo = "sha256", serialize = FALSE), 1, 12)
   sc
 }
 
-# Recompute the evaluated-regimen summary of an uncertainty scenario read back
-# with jsonlite::fromJSON(); the draws files must match the recorded SHA-256.
-rerun_uncertainty <- function(sc, draws_dir = DRAWS_DIR) {
+constraints_sha256 <- function(path = file.path("data", "oar_constraints.csv")) {
+  digest::digest(readBin(path, "raw", n = file.size(path)), algo = "sha256", serialize = FALSE)
+}
+
+# Strict validation of an uncertainty scenario read back with
+# jsonlite::fromJSON(): every field that changes the replay must be
+# supported, or the file is refused. Returns the inputs to recompute.
+validate_uncertainty_scenario <- function(sc, draws_dir = DRAWS_DIR) {
   if (!identical(sc$analysis, "uncertainty")) replay_fail("not an uncertainty analysis.")
-  if (!identical(as.character(sc$uncertainty_version), UNCERTAINTY_VERSION))
-    replay_fail("uncertainty version '", sc$uncertainty_version, "' is not this calculator's.")
+  uv <- as.character(sc$uncertainty_version)
+  if (identical(uv, "3.0"))
+    replay_fail("uncertainty version 3.0 files did not record the applied organ limits or the fixed organ alpha/beta, ",
+                "so they cannot be replayed exactly. Run the analysis again in the app.")
+  if (!identical(uv, UNCERTAINTY_VERSION)) replay_fail("uncertainty version '", paste(uv, collapse = ","), "' is not this calculator's (", UNCERTAINTY_VERSION, ").")
+  if (!identical(as.character(sc$schema_version), SCHEMA_VERSION)) replay_fail("schema version '", sc$schema_version, "' is not ", SCHEMA_VERSION, ".")
+  if (!identical(as.character(sc$equation_version), EQUATION_VERSION)) replay_fail("equation version '", sc$equation_version, "' is not ", EQUATION_VERSION, ".")
+  if (!identical(as.character(sc$selection_version), SELECTION_VERSION)) replay_fail("selection version '", sc$selection_version, "' is not ", SELECTION_VERSION, ".")
   u <- sc$uncertainty
-  di <- load_draws("di", u$variant, draws_dir); dd <- load_draws("dd", u$variant, draws_dir)
-  if (!identical(attr(di, "sha256"), u$draws$di$sha256) || !identical(attr(dd, "sha256"), u$draws$dd$sha256))
-    replay_fail("the draws files differ from those recorded (SHA-256).")
-  tx <- if (identical(u$toxicity$source, "fixed")) {
-    fixed_toxicity_draws(sc$params_fixed_toxicity, nrow(di))
-  } else toxicity_draws(nrow(di), u$toxicity$seed)
+  if (!is.list(u)) replay_fail("the uncertainty block is missing.")
+  variant <- check_choice(u$variant, "draws variant", UNC_VARIANT_KEYS)
+  di <- load_draws("di", variant, draws_dir); dd <- load_draws("dd", variant, draws_dir)
+  man <- jsonlite::fromJSON(file.path(draws_dir, "draws_manifest.json"), simplifyVector = FALSE)
+  for (model in c("di", "dd")) {
+    rec <- u$draws[[model]]; x <- if (model == "di") di else dd
+    if (!identical(rec$file, attr(x, "file"))) replay_fail("the ", model, " draws file '", rec$file, "' is not '", attr(x, "file"), "'.")
+    if (!identical(rec$sha256, attr(x, "sha256"))) replay_fail("the draws files differ from those recorded (SHA-256).")
+    if (!same_num(rec$n_draws, nrow(x)) || !same_num(man$files[[attr(x, "file")]]$n_draws, nrow(x)))
+      replay_fail("the recorded number of ", model, " draws (", rec$n_draws, ") does not match the file (", nrow(x), ").")
+  }
+  if (nrow(di) != nrow(dd)) replay_fail("the DI and DD draws files have different numbers of draws.")
+  tox <- u$toxicity
+  source <- check_choice(tox$source, "toxicity source", c("prior", "fixed"))
+  seed <- check_num(tox$seed, "toxicity seed", 1, .Machine$integer.max, TRUE)
+  if (!identical(tox$rng, TOXICITY_RNG)) replay_fail("random-number generator '", tox$rng, "' is not ", TOXICITY_RNG, ".")
+  now_prior <- jsonlite::fromJSON(scenario_json(toxicity_prior()), simplifyVector = TRUE)
+  if (!isTRUE(all.equal(canonicalize(now_prior), canonicalize(tox$prior), tolerance = 1e-12)))
+    replay_fail("the recorded toxicity prior differs from the one this calculator draws from.")
+  if (!same_num(u$search_draws, SEARCH_DRAWS)) replay_fail("the recorded number of screen draws is not ", SEARCH_DRAWS, ".")
+  pf <- NULL
+  if (source == "fixed") {
+    q <- sc$params_fixed_toxicity
+    if (!is.list(q)) replay_fail("fixed toxicity parameters are missing.")
+    pf <- list(ab_e = check_num(q$ab_e, "ab_e", 0.01, 1000), alpha_e = check_num(q$alpha_e, "alpha_e", 1e-6, 10),
+               lambda_e = check_num(q$lambda_e, "lambda_e", 1e-6, 100), Tk_e = check_num(q$Tk_e, "Tk_e", 0, 1000),
+               ab_l = check_num(q$ab_l, "ab_l", 0.01, 1000), ab_cord = check_num(q$ab_cord, "ab_cord", 0.01, 100),
+               ab_oar = check_num(q$ab_oar, "ab_oar", 0.01, 100))
+  }
   reg <- check_regimen(sc$regimen, "regimen"); ref <- check_regimen(sc$comparison, "comparison")
-  regs <- data.frame(m = reg$m, d = reg$d, T = reg$T)
-  td <- tumor_deltas(regs, ref, di, dd)
-  lim <- list(early = list(mode = sc$limits$early$mode, tol = sc$limits$early$tol),
-              late = list(mode = sc$limits$late$mode, tol = sc$limits$late$tol))
-  summarize_draws(regs, td, toxicity_ok_draws(regs, ref, tx, lim), check_num(sc$threshold, "threshold", -1000, 1000))
+  threshold <- check_num(sc$threshold, "threshold", -1000, 1000)
+  modes <- c("hypno", "reference")
+  lim <- list(early = list(mode = check_choice(sc$limits$early$mode, "early limit", modes),
+                           tol = check_num(sc$limits$early$tol, "early tol", 0, 1000)),
+              late = list(mode = check_choice(sc$limits$late$mode, "late limit", modes),
+                          tol = check_num(sc$limits$late$tol, "late tol", 0, 1000)))
+  o <- sc$oar
+  if (!is.list(o)) replay_fail("the organ block is missing.")
+  oar <- NULL
+  if (check_flag(o$applied, "oar applied")) {
+    lib_name <- check_choice(o$library, "oar library", c("QUANTEC", "HYHOPE"))
+    if (!identical(as.character(o$oar_version), OAR_VERSION)) replay_fail("organ rules version '", o$oar_version, "' is not ", OAR_VERSION, ".")
+    if (!identical(o$constraints_sha256, constraints_sha256())) replay_fail("the organ constraint library differs from the one recorded (SHA-256).")
+    pct <- lapply(o$percents, function(v) check_num(v, "organ percent", 0, 200))
+    if (length(pct) == 0 || any(!names(pct) %in% OAR_ORGANS$key)) replay_fail("oar percents must name known organs.")
+    ab <- c(cord = check_num(o$ab$cord, "oar ab cord", 0.01, 100), oar = check_num(o$ab$oar, "oar ab", 0.01, 100))
+    if (!is.null(pf) && !(same_num(pf$ab_cord, ab[["cord"]]) && same_num(pf$ab_oar, ab[["oar"]])))
+      replay_fail("the fixed organ alpha/beta differs from the organ block.")
+    oar <- list(library = lib_name, percents = pct, ab = ab)
+  }
+  search <- NULL
+  if (!is.null(sc$search)) {
+    s <- sc$search
+    mr <- s$m_range
+    if (!is.numeric(mr) || length(mr) < 1 || any(!is.finite(mr)) || any(mr < 1) || any(mr > 100) ||
+        any(mr != round(mr)) || anyDuplicated(mr))
+      replay_fail("search m_range must be distinct whole numbers between 1 and 100.")
+    cc <- s$candidate_calendar
+    if (!is.list(cc)) replay_fail("the search's candidate calendar is missing.")
+    fpw <- check_num(cc$fx_per_week, "candidate calendar fx_per_week", 5, 6, TRUE)
+    cal <- list(fx_per_week = fpw, start_weekday = check_num(cc$start_weekday, "candidate calendar start_weekday", 1, fpw, TRUE),
+                skip_days = integer())
+    if (length(unlist(cc$skip_days)) > 0) replay_fail("candidate calendars have no skipped days.")
+    if (!same_num(s$screen_draws, SEARCH_DRAWS)) replay_fail("the recorded number of screen draws is not ", SEARCH_DRAWS, ".")
+    search <- list(rule = check_choice(s$rule, "search rule", SELECTION_RULES),
+                   tox_share_min = check_num(s$tox_share_min, "search tox_share_min", 0.5, 1),
+                   m_range = as.integer(mr), d_step = check_num(s$d_step, "search d_step", 1e-3, 30),
+                   d_max = check_num(s$d_max, "search d_max", 0.01, 30),
+                   min_days_saved = check_num(s$min_days_saved, "search min_days_saved", 0, 1000, TRUE),
+                   calendar = cal)
+  }
+  tx <- if (source == "fixed") fixed_toxicity_draws(pf, nrow(di), c(cord = pf$ab_cord, oar = pf$ab_oar)) else
+    toxicity_draws(nrow(di), seed)
+  oar_fun <- if (is.null(oar)) NULL else oar_draw_checker(load_constraints(), oar$percents, oar$library)
+  list(reg = reg, ref = ref, threshold = threshold, limits = lim, di = di, dd = dd, tx = tx,
+       oar_fun = oar_fun, search = search)
+}
+
+# Recompute an uncertainty scenario read back with jsonlite::fromJSON().
+# part "summary": the evaluated-regimen summary (evaluated_regimen_summary.csv);
+# part "search": the search with neighbors (search_with_neighbors.csv).
+# Strict: every recorded assumption must match this calculator.
+rerun_uncertainty <- function(sc, part = c("summary", "search"), draws_dir = DRAWS_DIR) {
+  part <- match.arg(part)
+  v <- validate_uncertainty_scenario(sc, draws_dir)
+  if (part == "summary") {
+    regs <- data.frame(m = v$reg$m, d = v$reg$d, T = v$reg$T)
+    td <- tumor_deltas(regs, v$ref, v$di, v$dd)
+    tox <- toxicity_ok_draws(regs, v$ref, v$tx, v$limits, if (is.null(v$oar_fun)) NULL else v$oar_fun(regs, v$tx))
+    return(summarize_draws(regs, td, tox, v$threshold))
+  }
+  if (is.null(v$search)) replay_fail("this file records no search (none was run with these settings).")
+  s <- v$search
+  run_uncertainty_search(v$ref, v$di, v$dd, v$tx, v$limits, v$threshold, s$rule, m_range = s$m_range,
+                         d_step = s$d_step, d_max = s$d_max, min_days_saved = s$min_days_saved,
+                         calendar = s$calendar, tox_share_min = s$tox_share_min, oar_fun = v$oar_fun)$full
 }
 
 write_uncertainty_zip <- function(file, sc, summary, search_full = NULL) {
@@ -508,10 +621,15 @@ write_uncertainty_zip <- function(file, sc, summary, search_full = NULL) {
                "",
                "Values are shares and quantiles of simulated parameter draws under the stated models and priors,",
                "not probabilities of tumor control or of safety. DI and DD are separate models, never averaged.",
-               "scenario.json records the draws files (SHA-256), toxicity prior and seed, limits and threshold.",
-               "Rerun in R from the app folder:",
+               "scenario.json records the draws files (SHA-256), toxicity prior and seed, limits, threshold,",
+               "the applied organ limits and, when the search was run with exactly these settings, the search.",
+               if (is.null(search_full)) "No search is included: none was run with exactly these settings." else
+                 "search_with_neighbors.csv: role is listed, neighbor, or failed_full_check (the screen's choice failed on all draws).",
+               "Rerun in R from the app folder (refused if any recorded version or assumption differs):",
                "  source('R/bed_models.R'); source('R/schedule.R'); source('R/uncertainty.R'); source('R/oar.R'); source('R/export.R')",
-               "  rerun_uncertainty(jsonlite::fromJSON('scenario.json'))"),
+               "  sc <- jsonlite::fromJSON('scenario.json')",
+               "  rerun_uncertainty(sc)                   # evaluated_regimen_summary.csv",
+               if (!is.null(search_full)) "  rerun_uncertainty(sc, part = 'search')  # search_with_neighbors.csv"),
              file.path(dir, "README.txt"))
   zip::zip(file, list.files(dir), root = dir)
 }

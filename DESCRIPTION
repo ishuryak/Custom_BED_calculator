@@ -1,7 +1,7 @@
 Package: CustomBEDCalculator
 Type: Application
 Title: HNSCC BED Calculator with Early and Late Toxicity
-Version: 3.0.0
+Version: 3.1.0
 Author: Igor Shuryak
 Maintainer: Igor Shuryak <is144@cumc.columbia.edu>
 Description: A Shiny application computing tumor BED under dose-independent and
