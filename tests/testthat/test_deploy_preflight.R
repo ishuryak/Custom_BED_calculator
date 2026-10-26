@@ -52,5 +52,13 @@ test_that("the bundle check refuses a missing draws manifest and local-only file
   expect_error(check_bundle(setdiff(need, "draws/draws_manifest.json"), app_abs), "missing from the bundle")
   expect_error(check_bundle(c(need, "external_proofs.yaml"), app_abs), "Local-only files")
   expect_false(any(basename(list.files(file.path(app_abs, c("data", "draws")))) == "manifest.json"))  # rsconnect skips that name
-  expect_true(any(grepl("check_bundle(files)", readLines(file.path(app_abs, "tools", "deploy.R")), fixed = TRUE)))
+  expect_true(any(grepl("check_bundle(files, tracked = ", readLines(file.path(app_abs, "tools", "deploy.R")), fixed = TRUE)))
+})
+
+# Review S6 (2026-10-25): an untracked file could reach the bundle, so the deployed code was not the recorded revision.
+test_that("the bundle check refuses files that are not tracked by git", {
+  need <- c("app.R", "about.md", file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+            file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
+  expect_true(check_bundle(need, app_abs, tracked = need))
+  expect_error(check_bundle(c(need, "R/scratch.R"), app_abs, tracked = need), "not committed to git.*R/scratch.R")
 })

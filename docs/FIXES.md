@@ -216,3 +216,13 @@ Record, verification of each finding, and decisions: `docs/development/2026_10_2
 | Test that pins it | `tests/python/test_refit_data_and_identity.py` (data, components, identity), `tests/python/test_export_draws.py` (pairing, gate refusal), `tests/python/test_repair_dd_calibrated.py`, `tests/testthat/test_v31_stage_e.R` (manifest, gate refusal, row pairing with anchor equality < 1e-6, units, point values). Each was observed red without its change (on the 10-25 file, the HEAD runner, the 10-21 draws, or by mutating the shipped line) and green with it. Details: `docs/development/2026_10_25_stages_BCDE_refit.md`. |
 | Verification | 2026-10-26, base revision 677ce21 plus the working tree: `python3 -m pytest tests/python -q` 38 passed. `Rscript tools/run_tests.R` 5265 expectations, 0 failed, 0 errors (baseline 3.0.0 on `f951cd3`: 4961, 0 failed). Fits: 12 DI fits and 3600 calibrated-DD fits pass the gate, 35 of them after the repair step. |
 | What it moves | The uncertainty results and refit preset listed in the first line, organ mean-dose statuses, labels. Not the D18 defaults, the anchor or any deterministic BED. |
+
+### 2026-10-26: deploy bundle limited to committed files (review S6)
+
+| | |
+|---|---|
+| What was wrong | The deploy check compared tracked files only (`--untracked-files=no`), so an untracked file in the app folder would be uploaded with the bundle while `deployed_revision.txt` named a commit that did not contain it. |
+| Proof it was real | Stage A baseline: `.suite_passed` was written and the preflight passed with an untracked file present (`docs/development/2026_10_25_stage_A_app_fixes.md`, S6). `check_bundle()` had no knowledge of git. |
+| Test that pins it | `tests/testthat/test_deploy_preflight.R::the bundle check refuses files that are not tracked by git`. Red without the change (`check_bundle` has no `tracked` argument), and red when the shipped line is mutated to check nothing (the error is not thrown); green with it. |
+| Verification | 2026-10-26: `Rscript tools/run_tests.R` on the release commit (see the deploy record in README). `tools/deploy.R` passes `git ls-files` to `check_bundle()`. |
+| What it moves | No number. Deploys now stop if an uncommitted file would be uploaded. |
