@@ -32,7 +32,7 @@ Every tab compares the evaluated regimen with one comparison regimen and one tum
 - `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`, `deploy.R` (publishes to shinyapps.io as `custom_bed_calculator_v3` only; refuses the version 1 and 2 names; pinned account; clean tree; suite passed on the same revision).
 - `.rscignore`: keeps `References/`, `tests/`, `docs/`, `fit/`, `.Rhistory` and `.Renviron` out of a shinyapps.io deployment.
 - `docs/FIXES.md`: one row per landed change, with its evidence.
-- `docs/user_guide/`: user guide to version 3.2 (every tab and menu item, the model fitting and its literature, and the uncertainty estimation), as Word and Markdown.
+- `docs/user_guide/`: user guide to version 3.2.1 (every tab and menu item, the model fitting and its literature, and the uncertainty estimation), as Word and Markdown.
 - `docs/development/`: review records and plans. For version 3 start with `2026_10_21_v3_build.md` and `2026_10_21_v3/fit_report.md`. For version 3.1, `PLAN_codex_review_2026_10_25.md` and `2026_10_25_stages_BCDE_refit.md`.
 - `renv.lock`: the release package versions (R 4.5.1), all from the Posit Package Manager snapshot of 2026-10-15, which serves binaries of exactly these versions for Windows, macOS and Linux.
 - `References/`: sources, with `References/README.md` giving each one's license and the quoted parameter values. Paywalled or non-redistributable PDFs are git-ignored.
@@ -64,7 +64,7 @@ From the review of 2026-10-26 (plan `docs/development/PLAN_codex_review_2026_10_
   - On the Results tab, the HYPNO control and HYHOPE benchmark rows now show their tumor BED differences (+1.11/−2.87 and −10.60/−15.14 Gy₁₀) instead of "not available".
   - An organ maximum that is indeterminate at the DVH resolution is no longer reported as "within" over the α/β range.
   - Uncertainty scenario files of version 3.1 are refused with a reason, because their draws were replaced. Deterministic scenario files replay as before.
-- **One diagnostic gate.** `fit/gate.py` is used by every fit, the repair, the export and (for draws version 3.2) the app. All 3600 conditional DD fits now pass it, 748 after refitting with longer chains (`fit/repair_dd_ess.py`).
+- **One diagnostic gate.** `fit/gate.py` is used by every fit, the repair, the export and (for draws version 3.2) the app. All 3600 conditional DD fits now pass it, 752 after refitting with longer chains (`fit/repair_dd_ess.py`): 748 had been below the bulk-ESS criterion and 4 below the tail criterion only (the 748 first reported counted bulk ESS only; corrected 2026-10-26 from `repair_ess.json`).
 - **Identity chain.** The export checks every input byte and every pair's anchor equality, and replaces `draws/` only when the whole set passes.
 - **Inputs.** One organ-mapping validator for both replay paths. Malformed Eclipse DVH rows are refused with their line number. Replayed searches are bounded at the largest grid the app can request.
 - **Provenance.** `data/*_provenance.csv` keep source intervals, estimators, population exceptions and prescription categories beside the unchanged fitting files.

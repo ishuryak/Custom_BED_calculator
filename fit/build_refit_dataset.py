@@ -9,7 +9,9 @@ Usage (from the repository root):
 Extraction folder: env BED_EXTRACT_DIR, default ../References_refit_trials/search/extraction.
 
 Main set (Igor Shuryak, 2026-10-22 and 2026-10-25): definitive radiotherapy alone of
-non-nasopharyngeal HNSCC, randomized, the 2018 Table 1 trials re-extracted from their papers,
+non-nasopharyngeal HNSCC, randomized, with arm-level exceptions that cannot be removed (RTOG 83-13
+included nasopharyngeal and sinus cases; DAHANCA 6/7 included the nasopharynx and gave nimorazole
+to nonglottic patients), the 2018 Table 1 trials re-extracted from their papers,
 ARTSCAN and the three trials added on 2026-10-24 in sensitivity sets only.
 
 Changes on 2026-10-25 (review of 2026-10-25, plan decisions 4-7):
