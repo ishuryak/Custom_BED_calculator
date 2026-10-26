@@ -110,9 +110,10 @@ main <- function(args) {
   check("1 banner: HYPNO 55/20 evaluated against 35 x 2 Gy, +1 Gy, DD calibrated",
         grepl("20 × 2.75 Gy in 26 days", bn, fixed = TRUE) && grepl("35 × 2 Gy in 47 days", bn, fixed = TRUE) &&
           grepl("+1 Gy", bn, fixed = TRUE) && grepl("DD calibrated", bn, fixed = TRUE), bn)
+  # 3.1 (2026-10-26): column name, DD status wording and fitted-DD banner text updated to the 3.1 app.
   rc <- table_text("report")
   check("1 report card opens first, with a named difference and the refit column",
-        grepl("Δ vs 35 × 2 Gy in 47 days", rc, fixed = TRUE) && grepl("Bayesian refit (for review)", rc, fixed = TRUE), substr(rc, 1, 200))
+        grepl("Δ vs 35 × 2 Gy in 47 days", rc, fixed = TRUE) && grepl("Verified-trial refit 2026-10-25", rc, fixed = TRUE), substr(rc, 1, 200))
   check("1 report card flags the extrapolation (2.75 Gy > 2.5 Gy)", grepl("outside the tumor data", text_of("report_notes")))
   check("1 how-to-read card visible", grepl("How to read this", js("document.body.innerText"), fixed = TRUE))
   check("1 Report card: no output errors", !nzchar(errors()), errors())
@@ -144,7 +145,7 @@ main <- function(args) {
   tab("Uncertainty"); idle(3)
   us <- table_text("unc-summary")
   check("4 uncertainty summary against HYPNO", grepl("vs 20 × 2.75 Gy in 26 days", us, fixed = TRUE) && grepl("80% range", us, fixed = TRUE), substr(us, 1, 160))
-  check("4 refit status names the DD limitation", grepl("reproduce their priors", text_of("unc-refit_status"), fixed = TRUE))
+  check("4 refit status names the DD limitation", grepl("DD is not an independent check of DI", text_of("unc-refit_status"), fixed = TRUE))
   js("document.getElementById('unc-run').click(); true"); idle(6)
   st <- table_text("unc-search_table")
   check("4 search under uncertainty lists regimens and neighbors", grepl("listed", st) && grepl("neighbor", st), substr(st, 1, 120))
@@ -185,7 +186,7 @@ main <- function(args) {
   check("6 33 fractions at 6 per week take 38 days", grepl("33 fractions, 38 days", text_of("T_shown"), fixed = TRUE), text_of("T_shown"))
   set_radio("fx_week", 5); num_input("m", 20); num_input("d", 2.75)
   set_radio("dd_mode", "fitted"); idle(2)
-  check("6 fitted DD named in the banner", grepl("DD fitted", text_of("banner"), fixed = TRUE), text_of("banner"))
+  check("6 fitted DD named in the banner", grepl("DD values entered directly (not calibrated)", text_of("banner"), fixed = TRUE), text_of("banner"))
   set_radio("dd_mode", "calibrated")
   check("6 no output errors after the calendar and DD changes", !nzchar(errors()), errors())
 
