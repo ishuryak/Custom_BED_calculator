@@ -4,14 +4,14 @@ R Shiny app for head and neck squamous cell carcinoma (HNSCC), for designing hyp
 
 - tumor BED under the dose-independent (DI) and dose-dependent (DD) repopulation models
 - early (acute mucosal) and late toxicity BED
-- organ-at-risk doses converted from QUANTEC or HYHOPE constraints to any number of fractions (new in version 3)
-- the uncertainty of the tumor BED differences, from a Bayesian refit of both models to 35 randomized trial arms (new in version 3).
+- organ-at-risk doses against QUANTEC or HYHOPE constraints: maximum doses converted to any number of fractions, mean doses compared on physical dose (new in version 3)
+- the uncertainty of the tumor BED differences, from a Bayesian refit to 45 arms of 19 randomized trials re-extracted from their publications (version 3.1).
 
 Every tab compares the evaluated regimen with one comparison regimen and one tumor threshold, shown in a banner. A search lists shorter regimens that meet the threshold within the toxicity and organ limits; a both-model screen requires the threshold under DI and DD. It is a research tool for hypothesis generation, not for treatment decisions.
 
 **Live:** https://ishuryak.shinyapps.io/custom_bed_calculator_v3/ (version 3.0.0, revision `f951cd3`, deployed 2026-10-21 with `Rscript tools/deploy.R` as its own app). Live browser walkthrough `docs/development/2026_10_21_v3/walkthrough_v3.R --live`: 34 of 34 checks. `tools/deploy.R` refuses the names of the live version 1 and version 2 apps, an unconfigured account, uncommitted changes, a revision on which the full suite has not passed, and a bundle missing any file the app reads. Version 2.7 (https://ishuryak.shinyapps.io/custom_bed_calculator_v2/) and version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/) are unchanged.
 
-**The refit is for review, not a default.** The DI refit is informed by the trial data (repopulation loss 0.47 Gy₁₀ per day, 95% interval 0.10–1.60, after about day 32, plus background growth). The DD refit is not: its rate and onset constant reproduce their priors, and leave-one-trial-out cross-validation does not distinguish DD from DI. The defaults therefore remain Scenario D18 with the DD model calibrated to DI, as in version 2.7. The report is `docs/development/2026_10_21_v3/fit_report.md`.
+**The refit is for review, not a default.** Version 3.1 (not yet deployed) uses the refit to 45 trial arms. The DI model is informed by the data (repopulation loss λ/α 0.63 Gy per day at each draw's α/β, 95% interval 0.21–1.19, after about day 37, plus background growth). A DD model fitted on its own does not sample reliably, so DD is calibrated to DI at 35 × 2 Gy in 47 days and its rate fitted given each DI draw (0.40 per day, 0.12–1.03). For HYPNO's 55 Gy in 20 fractions against 35 × 2 Gy the median tumor BED change is −2.0 Gy under DI and −3.3 Gy under DD. The defaults remain Scenario D18 with the DD model calibrated to DI. The record is `docs/development/2026_10_25_stages_BCDE_refit.md`.
 
 **Version 1 warning.** Version 1 (branch `main`) still carries the DD calibration error described below. Do not use version 1 DD results computed at a tumor α/β other than 10 Gy.
 
@@ -32,7 +32,7 @@ Every tab compares the evaluated regimen with one comparison regimen and one tum
 - `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`, `deploy.R` (publishes to shinyapps.io as `custom_bed_calculator_v3` only; refuses the version 1 and 2 names; pinned account; clean tree; suite passed on the same revision).
 - `.rscignore`: keeps `References/`, `tests/`, `docs/`, `fit/`, `.Rhistory` and `.Renviron` out of a shinyapps.io deployment.
 - `docs/FIXES.md`: one row per landed change, with its evidence.
-- `docs/development/`: review records and plans. For version 3 start with `2026_10_21_v3_build.md` and `2026_10_21_v3/fit_report.md`.
+- `docs/development/`: review records and plans. For version 3 start with `2026_10_21_v3_build.md` and `2026_10_21_v3/fit_report.md`. For version 3.1, `PLAN_codex_review_2026_10_25.md` and `2026_10_25_stages_BCDE_refit.md`.
 - `renv.lock`: the release package versions (R 4.5.1), all from the Posit Package Manager snapshot of 2026-10-15, which serves binaries of exactly these versions for Windows, macOS and Linux.
 - `References/`: sources, with `References/README.md` giving each one's license and the quoted parameter values. Paywalled or non-redistributable PDFs are git-ignored.
 
@@ -52,6 +52,13 @@ run_app.bat                     # or: Rscript tools/launch.R
 ```
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
+
+## Changes in version 3.1
+
+- **What moves.** The Uncertainty tab, the report card's refit column and the refit preset now come from the verified-trial refit (45 arms, 19 trials) instead of the 35 arms of the 2018 Table 1, and every DD draw is paired with the DI draw it was fitted on. Example: HYPNO 55 Gy/20 against 35 × 2 Gy, first 50 shipped DI draws, mean ΔDI changes from +1.75 to −2.28 Gy. Deterministic results with the D18 defaults are unchanged. Mean-dose organ limits are compared on physical dose, which changes those organ statuses (stage A).
+- **Fits gated.** Every fit behind the shipped draws passes 0 divergences, R-hat ≤ 1.01, bulk and tail ESS ≥ 400 (DI) and E-BFMI ≥ 0.3, and the app refuses draws whose manifest does not say so.
+- **Units.** BED differences over draws are labeled Gy₁₀ only when α/β is 10 Gy in every draw.
+- **Records.** Plan `docs/development/PLAN_codex_review_2026_10_25.md`, stage A `docs/development/2026_10_25_stage_A_app_fixes.md`, stages B–E `docs/development/2026_10_25_stages_BCDE_refit.md`, `docs/FIXES.md`.
 
 ## Changes in version 3.0
 

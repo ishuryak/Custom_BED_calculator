@@ -204,3 +204,15 @@ Record, verification of each finding, and decisions: `docs/development/2026_10_2
 | What it moves | Nothing in any result. |
 
 **Deployed** 2026-10-21 from `f951cd3` (suite 4961 expectations, 0 failed, on that revision) as `custom_bed_calculator_v3` with `Rscript tools/deploy.R`, account `ishuryak`. Bundle: `about.md`, `app.R`, `DESCRIPTION`, `LICENSE`, `renv.lock`, `deployed_revision.txt`, `R/` (7 files), `data/` (3 files), `draws/` (6 files). Live walkthrough: 34 of 34 (`docs/development/2026_10_21_v3/walkthrough/20261021_162106_live/`). Versions 1 and 2 not redeployed.
+
+## 2026-10-26: version 3.1.0, the verified-trial refit in the app (review of 2026-10-25, stages A–E)
+
+**Changes published numbers:** not yet. Version 3.1.0 is not deployed, so the live 3.0.0 site is unchanged. Once deployed, the Uncertainty tab, the report card's refit column and the refit preset move. For example, HYPNO 55 Gy/20 against 35 × 2 Gy over the first 50 shipped DI draws gives a mean ΔDI of −2.28 Gy, against +1.75 Gy₁₀ before. Mean-dose organ statuses move (physical comparison, stage A). D18 deterministic results do not move.
+
+| Item | Record |
+|---|---|
+| What was wrong | (1) The app's draws came from a fit to the 35 arms of the 2018 Table 1 rather than the trial publications. The DD draws were a separate, unidentified fit not paired with the DI draws, and nothing refused draws from a fit with sampling problems. (2) Two data errors in the 10-25 trial file: the KROG 0201 HYPO arm had 8 T2 patients (Moon 2014 Table 1: 9), and RTOG 9003 combined rates from one report with patient numbers from another. (3) Mixed fraction sizes entered as one mean fraction size. (4) BED differences at varying α/β were labeled Gy₁₀. |
+| Proof it was real | (1) The 10-21 manifest has no pairing and no gate field, and its free DD fit has 74 divergences. (2) Moon 2014 Table 1 lists T2a 7 + T2b 2. Fu 2000 Tables 1–2 give N 268/263/274/268 with rates 46.0/54.4/47.5/54.5%. (3) Ghoshal 25 × 1.8 + 15 × 1.5 Gy: Σd² 114.75 vs 40 × 1.6875² = 113.9. (4) `paper_restrictions` is the only variant with α/β 10 in every draw. |
+| Test that pins it | `tests/python/test_refit_data_and_identity.py` (data, components, identity), `tests/python/test_export_draws.py` (pairing, gate refusal), `tests/python/test_repair_dd_calibrated.py`, `tests/testthat/test_v31_stage_e.R` (manifest, gate refusal, row pairing with anchor equality < 1e-6, units, point values). Each was observed red without its change (on the 10-25 file, the HEAD runner, the 10-21 draws, or by mutating the shipped line) and green with it. Details: `docs/development/2026_10_25_stages_BCDE_refit.md`. |
+| Verification | 2026-10-26, base revision 677ce21 plus the working tree: `python3 -m pytest tests/python -q` 38 passed. `Rscript tools/run_tests.R` 5265 expectations, 0 failed, 0 errors (baseline 3.0.0 on `f951cd3`: 4961, 0 failed). Fits: 12 DI fits and 3600 calibrated-DD fits pass the gate, 35 of them after the repair step. |
+| What it moves | The uncertainty results and refit preset listed in the first line, organ mean-dose statuses, labels. Not the D18 defaults, the anchor or any deterministic BED. |
