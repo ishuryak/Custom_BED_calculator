@@ -219,7 +219,8 @@ N_SOURCE = {
 }
 
 
-def build(argv):
+def build(argv, matches=None):
+    """matches: optional list; receives (output row, matched extraction row) pairs for provenance."""
     R = json.load(open(os.path.join(EXTRACT, "all_extract.json"), encoding="utf-8"))
     R = R + json.load(open(os.path.join(EXTRACT, "supp_extract_2026_10_24.json"), encoding="utf-8"))
     arms = list(A)
@@ -250,9 +251,18 @@ def build(argv):
         if not m:
             problems.append(f"{unit} {arm}: no extracted row of {pmid} with value {v}")
             continue
+        # Several matching extraction rows must agree on everything used or kept (review R08).
+        sig = lambda x: tuple(str(x.get(k, "")) for k in ("arm", "n_analyzed", "value_ci", "endpoint", "estimate_type",
+                                                          "timepoint_years", "value_source"))
+        if len({sig(x) for x in m}) > 1:
+            problems.append(f"{unit} {arm}: {len(m)} extraction rows of {pmid} match with different content")
         r = m[0]
-        if not all(r.get("_quote_ok", {}).values()) and r.get("value_source") not in ("figure_read", "table_pdf_only"):
-            problems.append(f"{unit} {arm}: source row failed the quote check")
+        qok = r.get("_quote_ok") or {}
+        if r.get("value_source") not in ("figure_read", "table_pdf_only"):
+            if not qok:
+                problems.append(f"{unit} {arm}: source row has no recorded quote check")
+            elif not all(qok.values()):
+                problems.append(f"{unit} {arm}: source row failed the quote check")
         # Patient number must match the report the rate comes from, or carry a stated reason.
         nsrc = "n_analyzed of the matched extraction row"
         try:
@@ -295,7 +305,18 @@ def build(argv):
             estimate_type=r.get("estimate_type", ""), endpoint_definition=r.get("endpoint_definition", ""),
             source_value_pct=v, source_value_is_failure=fail, n_source=nsrc,
             n_scale=nscale, n_reported=N))
+        if matches is not None:
+            matches.append((out[-1], r))
     return out, problems
+
+
+def km_only(out):
+    """Keep only fitting units whose arms are all Kaplan-Meier estimates; renumber rows."""
+    bad = {o["ref_no"] for o in out if o["estimate_type"] != "actuarial/KM"}
+    out = [o for o in out if o["ref_no"] not in bad]
+    for i, o in enumerate(out, 1):
+        o["row"] = i
+    return out
 
 
 def main(argv):
@@ -303,11 +324,7 @@ def main(argv):
     if problems:
         sys.exit("REFUSED:\n" + "\n".join(problems))
     if "--km-only" in argv:
-        # Keep only fitting units whose arms are all Kaplan-Meier estimates.
-        bad = {o["ref_no"] for o in out if o["estimate_type"] != "actuarial/KM"}
-        out = [o for o in out if o["ref_no"] not in bad]
-        for i, o in enumerate(out, 1):
-            o["row"] = i
+        out = km_only(out)
     with open(argv[1], "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(out[0]), lineterminator="\n")
         w.writeheader(); w.writerows(out)
