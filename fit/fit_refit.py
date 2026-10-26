@@ -259,11 +259,18 @@ def loto(name, m, base, rows, trials):
     from scipy.stats import binom
     rng = np.random.default_rng(SEED)
     res_path = os.path.join(OUT, f"loso_{name}.json")
-    res = json.load(open(res_path)) if os.path.exists(res_path) else {}
     dsum = np.array(base["dsum"]); d2sum = np.array(base["d2sum"]); T = np.array(base["T"])
     tr = np.array(base["trial"]); y = np.array(base["y"]); npat = np.array(base["npat"])
     study = np.array([r["first_author"] for r in rows])
     studies = sorted(set(study), key=list(study).index)
+    # Cache identity (review R02): saved study scores are reused only for the same data, model,
+    # runner, priors, sampler, study list and units; anything else is refused.
+    ident = identity(name, stan_data(base, "primary"), SEED, 4, min(800, WARMUP), min(500, SAMPLES),
+                     extra=dict(analysis="leave one study out", studies=studies, units=list(trials),
+                                prior_c_sd=PRIOR_C_SD, score="conditional plug-in, 20 normal draws per posterior draw"))
+    res = json.load(open(res_path)) if os.path.exists(res_path) else {"_identity": ident}
+    if res.get("_identity", {}).get("identity_sha256") != ident["identity_sha256"]:
+        sys.exit(f"REFUSED: {res_path} holds scores from another data set, model or runner. Use a new output folder.")
     for s_i, st in enumerate(studies, start=1):
         if st in res:
             continue
