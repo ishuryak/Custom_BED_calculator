@@ -13,7 +13,7 @@ unc_ui <- function(id) {
   ns <- NS(id)
   tagList(
     div(class = "alert alert-secondary",
-        tags$strong("What this tab shows. "),
+        tags$strong("What this page shows. "),
         "The DI tumor model was refitted with Bayesian methods to randomized fractionation trial arms, mainly without chemotherapy,",
         "re-extracted from the trial publications (one intercept per trial, so the fit is driven mainly by",
         "within-trial contrasts, plus between-arm overdispersion). The DD model is calibrated to DI at 35 × 2 Gy",
@@ -29,7 +29,7 @@ unc_ui <- function(id) {
                   c("DI model" = "di", "both models (paired draws)" = "both",
                     "DD model (calibrated to DI)" = "dd"), selected = "both"),
       radioButtons(ns("tox_source"), "Toxicity parameters",
-                   c("Uncertain (stated priors)" = "prior", "Fixed (the sidebar values)" = "fixed"))),
+                   c("Uncertain (stated priors)" = "prior", "Fixed (the Model settings values)" = "fixed"))),
     uiOutput(ns("context")),
     h5("Evaluated regimen against the comparison"),
     div(style = "overflow-x:auto;", tableOutput(ns("summary"))),
@@ -67,7 +67,7 @@ unc_server <- function(id, settings, oar_policy) {
   moduleServer(id, function(input, output, session) {
     draws <- reactive(list(di = load_draws("di", input$variant), dd = load_draws("dd", input$variant)))
     # Fixed toxicity: the sidebar values and the organ alpha/beta of the
-    # Organs at risk tab (one effective parameter set, also exported).
+    # Organs at risk page (one effective parameter set, also exported).
     tx_all <- reactive({
       s <- settings()
       pol <- oar_policy()
@@ -77,7 +77,7 @@ unc_server <- function(id, settings, oar_policy) {
     limits <- reactive({
       s <- settings()
       validate(need(s$early_mode %in% c("hypno", "reference"),
-                    "Under uncertainty the early limit must be HYPNO 55 Gy/20 or the comparison plus an allowed excess (chosen on the Search tab): the Fowler and Fenwick limits are tied to fixed parameter values."))
+                    "Under uncertainty the early limit must be HYPNO 55 Gy/20 or the comparison plus an allowed excess (chosen on the Search page): the Fowler and Fenwick limits are tied to fixed parameter values."))
       list(early = list(mode = s$early_mode, tol = s$tol_early), late = list(mode = s$late_mode, tol = s$tol_late))
     })
     oar_fun <- reactive({
@@ -122,8 +122,8 @@ unc_server <- function(id, settings, oar_policy) {
       pol <- oar_policy()
       if (is.null(pol)) return(" Organ limits: not applied.")
       ab_txt <- if (identical(input$tox_source, "fixed"))
-        sprintf("organ α/β from the Organs at risk tab (%g Gy cord and brainstem, %g Gy other organs)", pol$ab[["cord"]], pol$ab[["oar"]]) else
-        "organ α/β drawn from the stated priors, which replace the tab's values"
+        sprintf("organ α/β from the Organs at risk page (%g Gy cord and brainstem, %g Gy other organs)", pol$ab[["cord"]], pol$ab[["oar"]]) else
+        "organ α/β drawn from the stated priors, which replace the page's values"
       sprintf(" Organ limits: applied to %s (%s; %s). %s", paste(pol$coverage$entered, collapse = ", "), pol$library, ab_txt,
               oar_coverage_text(pol$coverage))
     }

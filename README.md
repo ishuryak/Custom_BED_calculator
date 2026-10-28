@@ -1,6 +1,6 @@
-# Custom BED calculator, version 3
+# Custom BED calculator, version 4 (branch `v4`, not deployed)
 
-You can try the calculator [here](https://ishuryak.shinyapps.io/custom_bed_calculator_v3/). To see the code running on the website, open Model and sources and scroll to Version. This branch has changes waiting to go live, so it may be a little ahead of the website.
+Version 4 keeps the version 3.2.1 engine and changes the layout for clinicians. The calculator opens on one page: a list of shorter, hypofractionated schedules (5 fractions a week) that, compared with the standard 35 × 2 Gy in 47 days, keep the tumor BED (DI or DD model) at least the standard's minus 5 Gy and the early and late toxicity BEDs at most the standard's plus 5 Gy. Each row gives a number of fractions with the range of doses per fraction that qualifies, and says whether both tumor models agree. Every version 3 tab is still available as a page of a side menu. Version 4 is meant for its own site, `custom_bed_calculator_v4`. The version 3 site (https://ishuryak.shinyapps.io/custom_bed_calculator_v3/) runs 3.2.0 and is not touched. Reasoning, decisions and checks: `docs/development/2026_10_28_v4_simplified_layout.md`.
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC), for designing hypofractionated trial regimens. It computes:
 
@@ -55,6 +55,14 @@ run_app.bat                     # or: Rscript tools/launch.R
 ```
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
+
+## Changes in version 4.0.0
+
+- New main page (`R/v4_home.R`, `app.R`): the list described above, built by the unchanged `suggest_regimens()` with comparison 35 × 2 Gy, criterion "DI or DD", tumor margin −5 Gy, early and late margins +5 Gy, 5–34 fractions, 0.05 Gy steps up to 8 Gy. A row click shows each dose with its BED differences.
+- Layout: the version 3 tabs are menu pages. The evaluated regimen and the comparison are set on the Report card page, the model parameters on a Model settings page. Visible text names pages instead of the sidebar and tabs.
+- Deploy target `custom_bed_calculator_v4`. The preflight now also refuses the version 3 site.
+- Stale-constant registry: three new constants (margins, standard overall time, search ceiling) and three `app.R` site pointers repaired (they had moved with PR #1).
+- No equation, parameter, draw or selection rule changes. Every version 3 page gives the same numbers for the same inputs.
 
 ## Changes in version 3.2.1
 

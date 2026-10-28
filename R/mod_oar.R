@@ -57,7 +57,7 @@ oar_ui <- function(id) {
     helpText(textOutput(ns("unit_hint"), inline = TRUE)),
     do.call(tagList, organ_inputs),
     checkboxInput(ns("use_in_search"),
-                  "Also apply the entered organ limits in the Search and Uncertainty tabs (% of prescription only)", FALSE),
+                  "Also apply the entered organ limits on the Search and Uncertainty pages (% of prescription only)", FALSE),
     uiOutput(ns("context")),
     h5("Feasibility for the evaluated regimen"),
     div(style = "overflow-x:auto;", tableOutput(ns("table"))),

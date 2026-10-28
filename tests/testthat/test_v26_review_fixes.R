@@ -307,7 +307,7 @@ test_that("R6: each analysis tab names its own comparison, anchor and numerical 
                       late_mode = "reference", tol_early = 0, tol_late = 0, agree_cmp = "hypno_test",
                       agree_threshold_mode = "own", agree_margin = -3, agree_days = 1)
     sc <- output$search_context$html
-    expect_true(grepl("Comparison: 33 × 2 Gy in 38 days (sidebar)", sc, fixed = TRUE))
+    expect_true(grepl("Comparison: 33 × 2 Gy in 38 days (Report card page)", sc, fixed = TRUE))
     expect_true(grepl("DD anchor: 35 × 2 Gy in 47 days", sc, fixed = TRUE))
     expect_true(grepl("55.87 Gy₁₀ (HYPNO 55 Gy/20, fixed)", sc, fixed = TRUE))
     expect_true(grepl("110.00 Gy₃ (comparison 110.00 + 0)", sc, fixed = TRUE))
@@ -316,7 +316,7 @@ test_that("R6: each analysis tab names its own comparison, anchor and numerical 
     expect_true(grepl("105.42 Gy₃ (comparison 105.42 + 0)", ac, fixed = TRUE))
     expect_true(grepl("at least 1 day saved", ac, fixed = TRUE))
     expect_true(grepl("at least 7 days saved", sc, fixed = TRUE))
-    expect_true(grepl("the sidebar regimen, not a candidate row", output$sens_context$html, fixed = TRUE))
+    expect_true(grepl("the Report card regimen, not a candidate row", output$sens_context$html, fixed = TRUE))
     dd_fixed <- compute_all(20, 2.75, 26, params(), anchor())$bed_dd
     session$setInputs(comparator = "custom")
     expect_equal(compute_all(20, 2.75, 26, params(), anchor())$bed_dd, dd_fixed)
@@ -327,8 +327,8 @@ test_that("R6: each analysis tab names its own comparison, anchor and numerical 
   })
   app_txt <- read_text("app.R")
   expect_false(grepl("All differences and toxicity limits are relative to this regimen", app_txt, fixed = TRUE))
-  # version 3 (decision 7a): one comparison and one threshold for every tab
-  expect_true(grepl("One comparison and one threshold for every tab", app_txt, fixed = TRUE))
+  # version 3 (decision 7a), worded for the version 4 pages: one comparison and one threshold
+  expect_true(grepl("One comparison and one threshold for every page except the main list", app_txt, fixed = TRUE))
   ab <- read_text("about.md")
   expect_false(grepl("Versions 1 and 2.0 calibrated at the comparison regimen", ab, fixed = TRUE))
 })

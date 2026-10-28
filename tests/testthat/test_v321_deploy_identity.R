@@ -29,7 +29,7 @@ test_that("M01: every failed or empty git answer, and every bad marker, stops be
 
 test_that("M01: preflight refuses matching empty identities, and deploy.R uses only checked git calls", {
   acc <- data.frame(name = "ishuryak", server = "shinyapps.io")
-  expect_error(deploy_preflight("custom_bed_calculator_v3", "custom_bed_calculator_v3", acc, "ishuryak", character(),
+  expect_error(deploy_preflight("custom_bed_calculator_v4", "custom_bed_calculator_v4", acc, "ishuryak", character(),
                                 head = character(), passed = character()), "has not passed")
   s <- readLines(file.path(app_abs, "tools", "deploy.R"))
   expect_false(any(grepl("system(\"git", s, fixed = TRUE)))

@@ -43,7 +43,7 @@ constants:
     value: 0.5
     provenance: design
     why: Differences below this are "about the same" in words (plan workstream C, item 7). Tables keep full values.
-    sites: ["app.R:89"]
+    sites: ["app.R:101"]
   oar_near_fraction:
     value: 0.05
     provenance: design
@@ -68,12 +68,12 @@ constants:
     value: 140
     provenance: design
     why: Upper bound of the "minimum days saved" inputs (app.R LIMITS and controls).
-    sites: ["app.R:47"]
+    sites: ["app.R:57"]
   hypno_lrc_percent:
     value: [50.7, 51.2]
     provenance: literature
     why: HYPNO 3-year locoregional control, test vs control arm (Bentzen 2026), quoted in app text.
-    sites: ["app.R:692"]
+    sites: ["app.R:805"]
   hyhope_total_dose:
     value: 46.5
     provenance: literature
@@ -103,3 +103,28 @@ constants:
     value: 2026
     provenance: literature
     why: Publication year in labels (HYPNO 2026); not an analysis constant.
+  v4_margins_gy:
+    value: 5
+    provenance: design
+    why: >
+      Version 4 main list (Igor Shuryak, 2026-10-28): tumor BED at least the
+      standard's minus 5 Gy (DI or DD), early and late BED at most the
+      standard's plus 5 Gy. Pinned by tests/testthat/test_v4_home.R.
+    sites: ["R/v4_home.R:12"]
+  v4_standard_overall_time_days:
+    value: 47
+    provenance: derived
+    why: >
+      Overall time of the standard 35 x 2 Gy on the Mon-Fri calendar from a
+      Monday (overall_time(35)); the same as default_anchor(). Pinned by
+      test_v4_home.R ("the standard is 35 x 2 Gy in 47 days").
+    sites: ["R/v4_home.R:11"]
+  v4_grid_d_max_gy:
+    value: 8
+    provenance: design
+    why: >
+      Highest dose per fraction searched by the version 4 main list. Above the
+      largest qualifying dose at every listed setting (late BED + 5 Gy caps
+      5 fractions at about 7.2 Gy with late alpha/beta 3 Gy), so it does not
+      truncate the list at the defaults.
+    sites: ["R/v4_home.R:13"]

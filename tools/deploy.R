@@ -1,6 +1,6 @@
-# Deploys version 3 to shinyapps.io as its own app, "custom_bed_calculator_v3".
-# The version 1 site (custom_bed_calculator) and the version 2 site
-# (custom_bed_calculator_v2) are never touched: deploy_preflight() refuses them.
+# Deploys version 4 to shinyapps.io as its own app, "custom_bed_calculator_v4".
+# The version 1, 2 and 3 sites (custom_bed_calculator, custom_bed_calculator_v2,
+# custom_bed_calculator_v3) are never touched: deploy_preflight() refuses them.
 # Run from the app folder, after tools/restore_library.R and a green
 # tools/run_tests.R on the same commit:
 #   Rscript tools/deploy.R
@@ -8,7 +8,7 @@
 # release library holds only what the app and tests use.
 source("tools/env.R")
 source("tools/deploy_preflight.R")
-APP_NAME <- "custom_bed_calculator_v3"
+APP_NAME <- "custom_bed_calculator_v4"
 ACCOUNT <- "ishuryak"  # pinned: never deploy to whichever account happens to be first
 deploy_lib <- Sys.getenv("BED_DEPLOY_LIBRARY",
                          file.path(tools::R_user_dir("HNSCC_BED_calculator", "cache"), "deploy-tools"))
@@ -22,7 +22,7 @@ if (!requireNamespace("rsconnect", quietly = TRUE)) {
 # Checked git calls only (review M01): stops before anything is written or uploaded.
 id <- deploy_identity()
 head <- id$rev; passed <- id$passed
-deploy_preflight(APP_NAME, "custom_bed_calculator_v3", rsconnect::accounts(), ACCOUNT, character(),
+deploy_preflight(APP_NAME, "custom_bed_calculator_v4", rsconnect::accounts(), ACCOUNT, character(),
                  head = head, passed = passed)
 writeLines(head, "deployed_revision.txt")   # shown on the Model and sources page
 cat("Deploying revision", head, "\n")

@@ -78,7 +78,7 @@ test_that("E4 (version 3): one caveat line on each of the Report card, Results, 
   expect_true(cav[4] < pos("id=\"agree_table\""))
   line <- gsub("\\s+", " ", regmatches(html, regexpr("(?s)<div id=\"caveat-results\"[^>]*>.*?</div>", html, perl = TRUE)))
   for (w in c("Chemotherapy effects", "HPV status", "Organ-at-risk doses", "individual gap timing",
-              "Parameter uncertainty is shown on the Uncertainty tab"))
+              "Parameter uncertainty is shown on the Uncertainty page"))
     expect_true(grepl(w, line, fixed = TRUE), info = w)
   expect_false(grepl("Uncertainty intervals are not calculated", line, fixed = TRUE))
 })
@@ -252,5 +252,5 @@ test_that("D: a new export records the current version and the chosen settings (
 test_that("D: app and DESCRIPTION carry the same version", {
   desc <- read.dcf(file.path(app_abs, "DESCRIPTION"))
   expect_equal(unname(desc[1, "Version"]), APP_VERSION)
-  expect_equal(APP_VERSION, "3.2.1")   # 3.2.1: v3.2 review fixes; 3.2.0: 2026-10-26 review (3.1.0 was the verified-trial refit)
+  expect_equal(APP_VERSION, "4.0.0")   # 4.0.0: simplified layout (main list + menu); 3.2.1: v3.2 review fixes; 3.2.0: 2026-10-26 review (3.1.0 was the verified-trial refit)
 })

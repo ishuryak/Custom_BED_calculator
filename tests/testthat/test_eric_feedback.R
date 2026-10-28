@@ -35,7 +35,7 @@ test_that("negative BEDs cannot meet the tumor threshold", {
     session$setInputs(alpha = 0.35, g = 0, lambda_di = 0.23, lambda_dd = 0)
     expect_match(output$report, "threshold +1: not evaluable", fixed = TRUE)
     expect_false(grepl("threshold +1: met", output$report, fixed = TRUE))
-    expect_match(output$report_notes$html, "It does not show uncertainty around the preset selected in the sidebar.", fixed = TRUE)
+    expect_match(output$report_notes$html, "It does not show uncertainty around the preset selected in Model settings.", fixed = TRUE)
   })
 })
 test_that("uncertainty tab starts with both models", {

@@ -35,7 +35,7 @@ test_that("one comparison and one threshold: the both-model screen follows the s
     expect_equal(agreement()$m, c(17, 18, 19))             # the v2.4 result, now reached through the global settings
     session$setInputs(agree_threshold_mode = "own", agree_margin = 0)
     expect_equal(agree_threshold(), 0)
-    expect_true(grepl("Override on this tab", output$agree_override$html))
+    expect_true(grepl("Override on this page", output$agree_override$html))
     expect_true(grepl("threshold 0 Gy instead of the global -3 Gy", output$agree_override$html, fixed = TRUE))
   })
 })
