@@ -1,4 +1,6 @@
-# Custom BED calculator, version 3 (branch `v3`, in development)
+# Custom BED calculator, version 3
+
+You can try the calculator [here](https://ishuryak.shinyapps.io/custom_bed_calculator_v3/). To see the code running on the website, open Model and sources and scroll to Version. This branch has changes waiting to go live, so it may be a little ahead of the website.
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC), for designing hypofractionated trial regimens. It computes:
 

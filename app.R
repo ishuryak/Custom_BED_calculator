@@ -14,6 +14,15 @@ source("R/mod_uncertainty.R", local = TRUE)
 # have changed says so (code$changed_since_load).
 CODE_AT_LOAD <- code_identity()
 
+# link to deployed code
+deployed_revision_text <- function(path = "deployed_revision.txt") {
+  rev <- if (file.exists(path)) trimws(readLines(path, n = 1, warn = FALSE)) else character()
+  if (length(rev) != 1 || !grepl("^[0-9a-f]{40}$", rev))
+    return("Local copy (not deployed).")
+  sprintf("Deployed revision [%s](https://github.com/ishuryak/Custom_BED_calculator/tree/%s) (source code).",
+          substr(rev, 1, 7), rev)
+}
+
 num <- function(id, label, value, min, max, step) {
   numericInput(id, label, value = value, min = min, max = max, step = step)
 }
@@ -583,6 +592,13 @@ server <- function(input, output, session) {
       e <- tumor_endpoint(x[i], y[i])
       if (isTRUE(e$valid)) sprintf("%+.2f", e$delta) else "not evaluable (BED \u2264 0)"
     }, character(1))
+  }
+
+  tumor_threshold_txt <- function(x, y, threshold) {
+    endpoint <- tumor_endpoint(x, y)
+    status <- if (!isTRUE(endpoint$valid)) "not evaluable" else
+      if (endpoint$delta >= threshold - 1e-9) "met" else "not met"
+    sprintf("threshold %+g: %s", threshold, status)
   }
 
   output$results <- renderTable({
@@ -1195,10 +1211,8 @@ server <- function(input, output, session) {
       u = c(if (is.null(unc)) "not available" else rng(unc$di_median, unc$di_q10, unc$di_q90),
             if (is.null(unc)) "not available" else paste(rng(unc$dd_median, unc$dd_q10, unc$dd_q90), "(calibrated DD)"),
             "see Uncertainty tab", "see Uncertainty tab"),
-      `Limit and status` = c(sprintf("threshold %+g: %s", checked("min_gain"),
-                                     ifelse(is.finite(b$bed_di[1] - b$bed_di[2]) && b$bed_di[1] - b$bed_di[2] >= checked("min_gain") - 1e-9, "met", "not met")),
-                             sprintf("threshold %+g: %s", checked("min_gain"),
-                                     ifelse(is.finite(b$bed_dd[1] - b$bed_dd[2]) && b$bed_dd[1] - b$bed_dd[2] >= checked("min_gain") - 1e-9, "met", "not met")),
+      `Limit and status` = c(tumor_threshold_txt(b$bed_di[1], b$bed_di[2], checked("min_gain")),
+                             tumor_threshold_txt(b$bed_dd[1], b$bed_dd[2], checked("min_gain")),
                              early_st, st(b$bed_late[1], lv$late)),
       check.names = FALSE)
     names(rows)[4:5] <- c(sprintf("Δ vs %s", vs), "Verified-trial refit 2026-10-25: Δ median (80% range), Gy at each draw's α/β")
@@ -1237,6 +1251,7 @@ server <- function(input, output, session) {
                                                          "per fraction): tumor BEDs at this fraction size are extrapolations."), r$d, sup$d_min, sup$d_max)),
       if (isTRUE(tryCatch(any(oar()$table$entered), error = function(e) FALSE)))
         helpText(oar_coverage_text(oar()$coverage)),
+      helpText("The refit column uses its own fitted parameters. It does not show uncertainty around the preset selected in the sidebar."),
       helpText("Organ rows appear when organ doses are entered on the Organs at risk tab. The refit column applies the",
                sprintf(paste("refit's parameter draws (not the sidebar values) to the same two regimens: DI posterior draws and",
                              "calibrated-DD draws, fitted to %d arms of %d randomized trials (%s). Its BED differences use each",
@@ -1277,8 +1292,7 @@ server <- function(input, output, session) {
     txt <- gsub("{{VERSIONS}}", sprintf("Version %s of the Custom BED calculator (equations %s, selection rules %s, scenario set %s, uncertainty %s, organs %s).",
                                         APP_VERSION, EQUATION_VERSION, SELECTION_VERSION, SCENARIO_SET_VERSION, UNCERTAINTY_VERSION, OAR_VERSION),
                 txt, fixed = TRUE)
-    rev <- if (file.exists("deployed_revision.txt")) paste0("Deployed revision ", substr(readLines("deployed_revision.txt", n = 1), 1, 7), ".") else
-      "Local copy (not a deployed revision)."
+    rev <- deployed_revision_text()
     txt <- gsub("{{REVISION}}", rev, txt, fixed = TRUE)
     withMathJax(HTML(markdown::mark(text = txt, options = "+latex_math")))
   })

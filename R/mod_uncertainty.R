@@ -27,7 +27,7 @@ unc_ui <- function(id) {
       selectInput(ns("variant"), "Refit used", UNC_VARIANTS),
       selectInput(ns("tumor_crit"), "Tumor criterion for the joint share",
                   c("DI model" = "di", "both models (paired draws)" = "both",
-                    "DD model (calibrated to DI)" = "dd")),
+                    "DD model (calibrated to DI)" = "dd"), selected = "both"),
       radioButtons(ns("tox_source"), "Toxicity parameters",
                    c("Uncertain (stated priors)" = "prior", "Fixed (the sidebar values)" = "fixed"))),
     uiOutput(ns("context")),
@@ -44,7 +44,7 @@ unc_ui <- function(id) {
                "mixed endpoints and the model's form. The control rate is your input, and its uncertainty is not",
                "included: the refit's main trials did not use concurrent chemotherapy.")),
     div(style = "overflow-x:auto;", tableOutput(ns("tcp"))),
-    h5("Search under uncertainty"),
+    h5("Search within the toxicity limits"),
     helpText(sprintf("The search screens the grid with %d of the draws. The toxicity requirement of each listed dose is then", SEARCH_DRAWS),
              "checked again on all draws, and all draws are used for the summaries. The selection rule is fixed before",
              "the search. The best value over draws is never reported, because it is optimistic by construction. Each",
@@ -57,6 +57,8 @@ unc_ui <- function(id) {
       numericInput(ns("tox_share"), "Required share of draws within all toxicity limits (%)", 90, 50, 100, 5),
       actionButton(ns("run"), "Run the search", class = "btn-primary", style = "margin-top:1.9rem;")),
     uiOutput(ns("search_msg")),
+    div(class = "alert alert-info",
+        "These regimens meet the toxicity requirement, but they may still miss the tumor BED threshold."),
     div(style = "overflow-x:auto;", tableOutput(ns("search_table"))),
     downloadButton(ns("download"), "Download the uncertainty analysis (ZIP)"))
 }

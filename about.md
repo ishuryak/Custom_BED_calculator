@@ -216,6 +216,6 @@ Every preset keeps the sidebar's background growth $g$, and every setting of the
 
 ### Version
 
-{{VERSIONS}} {{REVISION}} Source code for version 3: [v3 branch](https://github.com/ishuryak/Custom_BED_calculator/tree/v3). Version 2 remains available at https://ishuryak.shinyapps.io/custom_bed_calculator_v2/. Version 1 remains available at https://ishuryak.shinyapps.io/custom_bed_calculator/. It still carries a calibration error at tumor α/β other than 10 Gy (at α/β 5 Gy, 35 × 2 Gy gives a DD BED of 73.8 Gy instead of 79.0).
+{{VERSIONS}} {{REVISION}} The [v3 branch](https://github.com/ishuryak/Custom_BED_calculator/tree/v3) has the development code and may differ from the live website. Version 2 remains available at https://ishuryak.shinyapps.io/custom_bed_calculator_v2/. Version 1 remains available at https://ishuryak.shinyapps.io/custom_bed_calculator/. It still carries a calibration error at tumor α/β other than 10 Gy (at α/β 5 Gy, 35 × 2 Gy gives a DD BED of 73.8 Gy instead of 79.0).
 
 Igor Shuryak, MD, PhD, is144@cumc.columbia.edu
