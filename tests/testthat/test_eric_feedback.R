@@ -1,4 +1,4 @@
-# Eric's feedback: report validity, uncertainty defaults, and exact deployed source.
+# check report card and search settings
 app_dir <- testthat::test_path("..", "..")
 app_abs <- normalizePath(app_dir)
 feedback_defaults <- list(
@@ -15,8 +15,7 @@ feedback_defaults <- list(
   `unc-tcp0` = 70, `unc-rule` = "min_q10", `unc-tox_share` = 90)
 set_feedback <- function(session, ...) do.call(session$setInputs, modifyList(feedback_defaults, list(...)))
 
-
-test_that("report-card status rejects a positive raw gain between negative BEDs", {
+test_that("negative BEDs cannot meet the tumor threshold", {
   shiny::testServer(app_dir, {
     set_feedback(session, m = 18, d = 2.9, preset = "custom", alpha = 0.01,
                  g = 0.1, lambda_di = 0, lambda_dd = 0)
@@ -36,24 +35,22 @@ test_that("report-card status rejects a positive raw gain between negative BEDs"
     session$setInputs(alpha = 0.35, g = 0, lambda_di = 0.23, lambda_dd = 0)
     expect_match(output$report, "threshold +1: not evaluable", fixed = TRUE)
     expect_false(grepl("threshold +1: met", output$report, fixed = TRUE))
-    expect_match(output$report_notes$html, "does not represent uncertainty around the selected sidebar preset", fixed = TRUE)
+    expect_match(output$report_notes$html, "It does not show uncertainty around the preset selected in the sidebar.", fixed = TRUE)
   })
 })
-
-test_that("uncertainty display defaults to both models and explains the search results", {
+test_that("uncertainty tab starts with both models", {
   env <- new.env()
   old <- setwd(app_abs); on.exit(setwd(old))
   source("app.R", local = env)
   ui <- env$unc_ui("unc")
   html <- htmltools::renderTags(ui)$html
   expect_match(html, '<option value="both" selected>', fixed = TRUE)
-  expect_match(html, "Rank regimens meeting the toxicity requirement", fixed = TRUE)
-  note <- "Listed regimens meet the required toxicity share but may not meet the tumor BED threshold."
+  expect_match(html, "Search within the toxicity limits", fixed = TRUE)
+  note <- "These regimens meet the toxicity requirement, but they may still miss the tumor BED threshold."
   expect_match(html, note, fixed = TRUE)
   expect_lt(regexpr(note, html, fixed = TRUE)[1], regexpr('id="unc-search_table"', html, fixed = TRUE)[1])
 })
-
-test_that("deployed source links use a full commit and local copies do not claim one", {
+test_that("source link uses the deployed commit", {
   env <- new.env()
   old <- setwd(app_abs); on.exit(setwd(old))
   source("app.R", local = env)

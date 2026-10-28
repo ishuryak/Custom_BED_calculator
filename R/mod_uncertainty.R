@@ -44,7 +44,7 @@ unc_ui <- function(id) {
                "mixed endpoints and the model's form. The control rate is your input, and its uncertainty is not",
                "included: the refit's main trials did not use concurrent chemotherapy.")),
     div(style = "overflow-x:auto;", tableOutput(ns("tcp"))),
-    h5("Rank regimens meeting the toxicity requirement"),
+    h5("Search within the toxicity limits"),
     helpText(sprintf("The search screens the grid with %d of the draws. The toxicity requirement of each listed dose is then", SEARCH_DRAWS),
              "checked again on all draws, and all draws are used for the summaries. The selection rule is fixed before",
              "the search. The best value over draws is never reported, because it is optimistic by construction. Each",
@@ -58,7 +58,7 @@ unc_ui <- function(id) {
       actionButton(ns("run"), "Run the search", class = "btn-primary", style = "margin-top:1.9rem;")),
     uiOutput(ns("search_msg")),
     div(class = "alert alert-info",
-        "Listed regimens meet the required toxicity share but may not meet the tumor BED threshold."),
+        "These regimens meet the toxicity requirement, but they may still miss the tumor BED threshold."),
     div(style = "overflow-x:auto;", tableOutput(ns("search_table"))),
     downloadButton(ns("download"), "Download the uncertainty analysis (ZIP)"))
 }

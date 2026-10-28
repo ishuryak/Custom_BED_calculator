@@ -14,12 +14,12 @@ source("R/mod_uncertainty.R", local = TRUE)
 # have changed says so (code$changed_since_load).
 CODE_AT_LOAD <- code_identity()
 
-# Only a full commit ID written by the guarded deploy can identify deployed source.
+# link to deployed code
 deployed_revision_text <- function(path = "deployed_revision.txt") {
   rev <- if (file.exists(path)) trimws(readLines(path, n = 1, warn = FALSE)) else character()
   if (length(rev) != 1 || !grepl("^[0-9a-f]{40}$", rev))
-    return("Local copy (not a verified deployed revision).")
-  sprintf("Deployed revision [%s](https://github.com/ishuryak/Custom_BED_calculator/tree/%s) (exact source).",
+    return("Local copy (not deployed).")
+  sprintf("Deployed revision [%s](https://github.com/ishuryak/Custom_BED_calculator/tree/%s) (source code).",
           substr(rev, 1, 7), rev)
 }
 
@@ -1251,7 +1251,7 @@ server <- function(input, output, session) {
                                                          "per fraction): tumor BEDs at this fraction size are extrapolations."), r$d, sup$d_min, sup$d_max)),
       if (isTRUE(tryCatch(any(oar()$table$entered), error = function(e) FALSE)))
         helpText(oar_coverage_text(oar()$coverage)),
-      helpText("The refit column uses a separate fitted parameter ensemble; its interval does not represent uncertainty around the selected sidebar preset."),
+      helpText("The refit column uses its own fitted parameters. It does not show uncertainty around the preset selected in the sidebar."),
       helpText("Organ rows appear when organ doses are entered on the Organs at risk tab. The refit column applies the",
                sprintf(paste("refit's parameter draws (not the sidebar values) to the same two regimens: DI posterior draws and",
                              "calibrated-DD draws, fitted to %d arms of %d randomized trials (%s). Its BED differences use each",
