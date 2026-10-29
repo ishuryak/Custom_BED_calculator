@@ -1,4 +1,4 @@
-# Custom BED calculator, version 4 (branch `v4`, not deployed)
+# Custom BED calculator, version 4.1 (branch `v4`, not deployed)
 
 Version 4 keeps the version 3.2.1 engine and changes the layout for clinicians. The calculator opens on one page: a list of shorter, hypofractionated schedules (5 fractions a week) that, compared with the standard 35 × 2 Gy in 47 days, keep the tumor BED (DI or DD model) at least the standard's minus 5 Gy and the early and late toxicity BEDs at most the standard's plus 5 Gy. Each row gives a number of fractions with the range of doses per fraction that qualifies, and says whether both tumor models agree. Every version 3 tab is still available as a page of a side menu. Version 4 is meant for its own site, `custom_bed_calculator_v4`. The version 3 site (https://ishuryak.shinyapps.io/custom_bed_calculator_v3/) runs 3.2.0 and is not touched. Reasoning, decisions and checks: `docs/development/2026_10_28_v4_simplified_layout.md`.
 
@@ -55,6 +55,14 @@ run_app.bat                     # or: Rscript tools/launch.R
 ```
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
+
+## Changes in version 4.1.0 (review of 4.0.0)
+
+- Main page states its limits: lead text and criteria with units ("candidates for a trial, not equivalent schedules"), a caution box above the table, and a disclosure that the default tumor values are not fitted.
+- New columns: tumor BED change under each model (DI / DD), refit support (share of the trial refit's parameter samples meeting the tumor condition), and Notes (outside the trial data above 2.55 Gy, acute BED above HYPNO 55 Gy/20, support below 80%, HYPNO test arm).
+- Row card: per-dose values, support and notes, and "Open on the Report card", which applies the main-page rules to the menu pages so their verdicts agree with the list.
+- Usability: hint above the table, card scrolls into view, pages open at the top, first column frozen on phones, menu closes after a choice on phones, darker links, menu descriptions.
+- Tests: two 4.0.0 tests now check what their names say. Review and decisions: `docs/development/2026_10_28_v4_review_and_plan.md`.
 
 ## Changes in version 4.0.0
 

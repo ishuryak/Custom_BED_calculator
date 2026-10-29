@@ -63,3 +63,5 @@ Findings, kept here because they bear on releasing either 3.2.1 or 4.0.0:
 - No deploy (Igor deploys). Committed and pushed to branch `v4` on 2026-10-28 with his approval.
 - Live walkthrough of v4 (needs a deploy).
 - The user guide (`docs/user_guide`) still describes the version 3 tabs.
+
+**Correction (2026-10-28, review of 4.0.0).** The Verification section above overstated two tests in 4.0.0. "The list matches brute force under other tumor settings" compared row counts only, and "an empty list carries the engine's reason" did not check the reason. Both now check what they claim (version 4.1.0). The brute-force oracle uses the same 0.05 Gy grid as the app, so it checks the selection on that grid, not the exact dose edges. See `2026_10_28_v4_review_and_plan.md`.

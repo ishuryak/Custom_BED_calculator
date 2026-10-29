@@ -39,6 +39,11 @@ test_that("deploy.R uses the preflight and the pinned account, not the first acc
   expect_false(any(grepl("acc$name[1]", s, fixed = TRUE)))
   expect_true(any(grepl("account = ACCOUNT", s, fixed = TRUE)))
 })
+
+test_that("deploy.R titles the shinyapps.io app as version 4", {
+  s <- readLines(file.path(app_abs, "tools", "deploy.R"))
+  expect_true(any(grepl('appTitle = "HNSCC BED calculator, version 4"', s, fixed = TRUE)))
+})
 test_that(".Rhistory, .Renviron and the suite marker are neither tracked nor deployed", {
   expect_true(".suite_passed" %in% readLines(file.path(app_abs, ".gitignore")))
   expect_true(all(c(".Rhistory", ".Renviron") %in% readLines(file.path(app_abs, ".rscignore"))))

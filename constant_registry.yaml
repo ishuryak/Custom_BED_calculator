@@ -128,3 +128,11 @@ constants:
       5 fractions at about 7.2 Gy with late alpha/beta 3 Gy), so it does not
       truncate the list at the defaults.
     sites: ["R/v4_home.R:13"]
+  v4_support_min:
+    value: 0.8
+    provenance: design
+    why: >
+      Main-list doses whose refit support (share of refit draws meeting the
+      tumor condition) is below this are named in Notes (Igor Shuryak,
+      decision 2, 2026-10-28). Pinned by test_v4_home.R.
+    sites: ["R/v4_home.R:49"]

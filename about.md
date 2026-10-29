@@ -11,14 +11,17 @@
 
 ### What is new in version 4
 
-- The calculator opens on one page: a list of shorter, hypofractionated schedules (5 fractions a week, 5 to 34 fractions, doses per fraction in 0.05 Gy steps up to 8 Gy) compared with the standard 35 × 2 Gy in 47 days. A schedule is listed when all three conditions hold: tumor BED at least the standard's minus 5 Gy under the DI or the DD model, early (acute mucosal) BED at most the standard's plus 5 Gy, and late BED at most the standard's plus 5 Gy. Each row gives the range of doses per fraction that meets them for that number of fractions, says whether the tumor condition holds under both models, and marks published trial arms inside the range. Clicking a row shows every dose with its BED differences.
-- The main list uses the model settings (Model settings page) and the DD anchor, but not the comparison, threshold or toxicity limits of the other pages. It calls the same search as the Search page, with these fixed rules.
-- Every version 3 tab is still available, unchanged, as a page of the menu (top left). The regimen to evaluate and the comparison are set on the Report card page, and the model parameters on the Model settings page.
+- The calculator opens on one page: a list of shorter, hypofractionated schedules (5 fractions a week, 5 to 34 fractions, doses per fraction checked in 0.05 Gy steps up to 8 Gy) compared with the standard 35 × 2 Gy in 47 days. A schedule is listed when all three conditions hold: tumor BED at least the standard's minus 5 Gy₁₀ under the DI or the DD model, early (acute mucosal) BED at most the standard's plus 5 Gy₁₀, and late BED at the prescription dose at most the standard's plus 5 Gy₃. A 5 Gy₁₀ tumor BED loss is about 4 Gy in 2-Gy fractions, so a listed schedule is a candidate for a trial, not an equivalent schedule.
+- Each row gives a number of fractions with the range of doses per fraction that qualifies, the tumor BED change under each model, where both models meet the tumor condition, and the share of the trial refit's parameter samples in which the dose meets it (refit support, from the refit's own parameters). Notes mark doses above the largest fraction size in the trial data (2.55 Gy, an extrapolation), doses whose acute BED exceeds HYPNO's 55 Gy in 20 fractions, doses with refit support below 80%, and the HYPNO test arm. The two models share their main parameters and are calibrated to agree at 35 × 2 Gy, so their agreement is not an independent confirmation.
+- Clicking a row shows every dose with its BED differences, refit support and notes. "Open on the Report card" sets the Report card and the other menu pages to that regimen against 35 × 2 Gy with the main-page rules (tumor threshold −5 Gy, early and late limits equal to the comparison plus 5 Gy).
+- Because doses are checked in 0.05 Gy steps, a number of fractions that qualifies only in a narrower window can be missing (with the defaults, 15 fractions qualify only near 3.33 Gy), and range edges can lie up to 0.05 Gy inside the exact edges.
+- The main list uses the model settings (Model settings page) and the DD anchor, but not the comparison, threshold or toxicity limits of the other pages. It calls the same search as the Search page, with these fixed rules. The default tumor values (Scenario D18) are not fitted to outcome data. The refit is available as a preset.
+- Every version 3 tab is still available, unchanged, as a page of the menu. The regimen to evaluate and the comparison are set on the Report card page, and the model parameters on the Model settings page.
 - The equations, parameter values, draws and selection rules are those of version 3.2.1.
 
 ### What was new in version 3
 
-- One comparison and one tumor threshold for every page (page), shown in a banner. The both-model screen can override them, and an override is highlighted.
+- One comparison and one tumor threshold for every page except the main list, shown in a banner. The both-model screen can override them, and an override is highlighted.
 - A **Report card** with every quantity, its difference from the comparison, its limit and its status.
 - **Parameter uncertainty** from a Bayesian refit of the tumor models to 45 arms of 19 randomized trials, re-extracted from the trial publications (Uncertainty page).
 - An **Organs at risk** page that converts QUANTEC or HYHOPE maximum-dose constraints to the evaluated schedule and compares mean doses with their physical limits, from point doses, mean doses or a dose-volume histogram.
@@ -219,7 +222,7 @@ Every preset keeps the background growth $g$ entered on Model settings, and ever
 - Two or more fractions per day are not supported. Incomplete repair between same-day fractions would raise the BED.
 - Overall duration is included, but individual gap timing and interruption effects are not modeled separately. The search builds regular once-daily weekday schedules.
 - The default tumor parameters (Scenario D18) are not fitted to outcome data. The Bayesian refit is offered as a preset and on the Uncertainty page, for review (see Parameter uncertainty above). The refit uses summary rates from trials of definitive fractionation, mainly without cytotoxic chemotherapy, without tumor HPV status.
-- The tumor data cover 1.15–2.55 Gy per fraction. Tumor BEDs at larger fractions are extrapolations. The report card, Compare regimens, Search and Uncertainty tables flag them.
+- The tumor data cover 1.15–2.55 Gy per fraction. Tumor BEDs at larger fractions are extrapolations. The main list, report card, Compare regimens, Search and Uncertainty tables flag them.
 
 ### Version
 

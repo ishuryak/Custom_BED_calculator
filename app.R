@@ -378,14 +378,26 @@ V4_MENU <- list(
   "Search and uncertainty" = c("Search" = "search", "Both-model screen" = "agree", "Sensitivity" = "sens",
                                "Uncertainty" = "unc", "Organs at risk" = "oar"),
   "Settings and sources" = c("Model settings" = "settings", "Model and sources" = "about"))
+# One-line descriptions under menu entries whose names alone do not say what they do.
+V4_MENU_NOTES <- c(
+  report = "one regimen against a comparison",
+  results = "all BED values and published regimens",
+  compare = "up to three regimens side by side",
+  search = "your own criteria and limits",
+  agree = "regimens meeting a threshold under both models",
+  sens = "one regimen under 15 parameter settings",
+  unc = "uncertainty from the trial refit")
 
 v4_menu <- function() {
   tagList(
     actionLink("go_home", "Suggested regimens", class = "v4-menu-link v4-menu-home"),
     lapply(names(V4_MENU), function(grp) tagList(
       div(class = "v4-menu-group", grp),
-      lapply(names(V4_MENU[[grp]]), function(title)
-        actionLink(paste0("go_", V4_MENU[[grp]][[title]]), title, class = "v4-menu-link")))))
+      lapply(names(V4_MENU[[grp]]), function(title) {
+        slug <- V4_MENU[[grp]][[title]]
+        actionLink(paste0("go_", slug), class = "v4-menu-link",
+                   tagList(title, if (!is.na(V4_MENU_NOTES[slug])) tags$small(class = "v4-menu-note", V4_MENU_NOTES[[slug]])))
+      }))))
 }
 
 # The main page: the list of regimens and nothing a reader must already know.
@@ -393,28 +405,42 @@ v4_home <- function() {
   div(class = "v4-home",
     div(class = "v4-home-top",
       h2("Hypofractionated alternatives to 70 Gy in 35 fractions"),
-      actionButton("open_menu", "\u2630 Menu", class = "btn-outline-primary btn-sm",
+      actionButton("open_menu", "☰ Menu", class = "btn-outline-primary btn-sm",
                    title = "Check a regimen, see uncertainty, change settings, read the sources")),
     p(class = "lead",
-      "Shorter schedules, 5 fractions a week, that the model estimates are about as effective against the tumor",
-      "as the standard 35 × 2 Gy over 7 weeks, without more early or late side effects beyond a small margin."),
+      "Shorter schedules of 5 fractions a week. Their modeled tumor dose is at most 5 Gy₁₀ below the standard",
+      "35 × 2 Gy (about 4 Gy in 2-Gy fractions), and their modeled early and late side-effect doses are at most",
+      "5 Gy above it. These are candidates for a trial, not equivalent schedules."),
     div(class = "v4-criteria",
-      tags$strong("Each regimen listed meets all three conditions, compared with 35 × 2 Gy:"),
+      tags$strong("Each regimen listed meets all three conditions, compared with 35 × 2 Gy in 47 days:"),
       tags$ol(
-        tags$li(tags$b("Tumor:"), " biologically effective dose (BED) at most 5 Gy below the standard."),
-        tags$li(tags$b("Early side effects"), " (acute mucositis): BED at most 5 Gy above the standard."),
-        tags$li(tags$b("Late side effects:"), " BED at most 5 Gy above the standard."))),
+        tags$li(tags$b("Tumor:"), " biologically effective dose (BED) at most 5 Gy₁₀ below the standard,",
+                "under at least one of the two tumor models."),
+        tags$li(tags$b("Early side effects"), " (acute mucositis): BED at most 5 Gy₁₀ above the standard."),
+        tags$li(tags$b("Late side effects:"), " BED at most 5 Gy₃ above the standard, at the prescription dose."))),
+    div(class = "alert alert-warning v4-caution",
+      tags$strong("Model estimates for trial design, not for treating a patient. "),
+      "The tumor parameters come mainly from trials of radiotherapy without chemotherapy. With concurrent",
+      "chemotherapy, shortening treatment may gain less. HPV status, tumor volume, treatment gaps and the doses",
+      "to individual organs are not included, and late effects are judged at the prescription dose only."),
     uiOutput("home_settings"),
     uiOutput("home_msg"),
+    p(class = "v4-hint", "Click a row for the numbers at each dose, and to open that regimen on the Report card."),
     DTOutput("home_table", fill = FALSE),
     uiOutput("home_footnotes"),
     uiOutput("home_detail"),
-    div(class = "alert alert-light v4-caution",
-      tags$strong("For trial design, not for treating a patient. "),
-      "These are model estimates. They do not account for chemotherapy, HPV status, tumor volume or",
-      "the doses to individual organs, and they have not been tested in a trial unless stated.",
-      "Open the menu to check a single regimen, see the uncertainty of the estimates,",
-      "change the model settings or read the sources."))
+    p(class = "text-muted v4-more",
+      "Open the menu to check a single regimen, see the uncertainty of the estimates, change the model settings",
+      "or read the sources."),
+    tags$script(HTML(paste(
+      "Shiny.addCustomMessageHandler('v4-top', function(x) { window.scrollTo(0, 0); });",
+      "Shiny.addCustomMessageHandler('v4-scroll', function(id) {",
+      "  setTimeout(function() { var el = document.getElementById(id); if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 150);",
+      "});",
+      "$(document).on('click', '.v4-menu-link', function() {",
+      "  if (window.innerWidth < 992) { var lay = $('.bslib-sidebar-layout').first();",
+      "    if (!lay.hasClass('sidebar-collapsed')) lay.children('.collapse-toggle').click(); }",
+      "});"))))
 }
 
 ui <- page_sidebar(
@@ -425,7 +451,11 @@ ui <- page_sidebar(
       ".bslib-page-title, .navbar-brand { white-space: normal; overflow-wrap: anywhere; font-size: clamp(1rem, 2.5vw, 1.25rem); }",
       "#about .MathJax_Display, #about mjx-container[display], #about .MathJax_SVG_Display { overflow-x: auto; overflow-y: hidden; max-width: 100%; }",
       "#about table { display: block; overflow-x: auto; max-width: 100%; }",
-      ".bed-banner { position: sticky; top: 0; z-index: 10; }",
+      ".bed-banner { margin-bottom: 0.5rem; }",
+      "a, .btn-link { color: #0f6e5c; }",
+      ".v4-menu-note { display: block; color: #5c6670; font-size: 0.78rem; line-height: 1.2; }",
+      ".v4-hint { font-weight: 600; margin: 0.4rem 0; }",
+      ".v4-more { margin-top: 1rem; }",
       ".bed-override { border-left: 4px solid #E69F00; padding-left: 0.5rem; }",
       ".v4-menu-link { display: block; padding: 0.3rem 0.5rem; border-radius: 0.3rem; text-decoration: none; }",
       ".v4-menu-link:hover, .v4-menu-link.active { background: rgba(44, 62, 80, 0.08); }",
@@ -1378,7 +1408,10 @@ server <- function(input, output, session) {
   })
 
   # --- version 4: menu navigation and the main page --------------------------
-  go_to <- function(page) nav_select("section", page)
+  go_to <- function(page) {
+    nav_select("section", page)
+    session$sendCustomMessage("v4-top", TRUE)   # each page opens at its top
+  }
   observeEvent(input$go_home, go_to("home"))
   for (grp in V4_MENU) for (title in names(grp)) local({
     page <- title; slug <- grp[[title]]
@@ -1389,98 +1422,154 @@ server <- function(input, output, session) {
   observeEvent(input$open_menu, sidebar_toggle("menu", open = TRUE))
 
   home <- reactive(v4_regimens(params(), anchor()))
-  home_rows <- reactive(v4_summary(home()$rows))
+  # Qualifying grid points with their refit support.
+  home_points <- reactive({
+    rows <- home()$rows
+    dr <- v4_draws()
+    if (!is.null(dr) && nrow(rows) > 0) rows$support <- v4_refit_support(rows, dr$di, dr$dd)
+    rows
+  })
+  hypno_early <- reactive({
+    hy <- comparator_presets()$hypno_test
+    compute_all(hy$m, hy$d, hy$T, params(), anchor())$bed_early
+  })
+  data_support <- tumor_data_support()
+  home_rows <- reactive(v4_summary(home_points(), hypno_early = hypno_early(), data_d_max = data_support$d_max))
 
   output$home_settings <- renderUI({
     p <- params(); d <- default_params()
-    keys <- intersect(names(d), names(p))
+    keys <- setdiff(intersect(names(d), names(p)), "clock_e")
     same <- isTRUE(all.equal(unlist(p[keys]), unlist(d[keys]), tolerance = 1e-9)) &&
-      identical(p$dd_mode, "calibrated") && isTRUE(all.equal(unlist(anchor()), unlist(default_anchor())))
+      identical(p$clock_e, d$clock_e) && identical(p$dd_mode, "calibrated") &&
+      isTRUE(all.equal(unlist(anchor()), unlist(default_anchor())))
     preset <- names(PRESET_LABELS)[PRESET_LABELS == input$preset]
     preset <- if (length(preset)) sub(":.*| \\(.*", "", preset) else "custom"
     div(class = "v4-settings text-muted",
-        if (same) "Model settings: defaults (tumor scenario D18)." else
+        if (same) tags$span("Model settings: defaults. The tumor values (scenario D18) were chosen by the developer and are",
+                            "not fitted to outcome data. A fit to randomized trials is available as a preset.") else
           tags$span(tags$strong("Model settings changed"), sprintf("(tumor preset: %s).", preset)),
         actionLink("open_settings", "View or change the settings"))
   })
 
   output$home_msg <- renderUI({
-    h <- home(); n <- nrow(home_rows())
-    if (n > 0) return(p(sprintf(paste("%d schedules qualify, from %d to %d fractions. Each row gives the range of doses",
-                                      "per fraction that meets all three conditions. The standard is 70 Gy in 35 fractions",
-                                      "of 2 Gy over %g days."), n, min(home_rows()$m), max(home_rows()$m), V4_STANDARD$T)))
+    h <- home(); s <- home_rows(); n <- nrow(s)
+    dd_note <- if (!is.finite(h$standard$bed_dd))
+      div(class = "alert alert-warning", "The DD model is not available with these settings, so only the DI model was used.")
+    if (n > 0) return(tagList(dd_note, p(sprintf(paste(
+      "%d schedules qualify, from %d to %d fractions. Each row gives the range of doses per fraction, checked in",
+      "0.05 Gy steps, that meets all three conditions."), n, min(s$m), max(s$m)))))
     div(class = "alert alert-warning",
-        "No schedule of 5 to 34 fractions (5 a week) meets all three conditions with the current model settings.",
-        if (!is.null(h$reason)) reason_text(h$reason, "either"))
+        "No schedule of 5 to 34 fractions (5 a week, doses in 0.05 Gy steps) meets all three conditions with the current model settings.",
+        v4_empty_reason(h$reason))
   })
 
   output$home_table <- renderDT({
     s <- home_rows()
     validate(need(nrow(s) > 0, ""))
-    dose <- ifelse(s$beyond, paste(s$dose, "*"), s$dose)
     tbl <- data.frame(
       `Fractions` = s$m,
-      `Dose per fraction (Gy)` = dose,
+      `Dose per fraction (Gy)` = s$dose,
       `Total dose (Gy)` = s$total,
-      `Treatment time` = sprintf("%g days", s$T),
-      `Shorter by` = sprintf("%g days", s$saved),
-      `Tumor condition met under` = s$models,
-      `Published trial arm` = ifelse(nzchar(s$trial), s$trial, ""),
+      `Time (days)` = sprintf("%g (%g fewer)", s$T, s$saved),
+      x = paste(s$d_di, "/", s$d_dd),
+      `Tumor condition holds in` = s$models,
+      `Refit support` = ifelse(nzchar(s$support), s$support, "not available"),
+      `Notes` = s$notes,
       check.names = FALSE)
-    datatable(tbl, rownames = FALSE, selection = "single",
+    names(tbl)[5] <- sprintf("Tumor BED change, DI / DD (%s)", bed_unit(params()$ab))
+    datatable(tbl, rownames = FALSE, selection = "single", extensions = "FixedColumns",
               options = list(dom = "t", paging = FALSE, ordering = FALSE, scrollX = TRUE,
-                             columnDefs = list(list(className = "dt-center", targets = 0:4))))
+                             fixedColumns = list(leftColumns = 1),
+                             columnDefs = list(list(className = "dt-center", targets = 0:3))))
   })
 
   output$home_footnotes <- renderUI({
     s <- home_rows()
     if (nrow(s) == 0) return(NULL)
+    hy <- hypno_early()
     helpText(
-      tags$p(tags$b("Tumor condition met under."), "The calculator estimates tumor BED with two models of how",
-             "the tumor regrows during treatment: one where regrowth starts at a fixed time (dose-independent, DI)",
-             "and one where its start and speed depend on the dose given (dose-dependent, DD). A schedule is listed",
-             "when the tumor condition holds under at least one model. Doses where it holds under both models",
-             "are the more robust choices."),
-      if (any(s$beyond)) tags$p(sprintf(paste("* Includes doses above %g Gy per fraction, the largest fraction size",
-                                              "among the published benchmark regimens (HYHOPE)."), PRECEDENT_MAX_D)),
-      tags$p("Click a row to see the numbers for each dose per fraction."))
+      tags$p(tags$b("Two tumor models."), "The calculator estimates tumor BED with two models of how the tumor",
+             "regrows during treatment: one where regrowth starts at a fixed time (dose-independent, DI) and one",
+             "where its start and speed depend on the dose given (dose-dependent, DD). A schedule is listed when",
+             "the tumor condition holds under at least one model. The two models share their main parameters and",
+             "are set to agree at 35 × 2 Gy, so their agreement is not an independent confirmation. Where only",
+             "one model meets the condition, the other estimates a larger loss (see the DI / DD column)."),
+      tags$p(tags$b("Refit support."), sprintf(paste(
+        "Share of the parameter samples of a Bayesian refit to %d arms of %d randomized trials in which the dose",
+        "meets the tumor condition under either model, from the lowest to the highest dose of the row. It uses the",
+        "refit's own parameters, not the Model settings values, and is not a probability of tumor control.",
+        "Doses below %d%% are named in Notes (\"support <\")."), data_support$n_arms, data_support$n_studies, round(100 * V4_SUPPORT_MIN))),
+      tags$p(tags$b("Notes."), sprintf(paste(
+        "\"Outside trial data\": above %.2f Gy per fraction, the largest fraction size in the trials the tumor",
+        "model was fitted to, so the tumor estimate is an extrapolation. \"Acute > HYPNO\": acute BED higher than",
+        "55 Gy in 20 fractions (%.1f %s), which gave grade 3 or worse acute mucositis in 50.9%% of 395 patients",
+        "in a randomized trial (75%% with weekly cisplatin). HYPNO compared 55 Gy in 20 fractions with 66 Gy in 33",
+        "fractions given 6 a week, not with 35 × 2 Gy."), data_support$d_max, hy, bed_unit(params()$ab_e))))
   })
 
   home_selected <- reactive({
     i <- input$home_table_rows_selected
     s <- home_rows()
     if (length(i) != 1 || i > nrow(s)) return(NULL)
-    h <- home()
-    list(s = s[i, ], x = h$rows[h$rows$m == s$m[i], , drop = FALSE])
+    x <- home_points()
+    list(s = s[i, ], x = x[x$m == s$m[i], , drop = FALSE])
   })
+  observeEvent(input$home_table_rows_selected, session$sendCustomMessage("v4-scroll", "home_detail"), ignoreNULL = TRUE)
   output$home_detail_table <- renderTable({
     sel <- home_selected(); req(sel)
     x <- sel$x
+    hy <- hypno_early()
+    sup <- if ("support" %in% names(x)) x$support else rep(NA_real_, nrow(x))
+    note <- vapply(seq_len(nrow(x)), function(k) paste(c(
+      if (x$d[k] > data_support$d_max + 1e-9) "outside trial data",
+      if (x$bed_early[k] > hy + 1e-9) "acute > HYPNO",
+      if (is.finite(sup[k]) && sup[k] < V4_SUPPORT_MIN - 1e-12) "support < 80%"), collapse = "; "), "")
     data.frame(
       `Dose per fraction (Gy)` = sprintf("%.2f", x$d),
       `Total dose (Gy)` = sprintf("%.1f", x$m * x$d),
-      `Tumor BED change, DI model` = fmt(x$d_di, TRUE),
-      `Tumor BED change, DD model` = fmt(x$d_dd, TRUE),
+      `Tumor BED change, DI` = fmt(x$d_di, TRUE),
+      `Tumor BED change, DD` = fmt(x$d_dd, TRUE),
       `Early BED change` = sprintf("%+.2f", x$d_early),
       `Late BED change` = sprintf("%+.2f", x$d_late),
-      `Meets the tumor condition under` = ifelse(x$qual_di & x$qual_dd, "both models", ifelse(x$qual_di, "DI only", "DD only")),
+      `Tumor condition holds in` = ifelse(x$qual_di & x$qual_dd, "both models", ifelse(x$qual_di, "DI only", "DD only")),
+      `Refit support` = ifelse(is.finite(sup), sprintf("%.0f%%", 100 * sup), "not available"),
+      `Notes` = note,
       check.names = FALSE)
   }, align = "c")
   output$home_detail <- renderUI({
     sel <- home_selected()
     if (is.null(sel)) return(NULL)
-    s <- sel$s
+    s <- sel$s; x <- sel$x
     h <- home(); r0 <- h$standard; p <- params()
     u_t <- bed_unit(p$ab); u_e <- bed_unit(p$ab_e); u_l <- bed_unit(p$ab_l)
+    doses <- sprintf("%.2f", x$d)
     card(
       card_header(sprintf("%d fractions in %g days: change from 35 × 2 Gy", s$m, s$T)),
       div(style = "overflow-x:auto;", tableOutput("home_detail_table")),
       helpText(sprintf(paste("Standard 35 × 2 Gy in %g days: tumor BED %.1f %s (DI) and %s (DD), early BED %.1f %s,",
-                             "late BED %.1f %s. Limits: tumor change at least %+g Gy under DI or DD, early and late",
-                             "change at most %+g and %+g Gy. Tumor changes are shown only where both BEDs are positive."),
+                             "late BED %.1f %s. Limits: tumor change at least %s %s under DI or DD, early change at most",
+                             "+%g %s, late change at most +%g %s. Tumor changes are shown only where both BEDs are positive."),
                        V4_STANDARD$T, r0$bed_di, u_t, if (is.na(r0$bed_dd)) "not available" else sprintf("%.1f %s", r0$bed_dd, u_t),
-                       r0$bed_early, u_e, r0$bed_late, u_l, -h$margins$tumor, h$margins$early, h$margins$late)),
-      helpText("To look at one of these regimens in full, enter it on the Report card page (menu)."))
+                       r0$bed_early, u_e, r0$bed_late, u_l, paste0("\u2212", h$margins$tumor), u_t, h$margins$early, u_e,
+                       h$margins$late, u_l)),
+      div(class = "d-flex flex-wrap gap-2 align-items-end",
+          selectInput("home_open_dose", "Dose per fraction to open", doses, selected = doses[ceiling(length(doses) / 2)], width = "220px"),
+          actionButton("home_open_report", "Open on the Report card", class = "btn-primary", style = "margin-bottom:1rem;")),
+      helpText("This sets the Report card, and the other menu pages, to this regimen against 35 × 2 Gy with the",
+               "main-page rules (tumor threshold −5 Gy, early and late limits = standard + 5 Gy)."))
+  })
+  observeEvent(input$home_open_report, {
+    sel <- home_selected(); req(sel, input$home_open_dose)
+    v <- v4_report_inputs(sel$s$m, as.numeric(input$home_open_dose))
+    for (k in c("m", "d", "ref_m", "ref_d", "min_gain", "tol_early", "tol_late")) updateNumericInput(session, k, value = v[[k]])
+    for (k in c("fx_week", "ref_fx_week", "early_mode", "late_mode")) updateRadioButtons(session, k, selected = v[[k]])
+    for (k in c("start_day", "comparator")) updateSelectInput(session, k, selected = v[[k]])
+    updateTextInput(session, "skip_days", value = v$skip_days)
+    for (k in c("auto_T", "ref_auto_T")) updateCheckboxInput(session, k, value = v[[k]])
+    go_to("Report card")
+    showNotification(sprintf(paste("Report card: %d × %s Gy against 35 × 2 Gy, tumor threshold −5 Gy,",
+                                   "early and late limits = standard + 5 Gy. The other menu pages use the same settings."),
+                             sel$s$m, input$home_open_dose), duration = 8)
   })
 
 }

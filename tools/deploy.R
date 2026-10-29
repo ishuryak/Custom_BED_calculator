@@ -31,6 +31,6 @@ files <- rsconnect::listDeploymentFiles(".")
 check_bundle(files, tracked = id$tracked)
 cat("Files:", files, "\n")
 rsconnect::deployApp(appDir = ".", appName = APP_NAME,
-                     appTitle = "HNSCC BED calculator, version 3",
+                     appTitle = "HNSCC BED calculator, version 4",
                      account = ACCOUNT, server = "shinyapps.io",
                      launch.browser = FALSE, forceUpdate = TRUE)

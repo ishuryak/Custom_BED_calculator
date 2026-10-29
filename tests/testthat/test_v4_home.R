@@ -3,7 +3,7 @@
 # test_bed_models.R; these tests check the v4 selection, summary and page.
 app_dir <- testthat::test_path("..", "..")
 app_abs <- normalizePath(app_dir)
-for (f in c("bed_models.R", "schedule.R", "v4_home.R"))
+for (f in c("bed_models.R", "schedule.R", "uncertainty.R", "v4_home.R"))
   source(file.path(app_abs, "R", f), local = TRUE)
 
 p0 <- default_params()
@@ -60,36 +60,64 @@ test_that("the list matches brute force under other tumor settings", {
     } else modifyList(p0, resolve_preset(pr))
     h <- v4_regimens(p)
     bf <- brute_force(p)
-    n_bf <- if (is.null(bf)) 0 else nrow(bf)
-    expect_equal(nrow(h$rows), n_bf, info = pr)
+    expect_false(is.null(bf), info = pr)
+    expect_equal(paste(h$rows$m, sprintf("%.2f", h$rows$d)), paste(bf[, "m"], sprintf("%.2f", bf[, "d"])), info = pr)
   }
 })
 
 test_that("pinned result at the defaults (scenario D18, calibrated DD)", {
-  s <- v4_summary(v4_regimens(p0)$rows)
+  h <- v4_regimens(p0)
+  hy <- compute_all(20, 2.75, 26, p0, default_anchor())$bed_early
+  s <- v4_summary(h$rows, hypno_early = hy, data_d_max = 2.55)
   expect_equal(s$m, 16:34)
-  expect_equal(s$dose[s$m == 20], "2.65–2.80")
-  expect_equal(s$total[s$m == 20], "53.0–56.0")
-  expect_equal(s$T[s$m == 20], 26)
-  expect_equal(s$saved[s$m == 20], 21)
-  expect_equal(s$trial[s$m == 20], "HYPNO test arm, 55 Gy in 20")
-  expect_equal(s$models[s$m == 20], "DI model only")
+  r20 <- s[s$m == 20, ]
+  expect_equal(r20$dose, "2.65–2.80"); expect_equal(r20$total, "53.0–56.0")
+  expect_equal(c(r20$T, r20$saved), c(26, 21))
+  expect_equal(r20$d_di, "−4.5 to +0.2")
+  expect_match(r20$d_dd, "^−11.1 to −")
+  expect_equal(r20$models, "DI only")
+  expect_match(r20$notes, "outside trial data", fixed = TRUE)
+  expect_match(r20$notes, "acute > HYPNO from 2.80 Gy", fixed = TRUE)
+  expect_match(r20$notes, "HYPNO test arm (55 Gy in 20) inside", fixed = TRUE)
   expect_equal(s$models[s$m == 34], "both models")
-  expect_equal(s$models[s$m == 22], "both models at 2.70 Gy, DI model only otherwise")
-  expect_true(s$beyond[s$m == 16])
-  expect_false(any(s$beyond[s$m >= 18]))
-  expect_true(all(s$trial[s$m != 20] == ""))
+  expect_equal(s$models[s$m == 22], "both at 2.70 Gy, else DI only")
+  # Extrapolation: rows 16-20 lie wholly above 2.55 Gy, row 21 starts at it, rows from 26 fractions lie below it.
+  expect_true(all(startsWith(s$notes[s$m <= 20], "outside trial data;")))
+  expect_match(s$notes[s$m == 21], "outside trial data above 2.55 Gy", fixed = TRUE)
+  expect_false(any(s$outside_data[s$m >= 26]))
+  # The HYPNO arm itself is not "above HYPNO's" acute BED.
+  x20 <- h$rows[h$rows$m == 20 & abs(h$rows$d - 2.75) < 1e-9, ]
+  expect_equal(x20$bed_early, hy, tolerance = 1e-12)
+  expect_equal(sum(nzchar(s$trial)), 1)
+})
+
+test_that("refit support: share of refit draws meeting the tumor condition", {
+  di <- load_draws("di", dir = file.path(app_abs, "draws")); dd <- load_draws("dd", dir = file.path(app_abs, "draws"))
+  regs <- data.frame(m = c(20, 21, 25), d = c(2.75, 2.55, 2.40)); regs$T <- overall_time(regs$m)
+  sh <- v4_refit_support(regs, di, dd)
+  expect_equal(round(sh, 2), c(0.95, 0.37, 1.00))
+  # Independent count for one regimen.
+  td <- tumor_deltas(regs[2, ], V4_STANDARD, di, dd)
+  expect_equal(sh[2], mean((td$delta_di >= -5 & !is.na(td$delta_di)) | (td$delta_dd >= -5 & !is.na(td$delta_dd))))
+  rows <- v4_regimens(p0)$rows
+  rows$support <- v4_refit_support(rows, di, dd)
+  s <- v4_summary(rows, data_d_max = 2.55)
+  expect_match(s$notes[s$m == 21], "support < 80% at 2.55", fixed = TRUE)
+  expect_true(all(grepl("^[0-9]+(–[0-9]+)?%$", s$support)))
 })
 
 test_that("summary wording follows which models qualify", {
-  mk <- function(d, di, dd) data.frame(m = 20, d = d, T = 26, qual_di = di, qual_dd = dd)
+  mk <- function(d, di, dd) data.frame(m = 20, d = d, T = 26, qual_di = di, qual_dd = dd,
+                                       d_di = 0, d_dd = 0, bed_early = 50)
   expect_equal(v4_summary(mk(c(2.7, 2.75), c(TRUE, TRUE), c(TRUE, TRUE)))$models, "both models")
-  expect_equal(v4_summary(mk(c(2.7, 2.75), c(TRUE, TRUE), c(FALSE, FALSE)))$models, "DI model only")
-  expect_equal(v4_summary(mk(c(2.7, 2.75), c(FALSE, FALSE), c(TRUE, TRUE)))$models, "DD model only")
+  expect_equal(v4_summary(mk(c(2.7, 2.75), c(TRUE, TRUE), c(FALSE, FALSE)))$models, "DI only")
+  expect_equal(v4_summary(mk(c(2.7, 2.75), c(FALSE, FALSE), c(TRUE, TRUE)))$models, "DD only")
   expect_equal(v4_summary(mk(c(2.7, 2.75, 2.8), c(TRUE, TRUE, TRUE), c(FALSE, TRUE, TRUE)))$models,
-               "both models at 2.75–2.80 Gy, DI model only otherwise")
+               "both at 2.75–2.80 Gy, else DI only")
   expect_equal(v4_summary(mk(c(2.7, 2.75, 2.8), c(FALSE, TRUE, TRUE), c(TRUE, TRUE, FALSE)))$models,
-               "both models at 2.75 Gy, DI or DD model only otherwise")
+               "both at 2.75 Gy, else DI or DD only")
+  expect_equal(v4_signed_range(c(-1.04, 0.33)), "−1.0 to +0.3")
+  expect_equal(v4_signed_range(c(NA_real_, NaN)), "n/a")
   expect_equal(v4_summary(mk(2.7, TRUE, FALSE))$dose, "2.70")
   expect_equal(nrow(v4_summary(mk(2.7, TRUE, FALSE)[0, ])), 0)
 })
@@ -104,6 +132,7 @@ test_that("an empty list carries the engine's reason", {
   p <- modifyList(p0, list(alpha = 0.01, lambda_di = 0.5, lambda_dd = 0.5))  # negative tumor BEDs
   h <- v4_regimens(p)
   expect_equal(nrow(h$rows), 0)
+  expect_identical(h$reason, "negative_reference_both")
   expect_equal(nrow(v4_summary(h$rows)), 0)
 })
 
@@ -112,14 +141,22 @@ v4_defaults <- list(
   m = 18, d = 2.9, fx_week = "5", start_day = "1", skip_days = "", auto_T = TRUE, T = 24,
   comparator = "custom", ref_m = 35, ref_d = 2, ref_fx_week = "5", ref_auto_T = TRUE, ref_T = 47, min_gain = 1,
   preset = "d18", alpha = 0.35, ab = 10, lambda_di = 0.23, lambda_dd = 0.4, Tk = 28, g = 0, dd_mode = "calibrated",
-  anchor_m = 35, anchor_d = 2, ab_e = 10, alpha_e = 0.35, Tp_e = 2.5, Tk_e = 7, chemo = FALSE, ab_l = 3)
+  anchor_m = 35, anchor_d = 2, ab_e = 10, alpha_e = 0.35, Tp_e = 2.5, Tk_e = 7, chemo = FALSE, ab_l = 3,
+  criterion = "both", rank_by = "worst", m_range = c(5, 34), min_days = 7, d_step = "0.05", d_max = 5,
+  early_mode = "hypno", late_mode = "reference", tol_early = 0, tol_late = 0,
+  agree_cmp = "sidebar", agree_threshold_mode = "global", agree_margin = -3, agree_days = 1,
+  `oar-library` = "QUANTEC", `oar-ab_cord` = 2, `oar-ab_oar` = 3, `oar-mode` = "percent", `oar-use_in_search` = FALSE)
 
 test_that("the main page lists the regimens and reacts to the model settings", {
   shiny::testServer(app_dir, {
     do.call(session$setInputs, v4_defaults)
     expect_equal(home_rows()$m, 16:34)
-    expect_match(as.character(output$home_settings$html), "defaults (tumor scenario D18)", fixed = TRUE)
+    expect_match(as.character(output$home_settings$html), "not fitted to outcome data", fixed = TRUE)
     expect_match(as.character(output$home_msg$html), "19 schedules qualify, from 16 to 34 fractions", fixed = TRUE)
+    expect_match(as.character(output$home_msg$html), "0.05 Gy", fixed = TRUE)
+    expect_false(grepl("DD model is not available", as.character(output$home_msg$html), fixed = TRUE))
+    tb <- output$home_table
+    for (h in c("Tumor BED change, DI / DD (Gy₁₀)", "Refit support", "Notes")) expect_match(tb, h, fixed = TRUE)
     session$setInputs(home_table_rows_selected = 5)  # 20 fractions
     det <- as.character(output$home_detail$html)
     expect_match(det, "20 fractions in 26 days", fixed = TRUE)
@@ -127,9 +164,26 @@ test_that("the main page lists the regimens and reacts to the model settings", {
     tb <- output$home_detail_table
     expect_match(tb, "2.65", fixed = TRUE); expect_match(tb, "2.80", fixed = TRUE)
     expect_false(grepl("2.85", tb, fixed = TRUE))
+    expect_match(tb, "Refit support", fixed = TRUE)
+    # Open in Report card: with the main-page rules the Report card agrees with the list.
+    rc <- v4_report_inputs(20, 2.75)
+    expect_equal(rc$min_gain, -5); expect_equal(c(rc$tol_early, rc$tol_late), c(5, 5))
+    expect_identical(c(rc$early_mode, rc$late_mode, rc$comparator), c("reference", "reference", "custom"))
+    do.call(session$setInputs, rc)
+    r <- output$report
+    expect_match(r, "threshold -5: met", fixed = TRUE)
+    expect_false(grepl("exceeds", r, fixed = TRUE))
+    # A dose just above the listed range breaks a toxicity limit there too.
+    do.call(session$setInputs, v4_report_inputs(20, 2.85))
+    expect_match(output$report, "exceeds", fixed = TRUE)
+    do.call(session$setInputs, v4_defaults)
     # The main list ignores the Report card comparison.
     session$setInputs(comparator = "hypno_test")
     expect_equal(home_rows()$m, 16:34)
+    # DD unavailable is announced.
+    session$setInputs(lambda_dd = 0)
+    expect_match(as.character(output$home_msg$html), "DD model is not available", fixed = TRUE)
+    session$setInputs(lambda_dd = 0.4)
     # It follows the model settings.
     session$setInputs(ab_l = 2)
     expect_match(as.character(output$home_settings$html), "Model settings changed", fixed = TRUE)

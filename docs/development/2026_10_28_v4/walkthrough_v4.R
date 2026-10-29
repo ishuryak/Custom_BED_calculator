@@ -63,7 +63,10 @@ main <- function(args) {
   check("main table has 19 rows at the defaults", identical(as.integer(n), 19L), paste("rows:", n))
   first <- js("$('#home_table table.dataTable tbody tr:first td').map((i,e)=>e.innerText).get().join(' | ')")
   check("first row is 16 fractions", grepl("^16 \\|", first), first)
-  check("HYPNO arm marked", isTRUE(js("$('#home_table').text().includes('HYPNO test arm, 55 Gy in 20')")))
+  check("HYPNO arm marked", isTRUE(js("$('#home_table').text().includes('HYPNO test arm (55 Gy in 20) inside')")))
+  check("extrapolation note on the main page", isTRUE(js("$('#home_table').text().includes('outside trial data')")))
+  check("refit support column", isTRUE(js("$('#home_table').text().includes('Refit support')")))
+  check("caution above the table", isTRUE(js("$('.v4-caution').offset().top < $('#home_table').offset().top")))
   check("menu starts closed", isTRUE(js("$('.bslib-sidebar-layout').hasClass('sidebar-collapsed')")))
   check("no banner on the main page", isTRUE(js("$('.bed-banner').is(':hidden')")))
   check("no output errors on the main page", !nzchar(visible_errors() %||% ""), visible_errors() %||% "")
@@ -77,7 +80,26 @@ main <- function(args) {
   idle(2)
   det <- js("$('#home_detail').text()")
   check("row click shows the dose-by-dose card", grepl("20 fractions in 26 days", det %||% ""), substr(det %||% "", 1, 80))
+  top <- js("document.getElementById('home_detail').getBoundingClientRect().top")
+  check("dose card is scrolled into view", is.numeric(top) && top >= -5 && top < 900, paste("top:", round(top %||% NA)))
   shot("02_main_row_selected")
+
+  # Open the selected regimen (20 x 2.75 Gy) on the Report card with the main-page rules.
+  js("$('#home_open_dose').val('2.75'); Shiny.setInputValue('home_open_dose', '2.75')"); idle()
+  bx <- js("(() => { const el = document.getElementById('home_open_report'); el.scrollIntoView({block: 'center'}); const r = el.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()")
+  for (ty in c("mousePressed", "mouseReleased"))
+    b$Input$dispatchMouseEvent(type = ty, x = bx[[1]], y = bx[[2]], button = "left", clickCount = 1)
+  idle(3)
+  check("Open on the Report card goes to the Report card", identical(js("$('.tab-pane.active').attr('data-value')"), "Report card"))
+  idle(2)
+  md <- c(js("String($('#m').val())") %||% "NULL", js("String($('#d').val())") %||% "NULL")
+  check("Report card got the regimen", identical(md, c("20", "2.75")), paste(md, collapse = " x "))
+  check("Report card opens at the top", isTRUE(js("window.scrollY < 50")), paste("scrollY:", js("window.scrollY")))
+  rep_txt <- js("$('#report').text()") %||% ""
+  check("Report card agrees with the main list", grepl("threshold -5: met", rep_txt, fixed = TRUE) && !grepl("exceeds", rep_txt),
+        substr(rep_txt, 1, 100))
+  shot("02b_report_from_main")
+  js("$('#back_report').click()"); idle()
 
   # Open the menu and visit every page.
   js("$('#open_menu').click()"); idle()
@@ -109,8 +131,14 @@ main <- function(args) {
   # Phone width.
   b2 <- ChromoteSession$new(width = 390, height = 844)
   b2$Page$navigate(base); Sys.sleep(4)
-  wide <- b2$Runtime$evaluate("document.documentElement.scrollWidth > window.innerWidth + 1", returnByValue = TRUE)$result$value
+  js2 <- function(e) b2$Runtime$evaluate(e, returnByValue = TRUE)$result$value
+  wide <- js2("document.documentElement.scrollWidth > window.innerWidth + 1")
   check("no horizontal page scroll at 390 px", !isTRUE(wide))
+  check("first column frozen on the phone", isTRUE(js2("document.querySelectorAll('#home_table .dtfc-fixed-left, #home_table .dtfc-fixed-start').length > 0")))
+  js2("$('#open_menu').click()"); Sys.sleep(1.5)
+  js2("$('#go_report').click()"); Sys.sleep(2)
+  check("phone: menu closes after choosing a page", isTRUE(js2("$('.bslib-sidebar-layout').first().hasClass('sidebar-collapsed')")))
+  js2("$('#back_report').click()"); Sys.sleep(1.5)
   b2$screenshot(file.path(out, "20_phone_main.png"), selector = "body", show = FALSE)
   b2$close()
 
