@@ -288,3 +288,15 @@ Also in 4.1.0: `tools/deploy.R` titled the shinyapps.io app "version 3". It now 
 | Test that pins it | `tests/testthat/test_v4_home.R`: "the standard is 35 x 2 Gy…" (search ceiling 30), "pinned result at the defaults" (rows 30:16, early −0.3 to +4.3 and late −16.8 to −8.4 Gy at 20 fractions, no "−0.0"), "summary wording", new "plot data…", and "the main page lists the regimens…" (early/late headers, details hidden until the checkbox is ticked, plot rendered, row 11 = 20 fractions). Against the 4.1.0 code: 17 failed, 2 errors. Browser: `walkthrough_v4.R`, 49 checks. |
 | Verification | 2026-10-30, Windows R 4.5.1, release library: `Rscript tools/run_tests.R` 5649 expectations, 0 failed, 0 errors, 0 warnings (baseline `8355d3e`: 5626, 0 failed). `walkthrough_v4.R` (local): 49 of 49. `stale_constant_audit.py --strict --project-root .`: 0 errors (new constant `v4_min_fewer_fractions`). |
 | What it moves | No BED value. Main page: 15 rows at the defaults (30 → 16 fractions), new early and late BED change columns, a Details checkbox, and a BED-change plot. Version 4.2.0. |
+
+### 2026-10-30: version 4.2.1, range explanation under Details (branch `v4`, from `ad73a34`)
+
+**Changes published numbers:** no. Display text only.
+
+| | |
+|---|---|
+| What was wrong | Igor Shuryak, 2026-10-30: the main page did not say how a row's dose range and BED change ranges are derived (asked "this regimen has BED DI between −1 and +1, how was that determined?"). |
+| Proof it was real | 4.2.0 footnotes and Details had no description of the 0.05 Gy dose search or of what the two ends of a range mean. |
+| Test that pins it | `tests/testthat/test_v4_home.R::range explanation: the doses next to a row fail, for the stated reasons` (hand check of the DI formula at 30 × 2.10 and 2.25 Gy, the reasons 2.05 and 2.30 Gy fail, and that the next dose outside every row fails a condition) and `::the main page lists the regimens…` (explanation shown only with Details). Against `ad73a34`: 1 error, 2 failed. Browser: `walkthrough_v4.R`, 50 checks. |
+| Verification | See the 4.2.1 commit message for the suite count on that revision. |
+| What it moves | Nothing numeric. Version 4.2.1. |

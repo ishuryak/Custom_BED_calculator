@@ -145,6 +145,31 @@ test_that("plot data: one bar per fraction number and endpoint, spanning the lis
   expect_equal(nrow(v4_plot_data(h$rows[0, ])), 0)
 })
 
+test_that("range explanation: the doses next to a row fail, for the stated reasons", {
+  h <- v4_regimens(p0); a <- default_anchor()
+  # Hand check at 30 fractions (40 days): DI BED = 30 d (1 + d/10) - (0.23/0.35) (40 - 28).
+  di <- function(d) 30 * d * (1 + d / 10) - 0.23 / 0.35 * 12
+  r0di <- 70 * 1.2 - 0.23 / 0.35 * 19
+  expect_equal(round(di(c(2.10, 2.25)) - r0di, 1), c(-3.2, 3.3))
+  x30 <- h$rows[h$rows$m == 30, ]
+  expect_equal(range(x30$d), c(2.10, 2.25))
+  expect_length(v4_failed_conditions(30, 2.10, p0, a, h$standard), 0)
+  expect_match(v4_failed_conditions(30, 2.05, p0, a, h$standard), "tumor BED", all = FALSE)
+  up <- v4_failed_conditions(30, 2.30, p0, a, h$standard)
+  expect_true(any(grepl("early BED", up)) && any(grepl("late BED", up)))
+  expect_equal(v4_failed_conditions(20, 2.85, p0, a, h$standard), "early BED more than 5 Gy above the standard")
+  ex <- v4_range_example(x30, p0, a, h$standard)
+  expect_match(ex, "with 30 fractions the doses 2.10–2.25 Gy", fixed = TRUE)
+  expect_match(ex, "2.05 Gy fails (tumor BED", fixed = TRUE)
+  expect_match(ex, "so the row shows −3.2 to +3.3", fixed = TRUE)
+  # Every row: the doses just outside the range fail at least one condition.
+  for (m in unique(h$rows$m)) {
+    d <- h$rows$d[h$rows$m == m]
+    expect_gt(length(v4_failed_conditions(m, max(d) + 0.05, p0, a, h$standard)), 0)
+    if (min(d) - 0.05 > 2) expect_gt(length(v4_failed_conditions(m, min(d) - 0.05, p0, a, h$standard)), 0)
+  }
+})
+
 test_that("wider margins list more regimens, zero margins fewer", {
   n <- function(mg) nrow(v4_regimens(p0, margins = list(tumor = mg, early = mg, late = mg))$rows)
   expect_lt(n(0), n(5))
@@ -184,10 +209,14 @@ test_that("the main page lists the regimens and reacts to the model settings", {
     # Details columns and their footnotes are hidden until asked for.
     for (h in c("Tumor condition holds in", "Refit support", "Notes")) expect_false(grepl(h, tb, fixed = TRUE), info = h)
     expect_false(grepl("Refit support.", as.character(output$home_footnotes$html), fixed = TRUE))
+    expect_false(grepl("How the dose and BED ranges", as.character(output$home_footnotes$html), fixed = TRUE))
     session$setInputs(home_details = TRUE)
     tb <- output$home_table
     for (h in c("Tumor condition holds in", "Refit support", "Notes")) expect_match(tb, h, fixed = TRUE)
     expect_match(as.character(output$home_footnotes$html), "Refit support.", fixed = TRUE)
+    ft <- as.character(output$home_footnotes$html)
+    expect_match(ft, "How the dose and BED ranges are calculated.", fixed = TRUE)
+    expect_match(ft, "with 30 fractions the doses 2.10–2.25 Gy", fixed = TRUE)
     session$setInputs(home_details = FALSE)
     # The plot is drawn below the table.
     expect_match(as.character(output$home_plot_ui$html), "home_plot", fixed = TRUE)

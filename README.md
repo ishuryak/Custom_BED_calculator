@@ -56,6 +56,10 @@ run_app.bat                     # or: Rscript tools/launch.R
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
 
+## Changes in version 4.2.1 (2026-10-30)
+
+- Details now explains how the dose and BED ranges are calculated (0.05 Gy dose search, change from the standard at each kept dose, lowest and highest over the kept doses), with a worked example for the top row that names why the next dose below and above fails. Display text only; no number changes.
+
 ## Changes in version 4.2.0 (Igor Shuryak's requests, 2026-10-30)
 
 - Main list shows only schedules with at least 5 fractions fewer than 35 × 2 Gy (30 fractions or fewer), sorted with the most fractions at the top.

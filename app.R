@@ -1537,6 +1537,21 @@ server <- function(input, output, session) {
              "are set to agree at 35 × 2 Gy, so their agreement is not an independent confirmation. Where only",
              "one model meets the condition, the other estimates a larger loss (see the DI / DD column)."),
       if (isTRUE(input$home_details)) tagList(
+      tags$p(tags$b("How the dose and BED ranges are calculated."), paste(
+        "For each number of fractions, the calculator tries every dose per fraction above 2 Gy in 0.05 Gy steps.",
+        "For each dose it computes the tumor BED (under both models), the early BED and the late BED, subtracts",
+        "the same quantity for 35 × 2 Gy in 47 days, and keeps the dose if all three conditions hold. The dose",
+        "column gives the lowest and highest dose kept. Each BED change column gives the lowest and highest change",
+        "over those doses. With the number of fractions fixed, every BED rises with dose per fraction, so the",
+        "left number belongs to the lowest dose and the right number to the highest. The range is not an",
+        "uncertainty interval: it shows the trade-off within the row, where a higher dose brings the tumor BED",
+        "closer to the standard and adds early and late toxicity. The tumor condition usually sets the lowest dose",
+        "and a toxicity limit the highest. The bars in the plot below show the same ranges. The BED formulas",
+        "are on the Model and sources page (menu)."),
+        tags$br(), tags$em({
+          x <- home_points(); x <- x[x$m == s$m[1], , drop = FALSE]
+          v4_range_example(x, params(), anchor(), home()$standard, home()$margins)
+        })),
       tags$p(tags$b("Refit support."), sprintf(paste(
         "Share of the parameter samples of a Bayesian refit to %d arms of %d randomized trials in which the dose",
         "meets the tumor condition under either model, from the lowest to the highest dose of the row. It uses the",

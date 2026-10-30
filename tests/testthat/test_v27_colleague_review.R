@@ -252,5 +252,5 @@ test_that("D: a new export records the current version and the chosen settings (
 test_that("D: app and DESCRIPTION carry the same version", {
   desc <- read.dcf(file.path(app_abs, "DESCRIPTION"))
   expect_equal(unname(desc[1, "Version"]), APP_VERSION)
-  expect_equal(APP_VERSION, "4.2.0")   # 4.2.0: main page 30 fx max, early/late columns, plot; 4.1.0: v4 review fixes; 4.0.0: simplified layout (main list + menu); 3.2.1: v3.2 review fixes; 3.2.0: 2026-10-26 review (3.1.0 was the verified-trial refit)
+  expect_equal(APP_VERSION, "4.2.1")   # 4.2.1: range explanation under Details; 4.2.0: main page 30 fx max, early/late columns, plot; 4.1.0: v4 review fixes; 4.0.0: simplified layout (main list + menu); 3.2.1: v3.2 review fixes; 3.2.0: 2026-10-26 review (3.1.0 was the verified-trial refit)
 })

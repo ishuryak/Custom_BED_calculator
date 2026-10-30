@@ -68,6 +68,7 @@ main <- function(args) {
   check("BED change plot below the table", isTRUE(js("$('#home_plot img').length === 1 && $('#home_plot').offset().top > $('#home_table').offset().top")))
   shot("01a_main_no_details")
   js("$('#home_details').prop('checked', true).trigger('change')"); idle(2)
+  check("range explanation under Details", isTRUE(js("$('#home_footnotes').text().includes('How the dose and BED ranges are calculated')")))
   check("HYPNO arm marked", isTRUE(js("$('#home_table').text().includes('HYPNO test arm (55 Gy in 20) inside')")))
   check("extrapolation note on the main page", isTRUE(js("$('#home_table').text().includes('outside trial data')")))
   check("refit support column", isTRUE(js("$('#home_table').text().includes('Refit support')")))

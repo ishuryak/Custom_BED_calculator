@@ -160,3 +160,33 @@ v4_empty_reason <- function(reason) {
     dd_unavailable = "The DD model is not available with these settings.",
     paste("No search was possible:", reason))
 }
+
+# Which main-page conditions a schedule fails, compared with the standard
+# (used to explain where a row's dose range starts and stops). Empty when it
+# meets all three. r0: compute_all() of the standard.
+v4_failed_conditions <- function(m, d, p, anchor, r0, margins = V4_MARGINS) {
+  x <- compute_all(m, d, overall_time(m), p, anchor)
+  tum <- function(b, b0) is.finite(b) && is.finite(b0) && b > 0 && b >= b0 - margins$tumor - 1e-9
+  c(if (!(tum(x$bed_di, r0$bed_di) || tum(x$bed_dd, r0$bed_dd)))
+      sprintf("tumor BED more than %g Gy below the standard under both models", margins$tumor),
+    if (x$bed_early > r0$bed_early + margins$early + 1e-9)
+      sprintf("early BED more than %g Gy above the standard", margins$early),
+    if (x$bed_late > r0$bed_late + margins$late + 1e-9)
+      sprintf("late BED more than %g Gy above the standard", margins$late))
+}
+
+# Plain-language worked example for one row of the main list: the doses that
+# qualify and why the next dose below and above does not.
+v4_range_example <- function(x, p, anchor, r0, margins = V4_MARGINS, grid = V4_GRID) {
+  m <- x$m[1]; lo <- min(x$d); hi <- max(x$d)
+  below <- round(lo - grid$d_step, 6); above <- round(hi + grid$d_step, 6)
+  why_lo <- if (below <= 2 + 1e-9) "the search starts above 2 Gy per fraction" else
+    sprintf("%.2f Gy fails (%s)", below, paste(v4_failed_conditions(m, below, p, anchor, r0, margins), collapse = "; "))
+  why_hi <- if (above > grid$d_max + 1e-9) sprintf("the search stops at %g Gy per fraction", grid$d_max) else
+    sprintf("%.2f Gy fails (%s)", above, paste(v4_failed_conditions(m, above, p, anchor, r0, margins), collapse = "; "))
+  sprintf(paste("For example, with %d fractions the doses %s Gy meet all three conditions. Below them, %s;",
+                "above them, %s. The tumor DI change is %s Gy at %.2f Gy and %s Gy at %.2f Gy, so the row shows %s."),
+          m, v4_range(x$d), why_lo, why_hi,
+          v4_signed_range(x$d_di[which.min(x$d)]), lo, v4_signed_range(x$d_di[which.max(x$d)]), hi,
+          v4_signed_range(x$d_di))
+}
