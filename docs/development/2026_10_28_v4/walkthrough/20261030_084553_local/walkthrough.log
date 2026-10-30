@@ -1,0 +1,55 @@
+PASS  main page is shown first
+PASS  main heading
+PASS  main table has 15 rows at the defaults  [rows: 15]
+PASS  first row is 30 fractions  [30 | 2.10–2.25 | 63.0–67.5 | 40 (7 fewer) | −3.2 to +3.3 / −5.3 to −0.4 | −2.2 to +4.2 | −9.6 to +1.5]
+PASS  early and late toxicity columns
+PASS  details hidden by default
+PASS  BED change plot below the table
+PASS  HYPNO arm marked
+PASS  extrapolation note on the main page
+PASS  refit support column
+PASS  caution above the table
+PASS  menu starts closed
+PASS  no banner on the main page
+PASS  no output errors on the main page
+PASS  row click shows the dose-by-dose card  [
+  20 fractions in 26 days: change from 35 × 2 Gy
+  
+    
+      
+   Dose per fra]
+PASS  dose card is scrolled into view  [top: 0]
+PASS  Open on the Report card goes to the Report card
+PASS  Report card got the regimen  [20 x 2.75]
+PASS  Report card opens at the top  [scrollY: 0]
+PASS  Report card agrees with the main list  [
+   Quantity   This regimen   Comparison   Δ vs 35 × 2 Gy in 47 days   Verified-trial refit 2026-10-]
+PASS  menu opens
+PASS  menu opens Report card  [Report card]
+PASS  Report card has no output errors
+PASS  menu opens Results  [Results]
+PASS  Results has no output errors
+PASS  menu opens Compare regimens  [Compare regimens]
+PASS  Compare regimens has no output errors
+PASS  menu opens Search  [Search]
+PASS  Search has no output errors
+PASS  menu opens Both-model screen  [Both-model screen]
+PASS  Both-model screen has no output errors
+PASS  menu opens Sensitivity  [Sensitivity]
+PASS  Sensitivity has no output errors
+PASS  menu opens Uncertainty  [Uncertainty]
+PASS  Uncertainty has no output errors
+PASS  menu opens Organs at risk  [Organs at risk]
+PASS  Organs at risk has no output errors
+PASS  menu opens Model settings  [Model settings]
+PASS  Model settings has no output errors
+PASS  menu opens Model and sources  [Model and sources]
+PASS  Model and sources has no output errors
+PASS  banner shown on a detail page
+PASS  back link returns to the main page
+PASS  main page reports changed settings
+PASS  list follows the late α/β setting  [rows: 15]
+PASS  no horizontal page scroll at 390 px
+PASS  first column frozen on the phone
+PASS  phone: menu closes after choosing a page
+PASS  no browser console errors

@@ -1,6 +1,6 @@
 # Custom BED calculator, version 4.1 (branch `v4`, not deployed)
 
-Version 4 keeps the version 3.2.1 engine and changes the layout for clinicians. The calculator opens on one page: a list of shorter, hypofractionated schedules (5 fractions a week) that, compared with the standard 35 × 2 Gy in 47 days, keep the tumor BED (DI or DD model) at least the standard's minus 5 Gy and the early and late toxicity BEDs at most the standard's plus 5 Gy. Each row gives a number of fractions with the range of doses per fraction that qualifies, and says whether both tumor models agree. Every version 3 tab is still available as a page of a side menu. Version 4 is meant for its own site, `custom_bed_calculator_v4`. The version 3 site (https://ishuryak.shinyapps.io/custom_bed_calculator_v3/) runs 3.2.0 and is not touched. Reasoning, decisions and checks: `docs/development/2026_10_28_v4_simplified_layout.md`.
+Version 4 keeps the version 3.2.1 engine and changes the layout for clinicians. The calculator opens on one page: a list of hypofractionated schedules (5 fractions a week, at least 5 fractions fewer than the standard, so 30 or fewer) that, compared with the standard 35 × 2 Gy in 47 days, keep the tumor BED (DI or DD model) at least the standard's minus 5 Gy and the early and late toxicity BEDs at most the standard's plus 5 Gy. Each row gives a number of fractions with the range of doses per fraction that qualifies, and says whether both tumor models agree. Every version 3 tab is still available as a page of a side menu. Version 4 is meant for its own site, `custom_bed_calculator_v4`. The version 3 site (https://ishuryak.shinyapps.io/custom_bed_calculator_v3/) runs 3.2.0 and is not touched. Reasoning, decisions and checks: `docs/development/2026_10_28_v4_simplified_layout.md`.
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC), for designing hypofractionated trial regimens. It computes:
 
@@ -55,6 +55,14 @@ run_app.bat                     # or: Rscript tools/launch.R
 ```
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
+
+## Changes in version 4.2.0 (Igor Shuryak's requests, 2026-10-30)
+
+- Main list shows only schedules with at least 5 fractions fewer than 35 × 2 Gy (30 fractions or fewer), sorted with the most fractions at the top.
+- Main table: new columns for the early and late toxicity BED change next to the tumor BED change. The columns "Tumor condition holds in", "Refit support" and "Notes" and their footnotes are hidden behind a "Details" checkbox. Table font is larger.
+- New plot below the table: BED change from 35 × 2 Gy against the number of fractions, a bar per endpoint spanning the listed doses (tumor DI and DD in blue shades, early toxicity red, late toxicity green), with the −5 / +5 Gy limits as dashed lines.
+- No equation, parameter or selection-rule change. At the defaults the list goes from 19 rows (16–34 fractions) to 15 rows (16–30); every remaining row is unchanged.
+- Earlier sites (`custom_bed_calculator`, `_v2`, `_v3`) archived on shinyapps.io so that only version 4 is live.
 
 ## Changes in version 4.1.0 (review of 4.0.0)
 

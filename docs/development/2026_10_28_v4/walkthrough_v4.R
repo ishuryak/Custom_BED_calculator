@@ -60,12 +60,18 @@ main <- function(args) {
   check("main page is shown first", isTRUE(js("$('.tab-pane.active').attr('data-value') === 'home'")))
   check("main heading", isTRUE(js("document.body.innerText.includes('Hypofractionated alternatives to 70 Gy in 35 fractions')")))
   n <- js("$('#home_table table.dataTable tbody tr').length")
-  check("main table has 19 rows at the defaults", identical(as.integer(n), 19L), paste("rows:", n))
+  check("main table has 15 rows at the defaults", identical(as.integer(n), 15L), paste("rows:", n))
   first <- js("$('#home_table table.dataTable tbody tr:first td').map((i,e)=>e.innerText).get().join(' | ')")
-  check("first row is 16 fractions", grepl("^16 \\|", first), first)
+  check("first row is 30 fractions", grepl("^30 \\|", first), first)
+  check("early and late toxicity columns", isTRUE(js("$('#home_table').text().includes('Early toxicity BED change') && $('#home_table').text().includes('Late toxicity BED change')")))
+  check("details hidden by default", isTRUE(js("!$('#home_table').text().includes('Refit support') && !$('#home_table').text().includes('Notes')")))
+  check("BED change plot below the table", isTRUE(js("$('#home_plot img').length === 1 && $('#home_plot').offset().top > $('#home_table').offset().top")))
+  shot("01a_main_no_details")
+  js("$('#home_details').prop('checked', true).trigger('change')"); idle(2)
   check("HYPNO arm marked", isTRUE(js("$('#home_table').text().includes('HYPNO test arm (55 Gy in 20) inside')")))
   check("extrapolation note on the main page", isTRUE(js("$('#home_table').text().includes('outside trial data')")))
   check("refit support column", isTRUE(js("$('#home_table').text().includes('Refit support')")))
+  js("$('#home_details').prop('checked', false).trigger('change')"); idle(2)
   check("caution above the table", isTRUE(js("$('.v4-caution').offset().top < $('#home_table').offset().top")))
   check("menu starts closed", isTRUE(js("$('.bslib-sidebar-layout').hasClass('sidebar-collapsed')")))
   check("no banner on the main page", isTRUE(js("$('.bed-banner').is(':hidden')")))
@@ -73,8 +79,8 @@ main <- function(args) {
   shot("01_main")
 
   # A real mouse click on the 20-fraction row (synthetic jQuery clicks do not reach DT's selection).
-  js("document.querySelectorAll('#home_table table.dataTable tbody tr')[4].scrollIntoView({block: 'center'})"); Sys.sleep(0.5)
-  xy <- js("(() => { const r = document.querySelectorAll('#home_table table.dataTable tbody tr')[4].cells[1].getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()")
+  js("document.querySelectorAll('#home_table table.dataTable tbody tr')[10].scrollIntoView({block: 'center'})"); Sys.sleep(0.5)
+  xy <- js("(() => { const r = document.querySelectorAll('#home_table table.dataTable tbody tr')[10].cells[1].getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()")
   for (ty in c("mousePressed", "mouseReleased"))
     b$Input$dispatchMouseEvent(type = ty, x = xy[[1]], y = xy[[2]], button = "left", clickCount = 1)
   idle(2)
@@ -125,7 +131,7 @@ main <- function(args) {
   check("back link returns to the main page", isTRUE(js("$('.tab-pane.active').attr('data-value') === 'home'")))
   check("main page reports changed settings", isTRUE(js("$('#home_settings').text().includes('Model settings changed')")))
   n2 <- js("$('#home_table table.dataTable tbody tr').length")
-  check("list follows the late α/β setting", !identical(as.integer(n2), 19L) ||
+  check("list follows the late α/β setting", !identical(as.integer(n2), 15L) ||
           !identical(js("$('#home_table').text()"), first), paste("rows:", n2))
 
   # Phone width.

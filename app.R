@@ -408,7 +408,7 @@ v4_home <- function() {
       actionButton("open_menu", "☰ Menu", class = "btn-outline-primary btn-sm",
                    title = "Check a regimen, see uncertainty, change settings, read the sources")),
     p(class = "lead",
-      "Shorter schedules of 5 fractions a week. Their modeled tumor dose is at most 5 Gy₁₀ below the standard",
+      "Schedules of 5 fractions a week with at least 5 fractions fewer than the standard. Their modeled tumor dose is at most 5 Gy₁₀ below the standard",
       "35 × 2 Gy (about 4 Gy in 2-Gy fractions), and their modeled early and late side-effect doses are at most",
       "5 Gy above it. These are candidates for a trial, not equivalent schedules."),
     div(class = "v4-criteria",
@@ -425,10 +425,13 @@ v4_home <- function() {
       "to individual organs are not included, and late effects are judged at the prescription dose only."),
     uiOutput("home_settings"),
     uiOutput("home_msg"),
-    p(class = "v4-hint", "Click a row for the numbers at each dose, and to open that regimen on the Report card."),
+    div(class = "d-flex flex-wrap gap-3 align-items-center justify-content-between",
+      p(class = "v4-hint", "Click a row for the numbers at each dose, and to open that regimen on the Report card."),
+      checkboxInput("home_details", "Details (which tumor model, refit support, notes)", value = FALSE)),
     DTOutput("home_table", fill = FALSE),
     uiOutput("home_footnotes"),
     uiOutput("home_detail"),
+    uiOutput("home_plot_ui"),
     p(class = "text-muted v4-more",
       "Open the menu to check a single regimen, see the uncertainty of the estimates, change the model settings",
       "or read the sources."),
@@ -469,7 +472,9 @@ ui <- page_sidebar(
       ".v4-caution { margin-top: 1.2rem; font-size: 0.9rem; }",
       ".v4-back { font-size: 0.9rem; }",
       ".v4-page-head h3 { margin-top: 0.4rem; }",
-      "#home_table table.dataTable tbody tr { cursor: pointer; }")),
+      "#home_table table.dataTable tbody tr { cursor: pointer; }",
+      "#home_table table.dataTable { font-size: 1.05rem; }",
+      ".v4-plot { margin-top: 1.2rem; }")),
   sidebar = sidebar(id = "menu", title = "Menu", width = 290, open = "closed", v4_menu()),
   conditionalPanel("input.section && input.section !== 'home'", div(class = "bed-banner", uiOutput("banner"))),
   do.call(navset_hidden, c(list(id = "section", selected = "home", nav_panel_hidden("home", v4_home())), V3_PAGES))
@@ -1456,31 +1461,68 @@ server <- function(input, output, session) {
     dd_note <- if (!is.finite(h$standard$bed_dd))
       div(class = "alert alert-warning", "The DD model is not available with these settings, so only the DI model was used.")
     if (n > 0) return(tagList(dd_note, p(sprintf(paste(
-      "%d schedules qualify, from %d to %d fractions. Each row gives the range of doses per fraction, checked in",
-      "0.05 Gy steps, that meets all three conditions."), n, min(s$m), max(s$m)))))
+      "%d schedules qualify, from %d down to %d fractions. Each row gives the range of doses per fraction, checked in",
+      "0.05 Gy steps, that meets all three conditions."), n, max(s$m), min(s$m)))))
     div(class = "alert alert-warning",
-        "No schedule of 5 to 34 fractions (5 a week, doses in 0.05 Gy steps) meets all three conditions with the current model settings.",
+        "No schedule of 5 to 30 fractions (5 a week, doses in 0.05 Gy steps) meets all three conditions with the current model settings.",
         v4_empty_reason(h$reason))
   })
 
   output$home_table <- renderDT({
     s <- home_rows()
     validate(need(nrow(s) > 0, ""))
+    p <- params()
     tbl <- data.frame(
       `Fractions` = s$m,
       `Dose per fraction (Gy)` = s$dose,
       `Total dose (Gy)` = s$total,
       `Time (days)` = sprintf("%g (%g fewer)", s$T, s$saved),
       x = paste(s$d_di, "/", s$d_dd),
-      `Tumor condition holds in` = s$models,
-      `Refit support` = ifelse(nzchar(s$support), s$support, "not available"),
-      `Notes` = s$notes,
+      y = s$d_early,
+      z = s$d_late,
       check.names = FALSE)
-    names(tbl)[5] <- sprintf("Tumor BED change, DI / DD (%s)", bed_unit(params()$ab))
+    names(tbl)[5:7] <- c(sprintf("Tumor BED change, DI / DD (%s)", bed_unit(p$ab)),
+                         sprintf("Early toxicity BED change (%s)", bed_unit(p$ab_e)),
+                         sprintf("Late toxicity BED change (%s)", bed_unit(p$ab_l)))
+    if (isTRUE(input$home_details)) {
+      tbl$`Tumor condition holds in` <- s$models
+      tbl$`Refit support` <- ifelse(nzchar(s$support), s$support, "not available")
+      tbl$`Notes` <- s$notes
+    }
     datatable(tbl, rownames = FALSE, selection = "single", extensions = "FixedColumns",
               options = list(dom = "t", paging = FALSE, ordering = FALSE, scrollX = TRUE,
                              fixedColumns = list(leftColumns = 1),
-                             columnDefs = list(list(className = "dt-center", targets = 0:3))))
+                             columnDefs = list(list(className = "dt-center", targets = 0:6))))
+  })
+
+  output$home_plot <- renderPlot({
+    d <- v4_plot_data(home_points())
+    validate(need(nrow(d) > 0, ""))
+    p <- params(); mg <- home()$margins
+    cols <- c("Tumor (DI model)" = "#0072B2", "Tumor (DD model)" = "#56B4E9",
+              "Early toxicity" = "#D62728", "Late toxicity" = "#009E73")
+    ggplot(d, aes(x = m, ymin = lo, ymax = hi, colour = endpoint)) +
+      geom_hline(yintercept = 0, colour = "grey30") +
+      geom_hline(yintercept = c(-mg$tumor, mg$early), colour = "grey55", linetype = "dashed") +
+      geom_linerange(linewidth = 2.2, position = position_dodge(width = 0.75)) +
+      scale_colour_manual(values = cols, name = NULL, drop = FALSE) +
+      scale_x_reverse(breaks = sort(unique(d$m))) +
+      labs(x = "Number of fractions",
+           y = "BED change vs 35 × 2 Gy (Gy)",
+           caption = sprintf(paste("Bars span the listed doses per fraction. Tumor in %s, early toxicity in %s,",
+                                   "late toxicity in %s. Dashed lines: tumor limit \u2212%g Gy, toxicity limits +%g Gy."),
+                             bed_unit(p$ab), bed_unit(p$ab_e), bed_unit(p$ab_l), mg$tumor, mg$early)) +
+      theme_minimal(base_size = 15) +
+      theme(axis.title = element_text(face = "bold", colour = "black"),
+            axis.text = element_text(face = "bold", colour = "black"),
+            panel.grid.minor = element_blank(), legend.position = "top",
+            plot.caption = element_text(hjust = 0, colour = "grey30", size = 11))
+  }, res = 96)
+  output$home_plot_ui <- renderUI({
+    if (nrow(home_rows()) == 0) return(NULL)
+    div(class = "v4-plot",
+        h4("BED change from 35 × 2 Gy by number of fractions"),
+        plotOutput("home_plot", height = "460px"))
   })
 
   output$home_footnotes <- renderUI({
@@ -1494,6 +1536,7 @@ server <- function(input, output, session) {
              "the tumor condition holds under at least one model. The two models share their main parameters and",
              "are set to agree at 35 × 2 Gy, so their agreement is not an independent confirmation. Where only",
              "one model meets the condition, the other estimates a larger loss (see the DI / DD column)."),
+      if (isTRUE(input$home_details)) tagList(
       tags$p(tags$b("Refit support."), sprintf(paste(
         "Share of the parameter samples of a Bayesian refit to %d arms of %d randomized trials in which the dose",
         "meets the tumor condition under either model, from the lowest to the highest dose of the row. It uses the",
@@ -1504,7 +1547,7 @@ server <- function(input, output, session) {
         "model was fitted to, so the tumor estimate is an extrapolation. \"Acute > HYPNO\": acute BED higher than",
         "55 Gy in 20 fractions (%.1f %s), which gave grade 3 or worse acute mucositis in 50.9%% of 395 patients",
         "in a randomized trial (75%% with weekly cisplatin). HYPNO compared 55 Gy in 20 fractions with 66 Gy in 33",
-        "fractions given 6 a week, not with 35 × 2 Gy."), data_support$d_max, hy, bed_unit(params()$ab_e))))
+        "fractions given 6 a week, not with 35 × 2 Gy."), data_support$d_max, hy, bed_unit(params()$ab_e)))))
   })
 
   home_selected <- reactive({

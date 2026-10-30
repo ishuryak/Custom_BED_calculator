@@ -276,3 +276,15 @@ Record, verification of each finding, and decisions: `docs/development/2026_10_2
 | What it moves | No BED value. Main page at the defaults: same 19 rows (16–34 fractions), now with DI / DD changes, refit support (for example 51–99% at 20 fractions) and notes. Version 4.1.0. |
 
 Also in 4.1.0: `tools/deploy.R` titled the shinyapps.io app "version 3". It now reads "version 4". Pinned by `tests/testthat/test_deploy_preflight.R::"deploy.R titles the shinyapps.io app as version 4"`, observed red before the edit and green after. Moves no number.
+
+### 2026-10-30: version 4.2.0, main-page layout requests (branch `v4`, from `8355d3e`)
+
+**Changes published numbers:** no BED value changes. The main list at the defaults drops from 19 rows (16–34 fractions) to 15 rows (30 down to 16); every remaining row keeps its doses and BED changes. Record: `docs/development/2026_10_30_v4_2_main_page.md`.
+
+| | |
+|---|---|
+| What was wrong | Requests from Igor Shuryak, 2026-10-30: the list included 31–34 fraction schedules that save little time; it was sorted fewest fractions first; seven columns made the font small, three of them (tumor model, refit support, notes) secondary; early and late toxicity changes were shown only after a row click; no overview figure. |
+| Proof it was real | Live 4.1.0 at the defaults: 19 rows, first row 16 fractions, no early or late column in the main table, no plot. |
+| Test that pins it | `tests/testthat/test_v4_home.R`: "the standard is 35 x 2 Gy…" (search ceiling 30), "pinned result at the defaults" (rows 30:16, early −0.3 to +4.3 and late −16.8 to −8.4 Gy at 20 fractions, no "−0.0"), "summary wording", new "plot data…", and "the main page lists the regimens…" (early/late headers, details hidden until the checkbox is ticked, plot rendered, row 11 = 20 fractions). Against the 4.1.0 code: 17 failed, 2 errors. Browser: `walkthrough_v4.R`, 49 checks. |
+| Verification | 2026-10-30, Windows R 4.5.1, release library: `Rscript tools/run_tests.R` 5649 expectations, 0 failed, 0 errors, 0 warnings (baseline `8355d3e`: 5626, 0 failed). `walkthrough_v4.R` (local): 49 of 49. `stale_constant_audit.py --strict --project-root .`: 0 errors (new constant `v4_min_fewer_fractions`). |
+| What it moves | No BED value. Main page: 15 rows at the defaults (30 → 16 fractions), new early and late BED change columns, a Details checkbox, and a BED-change plot. Version 4.2.0. |

@@ -119,6 +119,14 @@ constants:
       Monday (overall_time(35)); the same as default_anchor(). Pinned by
       test_v4_home.R ("the standard is 35 x 2 Gy in 47 days").
     sites: ["R/v4_home.R:11"]
+  v4_min_fewer_fractions:
+    value: 5
+    provenance: design
+    why: >
+      Version 4 main list shows only regimens with at least 5 fractions fewer
+      than the standard 35 fractions, i.e. at most 30 (Igor Shuryak,
+      2026-10-30). Pinned by test_v4_home.R.
+    sites: ["R/v4_home.R:13"]
   v4_grid_d_max_gy:
     value: 8
     provenance: design
@@ -127,7 +135,7 @@ constants:
       largest qualifying dose at every listed setting (late BED + 5 Gy caps
       5 fractions at about 7.2 Gy with late alpha/beta 3 Gy), so it does not
       truncate the list at the defaults.
-    sites: ["R/v4_home.R:13"]
+    sites: ["R/v4_home.R:14"]
   v4_support_min:
     value: 0.8
     provenance: design
@@ -135,4 +143,4 @@ constants:
       Main-list doses whose refit support (share of refit draws meeting the
       tumor condition) is below this are named in Notes (Igor Shuryak,
       decision 2, 2026-10-28). Pinned by test_v4_home.R.
-    sites: ["R/v4_home.R:49"]
+    sites: ["R/v4_home.R:50"]

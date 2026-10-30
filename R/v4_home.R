@@ -5,12 +5,13 @@
 #   1. tumor BED (DI or DD model) >= the standard's BED under that model - 5 Gy,
 #   2. early (acute mucosal) BED <= the standard's early BED + 5 Gy,
 #   3. late BED <= the standard's late BED + 5 Gy,
-# and it is shorter than the standard (5 fractions per week from a Monday,
-# dose per fraction above 2 Gy).
+# and it has at least 5 fractions fewer than the standard (5 fractions per week
+# from a Monday, dose per fraction above 2 Gy).
 
 V4_STANDARD <- list(m = 35, d = 2, T = 47)
 V4_MARGINS <- list(tumor = 5, early = 5, late = 5)
-V4_GRID <- list(m_range = 5:34, d_step = 0.05, d_max = 8)
+V4_MIN_FEWER_FRACTIONS <- 5  # listed regimens have at most 35 - 5 = 30 fractions
+V4_GRID <- list(m_range = 5:(V4_STANDARD$m - V4_MIN_FEWER_FRACTIONS), d_step = 0.05, d_max = 8)
 
 # Every qualifying (fractions, dose per fraction) pair, the standard's BEDs and,
 # when nothing can be listed, the engine's reason.
@@ -41,7 +42,7 @@ v4_signed_range <- function(x, digits = 1) {
   x <- x[is.finite(x)]
   if (length(x) == 0) return("n/a")
   f <- function(v) gsub("-", "−", sprintf(paste0("%+.", digits, "f"), v), fixed = TRUE)
-  lo <- round(min(x), digits); hi <- round(max(x), digits)
+  lo <- round(min(x), digits) + 0; hi <- round(max(x), digits) + 0  # + 0 turns -0 into 0
   if (lo == hi) f(lo) else paste(f(lo), "to", f(hi))
 }
 
@@ -72,8 +73,9 @@ v4_report_inputs <- function(m, d) {
 # Published trial arm that the main list can contain (5 fractions a week).
 V4_TRIAL_ARMS <- data.frame(m = 20, d = 2.75, T = 26, label = "HYPNO test arm (55 Gy in 20) inside")
 
-# One row per number of fractions: dose and total-dose ranges, time, the tumor BED
-# change range under each model, where both models meet the tumor condition, the
+# One row per number of fractions, most fractions first: dose and total-dose ranges,
+# time, the tumor BED change range under each model, the early and late BED change
+# ranges, where both models meet the tumor condition, the
 # refit support range, and notes (outside the trial data, acute BED above HYPNO's,
 # low refit support, a published trial arm). rows: v4_regimens()$rows, with column
 # `support` when refit support is shown. hypno_early: HYPNO 55 Gy/20 early BED
@@ -82,7 +84,8 @@ v4_summary <- function(rows, standard_T = V4_STANDARD$T, hypno_early = Inf, data
                        trials = V4_TRIAL_ARMS, support_min = V4_SUPPORT_MIN) {
   if (nrow(rows) == 0)
     return(data.frame(m = integer(), dose = character(), total = character(), T = numeric(),
-                      saved = numeric(), d_di = character(), d_dd = character(), models = character(),
+                      saved = numeric(), d_di = character(), d_dd = character(),
+                      d_early = character(), d_late = character(), models = character(),
                       support = character(), notes = character(), outside_data = logical(),
                       above_hypno = logical(), low_support = logical(), trial = character()))
   has_support <- "support" %in% names(rows)
@@ -105,7 +108,8 @@ v4_summary <- function(rows, standard_T = V4_STANDARD$T, hypno_early = Inf, data
       if (nzchar(trial)) trial)
     data.frame(m = x$m[1], dose = v4_range(x$d), total = v4_range(x$m * x$d, 1),
                T = x$T[1], saved = standard_T - x$T[1],
-               d_di = v4_signed_range(x$d_di), d_dd = v4_signed_range(x$d_dd), models = models,
+               d_di = v4_signed_range(x$d_di), d_dd = v4_signed_range(x$d_dd),
+               d_early = v4_signed_range(x$d_early), d_late = v4_signed_range(x$d_late), models = models,
                support = if (has_support) {
                  lo <- round(100 * min(x$support)); hi <- round(100 * max(x$support))
                  if (lo == hi) sprintf("%d%%", lo) else sprintf("%d–%d%%", lo, hi)
@@ -113,6 +117,24 @@ v4_summary <- function(rows, standard_T = V4_STANDARD$T, hypno_early = Inf, data
                notes = paste(notes, collapse = "; "),
                outside_data = any(outside), above_hypno = any(hot), low_support = any(low), trial = trial)
   }))
+  out <- out[order(-out$m), , drop = FALSE]
+  rownames(out) <- NULL
+  out
+}
+
+# Long table for the main-page plot: for each fraction number and endpoint, the
+# lowest and highest BED change (regimen minus standard) over the listed doses.
+v4_plot_data <- function(rows) {
+  ends <- c(d_di = "Tumor (DI model)", d_dd = "Tumor (DD model)",
+            d_early = "Early toxicity", d_late = "Late toxicity")
+  if (nrow(rows) == 0)
+    return(data.frame(m = integer(), endpoint = factor(levels = ends), lo = numeric(), hi = numeric()))
+  out <- do.call(rbind, lapply(split(rows, rows$m), function(x) do.call(rbind, lapply(names(ends), function(k) {
+    v <- x[[k]][is.finite(x[[k]])]
+    if (length(v) == 0) return(NULL)
+    data.frame(m = x$m[1], endpoint = ends[[k]], lo = min(v), hi = max(v))
+  }))))
+  out$endpoint <- factor(out$endpoint, levels = ends)
   rownames(out) <- NULL
   out
 }
