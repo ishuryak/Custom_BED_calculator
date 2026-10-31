@@ -188,36 +188,47 @@ def fit_one(m, name, data, seed, outdir, chains=CHAINS, warmup=WARMUP, samples=S
                     show_progress=False, output_dir=raw, inits=[init() for _ in range(chains)])
 
 
-def diagnostics(f, sampled, max_treedepth=12):
-    """Full diagnostics: every sampled parameter (vectors included) and every delta_eval contrast."""
+def diagnostics(f, sampled, max_treedepth=12, dims=None):
+    """Full diagnostics: every sampled parameter (vectors included) and every delta_eval contrast.
+
+    dims: the Stan data (or any dict with N, J and R). With it, every expected quantity name
+    (gate.expected_quantities) must be reported exactly once (review F06 of 2026-10-31); the
+    fitting call sites pass it. Without it only the base names are required.
+    Each chain's energy and E-BFMI and the sampler arrays are validated before any reduction.
+    """
     s = f.summary()
     col = lambda key: [c for c in s.columns if c.lower().replace("-", "_") == key][0]
     rh, eb, et = col("r_hat"), col("ess_bulk"), col("ess_tail")
-    names = [i for i in s.index if i.split("[")[0] in set(sampled) | {"c", "z", "delta_eval"}]
-    sub = s.loc[names]
+    families = set(sampled) | {"c", "z", "delta_eval"}
+    sub = s[[str(i).split("[")[0] in families for i in s.index]]
     # Every quantity is checked on its own before min/max, which skip NaN (review F02). A quantity
     # constant across draws is a failure, not an exclusion: none of these models samples a fixed one.
     import pandas as pd
-    tab = pd.DataFrame(dict(rhat=sub[rh], ess_bulk=sub[eb], ess_tail=sub[et],
-                            sd=sub["StdDev"] if "StdDev" in sub.columns else np.nan), index=sub.index)
-    bad = G.invalid_quantities(tab, list(sampled) + ["delta_eval"])
-    mv = f.method_variables()
-    div = int(mv["divergent__"].sum())
-    tdh = int((mv["treedepth__"] >= max_treedepth).sum())
+    tab = pd.DataFrame(dict(rhat=sub[rh].to_numpy(), ess_bulk=sub[eb].to_numpy(), ess_tail=sub[et].to_numpy(),
+                            sd=sub["StdDev"].to_numpy() if "StdDev" in sub.columns else np.nan), index=sub.index)
+    expected = G.expected_quantities(sampled, **dims) if dims is not None else None
+    bad = G.invalid_quantities(tab, list(sampled) + ["delta_eval"], expected=expected)
     e = f.draws(concat_chains=False)[:, :, list(f.column_names).index("energy__")]
-    ebfmi = [float(np.sum(np.diff(e[:, k]) ** 2) / np.sum((e[:, k] - e[:, k].mean()) ** 2)) for k in range(e.shape[1])]
-    res = dict(divergences=div, treedepth_hits=tdh, max_rhat=float(sub[rh].max()), worst_rhat=str(sub[rh].idxmax()),
+    ebfmi, chain_bad = G.ebfmi_per_chain(e)
+    mv = f.method_variables()
+    div, tdh, samp_bad = G.sampler_counts(mv["divergent__"], mv["treedepth__"], max_treedepth, shape=np.shape(e)[:2])
+    res = dict(divergences=div, treedepth_hits=tdh,
+               max_rhat=float(sub[rh].max()), worst_rhat=str(sub[rh].idxmax()),
                min_ess_bulk=float(sub[eb].min()), worst_ess_bulk=str(sub[eb].idxmin()),
                min_ess_tail=float(sub[et].min()), worst_ess_tail=str(sub[et].idxmin()),
-               min_ebfmi=float(min(ebfmi)), n_quantities=int(len(sub)), invalid_quantities=bad)
+               # NaN unless every chain is valid: a bad chain cannot be hidden by min() (review F06).
+               min_ebfmi=float(min(ebfmi)) if ebfmi and not chain_bad else float("nan"),
+               ebfmi_per_chain=ebfmi, n_quantities=int(len(sub)), invalid_quantities=bad,
+               invalid_sampler=chain_bad + samp_bad,
+               quantities_checked=expected if expected is not None else [str(i) for i in sub.index])
     res["gate_pass"] = G.passes(res)
     res["gate_policy"] = G.POLICY["version"]
     return res
 
 
-def summarize(f, name, outdir, rows):
+def summarize(f, name, outdir, rows, base=None):
     keep = PARAMS[name]
-    dg = diagnostics(f, SAMPLED[name])
+    dg = diagnostics(f, SAMPLED[name], dims=base)
     dr = f.draws_pd()
     post = {p: dict(median=float(dr[p].median()), q2_5=float(dr[p].quantile(.025)),
                     q97_5=float(dr[p].quantile(.975)), q10=float(dr[p].quantile(.10)),
@@ -341,7 +352,7 @@ def main():
                 log("skip (done, identity matches)", name, variant); continue
             log("fitting", name, variant)
             f = fit_one(m, name, data, seed, outdir)
-            r = summarize(f, name, outdir, rows)
+            r = summarize(f, name, outdir, rows, base)
             json.dump(ident, open(os.path.join(outdir, "identity.json"), "w"), indent=1)
             log(f"done {name} {variant}: div {r['divergences']} rhat {r['max_rhat']:.4f} ({r['worst_rhat']}) "
                 f"ess bulk {r['min_ess_bulk']:.0f} tail {r['min_ess_tail']:.0f} ebfmi {r['min_ebfmi']:.2f} "

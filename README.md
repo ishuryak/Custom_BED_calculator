@@ -1,6 +1,6 @@
-# Custom BED calculator, version 4.1 (branch `v4`, not deployed)
+# Custom BED calculator, version 4.3.0 (branch `review_v4_2026_10_31`, not deployed)
 
-Version 4 keeps the version 3.2.1 engine and changes the layout for clinicians. The calculator opens on one page: a list of hypofractionated schedules (5 fractions a week, at least 5 fractions fewer than the standard, so 30 or fewer) that, compared with the standard 35 × 2 Gy in 47 days, keep the tumor BED (DI or DD model) at least the standard's minus 5 Gy and the early and late toxicity BEDs at most the standard's plus 5 Gy. Each row gives a number of fractions with the range of doses per fraction that qualifies, and says whether both tumor models agree. Every version 3 tab is still available as a page of a side menu. Version 4 is meant for its own site, `custom_bed_calculator_v4`. The version 3 site (https://ishuryak.shinyapps.io/custom_bed_calculator_v3/) runs 3.2.0 and is not touched. Reasoning, decisions and checks: `docs/development/2026_10_28_v4_simplified_layout.md`.
+Version 4 keeps the version 3.2.1 engine and changes the layout for clinicians. The calculator opens on one page: a list of hypofractionated schedules (5 fractions a week, at least 5 fractions fewer than the standard, so 30 or fewer) that, compared with the standard 35 × 2 Gy in 47 days, keep the tumor BED (DI or DD model) at least the standard's minus 5 Gy and the early and late toxicity BEDs at most the standard's plus 5 Gy. Each row gives a number of fractions with the range of doses per fraction that qualifies, and says whether both tumor models agree. Every version 3 tab is still available as a page of a side menu. Version 4 runs on its own site, https://ishuryak.shinyapps.io/custom_bed_calculator_v4/ (live: 4.2.1, revision `917825b`, deployed 2026-10-30). The earlier sites were archived on 2026-10-30. Current user guide: `docs/user_guide/HNSCC_BED_v4_user_guide.md` (the 3.2.1 guide is kept as a historical record). Reasoning, decisions and checks: `docs/development/2026_10_28_v4_simplified_layout.md`.
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC), for designing hypofractionated trial regimens. It computes:
 
@@ -11,7 +11,7 @@ R Shiny app for head and neck squamous cell carcinoma (HNSCC), for designing hyp
 
 Every tab compares the evaluated regimen with one comparison regimen and one tumor threshold, shown in a banner. A search lists shorter regimens that meet the threshold within the toxicity and organ limits; a both-model screen requires the threshold under DI and DD. It is a research tool for hypothesis generation, not for treatment decisions.
 
-**Live:** https://ishuryak.shinyapps.io/custom_bed_calculator_v3/ (version 3.2.0, revision `4876ae4`, deployed 2026-10-26 with `Rscript tools/deploy.R` as its own app; previous release 3.1.0 at `e4ff22f`, the rollback point). Live browser walkthrough `docs/development/2026_10_21_v3/walkthrough_v3.R --live`: 35 of 35 checks on 2026-10-26. `tools/deploy.R` refuses the names of the live version 1 and version 2 apps, an unconfigured account, uncommitted changes, a revision on which the full suite has not passed, a bundle missing any file the app reads, and a bundle holding any file not tracked by git. Version 2.7 (https://ishuryak.shinyapps.io/custom_bed_calculator_v2/) and version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/) are unchanged.
+**Historical (version 3; site archived 2026-10-30):** https://ishuryak.shinyapps.io/custom_bed_calculator_v3/ ran version 3.2.0 ( revision `4876ae4`, deployed 2026-10-26 with `Rscript tools/deploy.R` as its own app; previous release 3.1.0 at `e4ff22f`, the rollback point). Live browser walkthrough `docs/development/2026_10_21_v3/walkthrough_v3.R --live`: 35 of 35 checks on 2026-10-26. `tools/deploy.R` refuses the names of the live version 1 and version 2 apps, an unconfigured account, uncommitted changes, a revision on which the full suite has not passed, a bundle missing any file the app reads, and a bundle holding any file not tracked by git. Version 2.7 (https://ishuryak.shinyapps.io/custom_bed_calculator_v2/) and version 1 (https://ishuryak.shinyapps.io/custom_bed_calculator/) are unchanged.
 
 **The refit is for review, not a default.** Version 3.2 uses the refit to 45 trial arms. The DI model is informed by the data (repopulation loss λ/α 0.63 Gy per day at each draw's α/β, 95% interval 0.21–1.19, after about day 37; background growth is essentially its prior). A DD model fitted on its own does not sample reliably, so DD is calibrated to DI at 35 × 2 Gy in 47 days and its rate fitted given each DI draw (0.41 per day, 0.12–1.04). Every DI and conditional DD fit meets the full diagnostic gate, effective sample size included. For HYPNO's 55 Gy in 20 fractions against 35 × 2 Gy the median tumor BED change is −2.0 Gy under DI and −3.3 Gy under DD. The defaults remain Scenario D18 with the DD model calibrated to DI. The records are `docs/development/2026_10_25_stages_BCDE_refit.md` and `docs/development/2026_10_26_review_v31_fixes.md`.
 
@@ -56,6 +56,18 @@ run_app.bat                     # or: Rscript tools/launch.R
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
 
+## Changes in version 4.3.0 (external review of 4.2.1, 2026-10-31)
+
+No equation, parameter, draws file or selection rule changed. At the defaults the main list is unchanged (60 qualifying doses in 15 rows, 30 down to 16 fractions, same BEDs and refit support). Evidence for each fix: `docs/FIXES.md`. Plan and decisions: `docs/development/2026_10_31_v4_review_fixes.md`.
+
+- Range explanation no longer claims that every BED rises with dose: the DD tumor BED can fall with dose, and the worked example names the dose of each extreme. The explanation uses the search's own validity rule, so an unusable model never "credits" a dose (F01). Disjoint dose runs would be shown separately.
+- Units, the EQD2 equivalent of the 5-unit tumor margin, the DD anchor and the DD mode (calibrated or direct) follow Model settings. A finite but negative standard BED is announced as unusable (F02).
+- HYPNO acute mucositis: 190 of 373 evaluable (50.9%), 395 randomized, not "50.9% of 395" (F03).
+- "Open on the Report card" states what it copies; Search, the Both-model screen, Uncertainty and Organs at risk keep their own criteria (F04). The server accepts only a dose of the row as currently listed (F05).
+- Fitting pipeline (not used by the running app): per-chain E-BFMI and sampler arrays validated before aggregation, every expected quantity index required, booleans refused as counts (F06). The ESS repair no longer fills a missing historical anchor from current code (F07). `fit/README.md` says where the retained fit artifacts live (F11).
+- New "Download this list (ZIP)" on the main page with exact replay (`main_rerun()`), schema `main-1` (F08). Candidate and agreement exports unchanged.
+- New user guide for version 4 (F09). CI runs on pushes to `v4` (F10). A failed load of the refit draws is retried after 5 minutes instead of lasting until restart (F12).
+
 ## Changes in version 4.2.1 (2026-10-30)
 
 - Details now explains how the dose and BED ranges are calculated (0.05 Gy dose search, change from the standard at each kept dose, lowest and highest over the kept doses), with a worked example for the top row that names why the next dose below and above fails. Display text only; no number changes.
@@ -72,7 +84,7 @@ Each prints the R and package versions it used. Without the restore step the app
 
 - Main page states its limits: lead text and criteria with units ("candidates for a trial, not equivalent schedules"), a caution box above the table, and a disclosure that the default tumor values are not fitted.
 - New columns: tumor BED change under each model (DI / DD), refit support (share of the trial refit's parameter samples meeting the tumor condition), and Notes (outside the trial data above 2.55 Gy, acute BED above HYPNO 55 Gy/20, support below 80%, HYPNO test arm).
-- Row card: per-dose values, support and notes, and "Open on the Report card", which applies the main-page rules to the menu pages so their verdicts agree with the list.
+- Row card: per-dose values, support and notes, and "Open on the Report card", which applies the main-page rules to the Report card (corrected in 4.3.0: other pages keep their own criteria, so their verdicts need not agree with the list).
 - Usability: hint above the table, card scrolls into view, pages open at the top, first column frozen on phones, menu closes after a choice on phones, darker links, menu descriptions.
 - Tests: two 4.0.0 tests now check what their names say. Review and decisions: `docs/development/2026_10_28_v4_review_and_plan.md`.
 

@@ -43,7 +43,7 @@ constants:
     value: 0.5
     provenance: design
     why: Differences below this are "about the same" in words (plan workstream C, item 7). Tables keep full values.
-    sites: ["app.R:101"]
+    sites: ["app.R:102"]
   oar_near_fraction:
     value: 0.05
     provenance: design
@@ -68,12 +68,12 @@ constants:
     value: 140
     provenance: design
     why: Upper bound of the "minimum days saved" inputs (app.R LIMITS and controls).
-    sites: ["app.R:57"]
+    sites: ["app.R:58"]
   hypno_lrc_percent:
     value: [50.7, 51.2]
     provenance: literature
     why: HYPNO 3-year locoregional control, test vs control arm (Bentzen 2026), quoted in app text.
-    sites: ["app.R:805"]
+    sites: ["app.R:835"]
   hyhope_total_dose:
     value: 46.5
     provenance: literature
@@ -143,4 +143,4 @@ constants:
       Main-list doses whose refit support (share of refit draws meeting the
       tumor condition) is below this are named in Notes (Igor Shuryak,
       decision 2, 2026-10-28). Pinned by test_v4_home.R.
-    sites: ["R/v4_home.R:50"]
+    sites: ["R/v4_home.R:63"]

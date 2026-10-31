@@ -66,35 +66,111 @@ def check_inputs(out, di_dir, pick):
     return ident
 
 
+# Historical scientific target of every DD identity written before C.TARGET_SCHEMA (review F07 of
+# 2026-10-31). Those identities record no anchor and no evaluation regimens; they were fitted by
+# the fit_refit.py whose sha256 they record (fit_refit_sha256), which is also their parent DI
+# fit's runner_sha256, and with these values that parent's recorded stan_data_sha256 reproduces
+# exactly (checked for all ten 2026-10-25c targets, tests/python/test_v43_review_guards.py and
+# legacy_target below). Never replaced by the current C.ANCHOR or C.REGIMENS: those may change.
+LEGACY_ANCHOR = (35, 2.0, 47.0)          # fractions, Gy per fraction, overall days
+LEGACY_REGIMENS = ((20, 2.75, 26), (15, 3.1, 19), (17, 3.05, 23), (25, 2.4, 33), (30, 65 / 30, 40),
+                   (33, 2.0, 45), (30, 2.0, 40), (33, 2.0, 38), (35, 2.0, 40), (68, 1.2, 47))
+
+
+def stan_form(n, d, T):
+    return [float(n * d), float(n * d * d), T]
+
+
 def posterior_target(base, onset_min, variant, ndi):
     """Every setting that defines the conditional posterior, as the Stan data of fit_draw will carry it."""
     return dict(prior_c_sd=float(base["prior_c_sd"]), onset_min=float(onset_min), onset_scale=float(C.ONSET_SCALE),
                 prior_log_lambda=[float(x) for x in C.PRIOR_LOG_LAMBDA], di_variant=variant, n_di=int(ndi),
-                anchor=[float(base["anchor_dsum"]), float(base["anchor_d2sum"]), float(base["anchor_T"])])
+                anchor=[float(base["anchor_dsum"]), float(base["anchor_d2sum"]), float(base["anchor_T"])],
+                eval_regimens=[[float(a), float(b), c] for a, b, c in zip(base["eval_dsum"], base["eval_d2sum"], base["eval_T"])])
 
 
-def check_target(ident, target):
+def legacy_target(ident, di_ident, base):
+    """Anchor and evaluation regimens of a pre-schema identity, from the verified historical mapping.
+
+    Refuses unless the provenance chain holds: the identity's fit_refit_sha256 equals the parent DI
+    runner_sha256, and the parent's stan_data_sha256 reproduces from the current data file (whose
+    bytes check_inputs has verified) with LEGACY_ANCHOR, LEGACY_REGIMENS and the recorded prior.
+    """
+    import hashlib
+    anchor = stan_form(*LEGACY_ANCHOR)
+    regs = [stan_form(*r) for r in LEGACY_REGIMENS]
+    why = None
+    if not di_ident or base is None:
+        why = "no parent DI identity to verify it against"
+    elif not ident.get("fit_refit_sha256") or ident.get("fit_refit_sha256") != di_ident.get("runner_sha256"):
+        why = "its fit_refit_sha256 does not match the parent DI runner_sha256"
+    elif not di_ident.get("stan_data_sha256") or ident.get("prior_c_sd") is None:
+        why = "the parent DI identity records no stan_data_sha256"
+    else:
+        hist = dict(base, prior_c_sd=float(ident["prior_c_sd"]), R=len(regs),
+                    anchor_dsum=anchor[0], anchor_d2sum=anchor[1], anchor_T=anchor[2],
+                    eval_dsum=[r[0] for r in regs], eval_d2sum=[r[1] for r in regs], eval_T=[r[2] for r in regs])
+        h = hashlib.sha256(json.dumps(F.stan_data(hist, ident.get("di_variant", "primary")), sort_keys=True,
+                                      default=float).encode()).hexdigest()
+        if h != di_ident["stan_data_sha256"]:
+            why = "the parent DI stan_data_sha256 does not reproduce with the historical anchor and regimens"
+    if why:
+        sys.exit(f"REFUSED: the identity predates {C.TARGET_SCHEMA} and records no anchor; its legacy anchor "
+                 f"cannot be verified ({why}). Provenance is ambiguous; use a new scientific generation.")
+    return anchor, regs
+
+
+def recorded_target(ident, di_ident=None, base=None):
+    """The posterior target the folder was fitted for, from its identity only (never current code)."""
+    rec = {k: ident.get(k) for k in ("prior_c_sd", "onset_min", "onset_scale", "prior_log_lambda", "di_variant", "n_di")}
+    schema = ident.get("target_schema")
+    if schema is not None and schema != C.TARGET_SCHEMA:
+        sys.exit(f"REFUSED: unknown identity target_schema {schema!r}.")
+    if schema is None and ("anchor" not in ident or "eval_regimens" not in ident):
+        anchor, regs = legacy_target(ident, di_ident, base)
+        rec["anchor"] = ident.get("anchor", anchor)
+        rec["eval_regimens"] = ident.get("eval_regimens", regs)
+    else:   # a schema identity must state both; a missing one stays None and is refused
+        rec["anchor"] = ident.get("anchor")
+        rec["eval_regimens"] = ident.get("eval_regimens")
+    return rec
+
+
+def same(v, t):
+    """Equal as JSON, or numerically equal to 1e-12 with the same structure."""
+    if json.dumps(v) == json.dumps(t):
+        return True
+    try:
+        a, b = np.asarray(v, dtype=float), np.asarray(t, dtype=float)
+    except (TypeError, ValueError):
+        return False
+    return a.shape == b.shape and bool(np.allclose(a, b, rtol=0, atol=1e-12))
+
+
+def check_target(ident, target, di_ident=None, base=None):
     """Refuse a repair whose posterior differs from the original fit (review F04 of 2026-10-26).
 
-    Longer chains and new seeds are allowed; a different prior, onset penalty, anchor, variant or
-    selection is a different scientific generation and needs its own output folder.
+    Longer chains and new seeds are allowed; a different prior, onset penalty, anchor, evaluation
+    regimens, variant or selection is a different scientific generation and needs its own output
+    folder. The recorded anchor is never filled from the current C.ANCHOR (review F07 of 2026-10-31).
     """
-    n0, d0, T0 = C.ANCHOR
-    recorded = {k: ident.get(k) for k in ("prior_c_sd", "onset_min", "onset_scale", "prior_log_lambda", "di_variant", "n_di")}
-    recorded["anchor"] = ident.get("anchor", [n0 * d0, n0 * d0 * d0, T0])
-    bad = [k for k, v in recorded.items() if v is None or json.dumps(v) != json.dumps(target[k])
-           and not (isinstance(v, (int, float)) and np.isclose(v, target[k], rtol=0, atol=1e-12))
-           and not (isinstance(v, list) and np.allclose(v, target[k], rtol=0, atol=1e-12))]
+    recorded = recorded_target(ident, di_ident, base)
+    bad = [k for k, v in recorded.items() if v is None or not isinstance(v, (str, list, int, float))
+           or isinstance(v, bool) or not same(v, target[k])]
     if bad:
         sys.exit("REFUSED: the posterior to be repaired differs from the one fitted ("
                  + ", ".join(f"{k}: fitted {recorded[k]}, now {target[k]}" for k in bad) + ").")
 
 
 def fit_draw(m, r, base, onset_min, idx, out):
-    """Refit one outer draw at 4x, 8x, 16x length until it passes. Returns (rows, diagnostics, mult, ok)."""
-    n0, d0, T0 = C.ANCHOR
+    """Refit one outer draw at 4x, 8x, 16x length until it passes. Returns (rows, diagnostics, mult, ok).
+
+    R0, K0 and T0 come from the anchor in base, which check_target verified against the folder's
+    identity, never from the current C.ANCHOR (review F07 of 2026-10-31).
+    """
+    T0 = float(base["anchor_T"])
     data = dict(base, alpha=r.alpha, ab=r.ab, g=r.g, R0=float(C.rep_di(r["lambda"], r.Tk, T0)),
-                K0=C.bed(n0, d0, r.ab), T0=T0, onset_min=onset_min, onset_scale=C.ONSET_SCALE,
+                K0=float(base["anchor_dsum"] + base["anchor_d2sum"] / r.ab), T0=T0, onset_min=onset_min, onset_scale=C.ONSET_SCALE,
                 prior_log_lambda_mean=C.PRIOR_LOG_LAMBDA[0], prior_log_lambda_sd=C.PRIOR_LOG_LAMBDA[1])
     for k, mult in enumerate(MULTIPLIERS):
         seed = F.SEED + int(idx) + SEED_OFFSET + 1_000_000 * k
@@ -106,7 +182,7 @@ def fit_draw(m, r, base, onset_min, idx, out):
                      seed=seed, adapt_delta=0.99, max_treedepth=12, show_progress=False,
                      output_dir=os.path.join(F.RAW, "dd_cal_ess", os.path.basename(F.OUT), os.path.basename(out), f"{idx}_x{mult}"),
                      inits=inits)
-        dg = F.diagnostics(f, ["lambda_dd", "sigma_raw"])
+        dg = F.diagnostics(f, ["lambda_dd", "sigma_raw"], dims=base)
         fails = G.failures(dg)
         C.log(f"  ess-repair DI draw {idx} x{mult}: {'PASS' if not fails else 'FAIL ' + '; '.join(fails)} "
               f"(ess bulk {dg['min_ess_bulk']:.0f}, tail {dg['min_ess_tail']:.0f}, rhat {dg['max_rhat']:.4f})")
@@ -139,7 +215,7 @@ def main():
     ident = check_inputs(out, di_dir, pick)
     rows, trials, base = F.load()
     target = posterior_target(base, onset_min, v, ndi)
-    check_target(ident, target)
+    check_target(ident, target, json.load(open(os.path.join(di_dir, "identity.json"))), base)
     failing = []
     for idx in pick:
         path = os.path.join(out, f"di_draw_{idx:05d}.csv")

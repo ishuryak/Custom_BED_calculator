@@ -62,13 +62,19 @@ def setup(monkeypatch, tmp_path, ess=(900, 150, 900), tamper=None, extra=None):
     F, C = Rp.F, Rp.C
     di_dir = out / "di_primary"; di_dir.mkdir(parents=True)
     pd.DataFrame(dict(draw=range(5), alpha=0.04, ab=10.0, g=0.01, **{"lambda": 0.03}, Tk=30.0)).to_csv(di_dir / "draws_params.csv", index=False)
-    json.dump(dict(identity_sha256="di-x", data_file_sha256=F.sha_file(DATA)), open(di_dir / "identity.json", "w"))
+    # Legacy provenance chain checked by repair_dd_ess.legacy_target (review F07 of 2026-10-31): the
+    # parent's stan-data hash as the real fit_refit.py wrote it, at the prior the DD folder records.
+    pc = (extra or {}).get("prior_c_sd", 3.0)
+    di_data = F.stan_data(dict(F.load()[2], prior_c_sd=float(3.0 if pc is None else pc)), "primary")
+    json.dump(dict(identity_sha256="di-x", data_file_sha256=F.sha_file(DATA), runner_sha256="runner-x",
+                   stan_data_sha256=hashlib.sha256(json.dumps(di_data, sort_keys=True, default=float).encode()).hexdigest()),
+              open(di_dir / "identity.json", "w"))
     dd = out / "dd_calibrated_onset7_n3"; dd.mkdir()
     pick = np.linspace(0, 4, 3).round().astype(int)
     ident = dict(identity_sha256="dd-x", parent_di_identity="di-x", parent_di_draws_sha256=F.sha_file(di_dir / "draws_params.csv"),
                  data_file_sha256=F.sha_file(DATA), stan_sha256=F.sha_file(os.path.join(ROOT, "fit", "stan", "dd_cal.stan")),
                  common_sha256=F.sha_file(os.path.join(ROOT, "fit", "stan", "common_functions.stanfunctions")),
-                 runner_sha256="an older runner", picks_sha256=hashlib.sha256(pick.tobytes()).hexdigest(),
+                 runner_sha256="an older runner", fit_refit_sha256="runner-x", picks_sha256=hashlib.sha256(pick.tobytes()).hexdigest(),
                  prior_c_sd=3.0, onset_min=7.0, onset_scale=1.0, prior_log_lambda=[-0.6931471805599453, 1.5],
                  di_variant="primary", n_di=3)
     ident.update(extra or {})

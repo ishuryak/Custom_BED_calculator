@@ -36,7 +36,8 @@ class FakeFit:
     def summary(self):
         return self.table
     def method_variables(self):
-        return dict(divergent__=np.zeros(8), treedepth__=np.zeros(8))
+        # (draws, chains), as cmdstanpy returns them and as the energy array below (review F06 of 2026-10-31)
+        return dict(divergent__=np.zeros((200, 4)), treedepth__=np.zeros((200, 4)))
     def draws(self, concat_chains=False):
         rng = np.random.default_rng(1)
         return rng.normal(size=(200, 4, 2))

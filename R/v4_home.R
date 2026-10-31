@@ -30,11 +30,24 @@ v4_regimens <- function(p, anchor = default_anchor(), standard = V4_STANDARD,
        reason = attr(s, "reason"), margins = margins)
 }
 
-# "2.65–2.80", or one value when the range has a single dose.
-v4_range <- function(x, digits = 2) {
-  lo <- min(x); hi <- max(x)
+# Contiguous runs of a sorted grid: list of c(lo, hi). Two values belong to one
+# run when they are one grid step apart (review F01 of 2026-10-31: a future
+# setting with a gap must not be shown as one unbroken range).
+v4_runs <- function(x, step) {
+  x <- sort(unique(round(x, 9)))
+  if (length(x) == 0) return(list())
+  brk <- which(diff(x) > step * 1.5)
+  starts <- c(1, brk + 1); ends <- c(brk, length(x))
+  lapply(seq_along(starts), function(k) c(x[starts[k]], x[ends[k]]))
+}
+
+# "2.65–2.80", or one value when the range has a single dose. With step, each
+# contiguous run is shown separately ("2.10–2.20, 2.40–2.50").
+v4_range <- function(x, digits = 2, step = NULL) {
   f <- paste0("%.", digits, "f")
-  if (abs(hi - lo) < 1e-9) sprintf(f, lo) else sprintf(paste0(f, "–", f), lo, hi)
+  one <- function(lo, hi) if (abs(hi - lo) < 1e-9) sprintf(f, lo) else sprintf(paste0(f, "–", f), lo, hi)
+  if (is.null(step)) return(one(min(x), max(x)))
+  paste(vapply(v4_runs(x, step), function(r) one(r[1], r[2]), ""), collapse = ", ")
 }
 
 # Signed range with a true minus sign, "−4.5 to −0.3"; "n/a" when not evaluable.
@@ -60,9 +73,10 @@ v4_refit_support <- function(rows, di, dd, standard = V4_STANDARD, margin = V4_M
   rowMeans(ok)
 }
 
-# Settings that make the Report card and the other menu pages use the main-page rules
-# for one regimen: comparison 35 x 2 Gy, tumor threshold -5 Gy, early and late limits
-# equal to the comparison plus 5 Gy, 5 fractions a week from a Monday.
+# Settings copied to the Report card (and so to Results) for one regimen: comparison
+# 35 x 2 Gy, tumor threshold -5, early and late limits equal to the comparison plus 5,
+# 5 fractions a week from a Monday. Search, the Both-model screen, Uncertainty and
+# Organs at risk keep their own criteria (review F04 of 2026-10-31; V4_TRANSFER_SCOPE).
 v4_report_inputs <- function(m, d) {
   list(m = m, d = d, fx_week = "5", start_day = "1", skip_days = "", auto_T = TRUE,
        comparator = "custom", ref_m = V4_STANDARD$m, ref_d = V4_STANDARD$d, ref_fx_week = "5", ref_auto_T = TRUE,
@@ -92,8 +106,9 @@ v4_summary <- function(rows, standard_T = V4_STANDARD$T, hypno_early = Inf, data
   out <- do.call(rbind, lapply(split(rows, rows$m), function(x) {
     both <- x$qual_di & x$qual_dd
     one <- if (all(x$qual_di | both)) "DI" else if (all(x$qual_dd | both)) "DD" else "DI or DD"
+    step <- V4_GRID$d_step
     models <- if (all(both)) "both models" else if (any(both))
-      sprintf("both at %s Gy, else %s only", v4_range(x$d[both]), one) else sprintf("%s only", one)
+      sprintf("both at %s Gy, else %s only", v4_range(x$d[both], step = step), one) else sprintf("%s only", one)
     outside <- x$d > data_d_max + 1e-9
     hot <- x$bed_early > hypno_early + 1e-9
     low <- if (has_support) x$support < support_min - 1e-12 else rep(FALSE, nrow(x))
@@ -104,9 +119,9 @@ v4_summary <- function(rows, standard_T = V4_STANDARD$T, hypno_early = Inf, data
       if (all(outside)) "outside trial data" else if (any(outside))
         sprintf("outside trial data above %.2f Gy", data_d_max),
       if (any(hot)) sprintf("acute > HYPNO from %.2f Gy", min(x$d[hot])),
-      if (any(low)) sprintf("support < %d%% at %s Gy", round(100 * support_min), v4_range(x$d[low])),
+      if (any(low)) sprintf("support < %d%% at %s Gy", round(100 * support_min), v4_range(x$d[low], step = step)),
       if (nzchar(trial)) trial)
-    data.frame(m = x$m[1], dose = v4_range(x$d), total = v4_range(x$m * x$d, 1),
+    data.frame(m = x$m[1], dose = v4_range(x$d, step = step), total = v4_range(x$m * x$d, 1, step = x$m[1] * step),
                T = x$T[1], saved = standard_T - x$T[1],
                d_di = v4_signed_range(x$d_di), d_dd = v4_signed_range(x$d_dd),
                d_early = v4_signed_range(x$d_early), d_late = v4_signed_range(x$d_late), models = models,
@@ -139,14 +154,23 @@ v4_plot_data <- function(rows) {
   out
 }
 
-# Refit draws for the support column, loaded once per R process. NULL when the
-# draws cannot be read (the column then says "not available").
+# Refit draws for the support column. A successful load is kept for the life of
+# the R process. A failed load returns NULL (the column then says "not
+# available") and is retried at most once every V4_DRAWS_RETRY_SEC seconds, so a
+# transient failure does not last until a restart and a persistent one is not
+# retried on every recalculation (review F12 of 2026-10-31). If the deployed
+# draw files are ever replaced, restart the app so the new files are read.
 V4_DRAWS_CACHE <- new.env()
-v4_draws <- function() {
-  if (!exists("x", envir = V4_DRAWS_CACHE, inherits = FALSE))
-    assign("x", tryCatch(list(di = load_draws("di"), dd = load_draws("dd")), error = function(e) NULL),
-           envir = V4_DRAWS_CACHE)
-  get("x", envir = V4_DRAWS_CACHE)
+V4_DRAWS_RETRY_SEC <- 300
+v4_draws <- function(loader = function() list(di = load_draws("di"), dd = load_draws("dd")),
+                     now = Sys.time(), retry_sec = V4_DRAWS_RETRY_SEC, cache = V4_DRAWS_CACHE) {
+  if (isTRUE(cache$ok)) return(cache$x)
+  if (!is.null(cache$failed_at) &&
+      as.numeric(difftime(now, cache$failed_at, units = "secs")) < retry_sec) return(NULL)
+  x <- tryCatch(loader(), error = function(e) { cache$error <- conditionMessage(e); NULL })
+  if (is.null(x)) { cache$failed_at <- now; return(NULL) }
+  cache$x <- x; cache$ok <- TRUE; cache$failed_at <- NULL; cache$error <- NULL
+  x
 }
 
 # Why the main list is empty, in the main page's terms (the standard, not a chosen comparison).
@@ -161,32 +185,128 @@ v4_empty_reason <- function(reason) {
     paste("No search was possible:", reason))
 }
 
+# Tumor endpoints of one or more schedules against the standard, under the
+# same validity rule as the search (tumor_endpoint(): the model must be
+# available and both BEDs positive). x: compute_all() rows.
+v4_tumor_endpoints <- function(x, p, anchor, r0) {
+  dd_available <- dd_setup(p, anchor)$status != "infeasible"
+  list(di = tumor_endpoint(x$bed_di, r0$bed_di), dd = tumor_endpoint(x$bed_dd, r0$bed_dd, dd_available))
+}
+
+# Why one tumor model cannot credit a schedule, in words.
+v4_endpoint_words <- function(e, name, k = 1) {
+  switch(e$reason[k],
+    dd_unavailable = sprintf("%s model not available", name),
+    negative_reference = sprintf("%s BED of the standard not positive, so %s cannot be used", name, name),
+    negative_candidate = sprintf("%s BED not positive", name),
+    sprintf("%s change %s Gy", name, v4_signed_range(e$delta[k])))
+}
+
 # Which main-page conditions a schedule fails, compared with the standard
 # (used to explain where a row's dose range starts and stops). Empty when it
-# meets all three. r0: compute_all() of the standard.
+# meets all three. r0: compute_all() of the standard. Uses the search's own
+# validity rules (review F01 of 2026-10-31): a model whose standard BED is not
+# positive, or that is unavailable, never credits a schedule.
 v4_failed_conditions <- function(m, d, p, anchor, r0, margins = V4_MARGINS) {
   x <- compute_all(m, d, overall_time(m), p, anchor)
-  tum <- function(b, b0) is.finite(b) && is.finite(b0) && b > 0 && b >= b0 - margins$tumor - 1e-9
-  c(if (!(tum(x$bed_di, r0$bed_di) || tum(x$bed_dd, r0$bed_dd)))
-      sprintf("tumor BED more than %g Gy below the standard under both models", margins$tumor),
-    if (x$bed_early > r0$bed_early + margins$early + 1e-9)
+  e <- v4_tumor_endpoints(x, p, anchor, r0)
+  meets <- function(en) isTRUE(en$valid[1]) && en$delta[1] >= -margins$tumor - 1e-9
+  c(if (!(meets(e$di) || meets(e$dd)))
+      sprintf("tumor BED not within %g Gy of the standard under either model: %s; %s", margins$tumor,
+              v4_endpoint_words(e$di, "DI"), v4_endpoint_words(e$dd, "DD")),
+    if (!(is.finite(x$bed_early) && x$bed_early > 0)) "early BED not positive"
+    else if (x$bed_early > r0$bed_early + margins$early + 1e-9)
       sprintf("early BED more than %g Gy above the standard", margins$early),
     if (x$bed_late > r0$bed_late + margins$late + 1e-9)
       sprintf("late BED more than %g Gy above the standard", margins$late))
 }
 
+# Lowest and highest value of a BED change over a row's doses, with the dose at
+# which each occurs. Under the DD model the change need not rise with dose, so
+# the extremes are not assumed to sit at the row's lowest and highest dose.
+v4_extremes_text <- function(v, d, name) {
+  ok <- is.finite(v)
+  if (!any(ok)) return(sprintf("The %s change is not available for these doses.", name))
+  v <- v[ok]; d <- d[ok]
+  lo <- which.min(v); hi <- which.max(v)
+  if (abs(v[hi] - v[lo]) < 1e-9)
+    return(sprintf("The %s change is %s Gy at every dose.", name, v4_signed_range(v[lo])))
+  sprintf("The %s change runs from %s Gy (at %.2f Gy) to %s Gy (at %.2f Gy).", name,
+          v4_signed_range(v[lo]), d[lo], v4_signed_range(v[hi]), d[hi])
+}
+
 # Plain-language worked example for one row of the main list: the doses that
-# qualify and why the next dose below and above does not.
+# qualify, why the next dose below and above does not, and where each tumor
+# model's lowest and highest change occur.
 v4_range_example <- function(x, p, anchor, r0, margins = V4_MARGINS, grid = V4_GRID) {
   m <- x$m[1]; lo <- min(x$d); hi <- max(x$d)
   below <- round(lo - grid$d_step, 6); above <- round(hi + grid$d_step, 6)
-  why_lo <- if (below <= 2 + 1e-9) "the search starts above 2 Gy per fraction" else
-    sprintf("%.2f Gy fails (%s)", below, paste(v4_failed_conditions(m, below, p, anchor, r0, margins), collapse = "; "))
-  why_hi <- if (above > grid$d_max + 1e-9) sprintf("the search stops at %g Gy per fraction", grid$d_max) else
-    sprintf("%.2f Gy fails (%s)", above, paste(v4_failed_conditions(m, above, p, anchor, r0, margins), collapse = "; "))
-  sprintf(paste("For example, with %d fractions the doses %s Gy meet all three conditions. Below them, %s;",
-                "above them, %s. The tumor DI change is %s Gy at %.2f Gy and %s Gy at %.2f Gy, so the row shows %s."),
-          m, v4_range(x$d), why_lo, why_hi,
-          v4_signed_range(x$d_di[which.min(x$d)]), lo, v4_signed_range(x$d_di[which.max(x$d)]), hi,
-          v4_signed_range(x$d_di))
+  why <- function(dd) {
+    f <- v4_failed_conditions(m, dd, p, anchor, r0, margins)
+    if (length(f) == 0) sprintf("%.2f Gy also meets them (it belongs to another listed range)", dd)
+    else sprintf("%.2f Gy fails (%s)", dd, paste(f, collapse = "; "))
+  }
+  why_lo <- if (below <= 2 + 1e-9) "the search starts above 2 Gy per fraction" else why(below)
+  why_hi <- if (above > grid$d_max + 1e-9) sprintf("the search stops at %g Gy per fraction", grid$d_max) else why(above)
+  paste(sprintf("For example, with %d fractions the doses %s Gy meet all three conditions. Below them, %s; above them, %s.",
+                m, v4_range(x$d, step = grid$d_step), why_lo, why_hi),
+        if (any(is.finite(x$d_di))) sub("\\.$", sprintf(", so the row shows %s.", v4_signed_range(x$d_di)),
+                                        v4_extremes_text(x$d_di, x$d, "tumor DI"))
+        else v4_extremes_text(x$d_di, x$d, "tumor DI"),
+        v4_extremes_text(x$d_dd, x$d, "tumor DD"))
 }
+
+# Units and the 2-Gy-fraction equivalent of the tumor margin for the current
+# tumor alpha/beta (review F02 of 2026-10-31): five BED units are 4.2 Gy EQD2 at
+# alpha/beta 10 Gy but 2.8 Gy at 2.5 Gy.
+v4_margin_eqd2 <- function(margin, ab) margin / (1 + 2 / ab)
+
+# What the two tumor models are in the current settings: calibrated DD at the
+# actual anchor, directly entered DD, zero DI rate, or DD unavailable.
+v4_model_relation <- function(p, anchor) {
+  cal <- dd_setup(p, anchor)
+  anc <- sprintf("%g × %g Gy in %g days", anchor$m, anchor$d, anchor$T)
+  is_std <- isTRUE(all.equal(unlist(anchor[c("m", "d", "T")]), unlist(V4_STANDARD[c("m", "d", "T")])))
+  switch(cal$status,
+    ok = paste0("The DD model shares α and the background growth rate with DI, and its onset constant is",
+                " solved so that both models give the same tumor BED at the anchor, ", anc,
+                if (is_std) " (the standard)" else " (not the standard, so the two models differ at 35 × 2 Gy)",
+                ". Their agreement is therefore not an independent confirmation. This calibrated DD model is a",
+                " variant of the published dose-dependent model, not its independent fit."),
+    no_repopulation = paste("The DI repopulation rate is zero, so the calibrated DD model has no accelerated",
+                            "repopulation either and the two models give the same tumor BED."),
+    fitted = sprintf(paste("The DD model uses its own entered parameters (α %g per Gy, C/α %g Gy, growth %g per day)",
+                           "and is not calibrated to DI, so the two models need not agree at the standard or any other schedule."),
+                     cal$alpha, cal$c_over_alpha, cal$g),
+    "The DD model is not available with these settings, so only the DI model is used.")
+}
+
+# Which tumor models can be used against the standard (same rule as the search).
+v4_usable_models <- function(p, anchor, r0) {
+  e <- v4_tumor_endpoints(data.frame(bed_di = 1, bed_dd = 1), p, anchor, r0)
+  list(di = e$di$ref_valid, dd = e$dd$ref_valid, dd_available = e$dd$reason[1] != "dd_unavailable")
+}
+
+# Row index and dose sent by the browser, checked against the current list
+# (review F05 of 2026-10-31). Returns list(m, d) of a listed point, or NULL.
+v4_valid_row <- function(i, n) {
+  i <- suppressWarnings(as.numeric(i))
+  length(i) == 1 && is.finite(i) && i >= 1 && i == round(i) && i <= n
+}
+v4_validate_transfer <- function(i, dose, s, points, tol = 1e-6) {
+  if (!v4_valid_row(i, nrow(s))) return(NULL)
+  dose <- suppressWarnings(as.numeric(dose))
+  if (length(dose) != 1 || !is.finite(dose)) return(NULL)
+  m <- s$m[i]
+  d <- points$d[points$m == m]
+  k <- which(abs(d - dose) < tol)
+  if (length(k) != 1) return(NULL)
+  list(m = m, d = d[k])
+}
+
+# What "Open on the Report card" copies, and what other pages keep (review F04).
+V4_TRANSFER_SCOPE <- paste(
+  "This copies the regimen, the comparison 35 × 2 Gy in 47 days (5 fractions a week from a Monday), the tumor",
+  "threshold −5 and the early and late limits (standard + 5) to the Report card, which the Results page also uses.",
+  "Search, the Both-model screen, Uncertainty and Organs at risk keep their own additional criteria (for example",
+  "both tumor models, a stricter ranking or organ limits), so they can be stricter and need not list this regimen.")

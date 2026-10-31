@@ -43,6 +43,12 @@ INNER = dict(chains=4, warmup=600, samples=250)
 if os.environ.get("DDCAL_INNER"):   # "warmup,samples", smoke tests only (recorded in the identity)
     INNER["warmup"], INNER["samples"] = (int(x) for x in os.environ["DDCAL_INNER"].split(","))
 MAX_ATTEMPTS = 3
+# Identity schema with an explicit scientific target (review F07 of 2026-10-31): the anchor and
+# the evaluation regimens are recorded as the Stan data carries them, so a later repair compares
+# against the recorded values, never against this file's current constants. Identities written
+# before this schema (every 2026-10-25c folder) have neither field; fit/repair_dd_ess.py resolves
+# them from its verified historical mapping (LEGACY_ANCHOR, LEGACY_REGIMENS).
+TARGET_SCHEMA = "dd-target-2026-10-31"
 
 
 def smax(x, k=SMOOTH_K):
@@ -120,7 +126,12 @@ def main():
                  runner_sha256=F.sha_file(os.path.abspath(__file__)), fit_refit_sha256=F.sha_file(F.__file__),
                  di_variant=di_variant, n_di=ndi, picks_sha256=F.picks_sha256(pick), onset_min=onset_min,
                  onset_scale=ONSET_SCALE, prior_log_lambda=list(PRIOR_LOG_LAMBDA), prior_c_sd=F.PRIOR_C_SD,
-                 inner=INNER, max_attempts=MAX_ATTEMPTS, seed=F.SEED, software=F.versions())
+                 inner=INNER, max_attempts=MAX_ATTEMPTS, seed=F.SEED, software=F.versions(),
+                 target_schema=TARGET_SCHEMA,
+                 anchor=[float(base["anchor_dsum"]), float(base["anchor_d2sum"]), float(base["anchor_T"])],
+                 anchor_regimen=list(ANCHOR),
+                 eval_regimens=[[float(a), float(b), c] for a, b, c in zip(base["eval_dsum"], base["eval_d2sum"], base["eval_T"])],
+                 eval_regimen_labels=[r[0] for r in REGIMENS])
     ident["identity_sha256"] = hashlib.sha256(json.dumps(ident, sort_keys=True).encode()).hexdigest()
     idp = os.path.join(out, "identity.json")
     if os.path.exists(idp) and json.load(open(idp)).get("identity_sha256") != ident["identity_sha256"]:
@@ -128,7 +139,9 @@ def main():
     json.dump(ident, open(idp, "w"), indent=1)
     log("data", F.DATA, "arms", base["N"], "units", base["J"], "DI draws", ndi, "onset_min", onset_min, "out", out)
     m = F.model("dd_cal")
-    n0, d0, T0 = ANCHOR
+    # Calibration inputs come from the anchor in the Stan data (the one recorded in the identity),
+    # so R0/K0/T0 and the generated-quantity anchor cannot diverge (review F07 of 2026-10-31).
+    T0 = float(base["anchor_T"])
     R = len(REGIMENS)
     for k, idx in enumerate(pick):
         r = di.iloc[idx]
@@ -139,7 +152,7 @@ def main():
             if not same:
                 sys.exit(f"REFUSED: {path} was fitted on other DI values than draw {idx} of the parent file.")
             continue
-        K0 = bed(n0, d0, r.ab)
+        K0 = float(base["anchor_dsum"] + base["anchor_d2sum"] / r.ab)
         data = dict(base, alpha=r.alpha, ab=r.ab, g=r.g, R0=float(rep_di(r["lambda"], r.Tk, T0)),
                     K0=K0, T0=T0, onset_min=onset_min, onset_scale=ONSET_SCALE,
                     prior_log_lambda_mean=PRIOR_LOG_LAMBDA[0], prior_log_lambda_sd=PRIOR_LOG_LAMBDA[1])
@@ -154,7 +167,7 @@ def main():
                          seed=seed, adapt_delta=0.99, max_treedepth=12, show_progress=False,
                          output_dir=os.path.join(F.RAW, "dd_cal", os.path.basename(F.OUT), os.path.basename(out), f"{idx}_{attempt}"),
                          inits=inits)
-            dg = F.diagnostics(f, ["lambda_dd", "sigma_raw"])
+            dg = F.diagnostics(f, ["lambda_dd", "sigma_raw"], dims=base)
             ok = F.G.passes(dg)
             if ok:
                 break

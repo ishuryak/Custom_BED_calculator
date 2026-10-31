@@ -113,3 +113,9 @@ Apply A1–A4, A6, C, D1–D6, E1 and E3–E5 together with the decided options.
 - Decision 5: all rows kept.
 
 Not changed: v3 page contents and defaults, equations, draws, selection rules.
+
+## Superseded wording (note added 2026-10-31)
+
+Two statements above were later found wrong by the external review of 4.2.1 (`2026_10_31_v4_review_fixes.md`). They are kept as written because this file records what was decided on 2026-10-28.
+- HYPNO acute toxicity: "50.9% grade ≥3 mucositis in 395 patients" applies the percentage to the randomized number. The trial observed 190 of 373 patients evaluable for early effects (50.9%); 395 were randomized to 55 Gy in 20 fractions.
+- "Open on the Report card ... on every menu page": the button copies the regimen, comparison and main-page thresholds to the Report card (and Results). Search, the Both-model screen, Uncertainty and Organs at risk keep their own criteria. Version 4.3.0 states this scope.
