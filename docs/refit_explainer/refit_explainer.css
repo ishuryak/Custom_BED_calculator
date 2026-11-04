@@ -1,0 +1,13 @@
+:root { --fg:#1d1d1f; --bg:#ffffff; --muted:#555; --line:#c8c8c8; --head:#f2f2f2; --link:#0b5cad; }
+@media (prefers-color-scheme: dark) { :root { --fg:#e6e6e6; --bg:#151515; --muted:#aaa; --line:#444; --head:#232323; --link:#7ab4ff; } }
+html { background: var(--bg); }
+body { color: var(--fg); background: var(--bg); font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; line-height: 1.55; max-width: 52rem; margin: 0 auto; padding: 1.5rem 16px 4rem; font-size: 16px; }
+a { color: var(--link); overflow-wrap: anywhere; }
+h1, h2, h3 { line-height: 1.25; }
+header#title-block-header .author, header#title-block-header .date { color: var(--muted); margin: 0.2rem 0; }
+table { border-collapse: collapse; margin: 1rem 0; font-size: 0.92rem; display: block; overflow-x: auto; max-width: 100%; }
+th, td { border: 1px solid var(--line); padding: 0.3rem 0.5rem; vertical-align: top; }
+th { background: var(--head); text-align: left; }
+math[display="block"] { overflow-x: auto; max-width: 100%; }
+code { font-size: 0.9em; overflow-wrap: anywhere; }
+.topnote { border: 1px solid var(--line); background: var(--head); padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.95rem; }

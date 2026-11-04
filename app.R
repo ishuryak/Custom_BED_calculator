@@ -80,6 +80,9 @@ PRESET_LABELS <- c(
 # DI at the anchor, as in the sidebar's default DD mode). Offered as a preset;
 # not part of the sensitivity set.
 REFIT <- jsonlite::fromJSON(file.path(DRAWS_DIR, "refit_point_values.json"))$values
+# The refit explainer (docs/refit_explainer, built into www/ and served at the site root).
+REFIT_EXPLAINER_HTML <- "refit_explainer.html"
+REFIT_EXPLAINER_DOCX <- "refit_explainer.docx"
 refit_preset <- function() list(alpha = REFIT$di$alpha, ab = REFIT$di$ab, lambda_di = REFIT$di$lambda,
                                 Tk = REFIT$di$Tk, g = REFIT$di$g, lambda_dd = REFIT$dd$lambda)
 refit_dd_values <- function() list(alpha_dd = REFIT$dd$alpha, lambda_dd = REFIT$dd$lambda,
@@ -430,6 +433,10 @@ v4_home <- function() {
     p(class = "text-muted v4-more",
       "Open the menu to check a single regimen, see the uncertainty of the estimates, change the model settings",
       "or read the sources."),
+    p(class = "text-muted v4-more",
+      "How the tumor model was refitted to randomized trials, and how its DI and DD versions compare: ",
+      tags$a(href = REFIT_EXPLAINER_HTML, target = "_blank", rel = "noopener", "read the refit explainer"),
+      " (or ", tags$a(href = REFIT_EXPLAINER_DOCX, download = NA, "download it as Word"), ")."),
     tags$script(HTML(paste(
       "Shiny.addCustomMessageHandler('v4-top', function(x) { window.scrollTo(0, 0); });",
       "Shiny.addCustomMessageHandler('v4-scroll', function(id) {",

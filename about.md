@@ -1,3 +1,7 @@
+### How the tumor model was refitted
+
+A separate explainer describes the Bayesian refit of the tumor models to randomized trials: which trial arms were used and how they differ from the 2018 paper, how each trial enters the fit, how the DI and DD models compare by the Akaike information criterion (AICc) and by leave-one-trial-out prediction, and why the fit is Bayesian. <a href="refit_explainer.html" target="_blank" rel="noopener">Read the refit explainer</a> or <a href="refit_explainer.docx" download>download it as Word</a>. Its source and the AICc script are in the code repository (docs/refit_explainer).
+
 ### Glossary
 
 - **BED** (biologically effective dose): a dose adjusted for fraction size, $n d (1 + d/(\alpha/\beta))$, minus any repopulation term. Gy₁₀ and Gy₃ mean BED computed with α/β = 10 Gy and 3 Gy. On the Uncertainty page, where tumor α/β varies from draw to draw, BED differences are in Gy at each draw's α/β.

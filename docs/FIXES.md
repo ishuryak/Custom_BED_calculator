@@ -323,3 +323,15 @@ Also in 4.1.0: `tools/deploy.R` titled the shinyapps.io app "version 3". It now 
 Several R tests were red on 917825b because the new helper did not exist yet. The behavioral reds are the server tests (F02/F03, F04/F05) and, for F06/F07, the tests listed with their observed messages in the development record. Mutation checks (F06/F07): restoring the `C.ANCHOR` fallback, a plain `min(ebfmi)`, accepting booleans, `fit_draw` taking T0 from `C.ANCHOR`, and dropping the expected-index check each turned at least one test red.
 
 **Verification (2026-10-31, R 4.5.1, pinned library `library-2026-10-15-R4.5.1`, Python 3 with NumPy 2.4.3):** `Rscript tools/run_tests.R` gave 6119 expectations, 0 failed, 0 errors, 0 skipped, 0 warnings, against 5691/0 on 917825b (baseline before these changes). `python3 -m pytest -q tests/python` gave 202 passed, against 114 passed on 917825b. `stale_constant_audit.py --strict` gave 0 errors after updating four line pointers in `constant_registry.yaml` (one, the HYPNO quote, was already stale on 917825b). Combined run on the final working tree before commit; the release marker is written by a rerun on the committed revision.
+
+## 2026-11-04: version 4.3.1, refit explainer published and linked (branch `review_v4_2026_10_31`)
+
+**Changes published numbers (live 4.3.0):** no. No equation, parameter, draws file or selection rule changed. The site gains a link on the main page and a section at the top of About, both pointing to the refit explainer served from `www/`. The explainer itself is new. Its AICc comparison (`docs/refit_explainer/aicc_check.py`) was computed for it and is not used by the app. Record and audit: `docs/development/2026_11_04_refit_explainer.md`.
+
+| Item | Record |
+|---|---|
+| What was wrong | The site had no account of how its tumor-model refit was done. The first draft of the explainer had stale numbers: its sensitivity table held calibrated-DD values from before the 2026-10-26 ESS repair. |
+| Proof it was real | The prior sd 10 row read −3.3 (−6.1, −0.7), while `fit/output_refit_2026_10_25c_prior_c10/dd_calibrated_onset7_n200/summary.json` gives −3.39 (−6.11, −0.76). Seven of nine rows differed by up to 0.1 Gy₁₀. |
+| Test that pins it | `tests/testthat/test_v431_refit_explainer.R::the explainer's sensitivity table matches the fit summaries` failed on all 9 rows with the pre-audit explainer. `::the main page links to the explainer` and `::the About section links to the explainer` failed with the 4.3.0 `app.R` and `about.md`. `::the served page is built from the committed source` failed with the pre-audit source. Each passes with this change. |
+| Verification | See the commit message of the 4.3.1 release for the full-suite count on the committed revision. |
+| What it moves | Nothing numeric. Version 4.3.1. |
