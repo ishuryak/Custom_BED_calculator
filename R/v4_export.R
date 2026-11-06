@@ -9,6 +9,8 @@
 
 MAIN_SCHEMA_VERSION <- "main-1"
 MAIN_ANALYSIS_VERSION <- "1.0"   # v4_regimens + v4_refit_support + v4_summary, as in app 4.3.0
+# From app 4.4.0 the three margins are user settings. They were already recorded (and hashed)
+# in every main-1 export, so exports made with the fixed 5/5/5 replay unchanged.
 MAIN_SUPPORT_VARIANT <- "primary"
 
 # Fields that determine the result (hashed for the analysis ID). App version,
@@ -34,7 +36,7 @@ main_support_block <- function(draws, margin = V4_MARGINS$tumor, threshold = V4_
 
 # The scenario of the main list for the current settings. draws: as above.
 main_scenario <- function(p, anchor, draws, data_domain = tumor_data_support(), context = list(),
-                          code = NULL, code_root = ".") {
+                          code = NULL, code_root = ".", margins = V4_MARGINS) {
   pp <- lapply(setNames(PARAM_NAMES, PARAM_NAMES), function(n) if (is.null(p[[n]]) && n == "g") 0 else p[[n]])
   cal <- dd_setup(p, anchor)
   sc <- list(
@@ -49,11 +51,11 @@ main_scenario <- function(p, anchor, draws, data_domain = tumor_data_support(), 
     calibration = list(status = cal$status,
                        c_over_alpha = if (is.finite(cal$c_over_alpha)) cal$c_over_alpha else NULL,
                        onset_anchor = if (is.finite(cal$onset_ref)) cal$onset_ref else NULL),
-    standard = V4_STANDARD, margins = V4_MARGINS,
+    standard = V4_STANDARD, margins = margins,
     grid = list(m_range = V4_GRID$m_range, d_step = V4_GRID$d_step, d_max = V4_GRID$d_max, min_days_saved = 1),
     calendar = list(fx_per_week = 5, start_weekday = 1),
     rule = "listed when tumor (DI or DD), early and late conditions all hold against the standard",
-    support = main_support_block(draws),
+    support = main_support_block(draws, margin = margins$tumor),
     data_domain = list(file = data_domain$file, d_max = data_domain$d_max,
                        n_arms = data_domain$n_arms, n_studies = data_domain$n_studies),
     trial_arms = V4_TRIAL_ARMS)
@@ -73,10 +75,10 @@ main_id <- function(sc) {
 
 # The main list for given inputs: every qualifying point (with support when
 # draws are given) and the summary rows.
-main_compute <- function(p, anchor, draws, data_d_max) {
-  h <- v4_regimens(p, anchor)
+main_compute <- function(p, anchor, draws, data_d_max, margins = V4_MARGINS) {
+  h <- v4_regimens(p, anchor, margins = margins)
   pts <- h$rows
-  if (!is.null(draws) && nrow(pts) > 0) pts$support <- v4_refit_support(pts, draws$di, draws$dd)
+  if (!is.null(draws) && nrow(pts) > 0) pts$support <- v4_refit_support(pts, draws$di, draws$dd, margin = margins$tumor)
   hy <- comparator_presets()$hypno_test
   hypno_early <- compute_all(hy$m, hy$d, hy$T, p, anchor)$bed_early
   list(points = pts, summary = v4_summary(pts, hypno_early = hypno_early, data_d_max = data_d_max),
@@ -141,18 +143,20 @@ validate_main_scenario <- function(sc, draws_loader = function() list(di = load_
       replay_fail(k, " '", paste(sc[[k]], collapse = ","), "' is not this calculator's (", cur, ").")
   }
   if (!identical(sc$analysis, "main")) replay_fail("this is not a main-list export.")
-  if (!same(sc$standard, V4_STANDARD) || !same(sc$margins, V4_MARGINS) ||
+  mg <- tryCatch(v4_check_margins(sc$margins$tumor, sc$margins$early, sc$margins$late),
+                 error = function(e) replay_fail("its margins are not valid: ", conditionMessage(e)))
+  if (!same(sc$standard, V4_STANDARD) ||
       !same(sc$grid[c("m_range", "d_step", "d_max")], V4_GRID[c("m_range", "d_step", "d_max")]) ||
       !same(sc$grid$min_days_saved, 1) || !same(sc$calendar, list(fx_per_week = 5, start_weekday = 1)))
-    replay_fail("its fixed main-list rules (standard, margins, grid or calendar) differ from this calculator's.")
+    replay_fail("its fixed main-list rules (standard, grid or calendar) differ from this calculator's.")
   if (!same(sc$data_domain$d_max, data_domain$d_max) || !identical(sc$data_domain$file, data_domain$file))
     replay_fail("its trial-data domain (", sc$data_domain$file, ", largest dose ", sc$data_domain$d_max,
                 " Gy) differs from this calculator's, so the notes could differ.")
   # Shared input checks (hinge, clocks, parameters, DD block, anchor, calibration).
   sc2 <- sc; sc2$comparison <- sc$standard
   sc2$search <- list(criterion = "either", rank_by = "best", m_range = V4_GRID$m_range, d_step = V4_GRID$d_step,
-                     d_max = V4_GRID$d_max, tol_early = V4_MARGINS$early, tol_late = V4_MARGINS$late,
-                     min_gain = -V4_MARGINS$tumor, min_days_saved = 1, fenwick = FALSE)
+                     d_max = V4_GRID$d_max, tol_early = mg$early, tol_late = mg$late,
+                     min_gain = -mg$tumor, min_days_saved = 1, fenwick = FALSE)
   v <- check_inputs(sc2)
   st <- check_choice(sc$support$status, "support status", c("available", "unavailable"))
   draws <- NULL
@@ -162,14 +166,14 @@ validate_main_scenario <- function(sc, draws_loader = function() list(di = load_
       if (!identical(as.character(sc$support$files[[m]]$sha256), attr(draws[[m]], "sha256")))
         replay_fail("its ", m, " support draws (SHA-256 ", sc$support$files[[m]]$sha256,
                     ") are not the draws of this calculator, so the support could differ.")
-    if (!same(sc$support$margin, V4_MARGINS$tumor) || !same(sc$support$flag_below, V4_SUPPORT_MIN))
-      replay_fail("its support margin or flag threshold differs from this calculator's.")
+    if (!same(sc$support$margin, mg$tumor) || !same(sc$support$flag_below, V4_SUPPORT_MIN))
+      replay_fail("its support margin differs from its tumor margin, or its flag threshold from this calculator's.")
   }
-  list(p = v$p, anchor = v$anchor, draws = draws)
+  list(p = v$p, anchor = v$anchor, draws = draws, margins = mg)
 }
 
 # Exact rerun of a main export: the same points, summary and support.
 main_rerun <- function(sc, ...) {
   v <- validate_main_scenario(sc, ...)
-  main_compute(v$p, v$anchor, v$draws, sc$data_domain$d_max)
+  main_compute(v$p, v$anchor, v$draws, sc$data_domain$d_max, margins = v$margins)
 }

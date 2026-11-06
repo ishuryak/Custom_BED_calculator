@@ -9,7 +9,22 @@
 # from a Monday, dose per fraction above 2 Gy).
 
 V4_STANDARD <- list(m = 35, d = 2, T = 47)
-V4_MARGINS <- list(tumor = 5, early = 5, late = 5)
+V4_MARGINS <- list(tumor = 5, early = 5, late = 5)   # defaults; the main page lets the user change each
+V4_MARGIN_RANGE <- c(0, 20)
+# The three main-page limits (Gy of BED), each between V4_MARGIN_RANGE[1] and [2]. Stops with
+# a message naming the first one that is missing or out of range (version 4.4.0).
+v4_check_margins <- function(tumor, early, late) {
+  x <- list(tumor = tumor, early = early, late = late)
+  words <- c(tumor = "tumor BED loss", early = "early BED increase", late = "late BED increase")
+  for (k in names(x)) {
+    v <- x[[k]]
+    if (!is.numeric(v) || length(v) != 1 || !is.finite(v) || v < V4_MARGIN_RANGE[1] || v > V4_MARGIN_RANGE[2])
+      stop(sprintf("The largest allowed %s must be a number from %g to %g Gy.", words[[k]],
+                   V4_MARGIN_RANGE[1], V4_MARGIN_RANGE[2]), call. = FALSE)
+    x[[k]] <- as.numeric(v)
+  }
+  x
+}
 V4_MIN_FEWER_FRACTIONS <- 5  # listed regimens have at most 35 - 5 = 30 fractions
 V4_GRID <- list(m_range = 5:(V4_STANDARD$m - V4_MIN_FEWER_FRACTIONS), d_step = 0.05, d_max = 8)
 
@@ -74,14 +89,15 @@ v4_refit_support <- function(rows, di, dd, standard = V4_STANDARD, margin = V4_M
 }
 
 # Settings copied to the Report card (and so to Results) for one regimen: comparison
-# 35 x 2 Gy, tumor threshold -5, early and late limits equal to the comparison plus 5,
+# 35 x 2 Gy, tumor threshold -margins$tumor, early and late limits equal to the comparison
+# plus margins$early and margins$late (5, 5 and 5 by default),
 # 5 fractions a week from a Monday. Search, the Both-model screen, Uncertainty and
 # Organs at risk keep their own criteria (review F04 of 2026-10-31; V4_TRANSFER_SCOPE).
-v4_report_inputs <- function(m, d) {
+v4_report_inputs <- function(m, d, margins = V4_MARGINS) {
   list(m = m, d = d, fx_week = "5", start_day = "1", skip_days = "", auto_T = TRUE,
        comparator = "custom", ref_m = V4_STANDARD$m, ref_d = V4_STANDARD$d, ref_fx_week = "5", ref_auto_T = TRUE,
-       min_gain = -V4_MARGINS$tumor, early_mode = "reference", tol_early = V4_MARGINS$early,
-       late_mode = "reference", tol_late = V4_MARGINS$late)
+       min_gain = -margins$tumor, early_mode = "reference", tol_early = margins$early,
+       late_mode = "reference", tol_late = margins$late)
 }
 
 # Published trial arm that the main list can contain (5 fractions a week).
@@ -305,9 +321,10 @@ v4_validate_transfer <- function(i, dose, s, points, tol = 1e-6) {
 }
 
 # What "Open on the Report card" copies, and what other pages keep (review F04).
-V4_TRANSFER_SCOPE <- paste(
+v4_transfer_scope <- function(margins = V4_MARGINS) paste(
   "This copies the regimen, the comparison 35 × 2 Gy in 47 days (5 fractions a week from a Monday), the tumor",
-  "threshold −5 and the early and late limits (standard + 5) to the Report card, which the Results page also uses.",
+  sprintf("threshold \u2212%g and the early and late limits (standard + %g and standard + %g) to the Report card,",
+          margins$tumor, margins$early, margins$late), "which the Results page also uses.",
   "Search, the Both-model screen, Uncertainty and Organs at risk keep their own additional criteria (for example",
   "both tumor models, a stricter ranking or organ limits), so they can be stricter and need not list this regimen.")
 
@@ -338,31 +355,71 @@ v4_fit_trials <- function(dir = DRAWS_DIR, list_path = V4_FIT_TRIAL_LIST) {
     time = sprintf("%g", round(x$total_time_days, 2)),
     time_basis = x$time_rule,
     chemotherapy = r$chemotherapy, other_drugs = r$other_drugs,
+    shuryak2018_ref = ifelse(is.na(r$shuryak2018_ref), "", as.character(r$shuryak2018_ref)),
     stringsAsFactors = FALSE)
   out[order(out$trial, seq_len(nrow(out))), , drop = FALSE]
 }
 
+# Footnotes of the fitted-trial list, one per trial that needs one: drugs given in any of
+# its arms (any chemotherapy other than "none", or another drug), and trials that were not
+# in Shuryak, Hall and Brenner 2018 and 2019. The 2019 paper used the 2018 data set (the same
+# 16 publications, 7283 patients, 35 regimens; its Methods and references 5, 6 and 12-25, read
+# 2026-11-06), so one list serves both. Returns list(marks = named by trial, notes).
+V4_SHURYAK_2018 <- paste("Shuryak I, Hall EJ, Brenner DJ. Dose dependence of accelerated repopulation in head and",
+                         "neck cancer: supporting evidence and clinical implications. Radiother Oncol 2018;127:20\u201326.")
+V4_SHURYAK_2019 <- paste("Shuryak I, Hall EJ, Brenner DJ. Optimized hypofractionation can markedly improve tumor",
+                         "control and decrease late effects for head and neck cancer. Int J Radiat Oncol Biol Phys",
+                         "2019;104:272\u2013278.")
+v4_fit_trial_notes <- function(t) {
+  trials <- unique(t$trial)
+  drug <- vapply(trials, function(tr) {
+    a <- t[t$trial == tr, , drop = FALSE]
+    ch <- unique(a$chemotherapy[a$chemotherapy != "none"])
+    ch <- sub("^none \\((.*)\\)$", "\\1", ch)
+    paste(c(if (length(ch)) paste0("Chemotherapy: ", ch), unique(a$other_drugs[nzchar(a$other_drugs)])), collapse = ". ")
+  }, character(1))
+  new <- vapply(trials, function(tr) !any(nzchar(t$shuryak2018_ref[t$trial == tr])), logical(1))
+  k <- 0L; marks <- setNames(character(length(trials)), trials); notes <- list()
+  for (i in seq_along(trials)) if (nzchar(drug[[i]])) {
+    k <- k + 1L; marks[[i]] <- letters[k]
+    notes[[length(notes) + 1]] <- list(mark = letters[k], text = paste0(trials[i], ": ", drug[[i]], "."))
+  }
+  if (any(new)) {
+    marks[new] <- paste0(marks[new], ifelse(nzchar(marks[new]), ",", ""), "*")
+    notes[[length(notes) + 1]] <- list(mark = "*", text = paste(
+      "Added in the refit: not among the trials of the earlier fits,", V4_SHURYAK_2018, "and", V4_SHURYAK_2019,
+      "Both papers used the same 16 publications. Their other trials are all in the refit except five that were",
+      "dropped (not randomized, full text not available, or control not reported by arm; see the refit explainer)."))
+  }
+  list(marks = marks, notes = notes)
+}
+
 # HTML table for the fitted-trial list: one row per arm, the trial and its reference
-# spanning that trial's arms.
+# spanning that trial's arms, with footnote marks (v4_fit_trial_notes) and the notes below.
 v4_fit_trials_table <- function(t) {
+  fn <- v4_fit_trial_notes(t)
   head <- c("Trial and reference", "Arm", "Total dose (Gy)", "Dose per fraction (Gy)", "Fractions",
-            "Overall time (days)", "Time basis", "Chemotherapy", "Other drugs")
+            "Overall time (days)", "Time basis")
   rows <- list()
   for (tr in unique(t$trial)) {
     a <- t[t$trial == tr, , drop = FALSE]
     for (i in seq_len(nrow(a))) {
       first <- if (i == 1) tags$td(rowspan = nrow(a), class = "v4-trial-ref",
-        tags$strong(tr), tags$br(), tags$span(class = "small", a$citation[1]), tags$br(),
+        tags$strong(tr), if (nzchar(fn$marks[[tr]])) tags$sup(fn$marks[[tr]]), tags$br(),
+        tags$span(class = "small", a$citation[1]), tags$br(),
         tags$a(href = sprintf("https://pubmed.ncbi.nlm.nih.gov/%s/", a$pmid[1]), target = "_blank",
                rel = "noopener", class = "small", sprintf("PubMed %s", a$pmid[1])),
         if (nzchar(a$doi[1])) tagList(" · ", tags$a(href = paste0("https://doi.org/", a$doi[1]), target = "_blank",
                                                   rel = "noopener", class = "small", "DOI")))
       rows[[length(rows) + 1]] <- tags$tr(first, tags$td(a$arm[i]), tags$td(a$total[i]), tags$td(a$dose[i]),
-        tags$td(a$fractions[i]), tags$td(a$time[i]), tags$td(a$time_basis[i]),
-        tags$td(a$chemotherapy[i]), tags$td(a$other_drugs[i]))
+        tags$td(a$fractions[i]), tags$td(a$time[i]), tags$td(a$time_basis[i]))
     }
   }
-  div(class = "table-responsive",
-      tags$table(class = "table table-sm table-bordered v4-trials",
-                 tags$thead(tags$tr(lapply(head, tags$th))), tags$tbody(rows)))
+  tagList(
+    div(class = "table-responsive",
+        tags$table(class = "table table-sm table-bordered v4-trials",
+                   tags$thead(tags$tr(lapply(head, tags$th))), tags$tbody(rows))),
+    div(class = "small v4-trial-notes",
+        lapply(fn$notes, function(n) tags$p(tags$sup(n$mark), " ", n$text))))
 }
+V4_TRANSFER_SCOPE <- v4_transfer_scope()

@@ -46,6 +46,7 @@ def test_builds_one_row_per_arm_with_reference_and_drugs(tmp_path):
     assert rows[0]["citation"] == "Overgaard et al. Five compared with six fractions. Lancet 2003."
     assert rows[0]["trial"] == "DAHANCA 6&7 (Overgaard 2003)"
     assert "nimorazole" in rows[0]["other_drugs"] and rows[1]["other_drugs"] == ""
+    assert rows[0]["shuryak2018_ref"] == "49" and rows[1]["shuryak2018_ref"] == ""
     assert rows[1]["chemotherapy"] == "none (no chemotherapy within 6 weeks; earlier chemotherapy allowed)"
 
 

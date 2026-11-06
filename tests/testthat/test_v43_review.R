@@ -302,8 +302,9 @@ test_that("F08: the analysis ID follows scientific inputs only; mismatches are r
   expect_error(main_rerun(bad), "support draws")
   bad <- a$back; bad$main_version <- "0.9"
   expect_error(main_rerun(bad), "main_version")
+  # From 4.4.0 the margins are settings; a tumor margin edited without its support margin is refused.
   bad <- a$back; bad$margins$tumor <- 3
-  expect_error(main_rerun(bad), "fixed main-list rules")
+  expect_error(main_rerun(bad), "support margin differs from its tumor margin")
   bad <- a$back; bad$params$alpha <- NA
   expect_error(main_rerun(bad), "alpha")
   bad <- a$back; bad$calibration$c_over_alpha <- 1

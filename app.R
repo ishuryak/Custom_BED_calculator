@@ -412,6 +412,15 @@ v4_home <- function() {
       actionButton("open_menu", "☰ Menu", class = "btn-outline-primary btn-sm",
                    title = "Check a regimen, see uncertainty, change settings, read the sources")),
     uiOutput("home_intro"),
+    div(class = "v4-limits",
+      tags$span(class = "v4-limits-label", "Change the limits (Gy of BED):"),
+      numericInput("home_m_tumor", "Tumor: largest loss", V4_MARGINS$tumor, min = V4_MARGIN_RANGE[1],
+                   max = V4_MARGIN_RANGE[2], step = 0.5, width = "150px"),
+      numericInput("home_m_early", "Early: largest increase", V4_MARGINS$early, min = V4_MARGIN_RANGE[1],
+                   max = V4_MARGIN_RANGE[2], step = 0.5, width = "170px"),
+      numericInput("home_m_late", "Late: largest increase", V4_MARGINS$late, min = V4_MARGIN_RANGE[1],
+                   max = V4_MARGIN_RANGE[2], step = 0.5, width = "170px"),
+      actionLink("home_m_reset", sprintf("Reset all to %g", V4_MARGINS$tumor))),
     div(class = "alert alert-warning v4-caution",
       tags$strong("Model estimates for trial design, not for treating a patient. "),
       "The tumor parameters come mainly from trials of radiotherapy without chemotherapy. With concurrent",
@@ -483,7 +492,13 @@ ui <- page_sidebar(
       ".v4-plot { margin-top: 1.2rem; }",
       ".v4-trials { font-size: 0.88rem; }",
       ".v4-trials td, .v4-trials th { vertical-align: top; }",
-      ".v4-trial-ref { min-width: 15rem; }")),
+      ".v4-trial-ref { min-width: 15rem; }",
+      ".v4-trial-notes p { margin-bottom: 0.3rem; }",
+      ".v4-limits { display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; align-items: flex-end; background: #f4f6f8;",
+      "  border-radius: 0.4rem; padding: 0.5rem 1rem 0; margin: -0.6rem 0 0.8rem; }",
+      ".v4-limits .form-group { margin-bottom: 0.5rem; }",
+      ".v4-limits-label { font-weight: 600; margin-bottom: 0.9rem; }",
+      ".v4-limits a { margin-bottom: 1rem; }")),
   sidebar = sidebar(id = "menu", title = "Menu", width = 290, open = "closed", v4_menu()),
   conditionalPanel("input.section && input.section !== 'home'", div(class = "bed-banner", uiOutput("banner"))),
   do.call(navset_hidden, c(list(id = "section", selected = "home", nav_panel_hidden("home", v4_home())), V3_PAGES))
@@ -1435,12 +1450,22 @@ server <- function(input, output, session) {
   observeEvent(input$open_settings, { go_to("Model settings"); sidebar_toggle("menu", open = TRUE) })
   observeEvent(input$open_menu, sidebar_toggle("menu", open = TRUE))
 
-  home <- reactive(v4_regimens(params(), anchor()))
+  # The three main-page limits (version 4.4.0); the defaults when the inputs are absent.
+  margins <- reactive({
+    v <- function(id, d) if (is.null(input[[id]])) d else input[[id]]
+    mg <- tryCatch(v4_check_margins(v("home_m_tumor", V4_MARGINS$tumor), v("home_m_early", V4_MARGINS$early),
+                                    v("home_m_late", V4_MARGINS$late)), error = function(e) conditionMessage(e))
+    validate(need(is.list(mg), mg))
+    mg
+  })
+  observeEvent(input$home_m_reset, for (k in c("tumor", "early", "late"))
+    updateNumericInput(session, paste0("home_m_", k), value = V4_MARGINS[[k]]))
+  home <- reactive(v4_regimens(params(), anchor(), margins = margins()))
   # Qualifying grid points with their refit support.
   home_points <- reactive({
     rows <- home()$rows
     dr <- v4_draws()
-    if (!is.null(dr) && nrow(rows) > 0) rows$support <- v4_refit_support(rows, dr$di, dr$dd)
+    if (!is.null(dr) && nrow(rows) > 0) rows$support <- v4_refit_support(rows, dr$di, dr$dd, margin = home()$margins$tumor)
     rows
   })
   hypno_early <- reactive({
@@ -1452,14 +1477,15 @@ server <- function(input, output, session) {
 
   # Lead and criteria in the units of the current alpha/beta values (review F02 of 2026-10-31).
   output$home_intro <- renderUI({
-    p <- params(); mg <- V4_MARGINS
+    p <- params(); mg <- margins()
     u_t <- bed_unit(p$ab); u_e <- bed_unit(p$ab_e); u_l <- bed_unit(p$ab_l)
     tagList(
       p(class = "lead", sprintf(paste(
         "Schedules of 5 fractions a week with at least 5 fractions fewer than the standard. Their modeled tumor dose is",
         "at most %g %s below the standard 35 × 2 Gy (about %.1f Gy in 2-Gy fractions at tumor α/β %g Gy), and their",
-        "modeled early and late side-effect doses are at most %g above it. These are candidates for a trial, not",
-        "equivalent schedules."), mg$tumor, u_t, v4_margin_eqd2(mg$tumor, p$ab), p$ab, mg$early)),
+        "modeled early and late side-effect doses are at most %g %s and %g %s above it. These are candidates for a",
+        "trial, not equivalent schedules."), mg$tumor, u_t, v4_margin_eqd2(mg$tumor, p$ab), p$ab, mg$early, u_e,
+        mg$late, u_l)),
       div(class = "v4-criteria",
         tags$strong("Each regimen listed meets all three conditions, compared with 35 × 2 Gy in 47 days:"),
         tags$ol(
@@ -1564,11 +1590,12 @@ server <- function(input, output, session) {
 
   # Main-list export (review F08 of 2026-10-31): the list itself, not a Candidate scenario.
   home_scenario <- reactive(main_scenario(params(), anchor(), v4_draws(), data_support,
-                                          context = list(details = isTRUE(input$home_details)), code = CODE_AT_LOAD))
+                                          context = list(details = isTRUE(input$home_details)), code = CODE_AT_LOAD,
+                                          margins = home()$margins))
   output$home_download <- downloadHandler(
     filename = function() export_filename("main", main_id(home_scenario())),
     content = function(file) {
-      r <- main_compute(params(), anchor(), v4_draws(), data_support$d_max)
+      r <- main_compute(params(), anchor(), v4_draws(), data_support$d_max, margins = home()$margins)
       write_main_zip(file, home_scenario(), r)
     },
     contentType = "application/zip")
@@ -1685,7 +1712,7 @@ server <- function(input, output, session) {
       div(class = "d-flex flex-wrap gap-2 align-items-end",
           selectInput("home_open_dose", "Dose per fraction to open", doses, selected = doses[ceiling(length(doses) / 2)], width = "220px"),
           actionButton("home_open_report", "Open on the Report card", class = "btn-primary", style = "margin-bottom:1rem;")),
-      helpText(V4_TRANSFER_SCOPE))
+      helpText(v4_transfer_scope(h$margins)))
   })
   observeEvent(input$home_open_report, {
     # Review F05 of 2026-10-31: transfer only a point of the current list. The row and
@@ -1696,16 +1723,18 @@ server <- function(input, output, session) {
                        type = "warning", duration = 8)
       return(invisible())
     }
-    v <- v4_report_inputs(ok$m, ok$d)
+    mg <- home()$margins
+    v <- v4_report_inputs(ok$m, ok$d, mg)
     for (k in c("m", "d", "ref_m", "ref_d", "min_gain", "tol_early", "tol_late")) updateNumericInput(session, k, value = v[[k]])
     for (k in c("fx_week", "ref_fx_week", "early_mode", "late_mode")) updateRadioButtons(session, k, selected = v[[k]])
     for (k in c("start_day", "comparator")) updateSelectInput(session, k, selected = v[[k]])
     updateTextInput(session, "skip_days", value = v$skip_days)
     for (k in c("auto_T", "ref_auto_T")) updateCheckboxInput(session, k, value = v[[k]])
     go_to("Report card")
-    showNotification(sprintf(paste("Report card: %d × %.2f Gy against 35 × 2 Gy, tumor threshold −5,",
-                                   "early and late limits = standard + 5. Search, the Both-model screen, Uncertainty",
-                                   "and Organs at risk keep their own criteria."), ok$m, ok$d), duration = 8)
+    showNotification(sprintf(paste("Report card: %d × %.2f Gy against 35 × 2 Gy, tumor threshold \u2212%g,",
+                                   "early limit = standard + %g, late limit = standard + %g. Search, the Both-model",
+                                   "screen, Uncertainty and Organs at risk keep their own criteria."),
+                             ok$m, ok$d, mg$tumor, mg$early, mg$late), duration = 8)
   })
 
 }

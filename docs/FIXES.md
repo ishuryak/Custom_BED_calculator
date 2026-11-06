@@ -347,3 +347,15 @@ Several R tests were red on 917825b because the new helper did not exist yet. Th
 | Tests that pin it | `tests/testthat/test_v44_trials_support.R`: `::the Refit support column and its footnote are shown without Details`, `::Details offers the fitted-trial list`, `::the fitted-trial list follows the fitting data named in the draws manifest`, `::a trial list that does not match the fitting data is refused`, `::the trial table gives each trial's reference once, spanning its arms, with links`. With 4.3.1's `app.R` and `R/v4_home.R` they gave 5 failures and 3 errors, and they pass with this change. `tests/python/test_fit_trial_list_builder.py` (5 tests): removing the nimorazole entry or the disagreement check each turned a test red. |
 | Verification | 2026-11-06, R 4.5.1, pinned library `library-2026-10-15-R4.5.1`, Windows: `Rscript tools/run_tests.R` on the working tree gave 6188 expectations, 2 failed (the two version pins in `test_v27_colleague_review.R` and `test_v31_stage_e.R`, updated to 4.4.0 and rerun with 0 failures), 0 errors, against 6155/0 on `ba9fe51`. `python3 -m pytest -q tests/python`: 196 passed (191 + 5 new), 11 skipped, and 5 failed for missing `cmdstanpy` and a Windows-R path, the same 5 as on `ba9fe51` in this environment. The certifying run on the committed revision is recorded in the development note. |
 | What it moves | Nothing numeric. Version 4.4.0. |
+
+### 2026-11-06, second round on the same branch: footnotes and changeable limits
+
+**Changes published numbers (live 4.3.0):** no at the defaults. With the default limits (5, 5, 5) the list, support and exports are unchanged. Other limits give other lists by design. Record: `docs/development/2026_11_06_v440_trials_and_support.md`, "Second round".
+
+| Item | Record |
+|---|---|
+| What was wrong | Requested changes: drug columns replaced by footnotes; trials not in the 2018 and 2019 papers marked; the three 5 Gy limits fixed in code. |
+| Proof it was so | At `ce41191` the dialog had 9 columns including Chemotherapy and Other drugs, and `V4_MARGINS` was the only source of the limits (`v4_regimens()` and the export used it unconditionally). |
+| Tests that pin it | `tests/testthat/test_v44_trials_support.R`: `::the trial table gives each trial's reference once, with footnotes for drugs and new trials`, `::margins: checked, and out-of-range values are refused with a message`, `::the main page follows the limits the user sets, and passes them on`, `::the Report card receives the limits in use`, `::a main-list export with changed limits replays exactly`. Red with `ce41191`'s `app.R`, `R/v4_home.R` and `R/v4_export.R` (9 failures, 4 errors), green with this change. `tests/python/test_fit_trial_list_builder.py` checks the 2018 reference column. |
+| Verification | 2026-11-06, Windows, R 4.5.1, pinned library: full suite on the working tree 6222 expectations, 1 failed (`test_v43_review.R`, F08 expectation for an edited tumor margin, updated as described in the record), 0 errors. Affected files rerun with 0 failures. Builder tests 5 passed. Certifying run: see the development record. |
+| What it moves | Nothing at the default limits. |

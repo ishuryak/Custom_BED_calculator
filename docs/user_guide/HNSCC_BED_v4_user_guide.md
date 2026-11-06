@@ -17,7 +17,7 @@ Every schedule of 5 fractions a week, started on a Monday, with 5 to 30 fraction
 2. Early side effects (acute mucositis): BED at most 5 above the standard's.
 3. Late side effects: BED at most 5 above the standard's, at the prescription dose.
 
-BED is in units of the tissue's α/β: Gy₁₀ for tumor and mucosa and Gy₃ for late effects at the defaults. The page rewrites its units when an α/β is changed. A 5 Gy₁₀ tumor loss is about 4.2 Gy in 2-Gy fractions (EQD2). At another tumor α/β it is 5/(1 + 2/(α/β)) Gy, for example 2.8 Gy at α/β 2.5 Gy. The three margins are chosen exploratory allowances. They are not established non-inferiority or toxicity margins.
+BED is in units of the tissue's α/β: Gy₁₀ for tumor and mucosa and Gy₃ for late effects at the defaults. The page rewrites its units when an α/β is changed. A 5 Gy₁₀ tumor loss is about 4.2 Gy in 2-Gy fractions (EQD2). At another tumor α/β it is 5/(1 + 2/(α/β)) Gy, for example 2.8 Gy at α/β 2.5 Gy. The three margins are chosen exploratory allowances. They are not established non-inferiority or toxicity margins. The boxes under the conditions ("Change the limits") set each margin separately, from 0 to 20 Gy of BED. Smaller values make a condition stricter and larger values looser, and "Reset all to 5" restores the defaults. The list, the plot, the refit support, the ZIP export and the Report card follow the values set.
 
 ## The two tumor models
 
@@ -39,7 +39,7 @@ HYPNO context: 395 patients were randomized to 55 Gy in 20 fractions. Weekly cis
 
 ## Opening a row on the Report card
 
-Clicking a row shows every qualifying dose. "Open on the Report card" copies the chosen dose and the comparison 35 × 2 Gy in 47 days (5 a week from a Monday) to the Report card, which Results also uses. It also copies the tumor threshold −5 and the early and late limits (standard + 5). Only a dose of the row as currently listed is accepted. If the settings changed after the row was selected, the page asks for the row to be selected again.
+Clicking a row shows every qualifying dose. "Open on the Report card" copies the chosen dose and the comparison 35 × 2 Gy in 47 days (5 a week from a Monday) to the Report card, which Results also uses. It also copies the tumor threshold and the early and late limits in use (−5 and standard + 5 by default). Only a dose of the row as currently listed is accepted. If the settings changed after the row was selected, the page asks for the row to be selected again.
 
 Other pages keep their own criteria:
 

@@ -76,16 +76,100 @@ test_that("a trial list that does not match the fitting data is refused", {
   })
 })
 
-test_that("the trial table gives each trial's reference once, spanning its arms, with links", {
+test_that("the trial table gives each trial's reference once, with footnotes for drugs and new trials", {
   withr::with_dir(app_abs, {
     t <- v4_fit_trials()
     h <- as.character(v4_fit_trials_table(t))
-    for (k in c("Trial and reference", "Overall time (days)", "Time basis", "Chemotherapy", "Other drugs"))
-      expect_match(h, k, fixed = TRUE)
+    for (k in c("Trial and reference", "Overall time (days)", "Time basis")) expect_match(h, k, fixed = TRUE)
+    # No drug columns: the few trials with a drug note get a footnote instead.
+    for (k in c("<th>Chemotherapy</th>", "<th>Other drugs</th>")) expect_false(grepl(k, h, fixed = TRUE), info = k)
+    expect_equal(lengths(regmatches(h, gregexpr("<th>", h, fixed = TRUE))), 7)
     expect_equal(lengths(regmatches(h, gregexpr("v4-trial-ref", h, fixed = TRUE))), 19)
     expect_match(h, "rowspan=\"4\"", fixed = TRUE)    # RTOG 9003 and Yamazaki have 4 arms
     expect_match(h, "https://pubmed.ncbi.nlm.nih.gov/14511925/", fixed = TRUE)
     expect_match(h, "https://doi.org/10.1016/s0140-6736(03)14361-9", fixed = TRUE)
     expect_equal(lengths(regmatches(h, gregexpr("<tr>", h, fixed = TRUE))), 1 + 45)
+    fn <- v4_fit_trial_notes(t)
+    # Drug notes: DAHANCA 6&7 (nimorazole) and RTOG 83-13 (chemotherapy only long before randomization).
+    expect_identical(fn$marks[["DAHANCA 6&7 (Overgaard 2003)"]], "a")
+    expect_identical(fn$marks[["RTOG 83-13 (Cox 1990)"]], "b,*")
+    expect_match(h, "DAHANCA 6&amp;7 (Overgaard 2003): nimorazole", fixed = TRUE)
+    expect_match(h, "RTOG 83-13 (Cox 1990): Chemotherapy: no chemotherapy within 6 weeks of randomization", fixed = TRUE)
+    # The eight trials added in the refit, from the 2018 paper's references, are starred; no others.
+    new <- names(fn$marks)[grepl("\\*", fn$marks)]
+    expect_setequal(new, c("EORTC 22811 (Van den Bogaert 1995)", "Ghoshal 2008", "IAEA-ACC (Overgaard 2010)",
+                           "KROG 0201 (Moon 2014)", "Princess Margaret (O'Sullivan 2020)", "RTOG 83-13 (Cox 1990)",
+                           "RTOG 88-09 (Fu 1995)", "RTOG 9512 (Trotti 2014)"))
+    expect_match(h, "Added in the refit: not among the trials of the earlier fits, Shuryak I, Hall EJ, Brenner DJ. Dose dependence", fixed = TRUE)
+    expect_match(h, "Int J Radiat Oncol Biol Phys 2019;104:272", fixed = TRUE)
+    expect_equal(length(fn$notes), 3)
+  })
+})
+
+# The three main-page limits can be changed (version 4.4.0).
+test_that("margins: checked, and out-of-range values are refused with a message", {
+  expect_identical(v4_check_margins(3, 4, 6.5), list(tumor = 3, early = 4, late = 6.5))
+  expect_error(v4_check_margins(-1, 5, 5), "tumor BED loss must be a number from 0 to 20")
+  expect_error(v4_check_margins(5, NA, 5), "early BED increase")
+  expect_error(v4_check_margins(5, 5, 21), "late BED increase")
+})
+
+test_that("the main page follows the limits the user sets, and passes them on", {
+  shiny::testServer(app_dir, {
+    do.call(session$setInputs, v4_defaults)
+    n5 <- nrow(home()$rows)
+    session$setInputs(home_m_tumor = 3, home_m_early = 4, home_m_late = 6)
+    mg <- list(tumor = 3, early = 4, late = 6)
+    expect_identical(home()$margins, mg)
+    # The same list as the engine gives directly for these limits, and different from 5/5/5.
+    expect_identical(home()$rows, v4_regimens(params(), anchor(), margins = mg)$rows)
+    expect_false(isTRUE(all.equal(nrow(home()$rows), n5)))
+    intro <- as.character(output$home_intro$html)
+    expect_match(intro, "at most 3 Gy₁₀ below the standard", fixed = TRUE)
+    expect_match(intro, "BED at most 4 Gy₁₀ above the standard", fixed = TRUE)
+    expect_match(intro, "BED at most 6 Gy₃ above the standard", fixed = TRUE)
+    # Support uses the tumor limit chosen.
+    dr <- v4_draws()
+    expect_false(is.null(dr)); expect_gt(nrow(home_points()), 0)
+    expect_equal(home_points()$support, v4_refit_support(home()$rows, dr$di, dr$dd, margin = 3))
+    # One limit tighter and another looser at once.
+    session$setInputs(home_m_tumor = 2, home_m_early = 8, home_m_late = 5)
+    expect_identical(home()$rows, v4_regimens(params(), anchor(), margins = list(tumor = 2, early = 8, late = 5))$rows)
+    # An invalid value stops the list with a message instead of failing.
+    session$setInputs(home_m_tumor = -1)
+    expect_error(home(), "tumor BED loss must be a number from 0 to 20")
+  })
+})
+
+test_that("the Report card receives the limits in use", {
+  rc <- v4_report_inputs(20, 2.75, list(tumor = 3, early = 4, late = 6))
+  expect_equal(c(rc$min_gain, rc$tol_early, rc$tol_late), c(-3, 4, 6))
+  expect_match(v4_transfer_scope(list(tumor = 3, early = 4, late = 6)),
+               "threshold \u22123 and the early and late limits (standard + 4 and standard + 6)", fixed = TRUE)
+  expect_equal(v4_report_inputs(20, 2.75)$min_gain, -5)
+})
+
+test_that("a main-list export with changed limits replays exactly", {
+  for (f in c("oar.R", "export.R", "v4_export.R")) source(file.path(app_abs, "R", f), local = TRUE)
+  withr::with_dir(app_abs, {
+    p <- default_params(); anchor <- default_anchor(); dom <- tumor_data_support()
+    draws <- list(di = load_draws("di"), dd = load_draws("dd"))
+    mg <- list(tumor = 3, early = 4, late = 6)
+    sc <- main_scenario(p, anchor, draws, dom, margins = mg)
+    expect_identical(sc$margins, mg); expect_equal(sc$support$margin, 3)
+    r <- main_compute(p, anchor, draws, dom$d_max, margins = mg)
+    expect_identical(r$points[, c("m", "d")], v4_regimens(p, anchor, margins = mg)$rows[, c("m", "d")])
+    zf <- tempfile(fileext = ".zip"); write_main_zip(zf, sc, r)
+    ex <- tempfile(); utils::unzip(zf, exdir = ex)
+    back <- jsonlite::fromJSON(file.path(ex, "scenario.json"), simplifyVector = TRUE)
+    rr <- main_rerun(back)
+    expect_equal(rr$points, r$points, tolerance = 1e-12)
+    expect_equal(rr$summary, r$summary)
+    # The id differs from the 5/5/5 list, and a tampered support margin is refused.
+    expect_false(identical(main_id(sc), main_id(main_scenario(p, anchor, draws, dom))))
+    bad <- back; bad$support$margin <- 5
+    expect_error(main_rerun(bad), "support margin differs from its tumor margin")
+    bad <- back; bad$margins$late <- 30
+    expect_error(main_rerun(bad), "margins are not valid")
   })
 })

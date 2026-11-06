@@ -9,7 +9,14 @@ lacks:
 - citation and doi: from the PubMed records saved by the trial search;
 - chemotherapy: the `chemo` field of the full-text extraction rows of that arm;
 - other_drugs: a radiosensitizer given within the arm, from the population notes that
-  fit/build_provenance.py records (read in the publications on 2026-10-26).
+  fit/build_provenance.py records (read in the publications on 2026-10-26);
+- shuryak2018_ref: the trial's reference number in Shuryak, Hall and Brenner 2018
+  (Radiother Oncol 127:20-26, PMID 29534828, Table 1 and references [23]-[55], read in the
+  full text on 2026-11-06), or empty when the trial was not in that paper. CHART was cited
+  there through Dische 1997 and RTOG 9003 through its first report (Fu 2000); the refit
+  uses Saunders 2010 for CHART. Shuryak, Hall and Brenner 2019 (Int J Radiat Oncol Biol Phys
+  104:272-278, PMID 30776451) used the same 16 publications (its references 5, 6 and 12-25),
+  so this column covers both papers.
 
 The builder refuses an arm with no extraction row, extraction rows that disagree on
 chemotherapy, or a trial with no PubMed record.
@@ -40,6 +47,13 @@ TRIAL_NAMES = {
     "25035199": "RTOG 9512 (Trotti 2014)",
     "11439206": "TROG 91.01 (Poulsen 2001)",
     "16169681": "Yamazaki 2006",
+}
+
+# Reference number of the trial in Shuryak, Hall and Brenner 2018 (Table 1 sources).
+SHURYAK_2018_REF = {
+    "17011446": "52", "22836063": "53", "20394851": "44", "14511925": "49", "1480768": "23",
+    "9288839": "24", "11830307": "47", "9165135": "48", "10924966": "45", "11439206": "51",
+    "16169681": "55",
 }
 
 # Radiosensitizers given within a fitted arm (fit/build_provenance.py, POPULATION).
@@ -86,7 +100,8 @@ def main(argv):
         out.append(dict(ref_no=r["ref_no"], arm=r["arm"], pmid=pmid, trial=TRIAL_NAMES[pmid],
                         citation=f"{p['first_author']} et al. {title}. {p['journal']} {p['year']}.",
                         doi=p.get("doi", ""), chemotherapy=chemo.pop(),
-                        other_drugs=OTHER_DRUGS.get(r["ref_no"], "")))
+                        other_drugs=OTHER_DRUGS.get(r["ref_no"], ""),
+                        shuryak2018_ref=SHURYAK_2018_REF.get(pmid, "")))
     if problems:
         sys.exit("REFUSED:\n" + "\n".join(problems))
     with open(a.out, "w", newline="", encoding="utf-8") as f:

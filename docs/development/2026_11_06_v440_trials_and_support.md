@@ -80,3 +80,46 @@ its current release until this branch is approved.
 - Not deployed. Deployment needs the shinyapps.io token, which the 2026-11-06 audit found exposed in
   `.Rhistory` on `main`. Rotate it first.
 - The user guide and About page do not yet describe the dialog.
+
+## Second round (Igor Shuryak, 2026-11-06)
+
+Requests: drop the Chemotherapy and Other drugs columns and use footnotes for the few trials that
+need one; footnote the trials that are in the refit but were not in the 2018 and 2019 papers with
+Hall and Brenner; make the three 5 Gy limits of the main page changeable, each on its own, if easy.
+
+- **Footnotes.** The dialog's table has seven columns. Mark a: DAHANCA 6&7 (nimorazole for all
+  patients except glottic cancer, in both arms). Mark b: RTOG 83-13 (no chemotherapy within 6 weeks
+  of randomization, earlier chemotherapy allowed). The notes are generated from
+  `data/fit_trial_list.csv`, so a future trial with a drug gets a note without code changes.
+- **Not in the 2018 and 2019 papers.** `shuryak2018_ref` in `data/fit_trial_list.csv` holds each
+  trial's reference number in Shuryak, Hall and Brenner 2018 (Radiother Oncol 127:20-26, PMID
+  29534828), read from its full text (Table 1 and references [23]-[55]). The 2019 paper (Int J
+  Radiat Oncol Biol Phys 104:272-278, PMID 30776451; full text supplied by Igor Shuryak,
+  `Publications/Articles/hypofrac.pdf`) used the same data set: its Methods name 16 randomized
+  trials from 16 publications, 7283 patients and 35 regimens, and its references 5, 6 and 12-25 are
+  the 2018 Table 1 publications. Eight refit trials are in neither paper and are starred: EORTC 22811,
+  Ghoshal, IAEA-ACC, KROG 0201, Princess Margaret, RTOG 83-13, RTOG 88-09 and RTOG 9512. This
+  agrees with Section 2.3 of the refit explainer. CHART was cited in 2018 through Dische 1997 and is
+  counted as the same trial as Saunders 2010.
+- **Changeable limits.** Three boxes under the conditions set the tumor loss and the early and late
+  increases (Gy of BED), each 0 to 20 in 0.5 steps, default 5, with "Reset all to 5". The value
+  reaches `v4_regimens()`, the refit support (tumor margin), the intro and criteria text, the row
+  card, the plot's dashed lines, the Report card transfer (`v4_report_inputs(m, d, margins)`,
+  `v4_transfer_scope(margins)`) and the ZIP export. An out-of-range value stops the list with a
+  message.
+- **Export compatibility (judgement call).** The margins were already recorded and hashed in every
+  `main-1` scenario, so the schema and analysis version stay `main-1` / `1.0`. Replay now checks the
+  recorded margins against the 0 to 20 range and requires the support margin to equal the tumor
+  margin, instead of requiring 5/5/5. Exports made with 4.3.x (5/5/5) replay unchanged. A 4.3.0 test
+  that expected an edited tumor margin to be refused as a "fixed rule" now expects the refusal for
+  the mismatched support margin.
+- **Range 0 to 20 Gy (judgement call).** Negative margins (demanding a gain) and values above 20 are
+  refused. Either bound can be widened in `V4_MARGIN_RANGE` if wanted.
+- Docs: About, the user guide (Markdown and its Word copy, rebuilt with pandoc) and the README say
+  the limits default to 5 and can be changed.
+
+Red without the change: with `app.R`, `R/v4_home.R` and `R/v4_export.R` from `ce41191`, the new and
+changed tests in `test_v44_trials_support.R` gave 9 failures and 4 errors (drug columns present, no
+footnotes, no `v4_check_margins`, the page ignoring `home_m_*`). Full suite on the working tree:
+6222 expectations, 1 failed (the 4.3.0 expectation above, updated), 0 errors. The certifying run on
+the committed revision is recorded below.
