@@ -206,9 +206,9 @@ test_that("the main page lists the regimens and reacts to the model settings", {
     tb <- output$home_table
     for (h in c("Tumor BED change, DI / DD (Gy₁₀)", "Early toxicity BED change (Gy₁₀)", "Late toxicity BED change (Gy₃)"))
       expect_match(tb, h, fixed = TRUE)
-    # Details columns and their footnotes are hidden until asked for.
-    for (h in c("Tumor condition holds in", "Refit support", "Notes")) expect_false(grepl(h, tb, fixed = TRUE), info = h)
-    expect_false(grepl("Refit support.", as.character(output$home_footnotes$html), fixed = TRUE))
+    # Details columns and their footnotes are hidden until asked for; Refit support is
+    # always shown from version 4.4.0 (test_v44_trials_support.R).
+    for (h in c("Tumor condition holds in", "Notes")) expect_false(grepl(h, tb, fixed = TRUE), info = h)
     expect_false(grepl("How the dose and BED ranges", as.character(output$home_footnotes$html), fixed = TRUE))
     session$setInputs(home_details = TRUE)
     tb <- output$home_table

@@ -310,3 +310,59 @@ V4_TRANSFER_SCOPE <- paste(
   "threshold −5 and the early and late limits (standard + 5) to the Report card, which the Results page also uses.",
   "Search, the Both-model screen, Uncertainty and Organs at risk keep their own additional criteria (for example",
   "both tumor models, a stricter ranking or organ limits), so they can be stricter and need not list this regimen.")
+
+# The trials the Bayesian refit of the DI and DD tumor models was fitted to (version 4.4.0).
+# Doses, fraction numbers and times come from the fitting file named in the draws manifest,
+# so the list moves with the data; references and drugs come from data/fit_trial_list.csv
+# (tools/build_fit_trial_list.py). Every fitted arm must have exactly one row there.
+V4_FIT_TRIAL_LIST <- "data/fit_trial_list.csv"
+v4_fit_trials <- function(dir = DRAWS_DIR, list_path = V4_FIT_TRIAL_LIST) {
+  ds <- draws_manifest(dir)$dataset
+  if (is.null(ds)) stop("The draws manifest names no fitting data file.")
+  x <- utils::read.csv(file.path("data", ds), stringsAsFactors = FALSE)
+  ref <- utils::read.csv(list_path, stringsAsFactors = FALSE, colClasses = c(pmid = "character"))
+  key <- function(d) paste(d$ref_no, d$arm, sep = "\r")
+  if (anyDuplicated(key(ref))) stop("Repeated arm in ", list_path)
+  k <- match(key(x), key(ref))
+  if (anyNA(k) || nrow(ref) != nrow(x))
+    stop("The fitted trial list does not match the fitting data ", ds, ": rebuild ", list_path)
+  r <- ref[k, , drop = FALSE]
+  fx <- x$n_fractions
+  fc <- x$fraction_components; fc[is.na(fc)] <- ""
+  out <- data.frame(
+    trial = r$trial, pmid = r$pmid, doi = r$doi, citation = r$citation, arm = x$arm,
+    total = sprintf("%.1f", x$total_dose_gy),
+    dose = ifelse(nzchar(fc), gsub(";", " + ", gsub("x", " × ", fc)),
+                  sprintf("%g", round(x$dose_per_fraction_gy, 4))),
+    fractions = ifelse(abs(fx - round(fx)) < 1e-9, sprintf("%d", as.integer(round(fx))), sprintf("≈ %.1f", fx)),
+    time = sprintf("%g", round(x$total_time_days, 2)),
+    time_basis = x$time_rule,
+    chemotherapy = r$chemotherapy, other_drugs = r$other_drugs,
+    stringsAsFactors = FALSE)
+  out[order(out$trial, seq_len(nrow(out))), , drop = FALSE]
+}
+
+# HTML table for the fitted-trial list: one row per arm, the trial and its reference
+# spanning that trial's arms.
+v4_fit_trials_table <- function(t) {
+  head <- c("Trial and reference", "Arm", "Total dose (Gy)", "Dose per fraction (Gy)", "Fractions",
+            "Overall time (days)", "Time basis", "Chemotherapy", "Other drugs")
+  rows <- list()
+  for (tr in unique(t$trial)) {
+    a <- t[t$trial == tr, , drop = FALSE]
+    for (i in seq_len(nrow(a))) {
+      first <- if (i == 1) tags$td(rowspan = nrow(a), class = "v4-trial-ref",
+        tags$strong(tr), tags$br(), tags$span(class = "small", a$citation[1]), tags$br(),
+        tags$a(href = sprintf("https://pubmed.ncbi.nlm.nih.gov/%s/", a$pmid[1]), target = "_blank",
+               rel = "noopener", class = "small", sprintf("PubMed %s", a$pmid[1])),
+        if (nzchar(a$doi[1])) tagList(" · ", tags$a(href = paste0("https://doi.org/", a$doi[1]), target = "_blank",
+                                                  rel = "noopener", class = "small", "DOI")))
+      rows[[length(rows) + 1]] <- tags$tr(first, tags$td(a$arm[i]), tags$td(a$total[i]), tags$td(a$dose[i]),
+        tags$td(a$fractions[i]), tags$td(a$time[i]), tags$td(a$time_basis[i]),
+        tags$td(a$chemotherapy[i]), tags$td(a$other_drugs[i]))
+    }
+  }
+  div(class = "table-responsive",
+      tags$table(class = "table table-sm table-bordered v4-trials",
+                 tags$thead(tags$tr(lapply(head, tags$th))), tags$tbody(rows)))
+}

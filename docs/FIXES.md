@@ -335,3 +335,15 @@ Several R tests were red on 917825b because the new helper did not exist yet. Th
 | Test that pins it | `tests/testthat/test_v431_refit_explainer.R::the explainer's sensitivity table matches the fit summaries` failed on all 9 rows with the pre-audit explainer. `::the main page links to the explainer` and `::the About section links to the explainer` failed with the 4.3.0 `app.R` and `about.md`. `::the served page is built from the committed source` failed with the pre-audit source. Each passes with this change. |
 | Verification | See the commit message of the 4.3.1 release for the full-suite count on the committed revision. |
 | What it moves | Nothing numeric. Version 4.3.1. |
+
+## 2026-11-06: version 4.4.0, refit support always shown and the list of refitted trials (branch `v4-trials-support`, not deployed)
+
+**Changes published numbers (live 4.3.0):** no. No equation, parameter, draws file or selection rule changed. The main table always shows the Refit support column, and Details opens a list of the trials of the Bayesian refit. Record: `docs/development/2026_11_06_v440_trials_and_support.md`.
+
+| Item | Record |
+|---|---|
+| What was wrong | Requested changes (Igor Shuryak, 2026-11-06), not defects. The Refit support column was hidden unless Details was on, and the site did not list the trials the refit used, their schedules or the drugs given. |
+| Proof it was so | On 4.3.1 (`ba9fe51`) the default main table has 7 columns and no "Refit support" header (`test_v4_home.R` asserted that it was absent), and no page or dialog lists the 19 trials. |
+| Tests that pin it | `tests/testthat/test_v44_trials_support.R`: `::the Refit support column and its footnote are shown without Details`, `::Details offers the fitted-trial list`, `::the fitted-trial list follows the fitting data named in the draws manifest`, `::a trial list that does not match the fitting data is refused`, `::the trial table gives each trial's reference once, spanning its arms, with links`. With 4.3.1's `app.R` and `R/v4_home.R` they gave 5 failures and 3 errors, and they pass with this change. `tests/python/test_fit_trial_list_builder.py` (5 tests): removing the nimorazole entry or the disagreement check each turned a test red. |
+| Verification | 2026-11-06, R 4.5.1, pinned library `library-2026-10-15-R4.5.1`, Windows: `Rscript tools/run_tests.R` on the working tree gave 6188 expectations, 2 failed (the two version pins in `test_v27_colleague_review.R` and `test_v31_stage_e.R`, updated to 4.4.0 and rerun with 0 failures), 0 errors, against 6155/0 on `ba9fe51`. `python3 -m pytest -q tests/python`: 196 passed (191 + 5 new), 11 skipped, and 5 failed for missing `cmdstanpy` and a Windows-R path, the same 5 as on `ba9fe51` in this environment. The certifying run on the committed revision is recorded in the development note. |
+| What it moves | Nothing numeric. Version 4.4.0. |

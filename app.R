@@ -421,7 +421,11 @@ v4_home <- function() {
     uiOutput("home_msg"),
     div(class = "d-flex flex-wrap gap-3 align-items-center justify-content-between",
       p(class = "v4-hint", "Click a row for the numbers at each dose, and to open that regimen on the Report card."),
-      checkboxInput("home_details", "Details (which tumor model, refit support, notes)", value = FALSE)),
+      div(class = "d-flex flex-wrap gap-2 align-items-center",
+        checkboxInput("home_details", "Details (which tumor model, notes, fitted trials)", value = FALSE),
+        conditionalPanel("input.home_details",
+          actionButton("home_trials", "Trials the tumor models were refitted to", class = "btn-outline-primary btn-sm",
+                       title = "References, arms, dose, fractionation, time and drugs of the trials in the Bayesian refit")))),
     DTOutput("home_table", fill = FALSE),
     uiOutput("home_footnotes"),
     uiOutput("home_detail"),
@@ -476,7 +480,10 @@ ui <- page_sidebar(
       ".v4-page-head h3 { margin-top: 0.4rem; }",
       "#home_table table.dataTable tbody tr { cursor: pointer; }",
       "#home_table table.dataTable { font-size: 1.05rem; }",
-      ".v4-plot { margin-top: 1.2rem; }")),
+      ".v4-plot { margin-top: 1.2rem; }",
+      ".v4-trials { font-size: 0.88rem; }",
+      ".v4-trials td, .v4-trials th { vertical-align: top; }",
+      ".v4-trial-ref { min-width: 15rem; }")),
   sidebar = sidebar(id = "menu", title = "Menu", width = 290, open = "closed", v4_menu()),
   conditionalPanel("input.section && input.section !== 'home'", div(class = "bed-banner", uiOutput("banner"))),
   do.call(navset_hidden, c(list(id = "section", selected = "home", nav_panel_hidden("home", v4_home())), V3_PAGES))
@@ -1513,15 +1520,16 @@ server <- function(input, output, session) {
     names(tbl)[5:7] <- c(sprintf("Tumor BED change, DI / DD (%s)", bed_unit(p$ab)),
                          sprintf("Early toxicity BED change (%s)", bed_unit(p$ab_e)),
                          sprintf("Late toxicity BED change (%s)", bed_unit(p$ab_l)))
+    # Refit support is always shown (version 4.4.0); the model column and Notes stay under Details.
+    tbl$`Refit support` <- ifelse(nzchar(s$support), s$support, "not available")
     if (isTRUE(input$home_details)) {
       tbl$`Tumor condition holds in` <- s$models
-      tbl$`Refit support` <- ifelse(nzchar(s$support), s$support, "not available")
       tbl$`Notes` <- s$notes
     }
     datatable(tbl, rownames = FALSE, selection = "single", extensions = "FixedColumns",
               options = list(dom = "t", paging = FALSE, ordering = FALSE, scrollX = TRUE,
                              fixedColumns = list(leftColumns = 1),
-                             columnDefs = list(list(className = "dt-center", targets = 0:6))))
+                             columnDefs = list(list(className = "dt-center", targets = 0:7))))
   })
 
   output$home_plot <- renderPlot({
@@ -1575,6 +1583,12 @@ server <- function(input, output, session) {
              "where its start and speed depend on the dose given (dose-dependent, DD). A schedule is listed when",
              "the tumor condition holds under at least one usable model.", v4_model_relation(params(), anchor()),
              "Where only one model meets the condition, the other estimates a larger loss (see the DI / DD column)."),
+      tags$p(tags$b("Refit support."), sprintf(paste(
+        "Share of the parameter samples of a Bayesian refit to %d arms of %d randomized trials in which the dose",
+        "meets the tumor condition under either model, from the lowest to the highest dose of the row. It uses the",
+        "refit's own parameters, not the Model settings values, and is not a probability of tumor control.",
+        "Doses below %d%% are named in Notes (\"support <\", shown with Details). The trials are listed under Details."),
+        data_support$n_arms, data_support$n_studies, round(100 * V4_SUPPORT_MIN))),
       if (isTRUE(input$home_details)) tagList(
       tags$p(tags$b("How the dose and BED ranges are calculated."), paste(
         "For each number of fractions, the calculator tries every dose per fraction above 2 Gy in 0.05 Gy steps.",
@@ -1592,11 +1606,6 @@ server <- function(input, output, session) {
           x <- home_points(); x <- x[x$m == s$m[1], , drop = FALSE]
           v4_range_example(x, params(), anchor(), home()$standard, home()$margins)
         })),
-      tags$p(tags$b("Refit support."), sprintf(paste(
-        "Share of the parameter samples of a Bayesian refit to %d arms of %d randomized trials in which the dose",
-        "meets the tumor condition under either model, from the lowest to the highest dose of the row. It uses the",
-        "refit's own parameters, not the Model settings values, and is not a probability of tumor control.",
-        "Doses below %d%% are named in Notes (\"support <\")."), data_support$n_arms, data_support$n_studies, round(100 * V4_SUPPORT_MIN))),
       tags$p(tags$b("Notes."), sprintf(paste(
         "\"Outside trial data\": above %.2f Gy per fraction, the largest fraction size in the trials the tumor",
         "model was fitted to, so the tumor estimate is an extrapolation. \"Acute > HYPNO\": acute BED higher than",
@@ -1605,6 +1614,27 @@ server <- function(input, output, session) {
         "(50.9%%); weekly cisplatin was permitted and given to about 75%%. HYPNO compared 55 Gy in 20 fractions with",
         "66 Gy in 33 fractions given 6 a week (208 of 380 evaluable, 54.7%%), not with 35 × 2 Gy. The modeled BED is",
         "not an observed toxicity rate."), data_support$d_max, hy, bed_unit(params()$ab_e)))))
+  })
+
+  # The trials of the Bayesian refit, in a dialog opened from Details (version 4.4.0).
+  observeEvent(input$home_trials, {
+    t <- v4_fit_trials()
+    no_chemo <- all(startsWith(t$chemotherapy, "none"))
+    showModal(modalDialog(
+      title = sprintf("Trials the tumor models were refitted to (%d trials, %d arms)", length(unique(t$pmid)), nrow(t)),
+      size = "xl", easyClose = TRUE, footer = modalButton("Close"),
+      tags$p(sprintf(paste(
+        "The Bayesian refit of the DI and DD tumor models used these %d arms of %d randomized trials of radiotherapy",
+        "for head and neck cancer.%s Its parameter samples give the Refit support column and the refit tumor preset",
+        "(Model settings). The default tumor values (scenario D18) were chosen by the developer and were not fitted to",
+        "these trials."), nrow(t), length(unique(t$pmid)),
+        if (no_chemo) " No arm received chemotherapy." else "")),
+      tags$p(class = "small text-muted", paste(
+        "Doses, fraction numbers and overall times are the values entered in the fit. A fraction number marked ≈ is an",
+        "average over the arm (mean delivered dose, or a mix of prescriptions). Time basis says whether the overall time",
+        "is the planned time or the delivered time reported by the trial. How the trials were chosen and read is in the "),
+        tags$a(href = REFIT_EXPLAINER_HTML, target = "_blank", rel = "noopener", "refit explainer"), "."),
+      v4_fit_trials_table(t)))
   })
 
   home_selected <- reactive({

@@ -1,6 +1,6 @@
-# Custom BED calculator, version 4.3.0
+# Custom BED calculator, version 4.4.0
 
-Version 4 keeps the version 3.2.1 engine and changes the layout for clinicians. The calculator opens on one page: a list of hypofractionated schedules (5 fractions a week, at least 5 fractions fewer than the standard, so 30 or fewer) that, compared with the standard 35 × 2 Gy in 47 days, keep the tumor BED (DI or DD model) at least the standard's minus 5 Gy and the early and late toxicity BEDs at most the standard's plus 5 Gy. Each row gives a number of fractions with the range of doses per fraction that qualifies, and says whether both tumor models agree. Every version 3 tab is still available as a page of a side menu. Version 4 runs on its own site, https://ishuryak.shinyapps.io/custom_bed_calculator_v4/ (live: 4.3.0, revision `a025071`, deployed 2026-10-31 with `Rscript tools/deploy.R`; previous release 4.2.1 at `917825b`, the rollback point; live browser walkthrough `docs/development/2026_10_28_v4/walkthrough_v4.R --live`: 50 of 50 checks on 2026-10-31). The earlier sites were archived on 2026-10-30. Current user guide: `docs/user_guide/HNSCC_BED_v4_user_guide.md` (the 3.2.1 guide is kept as a historical record). Reasoning, decisions and checks: `docs/development/2026_10_28_v4_simplified_layout.md`.
+Version 4 keeps the version 3.2.1 engine and changes the layout for clinicians. The calculator opens on one page: a list of hypofractionated schedules (5 fractions a week, at least 5 fractions fewer than the standard, so 30 or fewer) that, compared with the standard 35 × 2 Gy in 47 days, keep the tumor BED (DI or DD model) at least the standard's minus 5 Gy and the early and late toxicity BEDs at most the standard's plus 5 Gy. Each row gives a number of fractions with the range of doses per fraction that qualifies, and says whether both tumor models agree. Every version 3 tab is still available as a page of a side menu. Version 4 runs on its own site, https://ishuryak.shinyapps.io/custom_bed_calculator_v4/ (version 4.4.0 is on branch `v4-trials-support` and not yet deployed; 4.3.1 on branch `v4` is not deployed either; live: 4.3.0, revision `a025071`, deployed 2026-10-31 with `Rscript tools/deploy.R`; previous release 4.2.1 at `917825b`, the rollback point; live browser walkthrough `docs/development/2026_10_28_v4/walkthrough_v4.R --live`: 50 of 50 checks on 2026-10-31). The earlier sites were archived on 2026-10-30. Current user guide: `docs/user_guide/HNSCC_BED_v4_user_guide.md` (the 3.2.1 guide is kept as a historical record). Reasoning, decisions and checks: `docs/development/2026_10_28_v4_simplified_layout.md`.
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC), for designing hypofractionated trial regimens. It computes:
 
@@ -31,7 +31,7 @@ Every tab compares the evaluated regimen with one comparison regimen and one tum
 - `about.md`: the "Model and sources" page.
 - `tests/testthat/`: tests of the formulas against an independent implementation and published values, of the server logic, and of the export round trip.
 - `run_app.bat`: double-click launcher for Windows. It uses `RSCRIPT` if set, else Rscript on the PATH, else the newest R under Program Files, and starts `tools/launch.R`, which uses the release library when it has been restored.
-- `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`, `deploy.R` (publishes to shinyapps.io as `custom_bed_calculator_v3` only; refuses the version 1 and 2 names; pinned account; clean tree; suite passed on the same revision).
+- `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`, `deploy.R` (publishes to shinyapps.io as `custom_bed_calculator_v4` only; refuses the version 1 and 2 names; pinned account; clean tree; suite passed on the same revision).
 - `.rscignore`: keeps `References/`, `tests/`, `docs/`, `fit/`, `.Rhistory` and `.Renviron` out of a shinyapps.io deployment.
 - `docs/FIXES.md`: one row per landed change, with its evidence.
 - `docs/user_guide/`: user guide to version 3.2.1 (every tab and menu item, the model fitting and its literature, and the uncertainty estimation), as Word and Markdown.
@@ -55,6 +55,16 @@ run_app.bat                     # or: Rscript tools/launch.R
 ```
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
+
+## Changes in version 4.4.0 (Igor Shuryak's requests, 2026-11-06; branch `v4-trials-support`, not deployed)
+
+- The Refit support column is always shown on the main page. The model column and Notes stay under Details.
+- With Details on, the button "Trials the tumor models were refitted to" opens a list of the 45 arms of the 19 randomized trials of the Bayesian refit: reference (PubMed and DOI links), arm, total dose, dose per fraction, fractions, overall time and its basis, chemotherapy (none in any arm) and other drugs (nimorazole in DAHANCA 6&7). Doses and times are read from the fitting file named in the draws manifest. References and drugs come from `data/fit_trial_list.csv`, built by `tools/build_fit_trial_list.py` from the full-text extraction and the saved PubMed records.
+- No equation, parameter, draws file or selection rule changed. Record: `docs/development/2026_11_06_v440_trials_and_support.md`. Evidence: `docs/FIXES.md`.
+
+## Changes in version 4.3.1 (2026-11-04)
+
+- The refit explainer is served by the site (`www/refit_explainer.html`, and a Word copy) and linked from the main page and About. Record: `docs/development/2026_11_04_refit_explainer.md`.
 
 ## Changes in version 4.3.0 (external review of 4.2.1, 2026-10-31)
 
