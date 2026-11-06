@@ -1598,20 +1598,26 @@ server <- function(input, output, session) {
       scale_colour_manual(values = V4_PLOT_COLOURS, name = NULL, drop = FALSE) +
       guides(colour = guide_legend(nrow = if (narrow) 2 else 1)) +
       scale_x_reverse(breaks = brk) +
-      labs(x = "Number of fractions",
-           y = "BED change vs 35 × 2 Gy (Gy)",
-           caption = paste(strwrap(v4_plot_caption(c(bed_unit(p$ab), bed_unit(p$ab_e), bed_unit(p$ab_l)), mg), width = if (narrow) 55 else 130), collapse = "\n")) +
+      # The caption is page text below the plot (output$home_plot_caption): the browser draws the
+      # subscript units (Gy₁₀, Gy₃) that the plotting font may lack, and wraps it on any screen.
+      labs(x = "Number of fractions", y = "BED change vs 35 × 2 Gy (Gy)") +
       theme_minimal(base_size = if (narrow) 12 else 15) +
       theme(axis.title = element_text(face = "bold", colour = "black"),
             axis.text = element_text(face = "bold", colour = "black"),
             panel.grid.minor = element_blank(), legend.position = "top",
-            plot.caption = element_text(hjust = 0, colour = "grey30", size = 11))
+            plot.caption = element_blank())
   }, res = 96)
   output$home_plot_ui <- renderUI({
     if (nrow(home_rows()) == 0) return(NULL)
     div(class = "v4-plot",
         h4("BED change from 35 × 2 Gy by number of fractions"),
-        plotOutput("home_plot", height = "460px"))
+        plotOutput("home_plot", height = "460px"),
+        uiOutput("home_plot_caption"))
+  })
+  output$home_plot_caption <- renderUI({
+    p <- params()
+    tags$p(class = "text-muted small v4-plot-caption",
+           v4_plot_caption(c(bed_unit(p$ab), bed_unit(p$ab_e), bed_unit(p$ab_l)), margins()))
   })
 
   # Main-list export (review F08 of 2026-10-31): the list itself, not a Candidate scenario.

@@ -139,6 +139,8 @@ test_that("the main page follows the limits the user sets, and passes them on", 
     # The same list as the engine gives directly for these limits, and different from 5/5/5.
     expect_identical(home()$rows, v4_regimens(params(), anchor(), margins = mg)$rows)
     expect_false(isTRUE(all.equal(nrow(home()$rows), n5)))
+    # The plot's caption (page text below the plot) names the three limits in use.
+    expect_match(as.character(output$home_plot_caption$html), "tumor limit \u22123, early limit +4, late limit +6.", fixed = TRUE)
     intro <- as.character(output$home_intro$html)
     expect_match(intro, "at most 3 Gy₁₀ below the standard", fixed = TRUE)
     expect_match(intro, "BED at most 4 Gy₁₀ above the standard", fixed = TRUE)
