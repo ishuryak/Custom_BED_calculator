@@ -177,3 +177,5 @@ finding below was checked before it was acted on.
 - **Reviewer notes not acted on:** the grey download button reads as disabled, the caption's subscripts are small, a selected row disappears when the limits change, and `MAIN_ANALYSIS_VERSION` stays 1.0 (margins were always hashed, and the new ID check is stricter, not looser).
 
 **Tests added** (`tests/testthat/test_v44_trials_support.R`): the dialog's opening text, one plot line per limit and the caption, "0" rather than "−0", support falling with a stricter tumor limit, failure explanations naming the limits in use, 8 and 10 table columns, the NULL fallback, refusal of an edited export, exact replay of the 4.3.1 fixture, the trial notes and labels, and every note mark having its note. With `app.R`, `R/v4_home.R` and `R/v4_export.R` from `b4826f3`, the tests for the dialog text, plot limits, NULL fallback, ID check, labels and notes failed. The tests for support versus limit and for the column counts passed there too: they pin behavior that was already right but untested.
+
+**Certifying run.** `34bbe8d`: 6272 expectations, 0 failed, 0 errors, suite marker written. Details and baselines in `docs/FIXES.md`.
