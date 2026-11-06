@@ -123,3 +123,22 @@ changed tests in `test_v44_trials_support.R` gave 9 failures and 4 errors (drug 
 footnotes, no `v4_check_margins`, the page ignoring `home_m_*`). Full suite on the working tree:
 6222 expectations, 1 failed (the 4.3.0 expectation above, updated), 0 errors. The certifying run on
 the committed revision is recorded below.
+
+## Third round: the plot went blank while a limit was retyped (reported by Igor Shuryak, 2026-11-06)
+
+**Symptom.** Changing a limit could leave the plot section empty. Reproduced in headless Chrome
+(`chromote`) against the local app at `8da8c18`: whenever a limit box was empty or out of range, for
+example after Backspace while retyping, or after typing 25, `margins()` failed validation. The plot
+section (`#home_plot_ui`) shrank to an empty error element, and the table kept showing the previous
+list with no explanation. On the server all 150 combinations of valid limits tried (0 to 20) drew
+the plot, so the cause was the transient invalid value, not a limit combination.
+
+**Fix.** An observer checks the three boxes. A valid set becomes the limits in use. An empty or
+out-of-range box keeps the last valid limits, so the list and the plot stay, and a red note beside
+the boxes names the problem and the limits still used. The check `v4_check_margins()` is unchanged.
+
+**Evidence.** `test_v44_trials_support.R::the main page follows the limits the user sets, and passes
+them on` now sets the tumor box to NA, −1 and 25 and expects the previous limits, the same rows, the
+plot output and the message. With `app.R` from `8da8c18` it errored (`home()` failed on the invalid
+value). With the fix it passes. The browser probe after the fix: plot image present (1100 × 460) in
+all 17 states, including the three invalid ones, with the note shown only in those.

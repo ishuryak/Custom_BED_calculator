@@ -420,7 +420,8 @@ v4_home <- function() {
                    max = V4_MARGIN_RANGE[2], step = 0.5, width = "170px"),
       numericInput("home_m_late", "Late: largest increase", V4_MARGINS$late, min = V4_MARGIN_RANGE[1],
                    max = V4_MARGIN_RANGE[2], step = 0.5, width = "170px"),
-      actionLink("home_m_reset", sprintf("Reset all to %g", V4_MARGINS$tumor))),
+      actionLink("home_m_reset", sprintf("Reset all to %g", V4_MARGINS$tumor)),
+      uiOutput("home_m_msg", class = "v4-limits-msg")),
     div(class = "alert alert-warning v4-caution",
       tags$strong("Model estimates for trial design, not for treating a patient. "),
       "The tumor parameters come mainly from trials of radiotherapy without chemotherapy. With concurrent",
@@ -1451,12 +1452,26 @@ server <- function(input, output, session) {
   observeEvent(input$open_menu, sidebar_toggle("menu", open = TRUE))
 
   # The three main-page limits (version 4.4.0); the defaults when the inputs are absent.
-  margins <- reactive({
+  # While a box is empty or out of range (for example in the middle of retyping a number)
+  # the page keeps the last valid limits and says so beside the boxes, so the list and the
+  # plot never go blank.
+  last_margins <- reactiveVal(V4_MARGINS)
+  margins_msg <- reactiveVal(NULL)
+  observe({
     v <- function(id, d) if (is.null(input[[id]])) d else input[[id]]
     mg <- tryCatch(v4_check_margins(v("home_m_tumor", V4_MARGINS$tumor), v("home_m_early", V4_MARGINS$early),
-                                    v("home_m_late", V4_MARGINS$late)), error = function(e) conditionMessage(e))
-    validate(need(is.list(mg), mg))
-    mg
+                                    v("home_m_late", V4_MARGINS$late)), error = function(e) e)
+    if (inherits(mg, "error")) margins_msg(conditionMessage(mg)) else {
+      margins_msg(NULL)
+      if (!identical(mg, isolate(last_margins()))) last_margins(mg)
+    }
+  })
+  margins <- reactive(last_margins())
+  output$home_m_msg <- renderUI({
+    msg <- margins_msg()
+    if (is.null(msg)) return(NULL)
+    mg <- margins()
+    tags$span(class = "text-danger small", msg, sprintf("Still using %g, %g and %g.", mg$tumor, mg$early, mg$late))
   })
   observeEvent(input$home_m_reset, for (k in c("tumor", "early", "late"))
     updateNumericInput(session, paste0("home_m_", k), value = V4_MARGINS[[k]]))

@@ -359,3 +359,15 @@ Several R tests were red on 917825b because the new helper did not exist yet. Th
 | Tests that pin it | `tests/testthat/test_v44_trials_support.R`: `::the trial table gives each trial's reference once, with footnotes for drugs and new trials`, `::margins: checked, and out-of-range values are refused with a message`, `::the main page follows the limits the user sets, and passes them on`, `::the Report card receives the limits in use`, `::a main-list export with changed limits replays exactly`. Red with `ce41191`'s `app.R`, `R/v4_home.R` and `R/v4_export.R` (9 failures, 4 errors), green with this change. `tests/python/test_fit_trial_list_builder.py` checks the 2018 reference column. |
 | Verification | 2026-11-06, Windows, R 4.5.1, pinned library: full suite on the working tree 6222 expectations, 1 failed (`test_v43_review.R`, F08 expectation for an edited tumor margin, updated as described in the record), 0 errors. Affected files rerun with 0 failures. Builder tests 5 passed. Certifying run: see the development record. |
 | What it moves | Nothing at the default limits. |
+
+### 2026-11-06, third round: the plot no longer goes blank while a limit is retyped
+
+**Changes published numbers:** no. Record: `docs/development/2026_11_06_v440_trials_and_support.md`, "Third round".
+
+| Item | Record |
+|---|---|
+| What was wrong | With a limit box empty or out of range (mid-retype, or 25), the plot section went blank and the table kept the old list without explanation. |
+| Proof it was real | Headless Chrome against `8da8c18`: after Backspace in the tumor box, `#home_plot` was absent and the plot UI held only an empty error element (68 characters, against about 16,500 with a plot). |
+| Test that pins it | `tests/testthat/test_v44_trials_support.R::the main page follows the limits the user sets, and passes them on` (NA, −1 and 25 keep the last valid limits, rows and plot, with a message). Errored with `8da8c18`'s `app.R`, passes with the fix. |
+| Verification | Browser probe after the fix: plot present in all 17 states, the note only in the 3 invalid ones. Full suite on the committed revision: see the development record. |
+| What it moves | Nothing numeric. |

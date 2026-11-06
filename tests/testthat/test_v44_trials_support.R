@@ -135,9 +135,20 @@ test_that("the main page follows the limits the user sets, and passes them on", 
     # One limit tighter and another looser at once.
     session$setInputs(home_m_tumor = 2, home_m_early = 8, home_m_late = 5)
     expect_identical(home()$rows, v4_regimens(params(), anchor(), margins = list(tumor = 2, early = 8, late = 5))$rows)
-    # An invalid value stops the list with a message instead of failing.
-    session$setInputs(home_m_tumor = -1)
-    expect_error(home(), "tumor BED loss must be a number from 0 to 20")
+    # An empty or invalid box (for example while a number is retyped) keeps the last valid
+    # limits, so the list and plot stay, and a message says so beside the boxes.
+    good <- home()$rows
+    for (bad in list(NA, -1, 25)) {
+      session$setInputs(home_m_tumor = bad)
+      expect_identical(home()$margins, list(tumor = 2, early = 8, late = 5))
+      expect_identical(home()$rows, good)
+      expect_match(as.character(output$home_plot_ui$html), "home_plot", fixed = TRUE)
+      expect_match(as.character(output$home_m_msg$html), "tumor BED loss must be a number from 0 to 20", fixed = TRUE)
+      expect_match(as.character(output$home_m_msg$html), "Still using 2, 8 and 5.", fixed = TRUE)
+    }
+    session$setInputs(home_m_tumor = 4)
+    expect_identical(home()$margins, list(tumor = 4, early = 8, late = 5))
+    expect_null(output$home_m_msg$html)
   })
 })
 
