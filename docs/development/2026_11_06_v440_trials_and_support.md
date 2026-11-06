@@ -70,6 +70,10 @@ its current release until this branch is approved.
   no button) and 3 errors (`v4_fit_trials` absent). Builder mutations (dropping the nimorazole entry,
   disabling the disagreement check) each turned one builder test red.
 - Suite counts and revision: `docs/FIXES.md`, 2026-11-06 entry.
+- Certifying run on the committed revision `ab9152e` (2026-11-06, Windows, R 4.5.1, pinned library
+  `library-2026-10-15-R4.5.1`): `Rscript tools/run_tests.R` gave 6188 expectations, 0 failed, 0 errors,
+  0 skipped, 0 warnings, and wrote the suite marker for `ab9152e`. A deploy from a later revision
+  (this record, or a merge into `v4`) needs the suite rerun on that revision, as `tools/deploy.R` requires.
 
 ## Not done
 
