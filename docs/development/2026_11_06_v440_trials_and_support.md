@@ -106,7 +106,7 @@ Hall and Brenner; make the three 5 Gy limits of the main page changeable, each o
   reaches `v4_regimens()`, the refit support (tumor margin), the intro and criteria text, the row
   card, the plot's dashed lines, the Report card transfer (`v4_report_inputs(m, d, margins)`,
   `v4_transfer_scope(margins)`) and the ZIP export. An out-of-range value stops the list with a
-  message.
+  message. (Superseded by the third round: the page keeps the last valid limits.)
 - **Export compatibility (judgement call).** The margins were already recorded and hashed in every
   `main-1` scenario, so the schema and analysis version stay `main-1` / `1.0`. Replay now checks the
   recorded margins against the 0 to 20 range and requires the support margin to equal the tumor
@@ -142,3 +142,38 @@ them on` now sets the tumor box to NA, −1 and 25 and expects the previous limi
 plot output and the message. With `app.R` from `8da8c18` it errored (`home()` failed on the invalid
 value). With the fix it passes. The browser probe after the fix: plot image present (1100 × 460) in
 all 17 states, including the three invalid ones, with the note shown only in those.
+
+## Fourth round: review and audit of the whole branch (requested by Igor Shuryak, 2026-11-06)
+
+Four independent reviews of `ba9fe51..b4826f3`: code, trial data against the papers, a real-browser
+test (headless Chrome at desktop and phone width) and documentation, records and tests. Every
+finding below was checked before it was acted on.
+
+**Fixed**
+
+| Finding | Evidence | Fix |
+|---|---|---|
+| The plot drew dashed lines only at the tumor and early limits, and its caption named one "toxicity" limit. Wrong once early and late differ. | `app.R` at `b4826f3`: `geom_hline(yintercept = c(-mg$tumor, mg$early))`. Found by two reviewers independently. | One line per limit in its bars' color (`v4_plot_limits()`), caption naming all three (`v4_plot_caption()`). |
+| A row with a single qualifying dose had no bar in the plot. | Browser at tumor 3, early 8, late 2: the 15- and 14-fraction rows are listed, but the plot shows only their axis ticks (`geom_linerange` with lowest = highest). Present since 4.2.0. | End points drawn at the lowest and highest values. |
+| At phone width the plot legend, axis labels and caption were cut off. | Browser at 390 px. | Two-row legend, every other fraction number, wrapped caption, smaller text below 640 px. |
+| A zero tumor limit printed as "−0". | `sprintf("\u2212%g", 0)`. | `v4_neg()`, and `min_gain = 0 - tumor`. |
+| The empty-list message blamed only the model settings. | `app.R` `home_msg`. | "with the current limits and model settings". |
+| Replay accepted an export whose limits were edited consistently by hand. | `validate_main_scenario()` did not compare the stored analysis ID. | Refuses when the stored ID differs from the recomputed one. An untouched 4.3.1 export reproduces its ID and its tables exactly (new fixture `tests/testthat/fixtures/main_export_v431/`, made with the 4.3.1 code). The older tamper tests drop the ID first so they still test the check they were written for. |
+| A limit box reported as NULL reverted to 5 instead of keeping the limit in use. | `v()` fell back to `V4_MARGINS`. | Falls back to the last valid limit. |
+| Trial list: the intro said "No arm received chemotherapy" above a note that RTOG 83-13 allowed previous chemotherapy. | Cox 1990: "Previous chemotherapy was permitted but not within 6 weeks of randomization." | "No arm included chemotherapy with radiotherapy", and a plain note for RTOG 83-13. |
+| Trial list: schedule values shown as exact where the paper gives a range, a mix or whole-arm values. | CAIR 2006 Table 1 gives only whole-arm medians (40 and 54 days), yet the fitting data label the period times (36 and 51, 40 and 54 days) "median delivered". EORTC 22811's control arm allowed 70 Gy/35 or 75 Gy/44. IAEA-ACC gave 66 to 70 Gy in 33 to 35 fractions. KROG 0201 mixes T1 and T2 schedules. Princess Margaret times are from the 2007 report. Jackson's 47.6 and 24.25 days match the 2018 table, not a checked trial text. | A lettered note per trial (`trial_note` in `data/fit_trial_list.csv`), checked against the paper or the extraction quote. "Arms or strata" in the title and text, and readable labels for bare abbreviations (CB, CONV/HYPO, HF/CF, Yamazaki strata). |
+| The "*" note ran two citations together, and stray spaces stood before "." and ")". | Browser text. | Citations in parentheses, links built without the gap. |
+| The Report card opened scrolled down, and focus was lost after closing the trial list. | Browser: `DIV.main` scrollTop 789. Focus on BODY after Esc. | The page container is scrolled to the top on page change, and focus returns to the trial-list button. |
+| The stale-constant audit failed in strict mode. | Inserting `V4_MARGIN_RANGE` moved the registered line sites. | Sites updated. The margins entry now says it is a default. `v4_margin_max_gy` (20) registered, with the check that the 8 Gy grid still covers the largest dose at late +20 (about 7.7 Gy). Citation numbers registered as literature. Strict run: 0 errors. |
+| The user guide, About and README were stale (Refit support "under Details", no trial list, "fixed rules", guide titled 4.3, files list). | Text. | Updated, and the guide's Word copy rebuilt. |
+
+**Found and not changed (for a decision)**
+
+- **The CAIR period times in the fitting data are not from the paper.** The refit used 36 and 51 days (2.0 Gy period) and 40 and 54 days (1.8 Gy period). The paper reports only whole-arm medians (40 and 54 days). Correcting this changes the data the refit was fitted to and needs a refit, so it is reported, not done. The trial list now states it.
+- **Jackson's times (47.6 and 24.25 days) could not be checked** against the trial paper (not in hand). They equal the 2018 table's values.
+- **Keyboard users cannot select a table row** (no tabindex on rows), so they cannot open a row card. This predates 4.4.0.
+- **The Report card shows "not met" for one model** where the main page lists a dose on the other model alone, without restating that rule. This predates 4.4.0.
+- **CI runs only the R tests.** The builder's Python tests run only by hand, and the reproduction test only where the extraction folder is present.
+- **Reviewer notes not acted on:** the grey download button reads as disabled, the caption's subscripts are small, a selected row disappears when the limits change, and `MAIN_ANALYSIS_VERSION` stays 1.0 (margins were always hashed, and the new ID check is stricter, not looser).
+
+**Tests added** (`tests/testthat/test_v44_trials_support.R`): the dialog's opening text, one plot line per limit and the caption, "0" rather than "−0", support falling with a stricter tumor limit, failure explanations naming the limits in use, 8 and 10 table columns, the NULL fallback, refusal of an edited export, exact replay of the 4.3.1 fixture, the trial notes and labels, and every note mark having its note. With `app.R`, `R/v4_home.R` and `R/v4_export.R` from `b4826f3`, the tests for the dialog text, plot limits, NULL fallback, ID check, labels and notes failed. The tests for support versus limit and for the column counts passed there too: they pin behavior that was already right but untested.

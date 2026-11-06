@@ -371,3 +371,15 @@ Several R tests were red on 917825b because the new helper did not exist yet. Th
 | Test that pins it | `tests/testthat/test_v44_trials_support.R::the main page follows the limits the user sets, and passes them on` (NA, −1 and 25 keep the last valid limits, rows and plot, with a message). Errored with `8da8c18`'s `app.R`, passes with the fix. |
 | Verification | Browser probe after the fix: plot present in all 17 states, the note only in the 3 invalid ones. Full suite on the committed revision: see the development record. |
 | What it moves | Nothing numeric. |
+
+### 2026-11-06, fourth round: review and audit of the branch
+
+**Changes published numbers:** no. At the default limits the list, support and exports are unchanged (the 4.3.1 export fixture replays exactly). Record with every finding, its evidence and what was left for a decision: `docs/development/2026_11_06_v440_trials_and_support.md`, "Fourth round".
+
+| Item | Record |
+|---|---|
+| What was wrong | The plot ignored the late limit and dropped rows with a single dose. "−0" for a zero limit. Edited exports replayed. The trial list said no chemotherapy above a note allowing previous chemotherapy, and showed ranges, mixes and whole-arm times as exact values. Stale docs and a failing stale-constant audit. |
+| Proof it was real | `app.R` at `b4826f3`: `geom_hline(yintercept = c(-mg$tumor, mg$early))`. Browser at limits 3/8/2: 15- and 14-fraction rows listed with no bar. CAIR 2006 Table 1 gives only whole-arm medians (40, 54 days). `stale_constant_audit.py --strict`: exit 1 with 3 line-site errors. |
+| Tests that pin it | `tests/testthat/test_v44_trials_support.R`: `::the dialog's opening text is accurate about drugs, strata and what was fitted`, `::the plot draws one dashed line per limit, in the colour of its bars, and the caption names all three`, `::a box Shiny reports as NULL keeps the limits in use rather than resetting them`, `::replay refuses an edited export and still reproduces a real 4.3.1 export exactly`, `::the trial table gives each trial's reference once, with footnotes for drugs and new trials`, `::the fitted-trial list follows the fitting data named in the draws manifest`. Red with `b4826f3`'s `app.R`, `R/v4_home.R` and `R/v4_export.R`, green here. `::the support column and the failure explanations use the limits in force` and `::the main table has 8 columns, and 10 with Details` also pass on `b4826f3` (coverage of behavior that was already right). |
+| Verification | Recorded with the certifying run of this revision in the next section of this file. |
+| What it moves | Nothing numeric. |

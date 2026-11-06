@@ -1,0 +1,165 @@
+{
+  "schema_version": "main-1",
+  "main_version": "1.0",
+  "app_version": "4.3.1",
+  "equation_version": "3.0",
+  "selection_version": "2.6",
+  "analysis": "main",
+  "hinge": {
+    "type": "softplus",
+    "k_per_day": 3
+  },
+  "clocks": {
+    "input": "inclusive calendar days, first to last treatment day",
+    "tumor": "inclusive",
+    "acute": "elapsed"
+  },
+  "params": {
+    "alpha": 0.35,
+    "ab": 10,
+    "lambda_di": 0.23,
+    "lambda_dd": 0.4,
+    "Tk": 28,
+    "g": 0,
+    "ab_e": 10,
+    "alpha_e": 0.35,
+    "lambda_e": 0.277258872223978,
+    "Tk_e": 7,
+    "ab_l": 3
+  },
+  "dd": {
+    "mode": "calibrated"
+  },
+  "anchor": {
+    "m": 35,
+    "d": 2,
+    "T": 47
+  },
+  "calibration": {
+    "status": "ok",
+    "c_over_alpha": 42.0117045247141,
+    "onset_anchor": 23.5065489602567
+  },
+  "standard": {
+    "m": 35,
+    "d": 2,
+    "T": 47
+  },
+  "margins": {
+    "tumor": 5,
+    "early": 5,
+    "late": 5
+  },
+  "grid": {
+    "m_range": [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+    "d_step": 0.05,
+    "d_max": 8,
+    "min_days_saved": 1
+  },
+  "calendar": {
+    "fx_per_week": 5,
+    "start_weekday": 1
+  },
+  "rule": "listed when tumor (DI or DD), early and late conditions all hold against the standard",
+  "support": {
+    "status": "available",
+    "variant": "primary",
+    "files": {
+      "di": {
+        "file": "tumor_di_primary.csv",
+        "sha256": "bf60300e80dac83a1eb5a8a71089f5d5dc3e38f836cdcea2199dd0c9ea72d2c3"
+      },
+      "dd": {
+        "file": "tumor_dd_primary.csv",
+        "sha256": "badda372c6297ff6502da9a90670e789959bbd6f43187386bbd16ddd2b0020b0"
+      }
+    },
+    "n_rows": 4000,
+    "pairing": "row k of the DI draws paired with row k of the conditional calibrated-DD draws; every row weighted equally",
+    "event": "tumor BED change >= -5 under DI or DD, each draw at its own alpha/beta",
+    "margin": 5,
+    "flag_below": 0.8,
+    "engine": "v4_refit_support",
+    "meaning": "share of refit draws; not a probability of tumor control, safety or non-inferiority"
+  },
+  "data_domain": {
+    "file": "refit_trials_2026_10_25c_main.csv",
+    "d_max": 2.55,
+    "n_arms": 45,
+    "n_studies": 19
+  },
+  "trial_arms": [
+    {
+      "m": 20,
+      "d": 2.75,
+      "T": 26,
+      "label": "HYPNO test arm (55 Gy in 20) inside"
+    }
+  ],
+  "code": {
+    "files": {
+      "R/bed_models.R": "5d3dc80a4a3bdeda797632e8c7c5c40cb957890a3bf2ce75a8769d78a10d6010",
+      "R/export.R": "7ed1e63ee419a42acd37480ced2aa719388fad80a88f4b1cdc0e9b29c07bb8b7",
+      "R/mod_oar.R": "6199ad0e1d6f96eae87155fca3c0c557b49cdf89be8bd355dbce367ffee2b33f",
+      "R/mod_uncertainty.R": "84da2015ad05d172b8ca59fc005cbb2883c9fef3f532c4e4505ec154c76da07d",
+      "R/oar.R": "366919d86d663e94f5f737b3212eed1abec92158509182c90a1ae275bc3dd78a",
+      "R/schedule.R": "18fa2282838db8bfab64268f40b24111a08857ff757945b298a40dbf604294f4",
+      "R/uncertainty.R": "0c4b4d68b33efd472132096c30c271fdf7926857616e2a37524527bf2b8e6826",
+      "R/v4_export.R": "13fee5fdb7e929df7c812b3cb2414b3403ed5dc43b2cb657c658bd8010976fe2",
+      "R/v4_home.R": "7d5721ce1092a09e8825bc3747a17c6822c0dae3eb73c3ba589d103c3a688506",
+      "data/oar_constraints.csv": "76655c3ec79ab7bf48312514013beada76a6c282dfee7d7fca489a0cb0b7b11e",
+      "data/refit_trials_2026_10_22.csv": "d980ddc391a734c7e99e29409a3a967fdbd1a8f0b9027fe14f8e408892b9477a",
+      "data/refit_trials_2026_10_22_s1_no_figure.csv": "d7c6822e44ad3e3a839d26ee74d2b9ac4698c67bbb593abc5cb1a7f905b21761",
+      "data/refit_trials_2026_10_22_s2_postop.csv": "5a8a0abc76c7da52dd10d28b9849732437a70af67e90e7ace9dee066455708d7",
+      "data/refit_trials_2026_10_22_s3_postop_npc.csv": "470932cb28fbdf1486021eb64e0692d0ba0ed67999a3f0ced3aa3e036205e060",
+      "data/refit_trials_2026_10_24.csv": "ef3b40936351438f1e6c869dd7d4d06f5052c53d34bbe5f6cc757997ff673ab6",
+      "data/refit_trials_2026_10_24_chemo.csv": "06cb97a665aaae454a0d6fdbad4d2f158c22092e61ccd2998766f524f0d36841",
+      "data/refit_trials_2026_10_24_drop_artscan.csv": "6cf296e30c39c0e767ca249289e389bcf55fedbe4878d40fc7651ce837f4b0c6",
+      "data/refit_trials_2026_10_24_drop_elan.csv": "7fa879858a174d97bd8e72bdb56db52e4b55605f16e4f5cd7cb59be7e6b6f96b",
+      "data/refit_trials_2026_10_25_chemo.csv": "661d8bead08b6003fafd371154324d16dde9ada9f733822457d022a1bb069ada",
+      "data/refit_trials_2026_10_25_main.csv": "d4a98fc9f33e2950f14740bbb7604fe465a601fa39c80f9d87bc0f92572de974",
+      "data/refit_trials_2026_10_25c_artscan.csv": "db9bd298957abe8c58b6b8b059c0a5bc5bf8ff2283b4a6dba094d781f7335b46",
+      "data/refit_trials_2026_10_25c_artscan_provenance.csv": "df54292a5ee8d297314fc6136ca0330ac1a6d1ebe8ef6c21ef72e84cf2c4a2ea",
+      "data/refit_trials_2026_10_25c_chemo.csv": "1c471f1dd00e71ea5d4bc0843c130734957d3ee77657300517c043ed402df6d9",
+      "data/refit_trials_2026_10_25c_chemo_provenance.csv": "bd85dcf7125fc91511acad1ebccc664e506623f1a951f83f7ab976961b65ecf4",
+      "data/refit_trials_2026_10_25c_effn_half.csv": "69fec0e67d62d4631ac1379778986b41ace6895f8acd8e5cdfcd8341b018b308",
+      "data/refit_trials_2026_10_25c_effn_half_provenance.csv": "5538a146695af45d18aa47e39da03dd3bdea9dd3eee597b82508ba4a28ada10e",
+      "data/refit_trials_2026_10_25c_km_only.csv": "ad07607b53721291909e6b4108ae57dc15c9e7e10d33789ada36a6a799369263",
+      "data/refit_trials_2026_10_25c_km_only_provenance.csv": "ab4e7b28eebd068c918b3d9115bbfd745244c7b6cf0544a269ce4324e4f0d8d0",
+      "data/refit_trials_2026_10_25c_main.csv": "51ed5d8a2cc60acb86feb2ca694132ed775c797f0e64afccc14714517caa8409",
+      "data/refit_trials_2026_10_25c_main_provenance.csv": "5538a146695af45d18aa47e39da03dd3bdea9dd3eee597b82508ba4a28ada10e",
+      "data/refit_trials_2026_10_25c_new_trials.csv": "69b90003237deb3549bec662ab65456d7f3504be5147183e1d68c30b465da593",
+      "data/refit_trials_2026_10_25c_new_trials_provenance.csv": "bf8c5257e580d3388dc09ccc522add625a40744740225ac67eee2d111dd20db8",
+      "data/refit_trials_2026_10_25c_nominal_clock.csv": "6cd04b25aaa6ed4ae70b3121387eee58c93ffda7f0c9b6b499433b28d5dbedcb",
+      "data/refit_trials_2026_10_25c_nominal_clock_provenance.csv": "5538a146695af45d18aa47e39da03dd3bdea9dd3eee597b82508ba4a28ada10e",
+      "data/refit_trials_2026_10_25c_rtog9003_beitler.csv": "b73be1770cfa26de3bc87b9da7af92daaabca5dae79d5f469ac0c4e6a75fe5c8",
+      "data/refit_trials_2026_10_25c_rtog9003_beitler_provenance.csv": "707e0287780458f7bb8af8816d2092bb9f0dd03dd1af60fcc808137b237654c8",
+      "data/shuryak2018_table1.csv": "425dba0847935d202d658b02cbf1f7d2ba477a884281eb6bc8f854be28864087",
+      "data/shuryak2018_table2_published_fit.csv": "c717f3e5dc685220dd22f22dfa96f675ec754abe5179c69098d0f1c47466bb0c",
+      "draws/draws_manifest.json": "2e95b631131a68d28abf6344680b8df2a5162172fa68dc38ac01764a7c7727eb",
+      "draws/refit_point_values.json": "280b0e29647bea9bd2e79d8bead4f0e458eb88b1ecd4eb48317e4fb935b7432b",
+      "draws/tumor_dd_paper_restrictions.csv": "e11773f2008e1bcf6a7b28ba3940976ed839f1bc63473cadbe94494644df049c",
+      "draws/tumor_dd_primary.csv": "badda372c6297ff6502da9a90670e789959bbd6f43187386bbd16ddd2b0020b0",
+      "draws/tumor_di_paper_restrictions.csv": "be873892f1fa7fba68e38b5a08951787eadf8e4b6dfbcab5824466ecebf4015a",
+      "draws/tumor_di_primary.csv": "bf60300e80dac83a1eb5a8a71089f5d5dc3e38f836cdcea2199dd0c9ea72d2c3",
+      "app.R": "640b04b93d3c9d1d78fc14bcf82c5e91018cef924199311cd630f105be369f74",
+      "about.md": "8505c4aa4d10de33a901f8219103c7d19bb3bf9b8b4d7b51293489d1edbe378b"
+    },
+    "r_version": "R version 4.5.1 (2025-06-13 ucrt)",
+    "packages": {
+      "shiny": "1.14.0",
+      "jsonlite": "2.0.0",
+      "zip": "3.0.2",
+      "digest": "0.6.39"
+    },
+    "changed_since_load": false
+  },
+  "context": [],
+  "analysis_id": "51482f5bce3f",
+  "result": {
+    "points": 60,
+    "rows": 15,
+    "empty_reason": null
+  },
+  "exported_at": "2026-11-06T15:07:23-0500"
+}

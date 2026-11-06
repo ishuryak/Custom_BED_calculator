@@ -46,13 +46,17 @@ test_that("the fitted-trial list follows the fitting data named in the draws man
     expect_equal(nrow(t), nrow(x))
     expect_equal(nrow(t), 45)
     expect_equal(length(unique(t$pmid)), 19)
-    expect_setequal(t$arm, x$arm)
+    # Arm names: the fitting file's, or a readable label for bare abbreviations.
+    lab <- utils::read.csv(V4_FIT_TRIAL_LIST, stringsAsFactors = FALSE)$arm_label
+    expect_equal(sum(t$arm %in% x$arm), sum(is.na(lab) | !nzchar(lab)))
+    expect_true("CB: concomitant boost, 7 fractions in 5 days a week" %in% t$arm)
+    expect_true("Arm B (2.25 Gy), tumor over 2/3 of the vocal cord" %in% t$arm)
     # Values come from the fitting file, formatted for reading.
     ch <- t[t$trial == "CHART (Saunders 2010)" & t$arm == "CHART", ]
     expect_identical(c(ch$dose, ch$fractions, ch$time, ch$total), c("1.5", "36", "12", "54.0"))
     gh <- t[t$trial == "Ghoshal 2008" & grepl("boost", t$arm), ]
     expect_identical(gh$dose, "25 × 1.8 + 15 × 1.5")
-    kr <- t[t$trial == "KROG 0201 (Moon 2014)" & t$arm == "CONV", ]
+    kr <- t[t$trial == "KROG 0201 (Moon 2014)" & t$arm == "Conventional, 2.0 Gy (CONV)", ]
     expect_identical(kr$fractions, "≈ 33.2")
     # Drugs: no arm had chemotherapy; DAHANCA 6&7 gave nimorazole in both arms.
     expect_true(all(startsWith(t$chemotherapy, "none")))
@@ -90,19 +94,30 @@ test_that("the trial table gives each trial's reference once, with footnotes for
     expect_match(h, "https://doi.org/10.1016/s0140-6736(03)14361-9", fixed = TRUE)
     expect_equal(lengths(regmatches(h, gregexpr("<tr>", h, fixed = TRUE))), 1 + 45)
     fn <- v4_fit_trial_notes(t)
-    # Drug notes: DAHANCA 6&7 (nimorazole) and RTOG 83-13 (chemotherapy only long before randomization).
-    expect_identical(fn$marks[["DAHANCA 6&7 (Overgaard 2003)"]], "a")
-    expect_identical(fn$marks[["RTOG 83-13 (Cox 1990)"]], "b,*")
-    expect_match(h, "DAHANCA 6&amp;7 (Overgaard 2003): nimorazole", fixed = TRUE)
-    expect_match(h, "RTOG 83-13 (Cox 1990): Chemotherapy: no chemotherapy within 6 weeks of randomization", fixed = TRUE)
+    # Lettered notes: drugs (DAHANCA 6&7, RTOG 83-13) and schedule details checked against the papers.
+    noted <- names(fn$marks)[grepl("[a-z]", fn$marks)]
+    expect_setequal(noted, c("CAIR (Skladowski 2006)", "CHART (Saunders 2010)", "DAHANCA 6&7 (Overgaard 2003)",
+                             "EORTC 22811 (Van den Bogaert 1995)", "IAEA-ACC (Overgaard 2010)", "Jackson 1997",
+                             "KROG 0201 (Moon 2014)", "Princess Margaret (O'Sullivan 2020)", "RTOG 83-13 (Cox 1990)",
+                             "Yamazaki 2006"))
+    expect_match(h, "DAHANCA 6&amp;7 (Overgaard 2003). Other drugs: nimorazole", fixed = TRUE)
+    expect_match(h, "RTOG 83-13 (Cox 1990). Previous chemotherapy was allowed if not within 6 weeks of randomization.", fixed = TRUE)
+    expect_match(h, "are therefore not period medians", fixed = TRUE)           # CAIR period times
+    expect_match(h, "The fit uses 68 Gy in 34 fractions.", fixed = TRUE)        # IAEA-ACC range
+    expect_false(grepl("Chemotherapy: ", h, fixed = TRUE))
     # The eight trials added in the refit, from the 2018 paper's references, are starred; no others.
     new <- names(fn$marks)[grepl("\\*", fn$marks)]
     expect_setequal(new, c("EORTC 22811 (Van den Bogaert 1995)", "Ghoshal 2008", "IAEA-ACC (Overgaard 2010)",
                            "KROG 0201 (Moon 2014)", "Princess Margaret (O'Sullivan 2020)", "RTOG 83-13 (Cox 1990)",
                            "RTOG 88-09 (Fu 1995)", "RTOG 9512 (Trotti 2014)"))
-    expect_match(h, "Added in the refit: not among the trials of the earlier fits, Shuryak I, Hall EJ, Brenner DJ. Dose dependence", fixed = TRUE)
-    expect_match(h, "Int J Radiat Oncol Biol Phys 2019;104:272", fixed = TRUE)
-    expect_equal(length(fn$notes), 3)
+    expect_identical(fn$marks[["RTOG 83-13 (Cox 1990)"]], "i,*")
+    expect_match(h, paste0("Added in the refit: not among the trials of the earlier fits (Shuryak, Hall and Brenner,",
+                           " Radiother Oncol 2018;127:20\u201326, and Shuryak, Hall and Brenner, Int J Radiat Oncol",
+                           " Biol Phys 2019;104:272\u2013278)."), fixed = TRUE)
+    expect_equal(length(fn$notes), 11)
+    # Every note mark in the table has its note below, and the reverse.
+    used <- unique(unlist(strsplit(fn$marks[nzchar(fn$marks)], ",")))
+    expect_setequal(used, vapply(fn$notes, `[[`, "", "mark"))
   })
 })
 
@@ -178,9 +193,87 @@ test_that("a main-list export with changed limits replays exactly", {
     expect_equal(rr$summary, r$summary)
     # The id differs from the 5/5/5 list, and a tampered support margin is refused.
     expect_false(identical(main_id(sc), main_id(main_scenario(p, anchor, draws, dom))))
-    bad <- back; bad$support$margin <- 5
+    bad <- back; bad$analysis_id <- NULL; bad$support$margin <- 5
     expect_error(main_rerun(bad), "support margin differs from its tumor margin")
-    bad <- back; bad$margins$late <- 30
+    bad <- back; bad$analysis_id <- NULL; bad$margins$late <- 30
     expect_error(main_rerun(bad), "margins are not valid")
+  })
+})
+
+# Review of 2026-11-06 (all four reviewers): tests for what the first three rounds missed.
+test_that("the dialog's opening text is accurate about drugs, strata and what was fitted", {
+  withr::with_dir(app_abs, {
+    h <- as.character(v4_fit_trials_intro(v4_fit_trials(), "refit_explainer.html"))
+    expect_match(h, "used these 45 arms or strata of 19 randomized trials", fixed = TRUE)
+    expect_match(h, "No arm included chemotherapy with radiotherapy.", fixed = TRUE)
+    expect_false(grepl("No arm received chemotherapy", h, fixed = TRUE))
+    expect_match(h, "were not fitted to outcome data", fixed = TRUE)
+    expect_match(h, "read is in the <a href=\"refit_explainer.html\" target=\"_blank\" rel=\"noopener\">refit explainer</a>.", fixed = TRUE)
+  })
+})
+
+test_that("the plot draws one dashed line per limit, in the colour of its bars, and the caption names all three", {
+  lim <- v4_plot_limits(list(tumor = 3, early = 8, late = 2))
+  expect_equal(lim$y, c(-3, 8, 2))
+  expect_identical(lim$colour, unname(V4_PLOT_COLOURS[c("Tumor (DI model)", "Early toxicity", "Late toxicity")]))
+  u <- c("Gy\u2081\u2080", "Gy\u2081\u2080", "Gy\u2083")
+  cap <- v4_plot_caption(u, list(tumor = 3, early = 8, late = 2))
+  expect_match(cap, "late toxicity in Gy\u2083.", fixed = TRUE)
+  expect_match(cap, "tumor limit −3, early limit +8, late limit +2.", fixed = TRUE)
+  # A zero tumor limit reads 0, not -0, everywhere it is shown.
+  expect_identical(v4_neg(0), "0"); expect_identical(v4_neg(2.5), "−2.5")
+  expect_match(v4_plot_caption(u, list(tumor = 0, early = 5, late = 5)), "tumor limit 0,", fixed = TRUE)
+  expect_match(v4_transfer_scope(list(tumor = 0, early = 5, late = 5)), "threshold 0 and", fixed = TRUE)
+  expect_false(grepl("-0", format(v4_report_inputs(20, 2.75, list(tumor = 0, early = 5, late = 5))$min_gain), fixed = TRUE))
+})
+
+test_that("the support column and the failure explanations use the limits in force", {
+  withr::with_dir(app_abs, {
+    p <- default_params(); a <- default_anchor()
+    rows <- v4_regimens(p, a)$rows
+    dr <- list(di = load_draws("di"), dd = load_draws("dd"))
+    s5 <- v4_refit_support(rows, dr$di, dr$dd, margin = 5)
+    s3 <- v4_refit_support(rows, dr$di, dr$dd, margin = 3)
+    expect_true(all(s3 <= s5 + 1e-12)); expect_true(any(s3 < s5 - 1e-12))    # a stricter tumor limit lowers support
+    r0 <- compute_all(35, 2, 47, p, a)
+    mg <- list(tumor = 3, early = 8, late = 2)
+    txt <- unlist(lapply(c(2.6, 3.0, 3.4), function(d) v4_failed_conditions(20, d, p, a, r0, mg)))
+    expect_true(any(grepl("not within 3 Gy of the standard", txt, fixed = TRUE)))
+    expect_true(any(grepl("late BED more than 2 Gy above the standard", txt, fixed = TRUE)))
+    expect_false(any(grepl("5 Gy", txt, fixed = TRUE)))
+  })
+})
+
+test_that("the main table has 8 columns, and 10 with Details", {
+  shiny::testServer(app_dir, {
+    do.call(session$setInputs, v4_defaults)
+    n_cols <- function() lengths(regmatches(output$home_table, gregexpr("<th>", output$home_table, fixed = TRUE)))
+    session$setInputs(home_details = FALSE); expect_equal(n_cols(), 8)
+    session$setInputs(home_details = TRUE); expect_equal(n_cols(), 10)
+  })
+})
+
+test_that("a box Shiny reports as NULL keeps the limits in use rather than resetting them", {
+  shiny::testServer(app_dir, {
+    do.call(session$setInputs, v4_defaults)
+    session$setInputs(home_m_tumor = 3, home_m_early = 7, home_m_late = 4)
+    session$setInputs(home_m_early = NULL)
+    expect_identical(home()$margins, list(tumor = 3, early = 7, late = 4))
+  })
+})
+
+test_that("replay refuses an edited export and still reproduces a real 4.3.1 export exactly", {
+  for (f in c("oar.R", "export.R", "v4_export.R")) source(file.path(app_abs, "R", f), local = TRUE)
+  withr::with_dir(app_abs, {
+    fx <- file.path("tests", "testthat", "fixtures", "main_export_v431")
+    sc <- jsonlite::fromJSON(file.path(fx, "scenario.json"), simplifyVector = TRUE)
+    expect_identical(sc$app_version, "4.3.1")
+    expect_identical(sc$analysis_id, main_id(sc))
+    r <- main_rerun(sc)
+    expect_equal(r$points, utils::read.csv(file.path(fx, "points.csv")), tolerance = 1e-12, check.attributes = FALSE)
+    expect_equal(r$summary, utils::read.csv(file.path(fx, "summary.csv"), stringsAsFactors = FALSE), check.attributes = FALSE)
+    # Limits edited by hand, consistently (support margin too), no longer match the ID: refused.
+    bad <- sc; bad$margins$tumor <- 3; bad$support$margin <- 3
+    expect_error(main_rerun(bad), "does not match its contents")
   })
 })

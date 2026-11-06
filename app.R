@@ -286,7 +286,7 @@ V3_PAGES <- list(
         div(num("cmp3_m", "Regimen C: fractions", 30, 1, 100, 1), num("cmp3_d", "Gy per fraction", 2, 0.1, 30, 0.05))),
       div(style = "overflow-x:auto;", tableOutput("compare_table"))),
     nav_panel("Search",
-      page_head("Search", "search", "A search with your own tumor criterion, toxicity limits and ranking. The main page uses fixed rules instead."),
+      page_head("Search", "search", "A search with your own tumor criterion, toxicity limits and ranking. The main page uses its own three limits instead."),
       uiOutput("dd_warning2"),
       div(class = "alert alert-secondary",
           "These are model outputs for hypothesis generation, not treatment recommendations.",
@@ -450,9 +450,12 @@ v4_home <- function() {
     p(class = "text-muted v4-more",
       "How the tumor model was refitted to randomized trials, and how its DI and DD versions compare: ",
       tags$a(href = REFIT_EXPLAINER_HTML, target = "_blank", rel = "noopener", "read the refit explainer"),
-      " (or ", tags$a(href = REFIT_EXPLAINER_DOCX, download = NA, "download it as Word"), ")."),
+      HTML(paste0(" (or <a href=\"", REFIT_EXPLAINER_DOCX, "\" download>download it as Word</a>)."))),
     tags$script(HTML(paste(
-      "Shiny.addCustomMessageHandler('v4-top', function(x) { window.scrollTo(0, 0); });",
+      "Shiny.addCustomMessageHandler('v4-top', function(x) { window.scrollTo(0, 0);",
+      "  $('.bslib-page-main, .main, main').scrollTop(0); });",
+      "$(document).on('hidden.bs.modal', function() { var b = document.getElementById('home_trials');",
+      "  if (b && b.offsetParent !== null) b.focus(); });",
       "Shiny.addCustomMessageHandler('v4-scroll', function(id) {",
       "  setTimeout(function() { var el = document.getElementById(id); if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 150);",
       "});",
@@ -1458,9 +1461,10 @@ server <- function(input, output, session) {
   last_margins <- reactiveVal(V4_MARGINS)
   margins_msg <- reactiveVal(NULL)
   observe({
-    v <- function(id, d) if (is.null(input[[id]])) d else input[[id]]
-    mg <- tryCatch(v4_check_margins(v("home_m_tumor", V4_MARGINS$tumor), v("home_m_early", V4_MARGINS$early),
-                                    v("home_m_late", V4_MARGINS$late)), error = function(e) e)
+    # A box not yet bound (NULL) keeps the limit in use; an empty box arrives as NA and is reported.
+    v <- function(id, k) if (is.null(input[[id]])) isolate(last_margins())[[k]] else input[[id]]
+    mg <- tryCatch(v4_check_margins(v("home_m_tumor", "tumor"), v("home_m_early", "early"), v("home_m_late", "late")),
+                   error = function(e) e)
     if (inherits(mg, "error")) margins_msg(conditionMessage(mg)) else {
       margins_msg(NULL)
       if (!identical(mg, isolate(last_margins()))) last_margins(mg)
@@ -1541,7 +1545,7 @@ server <- function(input, output, session) {
       "%d schedules qualify, from %d down to %d fractions. Each row gives the range of doses per fraction, checked in",
       "0.05 Gy steps, that meets all three conditions."), n, max(s$m), min(s$m)))))
     div(class = "alert alert-warning",
-        "No schedule of 5 to 30 fractions (5 a week, doses in 0.05 Gy steps) meets all three conditions with the current model settings.",
+        "No schedule of 5 to 30 fractions (5 a week, doses in 0.05 Gy steps) meets all three conditions with the current limits and model settings.",
         v4_empty_reason(h$reason))
   })
 
@@ -1577,20 +1581,27 @@ server <- function(input, output, session) {
     d <- v4_plot_data(home_points())
     validate(need(nrow(d) > 0, ""))
     p <- params(); mg <- home()$margins
-    cols <- c("Tumor (DI model)" = "#0072B2", "Tumor (DD model)" = "#56B4E9",
-              "Early toxicity" = "#D62728", "Late toxicity" = "#009E73")
+    lim <- v4_plot_limits(mg)
+    # Narrow screens: every other fraction number on the axis, a two-row legend and a wrapped
+    # caption, so nothing is cut off at phone width.
+    w <- session$clientData$output_home_plot_width
+    narrow <- !is.null(w) && is.finite(w) && w < 640
+    brk <- sort(unique(d$m)); if (narrow && length(brk) > 8) brk <- brk[seq(length(brk), 1, by = -2)]
+    dodge <- position_dodge(width = 0.75)
     ggplot(d, aes(x = m, ymin = lo, ymax = hi, colour = endpoint)) +
       geom_hline(yintercept = 0, colour = "grey30") +
-      geom_hline(yintercept = c(-mg$tumor, mg$early), colour = "grey55", linetype = "dashed") +
-      geom_linerange(linewidth = 2.2, position = position_dodge(width = 0.75)) +
-      scale_colour_manual(values = cols, name = NULL, drop = FALSE) +
-      scale_x_reverse(breaks = sort(unique(d$m))) +
+      geom_hline(yintercept = lim$y, colour = lim$colour, linetype = "dashed", linewidth = 0.7) +
+      geom_linerange(linewidth = 2.2, position = dodge) +
+      # End points, so a row with a single dose (lowest = highest) is still drawn.
+      geom_point(aes(y = lo), position = dodge, size = 2.2) +
+      geom_point(aes(y = hi), position = dodge, size = 2.2) +
+      scale_colour_manual(values = V4_PLOT_COLOURS, name = NULL, drop = FALSE) +
+      guides(colour = guide_legend(nrow = if (narrow) 2 else 1)) +
+      scale_x_reverse(breaks = brk) +
       labs(x = "Number of fractions",
            y = "BED change vs 35 × 2 Gy (Gy)",
-           caption = sprintf(paste("Bars span the listed doses per fraction. Tumor in %s, early toxicity in %s,",
-                                   "late toxicity in %s. Dashed lines: tumor limit \u2212%g Gy, toxicity limits +%g Gy."),
-                             bed_unit(p$ab), bed_unit(p$ab_e), bed_unit(p$ab_l), mg$tumor, mg$early)) +
-      theme_minimal(base_size = 15) +
+           caption = paste(strwrap(v4_plot_caption(c(bed_unit(p$ab), bed_unit(p$ab_e), bed_unit(p$ab_l)), mg), width = if (narrow) 55 else 130), collapse = "\n")) +
+      theme_minimal(base_size = if (narrow) 12 else 15) +
       theme(axis.title = element_text(face = "bold", colour = "black"),
             axis.text = element_text(face = "bold", colour = "black"),
             panel.grid.minor = element_blank(), legend.position = "top",
@@ -1661,21 +1672,11 @@ server <- function(input, output, session) {
   # The trials of the Bayesian refit, in a dialog opened from Details (version 4.4.0).
   observeEvent(input$home_trials, {
     t <- v4_fit_trials()
-    no_chemo <- all(startsWith(t$chemotherapy, "none"))
     showModal(modalDialog(
-      title = sprintf("Trials the tumor models were refitted to (%d trials, %d arms)", length(unique(t$pmid)), nrow(t)),
+      title = sprintf("Trials the tumor models were refitted to (%d trials, %d arms or strata)",
+                      length(unique(t$pmid)), nrow(t)),
       size = "xl", easyClose = TRUE, footer = modalButton("Close"),
-      tags$p(sprintf(paste(
-        "The Bayesian refit of the DI and DD tumor models used these %d arms of %d randomized trials of radiotherapy",
-        "for head and neck cancer.%s Its parameter samples give the Refit support column and the refit tumor preset",
-        "(Model settings). The default tumor values (scenario D18) were chosen by the developer and were not fitted to",
-        "these trials."), nrow(t), length(unique(t$pmid)),
-        if (no_chemo) " No arm received chemotherapy." else "")),
-      tags$p(class = "small text-muted", paste(
-        "Doses, fraction numbers and overall times are the values entered in the fit. A fraction number marked ≈ is an",
-        "average over the arm (mean delivered dose, or a mix of prescriptions). Time basis says whether the overall time",
-        "is the planned time or the delivered time reported by the trial. How the trials were chosen and read is in the "),
-        tags$a(href = REFIT_EXPLAINER_HTML, target = "_blank", rel = "noopener", "refit explainer"), "."),
+      v4_fit_trials_intro(t, REFIT_EXPLAINER_HTML),
       v4_fit_trials_table(t)))
   })
 
@@ -1695,7 +1696,8 @@ server <- function(input, output, session) {
     note <- vapply(seq_len(nrow(x)), function(k) paste(c(
       if (x$d[k] > data_support$d_max + 1e-9) "outside trial data",
       if (x$bed_early[k] > hy + 1e-9) "acute > HYPNO",
-      if (is.finite(sup[k]) && sup[k] < V4_SUPPORT_MIN - 1e-12) "support < 80%"), collapse = "; "), "")
+      if (is.finite(sup[k]) && sup[k] < V4_SUPPORT_MIN - 1e-12) sprintf("support < %d%%", round(100 * V4_SUPPORT_MIN))),
+      collapse = ", "), "")
     data.frame(
       `Dose per fraction (Gy)` = sprintf("%.2f", x$d),
       `Total dose (Gy)` = sprintf("%.1f", x$m * x$d),
@@ -1722,7 +1724,7 @@ server <- function(input, output, session) {
                              "late BED %.1f %s. Limits: tumor change at least %s %s under DI or DD, early change at most",
                              "+%g %s, late change at most +%g %s. Tumor changes are shown only where both BEDs are positive."),
                        V4_STANDARD$T, r0$bed_di, u_t, if (is.na(r0$bed_dd)) "not available" else sprintf("%.1f %s", r0$bed_dd, u_t),
-                       r0$bed_early, u_e, r0$bed_late, u_l, paste0("\u2212", h$margins$tumor), u_t, h$margins$early, u_e,
+                       r0$bed_early, u_e, r0$bed_late, u_l, v4_neg(h$margins$tumor), u_t, h$margins$early, u_e,
                        h$margins$late, u_l)),
       div(class = "d-flex flex-wrap gap-2 align-items-end",
           selectInput("home_open_dose", "Dose per fraction to open", doses, selected = doses[ceiling(length(doses) / 2)], width = "220px"),
@@ -1746,10 +1748,10 @@ server <- function(input, output, session) {
     updateTextInput(session, "skip_days", value = v$skip_days)
     for (k in c("auto_T", "ref_auto_T")) updateCheckboxInput(session, k, value = v[[k]])
     go_to("Report card")
-    showNotification(sprintf(paste("Report card: %d × %.2f Gy against 35 × 2 Gy, tumor threshold \u2212%g,",
+    showNotification(sprintf(paste("Report card: %d × %.2f Gy against 35 × 2 Gy, tumor threshold %s,",
                                    "early limit = standard + %g, late limit = standard + %g. Search, the Both-model",
                                    "screen, Uncertainty and Organs at risk keep their own criteria."),
-                             ok$m, ok$d, mg$tumor, mg$early, mg$late), duration = 8)
+                             ok$m, ok$d, v4_neg(mg$tumor), mg$early, mg$late), duration = 8)
   })
 
 }

@@ -88,6 +88,23 @@ v4_refit_support <- function(rows, di, dd, standard = V4_STANDARD, margin = V4_M
   rowMeans(ok)
 }
 
+# A tumor limit as a signed threshold for display: "−3", and "0" rather than "−0".
+v4_neg <- function(x) if (isTRUE(x == 0)) "0" else sprintf("\u2212%g", x)
+
+# The plot's dashed limit lines, one per endpoint, each in its bars' color (version 4.4.0:
+# the early and late limits can differ, so one shared "toxicity" line is no longer right).
+V4_PLOT_COLOURS <- c("Tumor (DI model)" = "#0072B2", "Tumor (DD model)" = "#56B4E9",
+                     "Early toxicity" = "#D62728", "Late toxicity" = "#009E73")
+v4_plot_limits <- function(margins) {
+  data.frame(limit = c("tumor", "early", "late"), y = c(0 - margins$tumor, margins$early, margins$late),
+             colour = unname(V4_PLOT_COLOURS[c("Tumor (DI model)", "Early toxicity", "Late toxicity")]))
+}
+# units: the BED units of tumor, early and late, for example c("Gy₁₀", "Gy₁₀", "Gy₃").
+v4_plot_caption <- function(units, margins) sprintf(paste(
+  "Bars span the listed doses per fraction. Tumor in %s, early toxicity in %s, late toxicity in %s.",
+  "Dashed lines, in the color of their bars: tumor limit %s, early limit +%g, late limit +%g."),
+  units[1], units[2], units[3], v4_neg(margins$tumor), margins$early, margins$late)
+
 # Settings copied to the Report card (and so to Results) for one regimen: comparison
 # 35 x 2 Gy, tumor threshold -margins$tumor, early and late limits equal to the comparison
 # plus margins$early and margins$late (5, 5 and 5 by default),
@@ -96,7 +113,7 @@ v4_refit_support <- function(rows, di, dd, standard = V4_STANDARD, margin = V4_M
 v4_report_inputs <- function(m, d, margins = V4_MARGINS) {
   list(m = m, d = d, fx_week = "5", start_day = "1", skip_days = "", auto_T = TRUE,
        comparator = "custom", ref_m = V4_STANDARD$m, ref_d = V4_STANDARD$d, ref_fx_week = "5", ref_auto_T = TRUE,
-       min_gain = -margins$tumor, early_mode = "reference", tol_early = margins$early,
+       min_gain = 0 - margins$tumor, early_mode = "reference", tol_early = margins$early,
        late_mode = "reference", tol_late = margins$late)
 }
 
@@ -323,8 +340,8 @@ v4_validate_transfer <- function(i, dose, s, points, tol = 1e-6) {
 # What "Open on the Report card" copies, and what other pages keep (review F04).
 v4_transfer_scope <- function(margins = V4_MARGINS) paste(
   "This copies the regimen, the comparison 35 × 2 Gy in 47 days (5 fractions a week from a Monday), the tumor",
-  sprintf("threshold \u2212%g and the early and late limits (standard + %g and standard + %g) to the Report card,",
-          margins$tumor, margins$early, margins$late), "which the Results page also uses.",
+  sprintf("threshold %s and the early and late limits (standard + %g and standard + %g) to the Report card,",
+          v4_neg(margins$tumor), margins$early, margins$late), "which the Results page also uses.",
   "Search, the Both-model screen, Uncertainty and Organs at risk keep their own additional criteria (for example",
   "both tumor models, a stricter ranking or organ limits), so they can be stricter and need not list this regimen.")
 
@@ -347,7 +364,8 @@ v4_fit_trials <- function(dir = DRAWS_DIR, list_path = V4_FIT_TRIAL_LIST) {
   fx <- x$n_fractions
   fc <- x$fraction_components; fc[is.na(fc)] <- ""
   out <- data.frame(
-    trial = r$trial, pmid = r$pmid, doi = r$doi, citation = r$citation, arm = x$arm,
+    trial = r$trial, pmid = r$pmid, doi = r$doi, citation = r$citation,
+    arm = ifelse(is.na(r$arm_label) | !nzchar(r$arm_label), x$arm, r$arm_label),
     total = sprintf("%.1f", x$total_dose_gy),
     dose = ifelse(nzchar(fc), gsub(";", " + ", gsub("x", " × ", fc)),
                   sprintf("%g", round(x$dose_per_fraction_gy, 4))),
@@ -356,42 +374,60 @@ v4_fit_trials <- function(dir = DRAWS_DIR, list_path = V4_FIT_TRIAL_LIST) {
     time_basis = x$time_rule,
     chemotherapy = r$chemotherapy, other_drugs = r$other_drugs,
     shuryak2018_ref = ifelse(is.na(r$shuryak2018_ref), "", as.character(r$shuryak2018_ref)),
+    trial_note = ifelse(is.na(r$trial_note), "", r$trial_note),
     stringsAsFactors = FALSE)
   out[order(out$trial, seq_len(nrow(out))), , drop = FALSE]
 }
 
-# Footnotes of the fitted-trial list, one per trial that needs one: drugs given in any of
-# its arms (any chemotherapy other than "none", or another drug), and trials that were not
-# in Shuryak, Hall and Brenner 2018 and 2019. The 2019 paper used the 2018 data set (the same
-# 16 publications, 7283 patients, 35 regimens; its Methods and references 5, 6 and 12-25, read
-# 2026-11-06), so one list serves both. Returns list(marks = named by trial, notes).
-V4_SHURYAK_2018 <- paste("Shuryak I, Hall EJ, Brenner DJ. Dose dependence of accelerated repopulation in head and",
-                         "neck cancer: supporting evidence and clinical implications. Radiother Oncol 2018;127:20\u201326.")
-V4_SHURYAK_2019 <- paste("Shuryak I, Hall EJ, Brenner DJ. Optimized hypofractionation can markedly improve tumor",
-                         "control and decrease late effects for head and neck cancer. Int J Radiat Oncol Biol Phys",
-                         "2019;104:272\u2013278.")
+# Footnotes of the fitted-trial list: a lettered note for each trial with a note on drugs or on
+# the schedule values used in the fit (data/fit_trial_list.csv, trial_note), and * for trials
+# that were not in Shuryak, Hall and Brenner 2018 and 2019. The 2019 paper used the 2018 data
+# set (the same 16 publications, 7283 patients, 35 regimens; its Methods and references 5, 6 and
+# 12-25, read 2026-11-06), so one list serves both. Returns list(marks = named by trial, notes).
+V4_SHURYAK_2018 <- "Shuryak, Hall and Brenner, Radiother Oncol 2018;127:20\u201326"
+V4_SHURYAK_2019 <- "Shuryak, Hall and Brenner, Int J Radiat Oncol Biol Phys 2019;104:272\u2013278"
 v4_fit_trial_notes <- function(t) {
   trials <- unique(t$trial)
-  drug <- vapply(trials, function(tr) {
-    a <- t[t$trial == tr, , drop = FALSE]
-    ch <- unique(a$chemotherapy[a$chemotherapy != "none"])
-    ch <- sub("^none \\((.*)\\)$", "\\1", ch)
-    paste(c(if (length(ch)) paste0("Chemotherapy: ", ch), unique(a$other_drugs[nzchar(a$other_drugs)])), collapse = ". ")
+  note <- vapply(trials, function(tr) {
+    x <- unique(t$trial_note[t$trial == tr & nzchar(t$trial_note)])
+    if (length(x)) x[1] else ""
   }, character(1))
   new <- vapply(trials, function(tr) !any(nzchar(t$shuryak2018_ref[t$trial == tr])), logical(1))
   k <- 0L; marks <- setNames(character(length(trials)), trials); notes <- list()
-  for (i in seq_along(trials)) if (nzchar(drug[[i]])) {
+  for (i in seq_along(trials)) if (nzchar(note[[i]])) {
     k <- k + 1L; marks[[i]] <- letters[k]
-    notes[[length(notes) + 1]] <- list(mark = letters[k], text = paste0(trials[i], ": ", drug[[i]], "."))
+    notes[[length(notes) + 1]] <- list(mark = letters[k], text = paste0(trials[i], ". ", note[[i]]))
   }
   if (any(new)) {
     marks[new] <- paste0(marks[new], ifelse(nzchar(marks[new]), ",", ""), "*")
-    notes[[length(notes) + 1]] <- list(mark = "*", text = paste(
-      "Added in the refit: not among the trials of the earlier fits,", V4_SHURYAK_2018, "and", V4_SHURYAK_2019,
-      "Both papers used the same 16 publications. Their other trials are all in the refit except five that were",
-      "dropped (not randomized, full text not available, or control not reported by arm; see the refit explainer)."))
+    notes[[length(notes) + 1]] <- list(mark = "*", text = paste0(
+      "Added in the refit: not among the trials of the earlier fits (", V4_SHURYAK_2018, ", and ", V4_SHURYAK_2019,
+      "). Both papers used the same 16 publications. Their other trials are all in the refit except five that",
+      " were dropped (not randomized, full text not available, or control not reported by arm), as described",
+      " in the refit explainer."))
   }
   list(marks = marks, notes = notes)
+}
+
+# The dialog's opening text: what the trials are, what they were used for, and how to read
+# the schedule columns.
+v4_fit_trials_intro <- function(t, explainer_href) {
+  n_trials <- length(unique(t$pmid))
+  no_chemo <- all(startsWith(t$chemotherapy, "none"))
+  tagList(
+    tags$p(sprintf(paste(
+      "The Bayesian refit of the DI and DD tumor models used these %d arms or strata of %d randomized trials of",
+      "radiotherapy for head and neck cancer.%s Its parameter samples give the Refit support column and the refit",
+      "tumor preset (Model settings). The default tumor values (scenario D18) were chosen by the developer and were",
+      "not fitted to outcome data."), nrow(t), n_trials,
+      if (no_chemo) " No arm included chemotherapy with radiotherapy." else "")),
+    tags$p(class = "small text-muted", HTML(paste0(
+      "Doses, fraction numbers and overall times are the values entered in the fit. A fraction number marked \u2248 ",
+      "is an average over the arm (mean delivered dose, or a mix of prescriptions). Time basis says whether the ",
+      "overall time is planned or delivered, as reported by each trial, and trials count planned days in different ",
+      "ways. Lettered notes give the schedule details that the columns cannot show. How the trials were chosen and ",
+      "read is in the <a href=\"", htmltools::htmlEscape(explainer_href, attribute = TRUE),
+      "\" target=\"_blank\" rel=\"noopener\">refit explainer</a>."))))
 }
 
 # HTML table for the fitted-trial list: one row per arm, the trial and its reference

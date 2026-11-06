@@ -10,6 +10,11 @@ lacks:
 - chemotherapy: the `chemo` field of the full-text extraction rows of that arm;
 - other_drugs: a radiosensitizer given within the arm, from the population notes that
   fit/build_provenance.py records (read in the publications on 2026-10-26);
+- arm_label: a readable arm name where the fitting file uses a bare abbreviation;
+- trial_note: one note per trial for the dialog's footnotes: drugs given and what a reader
+  should know about the schedule values used in the fit. Each sentence was checked on
+  2026-11-06 against the trial paper (fulltext_text/<PMID>.txt) or, where the PDF is not in
+  hand, against the full-text extraction quote (all_extract.json);
 - shuryak2018_ref: the trial's reference number in Shuryak, Hall and Brenner 2018
   (Radiother Oncol 127:20-26, PMID 29534828, Table 1 and references [23]-[55], read in the
   full text on 2026-11-06), or empty when the trial was not in that paper. CHART was cited
@@ -56,9 +61,52 @@ SHURYAK_2018_REF = {
     "16169681": "55",
 }
 
-# Radiosensitizers given within a fitted arm (fit/build_provenance.py, POPULATION).
+# Radiosensitizers given within a fitted arm (fit/build_provenance.py, POPULATION; Overgaard
+# 2003: "All patients, except those with glottic cancers, also received the hypoxic
+# radiosensitiser nimorazole").
 OTHER_DRUGS = {
     "DAHANCA67": "nimorazole (hypoxic radiosensitizer) for all patients except glottic cancer, in both arms",
+}
+
+# Readable labels for arms the fitting file names only by an abbreviation, keyed by (ref_no, arm).
+ARM_LABELS = {
+    ("CAIR_vs_CB", "CAIR"): "CAIR: continuous accelerated, 7 days a week",
+    ("CAIR_vs_CB", "CB"): "CB: concomitant boost, 7 fractions in 5 days a week",
+    ("KROG0201", "CONV"): "Conventional, 2.0 Gy (CONV)",
+    ("KROG0201", "HYPO"): "Hypofractionated, 2.25 Gy (HYPO)",
+    ("PMH_HF", "HF"): "Hyperfractionated, 1.45 Gy twice daily (HF)",
+    ("PMH_HF", "CF"): "2.55 Gy once daily (CF)",
+    ("EORTC22791", "CF (arm 1)"): "Conventional fractionation (CF, arm 1)",
+    ("EORTC22791", "HF (arm 2)"): "Hyperfractionation (HF, arm 2)",
+}
+YAMAZAKI = {"Arm A-1": "Arm A (2.0 Gy), tumor up to 2/3 of the vocal cord",
+            "Arm A-2": "Arm A (2.0 Gy), tumor over 2/3 of the vocal cord",
+            "Arm B-1": "Arm B (2.25 Gy), tumor up to 2/3 of the vocal cord",
+            "Arm B-2": "Arm B (2.25 Gy), tumor over 2/3 of the vocal cord"}
+
+# Trial-level notes on drugs and on the schedule values used in the fit, keyed by PMID.
+TRIAL_NOTES = {
+    "2180866": "Previous chemotherapy was allowed if not within 6 weeks of randomization. No arm included "
+               "chemotherapy with radiotherapy.",
+    "17011446": "Patients were treated first with 2.0 Gy and later with 1.8 Gy fractions, so each arm is shown as "
+                "two periods. The paper gives overall times only for whole arms (median 40 days for CAIR and 54 "
+                "days for control, with a planned CAIR time of 33 to 36 days). The period times used in the fit "
+                "(36 and 51 days, 40 and 54 days) are therefore not period medians, although the fitting data "
+                "label them so. Total doses ranged from 66 to 76 Gy.",
+    "7569030": "The conventional arm allowed 70 Gy in 35 fractions over 7 weeks or 75 Gy in 44 fractions over "
+               "9 weeks, and the split is not reported. The fit uses 70 Gy in 35 fractions. The trial's third arm "
+               "(three fractions a day with misonidazole) is not used.",
+    "20382075": "Both arms received 66 to 70 Gy in 33 to 35 fractions. The fit uses 68 Gy in 34 fractions.",
+    "9165135": "Planned overall times were 45 to 48 days (once daily) and 22 to 25 days (twice daily). The fit uses "
+               "47.6 and 24.25 days, labeled as mean delivered times. These match the 2018 paper's Table 1 "
+               "(47.6 and 24.3 days) but were not checked against the trial paper.",
+    "24161568": "Schedules differed by T stage within each arm (T1: 66 Gy in 33 fractions or 63 Gy in 28, T2: "
+                "70 Gy in 35 or 67.5 Gy in 30). The fit uses fraction numbers weighted by each arm's T-stage mix.",
+    "32055717": "The overall times (median 29 days) are from the trial's earlier report (2007), not from the "
+                "2020 paper cited.",
+    "16169681": "Arms A (2.0 Gy) and B (2.25 Gy) each had two total doses by tumor extent, and the fit uses "
+                "these strata separately.",
+    "20394851": "The 2018 and 2019 papers cited this trial through an earlier report (Dische 1997).",
 }
 
 
@@ -97,7 +145,11 @@ def main(argv):
             continue
         p = pm[pmid]
         title = p["title"].rstrip(".")
+        note = [f"Other drugs: {OTHER_DRUGS[r['ref_no']]}." if r["ref_no"] in OTHER_DRUGS else "",
+                TRIAL_NOTES.get(pmid, "")]
         out.append(dict(ref_no=r["ref_no"], arm=r["arm"], pmid=pmid, trial=TRIAL_NAMES[pmid],
+                        arm_label=ARM_LABELS.get((r["ref_no"], r["arm"]), YAMAZAKI.get(r["arm"], "") if pmid == "16169681" else ""),
+                        trial_note=" ".join(x for x in note if x),
                         citation=f"{p['first_author']} et al. {title}. {p['journal']} {p['year']}.",
                         doi=p.get("doi", ""), chemotherapy=chemo.pop(),
                         other_drugs=OTHER_DRUGS.get(r["ref_no"], ""),

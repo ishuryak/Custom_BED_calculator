@@ -103,14 +103,41 @@ constants:
     value: 2026
     provenance: literature
     why: Publication year in labels (HYPNO 2026); not an analysis constant.
+  citation_year_2019:
+    value: 2019
+    provenance: literature
+    why: Publication year in citations (Shuryak, Hall and Brenner 2019); not an analysis constant.
+  citation_volume_127:
+    value: 127
+    provenance: literature
+    why: Journal volume in citations (Radiother Oncol 2018;127); not an analysis constant.
+  citation_volume_104:
+    value: 104
+    provenance: literature
+    why: Journal volume in citations (Int J Radiat Oncol Biol Phys 2019;104); not an analysis constant.
+  citation_page_272:
+    value: 272
+    provenance: literature
+    why: First page in citations (Int J Radiat Oncol Biol Phys 2019;104:272); not an analysis constant.
   v4_margins_gy:
     value: 5
     provenance: design
     why: >
-      Version 4 main list (Igor Shuryak, 2026-10-28): tumor BED at least the
-      standard's minus 5 Gy (DI or DD), early and late BED at most the
-      standard's plus 5 Gy. Pinned by tests/testthat/test_v4_home.R.
+      Default limits of the version 4 main list (Igor Shuryak, 2026-10-28):
+      tumor BED at least the standard's minus 5 Gy (DI or DD), early and late
+      BED at most the standard's plus 5 Gy. From 4.4.0 (2026-11-06) each is a
+      user setting on the main page that starts at this value; exports record
+      the values used and replay with them. Pinned by tests/testthat/test_v4_home.R.
     sites: ["R/v4_home.R:12"]
+  v4_margin_max_gy:
+    value: 20
+    provenance: design
+    why: >
+      Largest value accepted for each main-page limit (4.4.0, 2026-11-06; range
+      0 to 20 Gy of BED). At late +20 Gy3 the largest 5-fraction dose is about
+      7.7 Gy, still below v4_grid_d_max_gy, so the search grid never truncates
+      the list. Pinned by tests/testthat/test_v44_trials_support.R.
+    sites: ["R/v4_home.R:13"]
   v4_standard_overall_time_days:
     value: 47
     provenance: derived
@@ -126,7 +153,7 @@ constants:
       Version 4 main list shows only regimens with at least 5 fractions fewer
       than the standard 35 fractions, i.e. at most 30 (Igor Shuryak,
       2026-10-30). Pinned by test_v4_home.R.
-    sites: ["R/v4_home.R:13"]
+    sites: ["R/v4_home.R:28"]
   v4_grid_d_max_gy:
     value: 8
     provenance: design
@@ -134,8 +161,9 @@ constants:
       Highest dose per fraction searched by the version 4 main list. Above the
       largest qualifying dose at every listed setting (late BED + 5 Gy caps
       5 fractions at about 7.2 Gy with late alpha/beta 3 Gy), so it does not
-      truncate the list at the defaults.
-    sites: ["R/v4_home.R:14"]
+      truncate the list at the defaults, nor at the largest late limit allowed
+      (v4_margin_max_gy).
+    sites: ["R/v4_home.R:29"]
   v4_support_min:
     value: 0.8
     provenance: design
@@ -143,4 +171,4 @@ constants:
       Main-list doses whose refit support (share of refit draws meeting the
       tumor condition) is below this are named in Notes (Igor Shuryak,
       decision 2, 2026-10-28). Pinned by test_v4_home.R.
-    sites: ["R/v4_home.R:63"]
+    sites: ["R/v4_home.R:78"]

@@ -143,6 +143,11 @@ validate_main_scenario <- function(sc, draws_loader = function() list(di = load_
       replay_fail(k, " '", paste(sc[[k]], collapse = ","), "' is not this calculator's (", cur, ").")
   }
   if (!identical(sc$analysis, "main")) replay_fail("this is not a main-list export.")
+  # The ID hashes the scientific fields, so an edited scenario (for example limits changed
+  # by hand) no longer matches it and would not reproduce the exported files (version 4.4.0).
+  if (!is.null(sc$analysis_id) && !identical(as.character(sc$analysis_id), main_id(sc)))
+    replay_fail("its analysis ID (", sc$analysis_id, ") does not match its contents (", main_id(sc),
+                "), so the file was edited after export.")
   mg <- tryCatch(v4_check_margins(sc$margins$tumor, sc$margins$early, sc$margins$late),
                  error = function(e) replay_fail("its margins are not valid: ", conditionMessage(e)))
   if (!same(sc$standard, V4_STANDARD) ||
