@@ -102,7 +102,7 @@ test_that("the trial table gives each trial's reference once, with footnotes for
                              "Yamazaki 2006"))
     expect_match(h, "DAHANCA 6&amp;7 (Overgaard 2003). Other drugs: nimorazole", fixed = TRUE)
     expect_match(h, "RTOG 83-13 (Cox 1990). Previous chemotherapy was allowed if not within 6 weeks of randomization.", fixed = TRUE)
-    expect_match(h, "are therefore not period medians", fixed = TRUE)           # CAIR period times
+    expect_match(h, "gives the period medians used in the fit", fixed = TRUE)    # CAIR period times (review 2026-11-09)
     expect_match(h, "The fit uses 68 Gy in 34 fractions.", fixed = TRUE)        # IAEA-ACC range
     expect_false(grepl("Chemotherapy: ", h, fixed = TRUE))
     # The eight trials added in the refit, from the 2018 paper's references, are starred; no others.
