@@ -150,3 +150,26 @@ test_that("exact replay needs the exported ID; an intentional edit is a new anal
     expect_false(identical(attr(rr, "analysis_id"), id))
   })
 })
+
+# --- 5: messages follow the actual DD mode and model validity --------------------------------
+
+test_that("Sensitivity never calls a directly entered DD calibrated; Main does not invent a DD loss", {
+  shiny::testServer(app_dir, {
+    do.call(session$setInputs, modifyList(v45_inputs, list(dd_mode = "fitted", alpha_dd = 0.3, lambda_dd = 0.5,
+                                                            c_over_alpha_dd = 30, g_dd = 0.01)))
+    ctx <- as.character(output$sens_context$html); sm <- as.character(output$sens_summary$html)
+    expect_false(grepl("calibrated at", ctx, fixed = TRUE))
+    expect_match(ctx, "entered directly, not calibrated", fixed = TRUE)
+    expect_false(grepl("DD is calibrated to DI", sm, fixed = TRUE))
+    expect_match(sm, "is not calibrated to DI", fixed = TRUE)
+    do.call(session$setInputs, v45_inputs)
+    expect_match(as.character(output$sens_summary$html), "DD is calibrated to DI at the anchor", fixed = TRUE)
+    expect_match(as.character(output$sens_context$html), "DD calibrated at the anchor", fixed = TRUE)
+    # DD unavailable (zero DD rate): no claim that the other model estimates a larger loss.
+    do.call(session$setInputs, modifyList(v45_inputs, list(lambda_dd = 0)))
+    fn <- as.character(output$home_footnotes$html)
+    expect_false(grepl("the other estimates a larger loss", fn, fixed = TRUE))
+    do.call(session$setInputs, v45_inputs)
+    expect_match(as.character(output$home_footnotes$html), "the other estimates a larger loss", fixed = TRUE)
+  })
+})

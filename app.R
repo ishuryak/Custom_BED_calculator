@@ -978,9 +978,11 @@ server <- function(input, output, session) {
 
   output$sens_context <- renderUI({
     r <- regimen(); rf <- ref(); an <- anchor()
+    dd <- if (identical(params()$dd_mode, "fitted")) "DD: entered directly, not calibrated (the anchor is not used)" else
+      sprintf("DD calibrated at the anchor %s", regimen_txt(an))
     context_strip(sprintf(paste("Regimen evaluated: %s (the Report card regimen, not a candidate row). Comparison: %s.",
-                                "DD anchor: %s. Summary threshold: a change of at least %g Gy (the global tumor",
-                                "threshold)."), regimen_txt(r), regimen_txt(rf), regimen_txt(an), checked("min_gain")))
+                                "%s. Summary threshold: a change of at least %g Gy (the global tumor",
+                                "threshold)."), regimen_txt(r), regimen_txt(rf), dd, checked("min_gain")))
   })
 
   output$search_note <- renderUI({
@@ -1220,12 +1222,16 @@ server <- function(input, output, session) {
     tags$p(sprintf(paste("Tumor BED change at least %g Gy (the global tumor threshold):",
                          "%d of %d evaluable parameter settings under DI, %d of %d evaluable parameter settings under DD.%s",
                          "These selected parameter settings are not independent confirmations or a probability sample.",
-                         "Within each setting, DI and DD share \u03b1 and DD is calibrated to DI at the anchor. \u03b1 and the",
-                         "calibrated constant can differ between settings. Uncertainty intervals are not calculated."),
+                         "%s Uncertainty intervals are not calculated."),
                    mg, di_n, sum(st$valid_di), dd_n, sum(st$valid_dd),
                    if (bad > 0) sprintf(paste(" %d of %d settings are not evaluable under at least one model",
                                               "(a comparison or regimen BED is not positive, or DD is unavailable)."),
-                                        bad, n) else ""))
+                                        bad, n) else "",
+                   if (identical(params()$dd_mode, "fitted"))
+                     paste("DD uses its directly entered \u03b1, onset constant and growth in every setting and is not",
+                           "calibrated to DI. Between settings it changes only through presets that set the DD maximum rate.") else
+                     paste("Within each setting, DI and DD share \u03b1 and DD is calibrated to DI at the anchor. \u03b1 and",
+                           "the calibrated constant can differ between settings.")))
   })
 
   show_delta <- function(d, reason) {
@@ -1661,7 +1667,12 @@ server <- function(input, output, session) {
              "regrows during treatment: one where regrowth starts at a fixed time (dose-independent, DI) and one",
              "where its start and speed depend on the dose given (dose-dependent, DD). A schedule is listed when",
              "the tumor condition holds under at least one usable model.", v4_model_relation(params(), anchor()),
-             "Where only one model meets the condition, the other estimates a larger loss (see the DI / DD column)."),
+             {
+               us <- v4_usable_models(params(), anchor(), home()$standard)
+               if (us$di && us$dd) "Where only one model meets the condition, the other estimates a larger loss (see the DI / DD column)."
+               else if (us$di) "The DD model gives no usable estimate with these settings, so every row is based on the DI model alone."
+               else if (us$dd) "The DI model gives no usable estimate with these settings, so every row is based on the DD model alone."
+             }),
       tags$p(tags$b("Refit support."), sprintf(paste(
         "Share of the parameter samples of a Bayesian refit to %d arms of %d randomized trials in which the dose",
         "meets the tumor condition under either model, from the lowest to the highest dose of the row. It uses the",
