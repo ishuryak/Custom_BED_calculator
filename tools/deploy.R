@@ -13,12 +13,7 @@ ACCOUNT <- "ishuryak"  # pinned: never deploy to whichever account happens to be
 deploy_lib <- Sys.getenv("BED_DEPLOY_LIBRARY",
                          file.path(tools::R_user_dir("HNSCC_BED_calculator", "cache"), "deploy-tools"))
 invisible(use_bed_library(required = TRUE))
-.libPaths(c(.libPaths()[1], deploy_lib, .Library))
-if (!requireNamespace("rsconnect", quietly = TRUE)) {
-  dir.create(deploy_lib, recursive = TRUE, showWarnings = FALSE)
-  install.packages("rsconnect", lib = deploy_lib, repos = LOCK_REPO,
-                   type = if (.Platform$OS.type == "windows") "win.binary" else getOption("pkgType"))
-}
+ensure_deploy_tools(deploy_lib)
 # Checked git calls only (review M01): stops before anything is written or uploaded.
 id <- deploy_identity()
 head <- id$rev; passed <- id$passed

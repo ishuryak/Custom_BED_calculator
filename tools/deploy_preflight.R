@@ -34,12 +34,18 @@ deploy_preflight <- function(app_name, expected_app, accounts, account, dirty,
 # deployed code is exactly the recorded revision (an untracked file would ship
 # without being part of any commit). deployed_revision.txt is the one exception:
 # deploy.R writes it just before upload to name the revision (it is gitignored).
+# Documents the pages link to and serve (review 6.4, 2026-11-09: a bundle missing both refit
+# explainer copies was accepted). Each must be in the bundle and not empty.
+SERVED_ASSETS <- c("www/refit_explainer.html", "www/refit_explainer.docx")
 check_bundle <- function(files, root = ".", tracked = NULL) {
-  need <- c("app.R", "about.md",
+  need <- c("app.R", "about.md", SERVED_ASSETS,
             file.path("R", list.files(file.path(root, "R"), pattern = "\\.R$")),
             file.path("data", list.files(file.path(root, "data"))),
             file.path("draws", list.files(file.path(root, "draws"))))
   missing <- setdiff(need, files)
+  empty <- SERVED_ASSETS[SERVED_ASSETS %in% files & !(file.exists(file.path(root, SERVED_ASSETS)) &
+                                                       file.size(file.path(root, SERVED_ASSETS)) > 0)]
+  if (length(empty)) stop("Linked documents are empty or unreadable: ", paste(empty, collapse = ", "), call. = FALSE)
   forbidden <- intersect(files, c(".Rhistory", ".Renviron", "external_proofs.yaml", ".suite_passed"))
   if (length(missing)) stop("Files the app reads are missing from the bundle: ", paste(missing, collapse = ", "), call. = FALSE)
   if (length(forbidden)) stop("Local-only files would be deployed: ", paste(forbidden, collapse = ", "), call. = FALSE)
@@ -82,4 +88,22 @@ deploy_identity <- function(git = git_run, marker = ".suite_passed") {
   ls <- git(c("ls-files"))
   if (ls$status != 0 || !length(ls$out[nzchar(ls$out)])) stop("git ls-files failed or listed nothing.", call. = FALSE)
   list(rev = rr$rev, passed = passed, tracked = ls$out[nzchar(ls$out)])
+}
+
+# The tools library for rsconnect (review 6.4): create it BEFORE putting it on the library path.
+# R drops a directory that does not exist from .libPaths(), so a first-time install there was not
+# found in the same process. Then install if needed and confirm rsconnect loads from it.
+# install: function(pkg, lib) -> installs; replaceable in tests.
+ensure_deploy_tools <- function(lib, install = function(pkg, lib)
+                                  utils::install.packages(pkg, lib = lib, repos = LOCK_REPO,
+                                    type = if (.Platform$OS.type == "windows") "win.binary" else getOption("pkgType"))) {
+  dir.create(lib, recursive = TRUE, showWarnings = FALSE)
+  if (!dir.exists(lib)) stop("Cannot create the deploy tools library ", lib, call. = FALSE)
+  .libPaths(c(.libPaths()[1], lib, .Library))
+  if (!normalizePath(lib, winslash = "/") %in% normalizePath(.libPaths(), winslash = "/"))
+    stop("The deploy tools library is not on the library path: ", lib, call. = FALSE)
+  if (!requireNamespace("rsconnect", quietly = TRUE)) install("rsconnect", lib)
+  if (!requireNamespace("rsconnect", quietly = TRUE))
+    stop("rsconnect could not be installed or loaded from ", lib, call. = FALSE)
+  invisible(lib)
 }

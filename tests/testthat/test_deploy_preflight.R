@@ -51,7 +51,7 @@ test_that(".Rhistory, .Renviron and the suite marker are neither tracked nor dep
 })
 
 test_that("the bundle check refuses a missing draws manifest and local-only files", {
-  need <- c("app.R", "about.md", file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+  need <- c("app.R", "about.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
             file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
   expect_true(check_bundle(need, app_abs))
   expect_error(check_bundle(setdiff(need, "draws/draws_manifest.json"), app_abs), "missing from the bundle")
@@ -62,10 +62,45 @@ test_that("the bundle check refuses a missing draws manifest and local-only file
 
 # Review S6 (2026-10-25): an untracked file could reach the bundle, so the deployed code was not the recorded revision.
 test_that("the bundle check refuses files that are not tracked by git", {
-  need <- c("app.R", "about.md", file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+  need <- c("app.R", "about.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
             file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
   expect_true(check_bundle(need, app_abs, tracked = need))
   expect_error(check_bundle(c(need, "R/scratch.R"), app_abs, tracked = need), "not committed to git.*R/scratch.R")
   expect_true(check_bundle(c(need, "deployed_revision.txt"), app_abs, tracked = need))  # written by deploy.R itself
   expect_true(".pytest_cache" %in% readLines(file.path(app_abs, ".rscignore")))
+})
+
+# Review 6.4 (2026-11-09): a synthetic bundle without both refit explainer copies was accepted, and the
+# deploy tools library was put on the library path before it existed.
+test_that("the bundle check requires each linked document, present and not empty", {
+  need <- c("app.R", "about.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+            file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
+  expect_true(check_bundle(need, app_abs))
+  for (a in SERVED_ASSETS) expect_error(check_bundle(setdiff(need, a), app_abs), paste0("missing from the bundle.*", a))
+  expect_error(check_bundle(setdiff(need, SERVED_ASSETS), app_abs), "missing from the bundle")
+  tmp <- withr::local_tempdir()
+  for (f in need) { dir.create(dirname(file.path(tmp, f)), recursive = TRUE, showWarnings = FALSE); file.copy(file.path(app_abs, f), file.path(tmp, f)) }
+  expect_true(check_bundle(need, tmp))
+  writeBin(raw(0), file.path(tmp, "www/refit_explainer.docx"))
+  expect_error(check_bundle(need, tmp), "empty or unreadable: www/refit_explainer.docx")
+})
+
+test_that("the deploy tools library is created before it is put on the library path", {
+  old <- .libPaths(); on.exit(.libPaths(old))
+  lib <- file.path(withr::local_tempdir(), "deploy-tools")
+  seen <- NULL
+  have <- requireNamespace("rsconnect", quietly = TRUE)
+  inst <- function(pkg, lib) { seen <<- lib; if (!have) stop("no network in tests") }
+  if (have) {
+    expect_identical(ensure_deploy_tools(lib, install = inst), lib)
+    expect_true(dir.exists(lib))
+    expect_true(normalizePath(lib, winslash = "/") %in% normalizePath(.libPaths(), winslash = "/"))
+  } else {
+    expect_error(ensure_deploy_tools(lib, install = inst), "no network")
+    expect_identical(seen, lib)
+    expect_true(dir.exists(lib))
+  }
+  s <- readLines(file.path(app_abs, "tools", "deploy.R"))
+  expect_true(any(grepl("ensure_deploy_tools(deploy_lib)", s, fixed = TRUE)))
+  expect_false(any(grepl("^\\.libPaths\\(c\\(.libPaths\\(\\)\\[1\\], deploy_lib", s)))
 })

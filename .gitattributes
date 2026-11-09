@@ -1,0 +1,10 @@
+# Files whose exact bytes are recorded as SHA-256 (draws manifest, fitting-data identity,
+# fit provenance, code identity). Git must never convert their line endings on checkout or
+# commit: with core.autocrlf=true on Windows the converted draws failed their manifest
+# check (review 6.1, 2026-11-09). Several data files are stored with CRLF on purpose, so
+# "-text" (keep the stored bytes) is used rather than "eol=lf".
+draws/** -text
+data/** -text
+fit/stan/*.stan -text
+R/*.R -text
+docs/development/2026_10_21_v3/double_entry/** -text
