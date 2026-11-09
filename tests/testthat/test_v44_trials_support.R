@@ -196,9 +196,9 @@ test_that("a main-list export with changed limits replays exactly", {
     # The id differs from the 5/5/5 list, and a tampered support margin is refused.
     expect_false(identical(main_id(sc), main_id(main_scenario(p, anchor, draws, dom))))
     bad <- back; bad$analysis_id <- NULL; bad$support$margin <- 5
-    expect_error(main_rerun(bad), "support margin differs from its tumor margin")
+    expect_error(main_recompute(bad), "support margin differs from its tumor margin")
     bad <- back; bad$analysis_id <- NULL; bad$margins$late <- 30
-    expect_error(main_rerun(bad), "margins are not valid")
+    expect_error(main_recompute(bad), "margins are not valid")
   })
 })
 

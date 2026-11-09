@@ -133,8 +133,10 @@ write_main_zip <- function(file, sc, r) {
 # Returns the inputs to recompute. Refuses another version, a changed fixed
 # rule, a different trial-data domain, or support draws that are not the ones
 # recorded.
+# exact = TRUE (a saved file): the exported analysis ID is required and must match the
+# contents. exact = FALSE (main_recompute): inputs edited on purpose, no ID check.
 validate_main_scenario <- function(sc, draws_loader = function() list(di = load_draws("di"), dd = load_draws("dd")),
-                                   data_domain = tumor_data_support()) {
+                                   data_domain = tumor_data_support(), exact = TRUE) {
   same <- function(a, b) isTRUE(all.equal(unlist(a), unlist(b), check.attributes = FALSE, tolerance = 1e-12))
   for (k in c("schema_version", "main_version", "equation_version", "selection_version")) {
     cur <- list(schema_version = MAIN_SCHEMA_VERSION, main_version = MAIN_ANALYSIS_VERSION,
@@ -145,7 +147,12 @@ validate_main_scenario <- function(sc, draws_loader = function() list(di = load_
   if (!identical(sc$analysis, "main")) replay_fail("this is not a main-list export.")
   # The ID hashes the scientific fields, so an edited scenario (for example limits changed
   # by hand) no longer matches it and would not reproduce the exported files (version 4.4.0).
-  if (!is.null(sc$analysis_id) && !identical(as.character(sc$analysis_id), main_id(sc)))
+  # Exact replay of a saved file needs the ID: without this, deleting the ID let an edited file
+  # recompute something else under the name of a replay (review 6.3, 2026-11-09).
+  if (exact && (is.null(sc$analysis_id) || length(sc$analysis_id) != 1 || !nzchar(as.character(sc$analysis_id))))
+    replay_fail("it has no analysis ID, so it cannot be checked against its contents. Exact replay needs the file",
+                " as exported. To recompute with edited inputs on purpose, use main_recompute().")
+  if (exact && !identical(as.character(sc$analysis_id), main_id(sc)))
     replay_fail("its analysis ID (", sc$analysis_id, ") does not match its contents (", main_id(sc),
                 "), so the file was edited after export.")
   mg <- tryCatch(v4_check_margins(sc$margins$tumor, sc$margins$early, sc$margins$late),
@@ -179,6 +186,17 @@ validate_main_scenario <- function(sc, draws_loader = function() list(di = load_
 
 # Exact rerun of a main export: the same points, summary and support.
 main_rerun <- function(sc, ...) {
-  v <- validate_main_scenario(sc, ...)
+  v <- validate_main_scenario(sc, ..., exact = TRUE)
   main_compute(v$p, v$anchor, v$draws, sc$data_domain$d_max, margins = v$margins)
+}
+
+# Intentional recomputation of a main scenario whose inputs were edited (not a replay).
+# The same input checks apply. The result is a new analysis, identified by the ID of the
+# edited contents (attribute "analysis_id").
+main_recompute <- function(sc, ...) {
+  sc$analysis_id <- NULL
+  v <- validate_main_scenario(sc, ..., exact = FALSE)
+  r <- main_compute(v$p, v$anchor, v$draws, sc$data_domain$d_max, margins = v$margins)
+  attr(r, "analysis_id") <- main_id(sc)
+  r
 }

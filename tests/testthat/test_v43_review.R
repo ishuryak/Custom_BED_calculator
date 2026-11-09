@@ -299,19 +299,19 @@ test_that("F08: the analysis ID follows scientific inputs only; mismatches are r
   expect_false(identical(main_id(a$sc), main_id(c2$sc)))
   old <- setwd(app_abs); on.exit(setwd(old))
   bad <- a$back; bad$analysis_id <- NULL; bad$support$files$di$sha256 <- strrep("0", 64)
-  expect_error(main_rerun(bad), "support draws")
+  expect_error(main_recompute(bad), "support draws")
   bad <- a$back; bad$analysis_id <- NULL; bad$main_version <- "0.9"
-  expect_error(main_rerun(bad), "main_version")
+  expect_error(main_recompute(bad), "main_version")
   # From 4.4.0 the margins are settings; a tumor margin edited without its support margin is refused.
   bad <- a$back; bad$analysis_id <- NULL; bad$margins$tumor <- 3
-  expect_error(main_rerun(bad), "support margin differs from its tumor margin")
+  expect_error(main_recompute(bad), "support margin differs from its tumor margin")
   bad <- a$back; bad$analysis_id <- NULL; bad$params$alpha <- NA
-  expect_error(main_rerun(bad), "alpha")
+  expect_error(main_recompute(bad), "alpha")
   bad <- a$back; bad$analysis_id <- NULL; bad$calibration$c_over_alpha <- 1
-  expect_error(main_rerun(bad), "calibration")
+  expect_error(main_recompute(bad), "calibration")
   expect_error(main_rerun(a$back, draws_loader = function() stop("disk error")), "cannot be read")
   bad <- a$back; bad$analysis_id <- NULL; bad$analysis <- "candidate"
-  expect_error(main_rerun(bad), "not a main-list export")
+  expect_error(main_recompute(bad), "not a main-list export")
   # Existing Candidate scenarios are untouched by this schema.
   expect_identical(SCHEMA_VERSION, "3")
 })

@@ -1490,19 +1490,27 @@ server <- function(input, output, session) {
   observeEvent(input$home_m_reset, for (k in c("tumor", "early", "late"))
     updateNumericInput(session, paste0("home_m_", k), value = V4_MARGINS[[k]]))
   home <- reactive(v4_regimens(params(), anchor(), margins = margins()))
-  # Qualifying grid points with their refit support.
-  home_points <- reactive({
-    rows <- home()$rows
-    dr <- v4_draws()
-    if (!is.null(dr) && nrow(rows) > 0) rows$support <- v4_refit_support(rows, dr$di, dr$dd, margin = home()$margins$tumor)
-    rows
-  })
   hypno_early <- reactive({
     hy <- comparator_presets()$hypno_test
     compute_all(hy$m, hy$d, hy$T, params(), anchor())$bed_early
   })
   data_support <- tumor_data_support()
-  home_rows <- reactive(v4_summary(home_points(), hypno_early = hypno_early(), data_d_max = data_support$d_max))
+  # One evaluated snapshot of the main list: inputs, draws (read once), points with support,
+  # summary and scenario. The page, the download file name and every file in the ZIP use it,
+  # so an export can never mix support from one draw state with a scenario from another
+  # (review 6.2, 2026-11-09). While the draws are unavailable the snapshot is re-evaluated
+  # after the retry interval, so a recovery updates the page and the export together.
+  home_snapshot <- reactive({
+    dr <- v4_draws()
+    if (is.null(dr)) invalidateLater((V4_DRAWS_RETRY_SEC + 1) * 1000)
+    mg <- home()$margins
+    r <- main_compute(params(), anchor(), dr, data_support$d_max, margins = mg)
+    sc <- main_scenario(params(), anchor(), dr, data_support, code = CODE_AT_LOAD, margins = mg)
+    list(r = r, sc = sc, id = main_id(sc))
+  })
+  # Qualifying grid points with their refit support, and the summary rows.
+  home_points <- reactive(home_snapshot()$r$points)
+  home_rows <- reactive(home_snapshot()$r$summary)
 
   # Lead and criteria in the units of the current alpha/beta values (review F02 of 2026-10-31).
   output$home_intro <- renderUI({
@@ -1635,14 +1643,12 @@ server <- function(input, output, session) {
   })
 
   # Main-list export (review F08 of 2026-10-31): the list itself, not a Candidate scenario.
-  home_scenario <- reactive(main_scenario(params(), anchor(), v4_draws(), data_support,
-                                          context = list(details = isTRUE(input$home_details)), code = CODE_AT_LOAD,
-                                          margins = home()$margins))
   output$home_download <- downloadHandler(
-    filename = function() export_filename("main", main_id(home_scenario())),
+    filename = function() export_filename("main", home_snapshot()$id),
     content = function(file) {
-      r <- main_compute(params(), anchor(), v4_draws(), data_support$d_max, margins = home()$margins)
-      write_main_zip(file, home_scenario(), r)
+      snap <- home_snapshot()
+      sc <- snap$sc; sc$context <- list(details = isTRUE(input$home_details))   # context is not hashed
+      write_main_zip(file, sc, snap$r)
     },
     contentType = "application/zip")
 

@@ -94,3 +94,59 @@ test_that("an unreadable or malformed point-profile file starts on D18 and says 
   expect_true(ok$ok)
   expect_equal(unlist(ok$values[TUMOR_FIELDS]), unlist(refit_vals[TUMOR_FIELDS]), tolerance = 1e-12)
 })
+
+# --- 6.2 / 6.3 Main export consistency and exact replay --------------------------------------
+
+for (f in c("oar.R", "export.R", "v4_export.R")) source(file.path(app_abs, "R", f), local = TRUE)
+unzip_main <- function(f) {
+  out <- tempfile(); utils::unzip(f, exdir = out)
+  list(sc = jsonlite::fromJSON(file.path(out, "scenario.json"), simplifyVector = TRUE),
+       points = utils::read.csv(file.path(out, "points.csv")), name = basename(f))
+}
+
+test_that("a Main ZIP agrees with its own scenario after a draw-loading failure recovers (review 6.2)", {
+  shiny::testServer(app_dir, {
+    cache <- get("V4_DRAWS_CACHE", envir = environment(go_to))   # the app's cache, not this file's copy
+    rm(list = ls(cache), envir = cache)
+    cache$failed_at <- Sys.time()            # a failure just now: no support on the page
+    do.call(session$setInputs, v45_inputs)
+    tb <- output$home_table
+    cache$failed_at <- Sys.time() - 3600     # the retry interval has passed; no input is edited
+    z <- unzip_main(output$home_download)
+    has_support <- "support" %in% names(z$points)
+    expect_identical(z$sc$support$status, "unavailable")   # the page state at the time of the failure
+    expect_identical(has_support, identical(z$sc$support$status, "available"))
+    expect_equal(nrow(z$points), 60)
+    r <- withr::with_dir(app_abs, main_rerun(z$sc))
+    expect_identical("support" %in% names(r$points), has_support)
+    expect_equal(nrow(r$points), nrow(z$points))
+    # After the retry interval the page and the export recover together, with support.
+    session$elapse((get("V4_DRAWS_RETRY_SEC", envir = environment(go_to)) + 2) * 1000)
+    z2 <- unzip_main(output$home_download)
+    expect_identical(z2$sc$support$status, "available")
+    expect_true("support" %in% names(z2$points))
+    expect_false(identical(z2$sc$analysis_id, z$sc$analysis_id))   # a new, identified analysis
+    r2 <- withr::with_dir(app_abs, main_rerun(z2$sc))
+    expect_equal(r2$points$support, z2$points$support, tolerance = 1e-12)
+  })
+})
+
+test_that("exact replay needs the exported ID; an intentional edit is a new analysis (review 6.3)", {
+  withr::with_dir(app_abs, {
+    p <- default_params(); a <- default_anchor(); dom <- tumor_data_support()
+    dr <- list(di = load_draws("di"), dd = load_draws("dd"))
+    sc <- main_scenario(p, a, dr, dom); r <- main_compute(p, a, dr, dom$d_max)
+    zf <- tempfile(fileext = ".zip"); id <- write_main_zip(zf, sc, r)
+    back <- unzip_main(zf)$sc
+    expect_equal(nrow(main_rerun(back)$points), 60)                     # intact file replays
+    bad <- back; bad$margins$early <- 0; bad$support$margin <- bad$margins$tumor
+    expect_error(main_rerun(bad), "does not match its contents")       # edited, old ID
+    bad$analysis_id <- NULL
+    expect_error(main_rerun(bad), "no analysis ID")                    # edited, ID removed
+    bad2 <- back; bad2$analysis_id <- ""
+    expect_error(main_rerun(bad2), "no analysis ID")                   # malformed ID
+    rr <- main_recompute(bad)                                          # intentional edit
+    expect_equal(nrow(rr$points), 18)
+    expect_false(identical(attr(rr, "analysis_id"), id))
+  })
+})
