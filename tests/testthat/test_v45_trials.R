@@ -154,3 +154,27 @@ test_that("the dialog says the list is unavailable instead of failing or showing
     expect_false(v4_fit_trials_dialog("x", list_path = "no_such_file.csv")$ok)
   })
 })
+
+# Review of 2026-11-09, section 3: corrections to the long refit explainer, with counts derived from the data.
+test_that("the refit explainer states counts from the data and the corrected model statements", {
+  flat <- function(f) gsub("\\s+", " ", paste(readLines(f, encoding = "UTF-8", warn = FALSE), collapse = "\n"))
+  md <- flat(file.path(app_abs, "docs", "refit_explainer", "HNSCC_BED_v4_refit_explainer_2026_11_04.md"))
+  html <- flat(file.path(app_abs, "www", "refit_explainer.html"))
+  x <- utils::read.csv(file.path(app_abs, "data", "refit_trials_2026_10_25c_main.csv"), stringsAsFactors = FALSE)
+  y <- round(x$n_patients * x$tcp_actual_pct / 100); fit <- 100 * y / x$n_patients
+  n_diff <- sum(round(fit, 1) != round(x$tcp_actual_pct, 1)); max_diff <- max(abs(fit - x$tcp_actual_pct))
+  df <- nrow(x) - length(unique(x$ref_no))
+  want <- c("fit generation 2026-10-25",
+            sprintf("%d within-unit contrast degrees of freedom", df),
+            sprintf("%d of the %d arms, by up to %.2f percentage points", n_diff, nrow(x), max_diff),
+            sprintf("8,279 analyzed patients in %d fitting units", length(unique(x$ref_no))),
+            "35 × 2.1 Gy in 47 days gains 4.94 Gy over 35 × 2 Gy in 47 days under DI and 3.02 Gy under DD",
+            "to −7.98 Gy under both", "0.53 Gy EQD2 per day (0.18–0.99)", "which is always shown",
+            "the last ten received 62.8 Gy", "Table 1, p.102")
+  for (k in want) { expect_match(md, k, fixed = TRUE, info = k); expect_match(html, k, fixed = TRUE, info = k) }
+  expect_match(md, "| Published (%) | Count in fit (%) |", fixed = TRUE)
+  expect_equal(sum(x$n_patients), 8279)
+  for (k in c("It does not change BED differences", "version 4.3", "Observed (%)", "Under Details on the main page",
+              "differ only in how they extrapolate", "About 24 within-trial contrasts", "Every value has a verbatim quote"))
+    expect_false(grepl(k, md, fixed = TRUE) || grepl(k, html, fixed = TRUE), info = k)
+})
