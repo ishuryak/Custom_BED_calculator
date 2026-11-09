@@ -345,25 +345,76 @@ v4_transfer_scope <- function(margins = V4_MARGINS) paste(
   "Search, the Both-model screen, Uncertainty and Organs at risk keep their own additional criteria (for example",
   "both tumor models, a stricter ranking or organ limits), so they can be stricter and need not list this regimen.")
 
-# The trials the Bayesian refit of the DI and DD tumor models was fitted to (version 4.4.0).
-# Doses, fraction numbers and times come from the fitting file named in the draws manifest,
-# so the list moves with the data; references and drugs come from data/fit_trial_list.csv
-# (tools/build_fit_trial_list.py). Every fitted arm must have exactly one row there.
+# The trials the Bayesian refit of the DI and DD tumor models was fitted to (version 4.4.0; checks and
+# published-outcome columns added 2026-11-09). Doses, fraction numbers, times and the published outcome
+# come from the fitting file named in the draws manifest, so the list moves with the data; references and
+# drugs come from data/fit_trial_list.csv (tools/build_fit_trial_list.py). Before joining, both files must
+# have unique nonempty (ref_no, arm) keys, the same key set and the same PMID for every key, and the fitting
+# file must match the SHA-256 the manifest records. Any failure is an error of class "v4_fit_trials_error",
+# so the dialog can say the list is unavailable (v4_fit_trials_dialog) instead of showing a wrong citation.
 V4_FIT_TRIAL_LIST <- "data/fit_trial_list.csv"
-v4_fit_trials <- function(dir = DRAWS_DIR, list_path = V4_FIT_TRIAL_LIST) {
-  ds <- draws_manifest(dir)$dataset
-  if (is.null(ds)) stop("The draws manifest names no fitting data file.")
-  x <- utils::read.csv(file.path("data", ds), stringsAsFactors = FALSE)
-  ref <- utils::read.csv(list_path, stringsAsFactors = FALSE, colClasses = c(pmid = "character"))
-  key <- function(d) paste(d$ref_no, d$arm, sep = "\r")
-  if (anyDuplicated(key(ref))) stop("Repeated arm in ", list_path)
-  k <- match(key(x), key(ref))
-  if (anyNA(k) || nrow(ref) != nrow(x))
-    stop("The fitted trial list does not match the fitting data ", ds, ": rebuild ", list_path)
-  r <- ref[k, , drop = FALSE]
+v4_fit_trials_fail <- function(...)
+  stop(structure(class = c("v4_fit_trials_error", "error", "condition"),
+                 list(message = paste0(...), call = NULL)))
+v4_fit_trials <- function(dir = DRAWS_DIR, list_path = V4_FIT_TRIAL_LIST, data_dir = "data") {
+  fail <- v4_fit_trials_fail
+  man <- draws_manifest(dir)
+  ds <- man$dataset
+  if (is.null(ds)) fail("The draws manifest names no fitting data file.")
+  path <- file.path(data_dir, ds)
+  if (!file.exists(path)) fail("The fitting data file ", ds, " named in the draws manifest is missing.")
+  if (!is.null(man$data_sha256)) {
+    sha <- digest::digest(readBin(path, "raw", n = file.size(path)), algo = "sha256", serialize = FALSE)
+    if (!identical(sha, man$data_sha256))
+      fail("The fitting data file ", ds, " differs from the one the draws manifest records (SHA-256 ", sha,
+           ", manifest ", man$data_sha256, ").")
+  }
+  read <- function(f, cc) tryCatch(utils::read.csv(f, stringsAsFactors = FALSE, colClasses = cc),
+                                   error = function(e) fail("Cannot read ", f, ": ", conditionMessage(e)),
+                                   warning = function(w) fail("Cannot read ", f, ": ", conditionMessage(w)))
+  x <- read(path, c(pmid = "character", source_value_pct = "character"))
+  ref <- read(list_path, c(pmid = "character"))
+  for (s in list(list(d = x, name = path, need = c("ref_no", "arm", "pmid", "source_value_pct", "tcp_actual_pct")),
+                 list(d = ref, name = list_path, need = c("ref_no", "arm", "pmid", "trial", "citation")))) {
+    gone <- setdiff(s$need, names(s$d))
+    if (length(gone)) fail("Missing column(s) ", paste(gone, collapse = ", "), " in ", s$name, ".")
+  }
+  key <- function(d) paste(trimws(d$ref_no), trimws(d$arm), sep = " / ")
+  for (s in list(list(d = x, name = paste("the fitting data", ds)), list(d = ref, name = list_path))) {
+    blank <- which(is.na(s$d$ref_no) | !nzchar(trimws(s$d$ref_no)) | is.na(s$d$arm) | !nzchar(trimws(s$d$arm)))
+    if (length(blank)) fail("Empty ref_no or arm in row(s) ", paste(blank, collapse = ", "), " of ", s$name, ".")
+    dup <- unique(key(s$d)[duplicated(key(s$d))])
+    if (length(dup)) fail("Repeated arm in ", s$name, ": ", paste(dup, collapse = "; "), ".")
+  }
+  miss <- setdiff(key(x), key(ref)); extra <- setdiff(key(ref), key(x))
+  if (length(miss) || length(extra))
+    fail("The fitted trial list does not match the fitting data ", ds, ".",
+         if (length(miss)) paste0(" Arms missing from ", list_path, ": ", paste(miss, collapse = "; "), "."),
+         if (length(extra)) paste0(" Arms not in the fitting data: ", paste(extra, collapse = "; "), "."),
+         " Rebuild ", list_path, ".")
+  r <- ref[match(key(x), key(ref)), , drop = FALSE]
+  norm_pmid <- function(p) sub("^0+", "", sub("\\.0+$", "", trimws(as.character(p))))
+  bad <- which(is.na(r$pmid) | norm_pmid(x$pmid) != norm_pmid(r$pmid))
+  if (length(bad))
+    fail("PMID differs between the fitting data ", ds, " and ", list_path, " for: ",
+         paste(sprintf("%s (data %s, list %s)", key(x)[bad], x$pmid[bad], r$pmid[bad]), collapse = "; "), ".")
+  # The fitted rate must be the published value, or its complement for a reported failure rate.
+  pub <- suppressWarnings(as.numeric(x$source_value_pct))
+  is_fail <- toupper(as.character(x$source_value_is_failure)) == "TRUE"
+  bad <- which(is.na(pub) | abs(ifelse(is_fail, 100 - pub, pub) - x$tcp_actual_pct) > 1e-9)
+  if (length(bad))
+    fail("Published and fitted outcome disagree in the fitting data ", ds, " for: ",
+         paste(sprintf("%s (published %s%s, fitted %g)", key(x)[bad], x$source_value_pct[bad],
+                       ifelse(is_fail[bad], " failure", ""), x$tcp_actual_pct[bad]), collapse = "; "), ".")
   fx <- x$n_fractions
   fc <- x$fraction_components; fc[is.na(fc)] <- ""
+  y <- round(x$n_patients * x$tcp_actual_pct / 100)
+  endpoint <- trimws(sub("\\s*--.*$", "", x$endpoint))
+  endpoint <- ifelse(is_fail, paste("freedom from", trimws(sub("\\(cumulative incidence\\)", "",
+                                                                 sub("FAILURE", "failure", endpoint, fixed = TRUE)))),
+                     endpoint)
   out <- data.frame(
+    ref_no = x$ref_no, arm_key = x$arm,
     trial = r$trial, pmid = r$pmid, doi = r$doi, citation = r$citation,
     arm = ifelse(is.na(r$arm_label) | !nzchar(r$arm_label), x$arm, r$arm_label),
     total = sprintf("%.1f", x$total_dose_gy),
@@ -372,11 +423,40 @@ v4_fit_trials <- function(dir = DRAWS_DIR, list_path = V4_FIT_TRIAL_LIST) {
     fractions = ifelse(abs(fx - round(fx)) < 1e-9, sprintf("%d", as.integer(round(fx))), sprintf("≈ %.1f", fx)),
     time = sprintf("%g", round(x$total_time_days, 2)),
     time_basis = x$time_rule,
+    n = x$n_patients,
+    published = ifelse(is_fail, sprintf("%s (from %s%% failure)", sprintf("%g", round(100 - pub, 4)), x$source_value_pct),
+                       x$source_value_pct),
+    published_is_failure = is_fail,
+    endpoint = endpoint,
+    horizon = sprintf("%s y", x$timepoint_years),
+    estimator = ifelse(x$estimate_type == "actuarial/KM", "actuarial (Kaplan–Meier)", x$estimate_type),
+    figure_read = x$value_source == "figure_read",
+    outcome_locator = x$location,
+    fit_count = sprintf("%d / %d", as.integer(y), as.integer(x$n_patients)),
+    fit_rate = sprintf("%.1f", 100 * y / x$n_patients),
+    outcome_source = if (is.null(r$outcome_source)) "" else ifelse(is.na(r$outcome_source), "", r$outcome_source),
+    schedule_source = if (is.null(r$schedule_source)) "" else ifelse(is.na(r$schedule_source), "", r$schedule_source),
     chemotherapy = r$chemotherapy, other_drugs = r$other_drugs,
     shuryak2018_ref = ifelse(is.na(r$shuryak2018_ref), "", as.character(r$shuryak2018_ref)),
     trial_note = ifelse(is.na(r$trial_note), "", r$trial_note),
     stringsAsFactors = FALSE)
   out[order(out$trial, seq_len(nrow(out))), , drop = FALSE]
+}
+
+# The dialog body for the fitted trials, or an explicit "unavailable" message when the metadata checks of
+# v4_fit_trials fail, so the page stays usable and never shows a citation it could not verify.
+v4_fit_trials_dialog <- function(explainer_href, ...) {
+  t <- tryCatch(v4_fit_trials(...), v4_fit_trials_error = function(e) e)
+  if (inherits(t, "v4_fit_trials_error"))
+    return(list(ok = FALSE, title = "Trials the tumor models were refitted to (list unavailable)",
+                body = tags$div(class = "alert alert-warning",
+                                tags$p("The list of fitted trials is unavailable because its references could not be",
+                                       "checked against the fitting data:"),
+                                tags$p(class = "small", conditionMessage(t)))))
+  list(ok = TRUE, t = t,
+       title = sprintf("Trials the tumor models were refitted to (%d trials, %d arms or strata)",
+                       length(unique(t$pmid)), nrow(t)),
+       body = tagList(v4_fit_trials_intro(t, explainer_href), v4_fit_trials_table(t)))
 }
 
 # Footnotes of the fitted-trial list: a lettered note for each trial with a note on drugs or on
@@ -425,7 +505,11 @@ v4_fit_trials_intro <- function(t, explainer_href) {
       "Doses, fraction numbers and overall times are the values entered in the fit. A fraction number marked \u2248 ",
       "is an average over the arm (mean delivered dose, or a mix of prescriptions). Time basis says whether the ",
       "overall time is planned or delivered, as reported by each trial, and trials count planned days in different ",
-      "ways. Lettered notes give the schedule details that the columns cannot show. How the trials were chosen and ",
+      "ways. Published outcome is the rate each trial reported for the arm, with its own endpoint, time point, ",
+      "estimator and page, table or figure. Count in fit is the rounded number of patients counted as controlled ",
+      "that the fit used in place of that rate, an approximation for Kaplan\u2013Meier and cumulative-incidence estimates. ",
+      "Where the schedule values were checked in a companion report, it is named under the reference. ",
+      "Lettered notes give the schedule details that the columns cannot show. How the trials were chosen and ",
       "read is in the <a href=\"", htmltools::htmlEscape(explainer_href, attribute = TRUE),
       "\" target=\"_blank\" rel=\"noopener\">refit explainer</a>."))))
 }
@@ -435,7 +519,8 @@ v4_fit_trials_intro <- function(t, explainer_href) {
 v4_fit_trials_table <- function(t) {
   fn <- v4_fit_trial_notes(t)
   head <- c("Trial and reference", "Arm", "Total dose (Gy)", "Dose per fraction (Gy)", "Fractions",
-            "Overall time (days)", "Time basis")
+            "Overall time (days)", "Time basis", "Patients", "Published outcome (%)",
+            "Endpoint, time point, estimator", "Outcome source (page, table or figure)", "Count in fit")
   rows <- list()
   for (tr in unique(t$trial)) {
     a <- t[t$trial == tr, , drop = FALSE]
@@ -446,9 +531,15 @@ v4_fit_trials_table <- function(t) {
         tags$a(href = sprintf("https://pubmed.ncbi.nlm.nih.gov/%s/", a$pmid[1]), target = "_blank",
                rel = "noopener", class = "small", sprintf("PubMed %s", a$pmid[1])),
         if (nzchar(a$doi[1])) tagList(" · ", tags$a(href = paste0("https://doi.org/", a$doi[1]), target = "_blank",
-                                                  rel = "noopener", class = "small", "DOI")))
+                                                  rel = "noopener", class = "small", "DOI")),
+        if (nzchar(a$schedule_source[1])) tagList(tags$br(), tags$span(class = "small v4-schedule-source",
+                                                  paste0("Schedule: ", a$schedule_source[1]))))
+      pub <- tagList(a$published[i], if (a$published_is_failure[i]) tags$sup("\u2020"),
+                     if (a$figure_read[i]) tags$span(class = "small", " (read from figure)"))
       rows[[length(rows) + 1]] <- tags$tr(first, tags$td(a$arm[i]), tags$td(a$total[i]), tags$td(a$dose[i]),
-        tags$td(a$fractions[i]), tags$td(a$time[i]), tags$td(a$time_basis[i]))
+        tags$td(a$fractions[i]), tags$td(a$time[i]), tags$td(a$time_basis[i]), tags$td(a$n[i]), tags$td(pub),
+        tags$td(sprintf("%s, %s, %s", a$endpoint[i], a$horizon[i], a$estimator[i])),
+        tags$td(class = "small", a$outcome_locator[i]), tags$td(a$fit_count[i]))
     }
   }
   tagList(
@@ -456,6 +547,11 @@ v4_fit_trials_table <- function(t) {
         tags$table(class = "table table-sm table-bordered v4-trials",
                    tags$thead(tags$tr(lapply(head, tags$th))), tags$tbody(rows))),
     div(class = "small v4-trial-notes",
-        lapply(fn$notes, function(n) tags$p(tags$sup(n$mark), " ", n$text))))
+        lapply(fn$notes, function(n) tags$p(tags$sup(n$mark), " ", n$text)),
+        if (any(t$published_is_failure)) tags$p(tags$sup("\u2020"), " ", paste(
+          "Reported as a cumulative incidence of failure. The fit uses its complement, freedom from failure,",
+          "which also counts patients who had a competing event such as death without failure.")),
+        if (any(t$figure_read)) tags$p(paste(
+          "Read from figure: the rate was read from the trial's published curve at the time point shown."))))
 }
 V4_TRANSFER_SCOPE <- v4_transfer_scope()

@@ -87,7 +87,7 @@ test_that("the trial table gives each trial's reference once, with footnotes for
     for (k in c("Trial and reference", "Overall time (days)", "Time basis")) expect_match(h, k, fixed = TRUE)
     # No drug columns: the few trials with a drug note get a footnote instead.
     for (k in c("<th>Chemotherapy</th>", "<th>Other drugs</th>")) expect_false(grepl(k, h, fixed = TRUE), info = k)
-    expect_equal(lengths(regmatches(h, gregexpr("<th>", h, fixed = TRUE))), 7)
+    expect_equal(lengths(regmatches(h, gregexpr("<th>", h, fixed = TRUE))), 12)  # published-outcome columns, review 2026-11-09
     expect_equal(lengths(regmatches(h, gregexpr("v4-trial-ref", h, fixed = TRUE))), 19)
     expect_match(h, "rowspan=\"4\"", fixed = TRUE)    # RTOG 9003 and Yamazaki have 4 arms
     expect_match(h, "https://pubmed.ncbi.nlm.nih.gov/14511925/", fixed = TRUE)
