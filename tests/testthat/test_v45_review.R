@@ -173,3 +173,19 @@ test_that("Sensitivity never calls a directly entered DD calibrated; Main does n
     expect_match(as.character(output$home_footnotes$html), "the other estimates a larger loss", fixed = TRUE)
   })
 })
+
+# --- 5: six destinations; every former page's inputs and outputs still mounted once -----------
+
+test_that("the menu has six destinations including the main page, and every former task keeps its ids", {
+  e <- new.env(); withr::with_dir(app_abs, sys.source("app.R", envir = e))
+  html <- as.character(htmltools::renderTags(e$ui)$html)
+  expect_identical(names(e$V4_MENU), c("Check a regimen", "Custom search (advanced)", "Uncertainty", "Organs at risk",
+                                       "Settings and sources"))
+  expect_equal(length(e$V4_MENU) + 1, 6)            # plus "Suggested regimens" (home)
+  links <- regmatches(html, gregexpr("id=\"go_[a-z]+\"", html))[[1]]
+  expect_setequal(links, sprintf("id=\"go_%s\"", c("home", unname(e$V4_MENU))))
+  ids <- c("report", "results", "verdicts", "acute_zone", "benchmarks", "compare_table", "cmp1_m", "cmp2_d", "cmp3_m",
+           "suggest_table", "download", "agree_table", "download_agree", "agree_cmp", "agree_margin", "sens_table",
+           "sens_tox", "sens_summary", "preset", "alpha", "g", "dd_mode", "anchor_m", "about", "home_table")
+  for (id in ids) expect_equal(lengths(regmatches(html, gregexpr(sprintf("id=\"%s\"", id), html))), 1, info = id)
+})

@@ -234,7 +234,7 @@ test_that("R07: the review's wording corrections are in place", {
     set_32(session)
     msg <- as.character(output$suggest_msg$html)
     expect_false(grepl("Model agreement tab", msg, fixed = TRUE))
-    expect_true(grepl("The Both-model screen uses", msg, fixed = TRUE))
+    expect_true(grepl("The both-model screen (below) uses", msg, fixed = TRUE))
   })
   r <- oar_row(lib, "parotid", list(mode = "gy", value = 19), 5, 5, "QUANTEC", ab = 3)
   expect_match(r$flags, "physical source comparison only")

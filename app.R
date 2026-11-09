@@ -192,7 +192,7 @@ V3_REGIMEN_PANELS <- list(
         num("m", "Number of fractions", 18, 1, 100, 1),
         num("d", "Dose per fraction (Gy)", 2.9, 0.1, 30, 0.05),
         helpText("Default: 18 × 2.9 Gy (52.2 Gy), an example schedule chosen by the developer. It is not a published or",
-                 "trial-tested regimen and not a recommendation. HYPNO's tested 55 Gy in 20 fractions is a benchmark on the Results page."),
+                 "trial-tested regimen and not a recommendation. HYPNO's tested 55 Gy in 20 fractions is a benchmark under All BED values below."),
         radioButtons("fx_week", "Fractions per week", c("5 (Mon-Fri)" = 5, "6 (Mon-Sat)" = 6), inline = TRUE),
         selectInput("start_day", "First treatment day", WEEKDAYS_IN, selected = 1),
         textInput("skip_days", "Days without treatment (holidays, gaps): calendar day numbers, day 1 = first treatment", ""),
@@ -259,19 +259,24 @@ V3_SETTINGS_PANELS <- list(
         helpText("A coarse screen at the prescription dose: late BED = n d (1 + d/(α/β)), no repopulation.",
                  "Organ doses are assessed on the Organs at risk page.")))
 
-# The version 3 tabs, each now a page opened from the menu. The page value is its title.
-V3_PAGES <- list(
-    nav_panel("Report card",
-      page_head("Report card", "report", "Checks one regimen against a comparison regimen. Set both on the left; the other pages use the same two regimens."),
+# The pages opened from the menu (version 4.5.0, review 5 of 2026-11-09): six destinations
+# including the main page. The regimen pages of version 3 (Report card, Results, Compare) are
+# one page, and the both-model screen and the sensitivity table are sections of the advanced
+# search. Every input and output keeps its id. The page value is its title.
+V45_PAGES <- list(
+    nav_panel("Check a regimen",
+      page_head("Check a regimen", "report", paste("Checks one regimen against a comparison regimen. Set both on the left;",
+                "the full BED values and up to three more regimens are in the sections below. Uncertainty, Organs at",
+                "risk and the advanced search use the same two regimens.")),
       layout_columns(col_widths = breakpoints(sm = 12, lg = c(4, 8)),
         do.call(accordion, c(V3_REGIMEN_PANELS, list(id = "regimen_inputs", open = TRUE))),
         div(how_to_read(),
             uiOutput("dd_warning0"),
             div(style = "overflow-x:auto;", tableOutput("report")),
             uiOutput("report_notes"),
-            caveat_strip("caveat-report")))),
-    nav_panel("Results",
-      page_head("Results", "results", "Full BED values of the regimen and comparison set on the Report card page, with published benchmark regimens."),
+            caveat_strip("caveat-report"))),
+      accordion(id = "check_more", open = "results", multiple = TRUE,
+        accordion_panel("All BED values and published regimens", value = "results",
       uiOutput("dd_warning"),
       uiOutput("neg_warning"),
       helpText("Tumor BED is shown under two repopulation models: dose-independent (DI),",
@@ -285,17 +290,18 @@ V3_PAGES <- list(
       h5("Published regimens, recomputed with the current parameters"),
       div(class = "table-scroll", style = "overflow-x: auto;", tableOutput("benchmarks")),
       uiOutput("hypno_note")),
-    nav_panel("Compare regimens",
-      page_head("Compare regimens", "compare"),
+        accordion_panel("Compare up to three more regimens", value = "compare",
       helpText("Up to three further regimens side by side with the evaluated regimen and the published benchmarks,",
                "all on 5 fractions/week from a Monday unless they are benchmarks with their own calendar."),
       layout_columns(col_widths = c(4, 4, 4),
         div(num("cmp1_m", "Regimen A: fractions", 17, 1, 100, 1), num("cmp1_d", "Gy per fraction", 3.05, 0.1, 30, 0.05)),
         div(num("cmp2_m", "Regimen B: fractions", 15, 1, 100, 1), num("cmp2_d", "Gy per fraction", 3.1, 0.1, 30, 0.05)),
         div(num("cmp3_m", "Regimen C: fractions", 30, 1, 100, 1), num("cmp3_d", "Gy per fraction", 2, 0.1, 30, 0.05))),
-      div(style = "overflow-x:auto;", tableOutput("compare_table"))),
-    nav_panel("Search",
-      page_head("Search", "search", "A search with your own tumor criterion, toxicity limits and ranking. The main page uses its own three limits instead."),
+      div(style = "overflow-x:auto;", tableOutput("compare_table"))))),
+    nav_panel("Custom search (advanced)",
+      page_head("Custom search (advanced)", "search", paste("A search with your own tumor criterion, toxicity limits",
+                "and ranking, for the comparison set on Check a regimen. The main page uses its own three limits",
+                "against 35 × 2 Gy instead. Two further analyses are in the sections below the results.")),
       uiOutput("dd_warning2"),
       div(class = "alert alert-secondary",
           "These are model outputs for hypothesis generation, not treatment recommendations.",
@@ -340,21 +346,21 @@ V3_PAGES <- list(
       plotOutput("suggest_plot", height = "380px"),
       helpText("Each point is the listed regimen for that number of fractions, so the dose per fraction",
                "changes from point to point. The plot is not a dose-response curve, and a model's point is",
-               "missing where its difference is not evaluable.")),
-    nav_panel("Both-model screen",
-      page_head("Both-model screen", "agree"),
+               "missing where its difference is not evaluable."),
+      accordion(id = "search_more", open = FALSE, multiple = TRUE,
+        accordion_panel("Both models must meet the threshold (both-model screen)", value = "agree",
       helpText("Regimens whose tumor BED change from the comparison is at least the threshold under DI and under DD,",
-               "with the toxicity limits chosen on the Search page. It searches every number of fractions below the",
+               "with the toxicity limits chosen above. It searches every number of fractions below the",
                "comparison. The ranges and counts use 15 selected parameter settings: five tumor presets × three tumor",
                "α/β values. Only settings in which both model differences are evaluable enter the joint count and ranges.",
                "These are sensitivity checks, not confidence intervals or probabilities (see the Uncertainty page)."),
       layout_columns(
         col_widths = c(4, 4, 4),
         selectInput("agree_cmp", "Comparison",
-                    c("The global comparison (Report card page)" = "sidebar",
+                    c("The global comparison (Check a regimen)" = "sidebar",
                       "Override: HYPNO test arm, 55 Gy in 20 fractions" = "hypno_test")),
         div(radioButtons("agree_threshold_mode", "Threshold",
-                         c("The global tumor threshold (Report card page)" = "global", "Override for this page" = "own")),
+                         c("The global tumor threshold (Check a regimen)" = "global", "Override for this section" = "own")),
             conditionalPanel("input.agree_threshold_mode == 'own'",
               num("agree_margin", "Own threshold (Gy; negative = allowed loss)", -3, -20, 30, 0.5))),
         num("agree_days", "Minimum days saved", 1, 1, 140, 1)),
@@ -365,8 +371,7 @@ V3_PAGES <- list(
       uiOutput("agree_msg"),
       div(class = "table-scroll", style = "overflow-x: auto;", tableOutput("agree_table")),
       downloadButton("download_agree", "Download the both-model screen (ZIP)")),
-    nav_panel("Sensitivity",
-      page_head("Sensitivity", "sens"),
+        accordion_panel("The regimen under selected parameter settings (sensitivity)", value = "sens",
       helpText("Tumor BED of the regimen being evaluated minus the comparison regimen, under",
                "each tumor preset and three tumor α/β values. These are selected parameter settings,",
                "not a probability distribution: a count of settings is not a chance of benefit.",
@@ -377,40 +382,36 @@ V3_PAGES <- list(
       uiOutput("sens_summary"),
       div(class = "table-scroll", style = "overflow-x: auto;", tableOutput("sens_table")),
       h5("Toxicity BED differences (do not depend on the tumor setting)"),
-      tableOutput("sens_tox")),
+      tableOutput("sens_tox")))),
     nav_panel("Uncertainty", page_head("Uncertainty", "unc"), unc_ui("unc")),
     nav_panel("Organs at risk", page_head("Organs at risk", "oar"), oar_ui("oar")),
-    nav_panel("Model settings", page_head("Model settings", "settings",
-      "Parameters used by every page, including the main list of regimens. Model and sources explains each default and where it comes from."),
+    nav_panel("Settings and sources",
+      page_head("Settings and sources", "settings",
+                "Parameters used by every page, including the main list of regimens, and where each comes from."),
+      navset_underline(id = "settings_tabs",
+        nav_panel("Model settings",
       do.call(accordion, c(V3_SETTINGS_PANELS, list(id = "settings_inputs", open = "Tumor (DI and DD models)")))),
-    nav_panel("Model and sources", page_head("Model and sources", "about"), uiOutput("about")))
+        nav_panel("Model and sources", uiOutput("about")))))
 
 # Menu entries: page value (= the page title) and its link id.
-V4_MENU <- list(
-  "Check a regimen" = c("Report card" = "report", "Results" = "results", "Compare regimens" = "compare"),
-  "Search and uncertainty" = c("Search" = "search", "Both-model screen" = "agree", "Sensitivity" = "sens",
-                               "Uncertainty" = "unc", "Organs at risk" = "oar"),
-  "Settings and sources" = c("Model settings" = "settings", "Model and sources" = "about"))
-# One-line descriptions under menu entries whose names alone do not say what they do.
+V4_MENU <- c("Check a regimen" = "report", "Custom search (advanced)" = "search", "Uncertainty" = "unc",
+             "Organs at risk" = "oar", "Settings and sources" = "settings")
+# One-line descriptions under menu entries.
 V4_MENU_NOTES <- c(
-  report = "one regimen against a comparison",
-  results = "all BED values and published regimens",
-  compare = "up to three regimens side by side",
-  search = "your own criteria and limits",
-  agree = "regimens meeting a threshold under both models",
-  sens = "one regimen under 15 parameter settings",
-  unc = "uncertainty from the trial refit")
+  report = "one regimen against a comparison, all BED values, side-by-side comparison",
+  search = "your own criteria and limits; both-model screen; selected parameter settings",
+  unc = "uncertainty from the trial refit",
+  oar = "organ dose limits for a plan",
+  settings = "model parameters, equations and sources")
 
 v4_menu <- function() {
   tagList(
     actionLink("go_home", "Suggested regimens", class = "v4-menu-link v4-menu-home"),
-    lapply(names(V4_MENU), function(grp) tagList(
-      div(class = "v4-menu-group", grp),
-      lapply(names(V4_MENU[[grp]]), function(title) {
-        slug <- V4_MENU[[grp]][[title]]
-        actionLink(paste0("go_", slug), class = "v4-menu-link",
-                   tagList(title, if (!is.na(V4_MENU_NOTES[slug])) tags$small(class = "v4-menu-note", V4_MENU_NOTES[[slug]])))
-      }))))
+    lapply(names(V4_MENU), function(title) {
+      slug <- V4_MENU[[title]]
+      actionLink(paste0("go_", slug), class = "v4-menu-link",
+                 tagList(title, tags$small(class = "v4-menu-note", V4_MENU_NOTES[[slug]])))
+    }))
 }
 
 # The main page: the list of regimens and nothing a reader must already know.
@@ -439,7 +440,7 @@ v4_home <- function() {
     uiOutput("home_settings"),
     uiOutput("home_msg"),
     div(class = "d-flex flex-wrap gap-3 align-items-center justify-content-between",
-      p(class = "v4-hint", "Click a row for the numbers at each dose, and to open that regimen on the Report card."),
+      p(class = "v4-hint", "Click a row for the numbers at each dose, and to open that regimen on Check a regimen."),
       div(class = "d-flex flex-wrap gap-2 align-items-center",
         checkboxInput("home_details", "Details (which tumor model, notes, fitted trials)", value = FALSE),
         conditionalPanel("input.home_details",
@@ -514,7 +515,7 @@ ui <- page_sidebar(
       ".v4-limits a { margin-bottom: 1rem; }")),
   sidebar = sidebar(id = "menu", title = "Menu", width = 290, open = "closed", v4_menu()),
   conditionalPanel("input.section && input.section !== 'home'", div(class = "bed-banner", uiOutput("banner"))),
-  do.call(navset_hidden, c(list(id = "section", selected = "home", nav_panel_hidden("home", v4_home())), V3_PAGES))
+  do.call(navset_hidden, c(list(id = "section", selected = "home", nav_panel_hidden("home", v4_home())), V45_PAGES))
 )
 
 server <- function(input, output, session) {
@@ -869,7 +870,7 @@ server <- function(input, output, session) {
     dd_txt <- one(x$bed_dd[1], x$bed_dd[2])
     di_txt <- one(x$bed_di[1], x$bed_di[2])
     tagList(
-      helpText(sprintf(paste("Δ values are relative to the comparison regimen chosen on the Report card page.",
+      helpText(sprintf(paste("Δ values are relative to the comparison regimen chosen on Check a regimen.",
                              "HYPNO compared its test arm with its own control arm (66 Gy in 33 fractions",
                              "at 6 fractions/week), not with 70 Gy in 35 fractions. With the current",
                              "parameters, test arm minus control arm in tumor BED is %s under DI",
@@ -970,7 +971,7 @@ server <- function(input, output, session) {
 
   output$search_context <- renderUI({
     rf <- ref(); an <- anchor(); p <- params()
-    context_strip(sprintf(paste("Comparison: %s (Report card page). DD anchor: %s. Tumor α/β %g Gy, mucosa %g Gy,",
+    context_strip(sprintf(paste("Comparison: %s (Check a regimen). DD anchor: %s. Tumor α/β %g Gy, mucosa %g Gy,",
                                 "late tissue %g Gy. Tumor criterion: change of at least %g Gy, and at least %s saved."),
                           regimen_txt(rf), regimen_txt(an), p$ab, p$ab_e, p$ab_l, checked("min_gain"), days_txt(checked("min_days"))),
                   tags$br(), if (isTRUE(search()$blocked)) "Early toxicity limit: not available (see below)." else limits_text(rf))
@@ -980,7 +981,7 @@ server <- function(input, output, session) {
     r <- regimen(); rf <- ref(); an <- anchor()
     dd <- if (identical(params()$dd_mode, "fitted")) "DD: entered directly, not calibrated (the anchor is not used)" else
       sprintf("DD calibrated at the anchor %s", regimen_txt(an))
-    context_strip(sprintf(paste("Regimen evaluated: %s (the Report card regimen, not a candidate row). Comparison: %s.",
+    context_strip(sprintf(paste("Regimen evaluated: %s (the regimen on Check a regimen, not a candidate row). Comparison: %s.",
                                 "%s. Summary threshold: a change of at least %g Gy (the global tumor",
                                 "threshold)."), regimen_txt(r), regimen_txt(rf), dd, checked("min_gain")))
   })
@@ -999,7 +1000,7 @@ server <- function(input, output, session) {
                            "comparison's (multiples of %s Gy, up to %g Gy), %s, and %s. For each number",
                            "of fractions, the highest-ranked dose per fraction is listed; the ZIP download",
                            "also holds every qualifying regimen. Δ = regimen minus comparison. Rows above",
-                           "%g Gy per fraction are above the largest fraction size among the benchmark regimens shown on the Results page.",
+                           "%g Gy per fraction are above the largest fraction size among the published benchmark regimens (Check a regimen, All BED values).",
                            "The list depends strongly on the tumor repopulation settings (now %.2f Gy/day under DI)."),
                      input$d_step, checked("d_max"), early_txt, late_txt, PRECEDENT_MAX_D,
                      p$lambda_di / p$alpha))
@@ -1036,7 +1037,7 @@ server <- function(input, output, session) {
     if (identical(input$criterion, "both"))
       return(msg(paste(
         "No regimen in the searched range meets the selected minimum tumor BED change under both models",
-        "and all other limits. An empty result is a valid outcome of this screen. The Both-model screen uses",
+        "and all other limits. An empty result is a valid outcome of this screen. The both-model screen (below) uses",
         "the global comparison and threshold by default, and you can override them there. An allowed BED loss",
         "changes the hypothesis being screened. To explore an allowed loss here, explicitly enter a negative minimum change.",
         "\u201cDI or DD model\u201d requires the threshold under at least one evaluable model. It can include",
@@ -1139,7 +1140,7 @@ server <- function(input, output, session) {
   output$agree_note <- renderUI({
     rf <- agree_ref(); p <- params(); an <- agree_anchor()
     helpText(sprintf(paste("Comparison: %d × %g Gy in %g days. DD anchor: %d × %g Gy in %g days (%s).",
-                           "Toxicity limits: as chosen on the Search page (a limit relative to the comparison",
+                           "Toxicity limits: as chosen in the search above (a limit relative to the comparison",
                            "is relative to this regimen). DI accelerated repopulation starts on day %g, so a course",
                            "ending well before that day gains little from further shortening under DI.%s Under DD,",
                            "onset and rate depend on cell killing, so shortening can save part of the repopulation or",
@@ -1353,7 +1354,7 @@ server <- function(input, output, session) {
                       tumor_deltas(data.frame(m = r$m, d = r$d, T = r$T), rf, di, dd))
     }, error = function(e) NULL)
     rng <- function(med, lo, hi) if (is.null(unc)) "not available" else sprintf("%s (%s to %s)", fmt_half(med), fmt_half(lo), fmt_half(hi))
-    st <- function(x, lim) if (is.na(lim)) "see Results page" else if (x <= lim + 1e-9) sprintf("within (limit %.1f)", lim) else sprintf("exceeds (limit %.1f)", lim)
+    st <- function(x, lim) if (is.na(lim)) "see All BED values" else if (x <= lim + 1e-9) sprintf("within (limit %.1f)", lim) else sprintf("exceeds (limit %.1f)", lim)
     dd_same <- !identical(p$dd_mode, "fitted") && isTRUE(all.equal(c(rf$m, rf$d, rf$T), c(anchor()$m, anchor()$d, anchor()$T)))
     early_st <- if (lv$fenwick) {
       lim <- fenwick_limit(r$T)
@@ -1462,12 +1463,14 @@ server <- function(input, output, session) {
     session$sendCustomMessage("v4-top", TRUE)   # each page opens at its top
   }
   observeEvent(input$go_home, go_to("home"))
-  for (grp in V4_MENU) for (title in names(grp)) local({
-    page <- title; slug <- grp[[title]]
+  for (title in names(V4_MENU)) local({
+    page <- title; slug <- V4_MENU[[title]]
     observeEvent(input[[paste0("go_", slug)]], go_to(page))
     observeEvent(input[[paste0("back_", slug)]], go_to("home"))
   })
-  observeEvent(input$open_settings, { go_to("Model settings"); sidebar_toggle("menu", open = TRUE) })
+  observeEvent(input$open_settings, {
+    go_to("Settings and sources"); nav_select("settings_tabs", "Model settings"); sidebar_toggle("menu", open = TRUE)
+  })
   observeEvent(input$open_menu, sidebar_toggle("menu", open = TRUE))
 
   # The three main-page limits (version 4.4.0); the defaults when the inputs are absent.
@@ -1691,7 +1694,7 @@ server <- function(input, output, session) {
         "and highest values can sit at any dose of the row (the row card lists every dose). The range is not an",
         "uncertainty interval: it shows the spread within the row. The tumor condition usually sets the lowest dose",
         "and a toxicity limit the highest. The bars in the plot below show the same ranges. The BED formulas",
-        "are on the Model and sources page (menu)."),
+        "are under Settings and sources, Model and sources (menu)."),
         tags$br(), tags$em({
           x <- home_points(); x <- x[x$m == s$m[1], , drop = FALSE]
           v4_range_example(x, params(), anchor(), home()$standard, home()$margins)
@@ -1765,7 +1768,7 @@ server <- function(input, output, session) {
                        h$margins$late, u_l)),
       div(class = "d-flex flex-wrap gap-2 align-items-end",
           selectInput("home_open_dose", "Dose per fraction to open", doses, selected = doses[ceiling(length(doses) / 2)], width = "220px"),
-          actionButton("home_open_report", "Open on the Report card", class = "btn-primary", style = "margin-bottom:1rem;")),
+          actionButton("home_open_report", "Open on Check a regimen", class = "btn-primary", style = "margin-bottom:1rem;")),
       helpText(v4_transfer_scope(h$margins)))
   })
   observeEvent(input$home_open_report, {
@@ -1784,9 +1787,9 @@ server <- function(input, output, session) {
     for (k in c("start_day", "comparator")) updateSelectInput(session, k, selected = v[[k]])
     updateTextInput(session, "skip_days", value = v$skip_days)
     for (k in c("auto_T", "ref_auto_T")) updateCheckboxInput(session, k, value = v[[k]])
-    go_to("Report card")
-    showNotification(sprintf(paste("Report card: %d × %.2f Gy against 35 × 2 Gy, tumor threshold %s,",
-                                   "early limit = standard + %g, late limit = standard + %g. Search, the Both-model",
+    go_to("Check a regimen")
+    showNotification(sprintf(paste("Check a regimen: %d × %.2f Gy against 35 × 2 Gy, tumor threshold %s,",
+                                   "early limit = standard + %g, late limit = standard + %g. The custom search, the both-model",
                                    "screen, Uncertainty and Organs at risk keep their own criteria."),
                              ok$m, ok$d, v4_neg(mg$tumor), mg$early, mg$late), duration = 8)
   })

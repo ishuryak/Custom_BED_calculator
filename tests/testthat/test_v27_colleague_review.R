@@ -66,8 +66,9 @@ test_that("E4 (version 3): one caveat line on each of the Report card, Results, 
   expect_equal(lengths(regmatches(html, gregexpr("class=\"bed-caveat", html))), 4)
   pos <- function(pat) regexpr(pat, html, fixed = TRUE)[1]
   pane <- function(v) max(gregexpr(sprintf("data-value=\"%s\"", v), html, fixed = TRUE)[[1]])
-  tabs <- c(pane("Report card"), pane("Results"), pane("Compare regimens"), pane("Search"),
-            pane("Both-model screen"), pane("Sensitivity"))
+  # Version 4.5.0: the six version 3 pages are sections of two pages; the order is unchanged.
+  tabs <- c(pane("Check a regimen"), pane("results"), pane("compare"), pane("Custom search (advanced)"),
+            pane("agree"), pane("sens"))
   expect_true(all(tabs > 0))
   cav <- vapply(ids, function(id) pos(sprintf("id=\"%s\"", id)), numeric(1))
   expect_true(cav[1] > tabs[1] && cav[1] < tabs[2])
@@ -104,7 +105,7 @@ test_that("E2: at the opening settings no candidate qualifies and the message ex
     expect_true(grepl("under both models", msg, fixed = TRUE))
     expect_true(grepl("valid outcome", msg, fixed = TRUE))
     # 3.2 (review R07, 2026-10-26): the old "Model agreement tab ... separate comparison" text was wrong
-    expect_true(grepl("The Both-model screen uses", msg, fixed = TRUE) && grepl("global comparison and threshold", msg, fixed = TRUE))
+    expect_true(grepl("The both-model screen (below) uses", msg, fixed = TRUE) && grepl("global comparison and threshold", msg, fixed = TRUE))
     expect_true(grepl("can include regimens that fail the threshold under the other model", msg, fixed = TRUE))
     expect_false(grepl("only one model supports", msg, fixed = TRUE))
     # no stale rows after a nonempty search

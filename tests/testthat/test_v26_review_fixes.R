@@ -307,7 +307,7 @@ test_that("R6: each analysis tab names its own comparison, anchor and numerical 
                       late_mode = "reference", tol_early = 0, tol_late = 0, agree_cmp = "hypno_test",
                       agree_threshold_mode = "own", agree_margin = -3, agree_days = 1)
     sc <- output$search_context$html
-    expect_true(grepl("Comparison: 33 × 2 Gy in 38 days (Report card page)", sc, fixed = TRUE))
+    expect_true(grepl("Comparison: 33 × 2 Gy in 38 days (Check a regimen)", sc, fixed = TRUE))
     expect_true(grepl("DD anchor: 35 × 2 Gy in 47 days", sc, fixed = TRUE))
     expect_true(grepl("55.87 Gy₁₀ (HYPNO 55 Gy/20, fixed)", sc, fixed = TRUE))
     expect_true(grepl("110.00 Gy₃ (comparison 110.00 + 0)", sc, fixed = TRUE))
@@ -316,7 +316,7 @@ test_that("R6: each analysis tab names its own comparison, anchor and numerical 
     expect_true(grepl("105.42 Gy₃ (comparison 105.42 + 0)", ac, fixed = TRUE))
     expect_true(grepl("at least 1 day saved", ac, fixed = TRUE))
     expect_true(grepl("at least 7 days saved", sc, fixed = TRUE))
-    expect_true(grepl("the Report card regimen, not a candidate row", output$sens_context$html, fixed = TRUE))
+    expect_true(grepl("the regimen on Check a regimen, not a candidate row", output$sens_context$html, fixed = TRUE))
     dd_fixed <- compute_all(20, 2.75, 26, params(), anchor())$bed_dd
     session$setInputs(comparator = "custom")
     expect_equal(compute_all(20, 2.75, 26, params(), anchor())$bed_dd, dd_fixed)
@@ -343,7 +343,7 @@ test_that("R7: default narrative, preset wording, version footer and source reco
     session$setInputs(preset = "withers", ab = 10, alpha = 0.2, lambda_di = 0.144, Tk = 28, lambda_dd = 0.4)
     h <- output$preset_note$html
     expect_true(grepl("calculator's", h, fixed = TRUE) && grepl("choice to complete the preset", h, fixed = TRUE))
-    expect_true(grepl("A preset fills only the values it sets", h, fixed = TRUE))
+    expect_true(grepl("The other presets set only the values named (partial)", h, fixed = TRUE))
     about <- as.character(output$about$html)
     expect_true(grepl(sprintf("Version %s of the Custom BED calculator (equations %s, selection rules %s",
                               APP_VERSION, EQUATION_VERSION, SELECTION_VERSION), about, fixed = TRUE))

@@ -39,8 +39,10 @@ test_that("the interface starts from these defaults", {
   html <- as.character(env$ui)
   val <- function(id) as.numeric(sub(".*value=\"([^\"]+)\".*", "\\1",
            regmatches(html, regexpr(sprintf("id=\"%s\"[^>]*value=\"[^\"]+\"", id), html))))
-  expect_equal(c(val("alpha"), val("ab"), val("lambda_di"), val("lambda_dd"), val("Tk")),
-               c(0.35, 10, 0.23, 0.40, 28))
+  # Version 4.5.0 (review 4.1, 2026-11-09): the tumor values start from the trial-fit point scenario.
+  rp <- env$REFIT_PROFILE$values
+  expect_equal(c(val("alpha"), val("ab"), val("lambda_di"), val("lambda_dd"), val("Tk"), val("g")),
+               c(rp$alpha, rp$ab, rp$lambda_di, rp$lambda_dd, rp$Tk, rp$g), tolerance = 1e-9)
   expect_true(grepl("value=\"hypno\" checked", html, fixed = TRUE))
-  expect_true(grepl("<option value=\"d18\" selected>", html, fixed = TRUE))
+  expect_true(grepl("<option value=\"refit\" selected>", html, fixed = TRUE))
 })

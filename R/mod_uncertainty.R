@@ -77,7 +77,7 @@ unc_server <- function(id, settings, oar_policy) {
     limits <- reactive({
       s <- settings()
       validate(need(s$early_mode %in% c("hypno", "reference"),
-                    "Under uncertainty the early limit must be HYPNO 55 Gy/20 or the comparison plus an allowed excess (chosen on the Search page): the Fowler and Fenwick limits are tied to fixed parameter values."))
+                    "Under uncertainty the early limit must be HYPNO 55 Gy/20 or the comparison plus an allowed excess (chosen in the custom search): the Fowler and Fenwick limits are tied to fixed parameter values."))
       list(early = list(mode = s$early_mode, tol = s$tol_early), late = list(mode = s$late_mode, tol = s$tol_late))
     })
     oar_fun <- reactive({
@@ -105,7 +105,7 @@ unc_server <- function(id, settings, oar_policy) {
                         "35 × 2 Gy in 47 days, with a soft preference for repopulation onset at or after day 7, so DD is not",
                         "an independent check of DI. Tumor α/β is not informed by these data (posterior close to prior).",
                         "The fit treats reported control rates, mostly Kaplan-Meier estimates, as counts (an approximation).",
-                        "The trial data cover %g-%g Gy per fraction; larger fractions are extrapolations. See Model and sources."),
+                        "The trial data cover %g-%g Gy per fraction; larger fractions are extrapolations. See Settings and sources."),
                   sup$n_arms, sup$n_studies, sup$file, la[1], la[2], sup$d_min, sup$d_max))
     })
 

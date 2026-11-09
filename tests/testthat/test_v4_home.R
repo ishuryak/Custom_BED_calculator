@@ -262,10 +262,10 @@ test_that("the main page opens first and every menu page exists", {
   html <- htmltools::renderTags(env$ui)$html
   expect_match(html, "Hypofractionated alternatives to 70 Gy in 35 fractions", fixed = TRUE)
   expect_match(html, 'data-value="home"', fixed = TRUE)
-  for (grp in env$V4_MENU) for (title in names(grp)) {
-    expect_match(html, sprintf('id="go_%s"', grp[[title]]), fixed = TRUE, info = title)
+  for (title in names(env$V4_MENU)) {
+    expect_match(html, sprintf('id="go_%s"', env$V4_MENU[[title]]), fixed = TRUE, info = title)
     expect_match(html, sprintf('data-value="%s"', title), fixed = TRUE, info = title)
-    expect_match(html, sprintf('id="back_%s"', grp[[title]]), fixed = TRUE, info = title)
+    expect_match(html, sprintf('id="back_%s"', env$V4_MENU[[title]]), fixed = TRUE, info = title)
   }
   # The home panel is the active one, and the menu starts closed.
   expect_match(html, 'class="tab-pane active" data-value="home"', fixed = TRUE)

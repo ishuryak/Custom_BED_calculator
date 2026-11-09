@@ -199,8 +199,11 @@ test_that("the preset menu explains the default and every preset", {
   shiny::testServer(app_dir, {
     set_srv(session, preset = "d18")
     h <- output$preset_note$html
-    expect_true(grepl("The default. Scenario D18", h, fixed = TRUE))
+    expect_true(grepl("Scenario D18 was chosen by the developer", h, fixed = TRUE))
+    expect_false(grepl("The default.", h, fixed = TRUE))   # 4.5.0: the trial-fit point is the default
     expect_true(grepl("not fitted", h, fixed = TRUE))
+    session$setInputs(preset = "refit")
+    expect_true(grepl("The default.", output$preset_note$html, fixed = TRUE))
     for (nm in c("calculator", "withers", "hartley", "hyhope", "custom")) {
       session$setInputs(preset = nm)
       expect_false(grepl("The default.", output$preset_note$html, fixed = TRUE), info = nm)
@@ -208,8 +211,8 @@ test_that("the preset menu explains the default and every preset", {
     }
   })
   app_txt <- read_text("app.R")
-  expect_true(grepl("\"Scenario D18 \\(default\\)[^\"]*\" = \"d18\"", app_txt))
-  expect_identical(DEFAULT_PRESET, "d18")
+  expect_true(grepl("\"Trial-fit point scenario \\(default\\)[^\"]*\" = \"refit\"", app_txt))
+  expect_identical(DEFAULT_PRESET, "refit")
   expect_false(grepl("Calculator defaults (version 1)", app_txt, fixed = TRUE))
 })
 

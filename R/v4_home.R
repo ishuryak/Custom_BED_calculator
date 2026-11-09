@@ -340,9 +340,9 @@ v4_validate_transfer <- function(i, dose, s, points, tol = 1e-6) {
 # What "Open on the Report card" copies, and what other pages keep (review F04).
 v4_transfer_scope <- function(margins = V4_MARGINS) paste(
   "This copies the regimen, the comparison 35 × 2 Gy in 47 days (5 fractions a week from a Monday), the tumor",
-  sprintf("threshold %s and the early and late limits (standard + %g and standard + %g) to the Report card,",
-          v4_neg(margins$tumor), margins$early, margins$late), "which the Results page also uses.",
-  "Search, the Both-model screen, Uncertainty and Organs at risk keep their own additional criteria (for example",
+  sprintf("threshold %s and the early and late limits (standard + %g and standard + %g) to Check a regimen,",
+          v4_neg(margins$tumor), margins$early, margins$late), "which its All BED values section also uses.",
+  "The custom search with its both-model screen, Uncertainty and Organs at risk keep their own additional criteria (for example",
   "both tumor models, a stricter ranking or organ limits), so they can be stricter and need not list this regimen.")
 
 # The trials the Bayesian refit of the DI and DD tumor models was fitted to (version 4.4.0).
