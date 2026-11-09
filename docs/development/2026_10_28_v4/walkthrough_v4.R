@@ -163,7 +163,7 @@ main <- function(args) {
   # Both served explainer copies exist and are the documents, not an error page.
   for (f in c("refit_explainer.html", "refit_explainer.docx")) {
     r <- tryCatch(httr2_like_get(paste0(base, "/", f)), error = function(e) NULL)
-    check(sprintf("served %s", f), !is.null(r) && r$ok, if (is.null(r)) "no response" else r$why)
+    check(sprintf("served %s", f), !is.null(r) && r$ok, if (is.null(r)) "no response" else if (r$ok) "" else r$why)
   }
   # A setting changes the main list.
   js("$('#go_settings').click()"); idle()
@@ -177,8 +177,14 @@ main <- function(args) {
 
   # Phone width.
   b2 <- ChromoteSession$new(width = 390, height = 844)
-  b2$Page$navigate(base); Sys.sleep(4)
+  b2$Page$navigate(base)
   js2 <- function(e) b2$Runtime$evaluate(e, returnByValue = TRUE)$result$value
+  # Wait for the table itself (up to 60 s): the live server can take longer than a fixed sleep.
+  t0 <- Sys.time()
+  while (as.numeric(Sys.time() - t0, units = "secs") < 60 &&
+         !isTRUE(tryCatch(js2("document.querySelectorAll('#home_table table.dataTable tbody tr').length > 0"),
+                          error = function(e) FALSE))) Sys.sleep(1)
+  Sys.sleep(2)
   wide <- js2("document.documentElement.scrollWidth > window.innerWidth + 1")
   check("no horizontal page scroll at 390 px", !isTRUE(wide))
   check("first column frozen on the phone", isTRUE(js2("document.querySelectorAll('#home_table .dtfc-fixed-left, #home_table .dtfc-fixed-start').length > 0")))

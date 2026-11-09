@@ -34,9 +34,12 @@ See `docs/FIXES.md` (2026-11-09) for each fix with its proof, test and red evide
 - **Targeted DI refit with the Jackson amendment** (review 2.1 step 3, second half, and step 4): a scientific decision that starts a versioned fit release. Recommended next step only if the encoding change is judged material; the point-value shift above is about 1.4 points in one arm.
 - **Uncertainty page in EQD2**: it still reports BED. Converting it needs per-draw conversion before quantiles and a new label set; deferred to keep this release a display change on the main page only.
 - **About length**: reordered (purpose, assumptions and fitted-model summary first, release history last) but not cut to the 3,000 words suggested by the earlier site review. It is about 9,200 words.
-- **Default branch, PR #2, credential revocation**: need Igor's GitHub and shinyapps.io accounts.
+- **Default branch and PR #2**: need Igor's GitHub account (the automated session was not permitted to change them).
 - **Python CI job** (review 6.5): not added. `tests/python` passes locally (208).
-- **Deployment**: not done; needs Igor's approval and a resolved credential status.
+
+## Credential rotation and deployment (2026-11-09)
+
+Igor approved deployment after rotation ("implement all as suggested"). Igor created a new shinyapps.io token, registered it in R on this computer from the console (not saved to any file), and deleted the old token. The configured token and secret were compared with those in the committed `.Rhistory` of `main` and match neither. The worktree's `.git` link was made relative so Windows git (called by Windows R) can read it. Certifying suite on `faf6817`: 6485 expectations, 0 failed, marker written. Deployed with `Rscript tools/deploy.R` (55 files, app id 18309450). Live walkthrough: 53 of 54 on the first run (timing of the phone frozen-column check; the column was frozen when probed with a wait), 54 of 54 after the walkthrough was changed to wait for the table.
 
 ## Measurements
 
