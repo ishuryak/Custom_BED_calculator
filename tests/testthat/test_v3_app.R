@@ -245,7 +245,7 @@ test_that("the refit preset values come from the draws, as medians of identified
   env <- new.env(); old <- setwd(app_abs); on.exit(setwd(old))
   source("app.R", local = env)
   di <- read.csv(file.path("draws", "tumor_di_primary.csv"))
-  rp <- env$refit_preset()
+  rp <- env$REFIT_PROFILE$values
   expect_equal(rp$lambda_di / rp$alpha, median(di$lambda / di$alpha), tolerance = 1e-9)
   expect_equal(rp$Tk, median(di$Tk), tolerance = 1e-6)
   expect_equal(rp$ab, 10)

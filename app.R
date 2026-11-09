@@ -66,27 +66,35 @@ LIMITS <- list(
   cmp3_m = list("Regimen C fractions", 1, 100, TRUE), cmp3_d = list("Regimen C dose per fraction", 0.1, 30, FALSE),
   agree_days = list("Minimum days saved (agreement)", 1, 140, TRUE))
 
+# Point values of the trial refit (fit/export_draws.py): medians of the identified DI
+# quantities, and the calibrated-DD rate median (DD is calibrated to DI at the anchor, as
+# in the default DD mode). From version 4.5.0 this "trial-fit point scenario" is the
+# startup profile; it is not part of the sensitivity set. When the file cannot be read
+# the app starts on scenario D18 and says why (review 4.1, 2026-11-09).
+REFIT_PROFILE <- refit_profile()
+STARTUP <- startup_profile(REFIT_PROFILE)
+REFIT_OK <- isTRUE(REFIT_PROFILE$ok)
 PRESET_LABELS <- c(
-  "Version 1 values (defaults of the published version 1 website)" = "calculator",
-  "Withers et al. 1988 rule: 0.6 Gy/day in 2-Gy fractions after 4 weeks (α 0.2 chosen, follows α/β)" = "withers",
-  "Hartley et al. 2011: α 0.3/Gy, doubling time 3 d, onset day 22 (elapsed)" = "hartley",
-  "HYHOPE protocol: α 0.35/Gy, doubling time 3 d, onset day 21" = "hyhope",
-  "Scenario D18 (default): α 0.35/Gy, doubling time 3 d, onset day 28" = "d18",
-  "Verified-trial refit 2026-10-25: posterior medians (DI; DD calibrated)" = "refit",
+  if (REFIT_OK) c("Trial-fit point scenario (default): medians of the Bayesian refit to randomized trials" = "refit"),
+  "Scenario D18: α 0.35/Gy, doubling time 3 d, onset day 28, g 0 (chosen by the developer, not fitted)" = "d18",
+  "Version 1 values (partial: sets α, α/β, both rates and onset)" = "calculator",
+  "Withers et al. 1988 rule: 0.6 Gy/day in 2-Gy fractions after 4 weeks (partial: α 0.2 chosen, follows α/β)" = "withers",
+  "Hartley et al. 2011: α 0.3/Gy, doubling time 3 d, onset day 22 elapsed (partial)" = "hartley",
+  "HYHOPE protocol: α 0.35/Gy, doubling time 3 d, onset day 21 (partial)" = "hyhope",
   "Custom (edited values)" = "custom")
-
-# Point values of the verified-trial refit (fit/export_draws.py): medians of the
-# identified DI quantities, and the calibrated-DD rate median (DD is calibrated to
-# DI at the anchor, as in the sidebar's default DD mode). Offered as a preset;
-# not part of the sensitivity set.
-REFIT <- jsonlite::fromJSON(file.path(DRAWS_DIR, "refit_point_values.json"))$values
+# Short names of the active tumor profile, for banners and the main page.
+PROFILE_NAMES <- c(refit = "trial-fit point scenario", d18 = "scenario D18", calculator = "version 1 values",
+                   withers = "Withers 1988 rule", hartley = "Hartley 2011", hyhope = "HYHOPE protocol",
+                   custom = "custom values")
 # The refit explainer (docs/refit_explainer, built into www/ and served at the site root).
 REFIT_EXPLAINER_HTML <- "refit_explainer.html"
 REFIT_EXPLAINER_DOCX <- "refit_explainer.docx"
-refit_preset <- function() list(alpha = REFIT$di$alpha, ab = REFIT$di$ab, lambda_di = REFIT$di$lambda,
-                                Tk = REFIT$di$Tk, g = REFIT$di$g, lambda_dd = REFIT$dd$lambda)
-refit_dd_values <- function() list(alpha_dd = REFIT$dd$alpha, lambda_dd = REFIT$dd$lambda,
-                                   c_over_alpha_dd = REFIT$dd$c_over_alpha, g_dd = REFIT$dd$g)
+# The values a complete profile sets (all six tumor fields).
+profile_values <- function(name) switch(name, refit = REFIT_PROFILE$values, d18 = d18_profile(), NULL)
+# Values of the directly entered ("fitted") DD mode: the refit's DD point values, or, if
+# they cannot be read, the D18 rate with a neutral onset constant (the mode is then hidden).
+DD_DIRECT <- if (REFIT_OK) REFIT_PROFILE$dd_values else
+  list(alpha_dd = 0.35, lambda_dd = 0.4, c_over_alpha_dd = 50, g_dd = 0)
 
 WEEKDAYS_IN <- c("Monday" = 1, "Tuesday" = 2, "Wednesday" = 3, "Thursday" = 4, "Friday" = 5, "Saturday" = 6)
 
@@ -99,7 +107,8 @@ COMPARATOR_LABELS <- c(
   "HYPNO test arm: 55 Gy in 20 fractions (26 days)" = "hypno_test",
   "HYPNO control arm: 66 Gy in 33 fractions, 6 fractions/week (38 days)" = "hypno_control")
 
-DEF <- default_params()
+# Startup values: toxicity values from default_params(), tumor values from the startup profile.
+DEF <- modifyList(default_params(), STARTUP$values)
 # A difference smaller than this is reported as "about the same" in words
 # (plan workstream C, item 7); tables keep full values.
 VERDICT_TOL <- 0.5
@@ -211,7 +220,7 @@ V3_REGIMEN_PANELS <- list(
 # Model parameters (Model settings page).
 V3_SETTINGS_PANELS <- list(
       accordion_panel("Tumor (DI and DD models)",
-        selectInput("preset", "Parameter preset", PRESET_LABELS, selected = DEFAULT_PRESET),
+        selectInput("preset", "Parameter preset", PRESET_LABELS, selected = STARTUP$name),
         uiOutput("preset_note"),
         num("alpha", "α, tumor cell killing (1/Gy)", DEF$alpha, 0.01, 2, 0.01),
         num("ab", "α/β, tumor (Gy)", DEF$ab, 0.5, 100, 1),
@@ -221,11 +230,11 @@ V3_SETTINGS_PANELS <- list(
         num("g", "Background tumor growth rate g (1/day, 0 = off)", DEF$g, 0, 0.1, 0.001),
         radioButtons("dd_mode", "DD model",
                      c("Calibrated to DI at the anchor (versions 1-2; default)" = "calibrated",
-                       "Refit point values, entered directly (no calibration)" = "fitted")),
+                       if (REFIT_OK) c("Refit point values, entered directly (no calibration)" = "fitted"))),
         conditionalPanel("input.dd_mode == 'fitted'",
-          num("alpha_dd", "DD α (1/Gy)", REFIT$dd$alpha, 0.001, 2, 0.001),
-          num("c_over_alpha_dd", "DD onset constant C/α (Gy)", REFIT$dd$c_over_alpha, 0.01, 1e5, 1),
-          num("g_dd", "DD background growth (1/day)", REFIT$dd$g, 0, 0.1, 0.001),
+          num("alpha_dd", "DD α (1/Gy)", DD_DIRECT$alpha_dd, 0.001, 2, 0.001),
+          num("c_over_alpha_dd", "DD onset constant C/α (Gy)", DD_DIRECT$c_over_alpha_dd, 0.01, 1e5, 1),
+          num("g_dd", "DD background growth (1/day)", DD_DIRECT$g_dd, 0, 0.1, 0.001),
           helpText("This mode uses its own α, onset constant and growth, and the maximum rate above; no calibration.",
                    "The values shown are the refit's: its DD rate median with the onset constant that makes DD equal DI",
                    "at 35 × 2 Gy in 47 days under the refit's DI medians. Changing the DI values does not change them.")),
@@ -529,9 +538,9 @@ server <- function(input, output, session) {
   last_ab <- reactiveVal(10)
   observeEvent(input$preset, {
     if (input$preset == "custom") return()
-    if (input$preset == "refit") {
-      pr <- refit_preset()
-      for (k in names(pr)) updateNumericInput(session, k, value = pr[[k]])
+    pr <- profile_values(input$preset)
+    if (!is.null(pr)) {   # a complete profile sets all six tumor fields
+      for (k in TUMOR_FIELDS) updateNumericInput(session, k, value = pr[[k]])
       return()
     }
     ab <- input$ab
@@ -541,11 +550,11 @@ server <- function(input, output, session) {
   }, ignoreInit = TRUE)
 
   # Show which preset the current tumor values match, or "custom".
-  observeEvent(list(input$alpha, input$lambda_di, input$Tk, input$ab, input$lambda_dd), {
+  observeEvent(list(input$alpha, input$lambda_di, input$Tk, input$ab, input$lambda_dd, input$g), {
     ab <- input$ab
     # While a field is being retyped it is empty (NA); keep the preset as it is.
-    vals <- c(input$alpha, input$lambda_di, input$Tk, ab)
-    if (length(vals) < 4 || any(!is.finite(vals))) return()
+    vals <- c(input$alpha, input$lambda_di, input$Tk, ab, input$lambda_dd, input$g)
+    if (length(vals) < 6 || any(!is.finite(vals))) return()
     if (identical(input$preset, "withers") &&
         !isTRUE(all.equal(ab, last_ab()))) {
       last_ab(ab)
@@ -553,18 +562,21 @@ server <- function(input, output, session) {
       return()
     }
     if (is.numeric(ab) && is.finite(ab)) last_ab(ab)
-    now <- preset_matching(input$alpha, input$lambda_di, input$Tk, ab = ab, lambda_dd = input$lambda_dd)
-    rp <- refit_preset()
-    if (isTRUE(all.equal(c(input$alpha, input$lambda_di, input$Tk, ab), c(rp$alpha, rp$lambda_di, rp$Tk, rp$ab), tolerance = 1e-6)))
-      now <- "refit"
+    now <- profile_matching(tumor_values(), REFIT_PROFILE$values)
     if (!identical(now, input$preset)) updateSelectInput(session, "preset", selected = now)
   }, ignoreInit = TRUE)
   observeEvent(input$dd_mode, {
     if (identical(input$dd_mode, "fitted")) {
-      v <- refit_dd_values()
-      for (k in names(v)) updateNumericInput(session, k, value = v[[k]])
+      for (k in names(DD_DIRECT)) updateNumericInput(session, k, value = DD_DIRECT[[k]])
     }
   }, ignoreInit = TRUE)
+
+  # The six tumor values as entered (NA while a field is empty).
+  tumor_values <- function() setNames(lapply(TUMOR_FIELDS, function(k) {
+    v <- input[[k]]; if (is.numeric(v) && length(v) == 1) v else NA_real_ }), TUMOR_FIELDS)
+  # Name of the profile the values in use match (not the menu's last choice), so a label
+  # never names a profile whose values are not the ones used (review 4.1).
+  active_profile <- reactive(profile_matching(params()[TUMOR_FIELDS], REFIT_PROFILE$values))
 
   params <- reactive({
     list(alpha = checked("alpha"), ab = checked("ab"),
@@ -644,12 +656,12 @@ server <- function(input, output, session) {
                      params()$lambda_e)))
   output$preset_note <- renderUI({
     keeps_dd <- "It keeps the DD maximum rate entered below."
+    sm <- REFIT_PROFILE$summary; rv <- REFIT_PROFILE$values
     txt <- switch(input$preset,
-      d18 = paste("The default. Scenario D18 was chosen by the developer on 2026-10-18 and is not fitted to",
-                  "outcome data. Its DI values are within published ranges: repopulation at 0.23 per day",
-                  "(doubling time 3.0 days) from day 28, a loss of 0.66 Gy₁₀ of tumor BED per day, at the low",
-                  "end of published estimates. Its DD maximum rate (0.40 per day) is a constructed value, not",
-                  "a published DD estimate. See \"Model and sources\"."),
+      d18 = paste("Scenario D18 was chosen by the developer on 2026-10-18 and is not fitted to outcome data. Its DI",
+                  "values are within published ranges: repopulation at 0.23 per day (doubling time 3.0 days) from",
+                  "day 28, a loss of 0.66 Gy₁₀ of tumor BED per day, at the low end of published estimates. Its DD",
+                  "maximum rate (0.40 per day) is a constructed value, not a published DD estimate. It sets g = 0."),
       calculator = paste("The tumor values of the published version 1 website: α 0.2/Gy, DI repopulation 0.2 per",
                          "day from day 28 (a loss of 1.0 Gy₁₀ per day) and DD maximum rate 0.5 per day."),
       withers = paste("Withers et al. 1988 supply the rule: repopulation compensated by about 0.6 Gy per day, in",
@@ -659,19 +671,18 @@ server <- function(input, output, session) {
       hartley = paste("Hartley et al. 2011: α 0.3/Gy, α/β 10 Gy, doubling time 3 days, onset on elapsed day 22",
                       "(day 23 in this calculator's count).", keeps_dd),
       hyhope = paste("HYHOPE protocol: α 0.35/Gy, α/β 10 Gy, doubling time 3 days, onset day 21.", keeps_dd),
-      refit = sprintf(paste("Medians of the Bayesian refit to randomized fractionation trials (mainly without chemotherapy), re-extracted from",
-                            "the trial publications (2026-10-25; one intercept per trial, overdispersion): α %.3f/Gy,",
-                            "repopulation loss %.2f Gy₁₀/day after day %.0f, plus background growth %.2f Gy₁₀/day over the",
-                            "whole course, and DD maximum rate %.2f per day (DD calibrated to DI at the anchor). α/β is not",
-                            "informed by these data and stays 10 Gy. A small aggregate α may reflect variation between",
-                            "patients, mixed endpoints and the model's form. Not the default."),
-                      REFIT$di$alpha, REFIT$di$loss_per_day_after_onset, REFIT$di$Tk, REFIT$di$growth_loss_per_day,
-                      REFIT$dd$lambda),
+      refit = if (REFIT_OK) sprintf(paste("The default. A single point from the Bayesian refit to randomized fractionation",
+                            "trials without concurrent chemotherapy: posterior medians of α (%.4f/Gy), the repopulation",
+                            "loss (%.2f Gy₁₀ per day after day %.1f), background growth (%.3f per day, %.2f Gy₁₀ per day over",
+                            "the whole course) and the calibrated DD maximum rate (%.3f per day). α/β is not informed by",
+                            "these data and is set to 10 Gy. It is one point: the Uncertainty page and the refit-support",
+                            "column use the full set of parameter samples."),
+                      rv$alpha, sm$loss_per_day_after_onset, rv$Tk, rv$g, sm$growth_loss_per_day, rv$lambda_dd) else "",
       custom = "The tumor values below were edited and match no preset.",
       "")
-    helpText(txt, paste("A preset fills only the values it sets (named above). The menu shows Custom when",
-                        "one of those values is edited. Values a preset does not set (the DD maximum rate for",
-                        "the Withers, Hartley and HYHOPE presets, and g for all presets except the refit) keep what is entered."))
+    helpText(txt, paste("The trial-fit point scenario and scenario D18 set all six tumor values. The other presets",
+                        "set only the values named (partial): the DD maximum rate for the Withers, Hartley and HYHOPE",
+                        "presets, and g for all of them, keep what is entered. The menu shows Custom when a value is edited."))
   })
   output$tumor_note <- renderUI({
     p <- params()
@@ -1050,7 +1061,7 @@ server <- function(input, output, session) {
   # Interface choices saved with an export. They do not change the result, so
   # an invalid Results-tab regimen is recorded as absent rather than blocking.
   export_context <- function() {
-    list(comparator = choice_or("comparator", "custom"), preset = input$preset,
+    list(comparator = choice_or("comparator", "custom"), preset = active_profile(),
          early_mode = input$early_mode, late_mode = choice_or("late_mode", "reference"),
          chemo = isTRUE(input$chemo), calendar = calendar(), dd_mode = choice_or("dd_mode", "calibrated"),
          regimen_evaluated = tryCatch(regimen(), error = function(e) NULL))
@@ -1292,15 +1303,14 @@ server <- function(input, output, session) {
     if (is.null(r) || is.null(rf)) return(div(class = "alert alert-danger", "Check the regimen inputs."))
     p <- params(); an <- anchor()
     dd <- if (identical(p$dd_mode, "fitted")) "DD values entered directly (not calibrated)" else sprintf("DD calibrated at %s", regimen_text(an))
-    pre <- names(PRESET_LABELS)[PRESET_LABELS == input$preset]
     sup <- tumor_data_support()
     extrap <- if (r$d > sup$d_max + 1e-9 || r$d < sup$d_min - 1e-9)
       tags$div(tags$strong("Extrapolation: "), sprintf("%g Gy per fraction is outside the tumor data (%g-%g Gy per fraction).",
                                                       r$d, sup$d_min, sup$d_max))
     div(class = "alert alert-primary", style = "padding:0.45rem 0.8rem; margin-bottom:0.5rem;",
         tags$strong("Evaluating "), regimen_text(r), tags$strong(" against "), regimen_text(rf),
-        sprintf(" · tumor threshold %+g Gy · %s · tumor preset: %s", checked("min_gain"), dd,
-                if (length(pre)) sub(" \\(.*$", "", sub(":.*$", "", pre)) else input$preset), extrap)
+        sprintf(" · tumor threshold %+g Gy · %s · tumor values: %s", checked("min_gain"), dd,
+                PROFILE_NAMES[[active_profile()]]), extrap)
   })
 
   limit_values <- reactive({
@@ -1515,17 +1525,21 @@ server <- function(input, output, session) {
   })
 
   output$home_settings <- renderUI({
-    p <- params(); d <- default_params()
+    p <- params(); d <- DEF
     keys <- setdiff(intersect(names(d), names(p)), "clock_e")
     same <- isTRUE(all.equal(unlist(p[keys]), unlist(d[keys]), tolerance = 1e-9)) &&
       identical(p$clock_e, d$clock_e) && identical(p$dd_mode, "calibrated") &&
       isTRUE(all.equal(unlist(anchor()), unlist(default_anchor())))
-    preset <- names(PRESET_LABELS)[PRESET_LABELS == input$preset]
-    preset <- if (length(preset)) sub(":.*| \\(.*", "", preset) else "custom"
+    prof <- active_profile()
+    what <- switch(prof,
+      refit = "the trial-fit point scenario (medians of the Bayesian refit to randomized trials, one point; refit support uses all samples)",
+      d18 = "scenario D18 (chosen by the developer, not fitted to outcome data)",
+      PROFILE_NAMES[[prof]])
     div(class = "v4-settings text-muted",
-        if (same) tags$span("Model settings: defaults. The tumor values (scenario D18) were chosen by the developer and are",
-                            "not fitted to outcome data. A fit to randomized trials is available as a preset.") else
-          tags$span(tags$strong("Model settings changed"), sprintf("(tumor preset: %s).", preset)),
+        if (nzchar(STARTUP$why)) div(class = "alert alert-warning", sprintf(paste(
+          "The trial-fit point values could not be read (%s), so the calculator started with scenario D18."), STARTUP$why)),
+        if (same) tags$span(sprintf("Model settings: defaults. Tumor values: %s.", what)) else
+          tags$span(tags$strong("Model settings changed."), sprintf("Tumor values: %s.", what)),
         actionLink("open_settings", "View or change the settings"))
   })
 

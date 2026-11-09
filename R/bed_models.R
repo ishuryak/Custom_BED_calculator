@@ -444,7 +444,35 @@ default_params <- function() {
 legacy_params <- function() modifyList(default_params(), resolve_preset("calculator"))
 
 DEFAULT_EARLY_MODE <- "hypno"
-DEFAULT_PRESET <- "d18"
+# The tumor profile the app starts with (version 4.5.0): the trial-fit point scenario,
+# or scenario D18 when the trial-fit point values cannot be read (startup_profile()).
+DEFAULT_PRESET <- "refit"
+
+# The six tumor fields. A complete profile (D18, trial-fit point) sets all six, so
+# choosing it never keeps a value of the previous profile (review 4.1, 2026-11-09).
+TUMOR_FIELDS <- c("alpha", "ab", "lambda_di", "lambda_dd", "Tk", "g")
+COMPLETE_PROFILES <- c("d18", "refit")
+d18_profile <- function() modifyList(tumor_presets()$d18, list(g = 0))
+
+# Name of the profile or preset the six tumor values match, or "custom". Complete
+# profiles must match all six fields. The partial literature presets keep their
+# documented meaning: they match on the fields they set (g and, for some, the DD
+# rate are not part of them).
+profile_matching <- function(vals, refit = NULL, tol = 1e-6) {
+  v <- vals[TUMOR_FIELDS]
+  if (any(vapply(v, function(x) !is.numeric(x) || length(x) != 1 || !is.finite(x), logical(1)))) return("custom")
+  # Field by field (all.equal on the vector would average the six relative differences).
+  near <- function(a, b) all(abs(a - b) <= tol * pmax(abs(b), 1e-3))
+  same <- function(pr) near(unlist(v[TUMOR_FIELDS]), unlist(pr[TUMOR_FIELDS]))
+  if (!is.null(refit) && same(refit)) return("refit")
+  if (same(d18_profile())) return("d18")
+  for (nm in setdiff(names(tumor_presets()), COMPLETE_PROFILES)) {
+    pr <- resolve_preset(nm, v$ab)
+    keys <- intersect(names(pr), TUMOR_FIELDS)
+    if (near(unlist(v[keys]), unlist(pr[keys]))) return(nm)
+  }
+  "custom"
+}
 
 default_ref <- function() list(m = 35, d = 2, T = 47)
 
@@ -454,23 +482,6 @@ default_ref <- function() list(m = 35, d = 2, T = 47)
 search_range_for_ref <- function(ref_m) {
   hi <- max(1, ref_m - 1)
   c(min(5, hi), hi)
-}
-
-# Name of the preset whose values equal the given ones, or "custom". A preset
-# matches when every field it sets agrees (the Withers rule is evaluated at
-# the given ab); fields it does not set are ignored.
-preset_matching <- function(alpha, lambda_di, Tk, ab = 10, lambda_dd = NULL) {
-  vals <- list(alpha = alpha, lambda_di = lambda_di, Tk = Tk, ab = ab, lambda_dd = lambda_dd)
-  given <- unlist(vals)
-  if (!is.numeric(given) || length(given) < 4 || any(!is.finite(given))) return("custom")
-  for (nm in names(tumor_presets())) {
-    pr <- resolve_preset(nm, ab)
-    keys <- intersect(names(pr), names(vals))
-    keys <- keys[!vapply(vals[keys], is.null, logical(1))]
-    if (!all(c("alpha", "lambda_di", "Tk") %in% keys)) next
-    if (isTRUE(all.equal(unlist(vals[keys]), unlist(pr[keys]), tolerance = 1e-6))) return(nm)
-  }
-  "custom"
 }
 
 # Definitions of the sensitivity scenarios: every tumor preset at each tumor

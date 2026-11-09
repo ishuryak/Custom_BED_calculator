@@ -42,6 +42,38 @@ tumor_data_support <- function(path = NULL, dir = DRAWS_DIR) {
        n_arms = nrow(x), n_studies = length(unique(x$first_author)), file = basename(path))
 }
 
+# The trial-fit point scenario as a complete tumor profile (draws/refit_point_values.json,
+# written by fit/export_draws.py). Returns list(ok, values, dd_values, summary, why); ok is
+# FALSE, with the reason in why, when the
+# file is missing or any of the six values is absent or not a positive finite number
+# (g may be 0), so the app can start on scenario D18 and say why instead of labeling D18
+# values as the refit (review 4.1, 2026-11-09).
+refit_profile <- function(dir = DRAWS_DIR) {
+  fail <- function(why) list(ok = FALSE, values = NULL, dd_values = NULL, summary = NULL, why = why)
+  f <- file.path(dir, "refit_point_values.json")
+  v <- tryCatch(jsonlite::fromJSON(f)$values, error = function(e) NULL)
+  if (is.null(v)) return(fail(paste("cannot read", f)))
+  num <- function(x) if (is.numeric(x) && length(x) == 1 && is.finite(x)) x else NA_real_
+  pr <- list(alpha = num(v$di$alpha), ab = num(v$di$ab), lambda_di = num(v$di$lambda),
+             lambda_dd = num(v$dd$lambda), Tk = num(v$di$Tk), g = num(v$di$g))
+  dd <- list(alpha_dd = num(v$dd$alpha), lambda_dd = num(v$dd$lambda),
+             c_over_alpha_dd = num(v$dd$c_over_alpha), g_dd = num(v$dd$g))
+  bad <- c(names(pr)[is.na(unlist(pr)) | unlist(pr) < 0 | (unlist(pr) == 0 & names(pr) != "g")],
+           names(dd)[is.na(unlist(dd)) | unlist(dd) < 0])
+  if (length(bad)) return(fail(paste("missing or invalid value(s):", paste(unique(bad), collapse = ", "))))
+  list(ok = TRUE, values = pr, dd_values = dd, why = "",
+       summary = list(loss_per_day_after_onset = num(v$di$loss_per_day_after_onset),
+                      growth_loss_per_day = num(v$di$growth_loss_per_day),
+                      onset_dd_at_anchor = num(v$dd$onset_at_anchor_days)))
+}
+
+# The profile the app starts with: the trial-fit point scenario when it can be read,
+# else scenario D18 (with the reason, shown on the main page).
+startup_profile <- function(rp = refit_profile()) {
+  if (isTRUE(rp$ok)) list(name = "refit", values = rp$values, why = "")
+  else list(name = "d18", values = d18_profile(), why = rp$why)
+}
+
 # Read a draws file and check its columns and SHA-256 against the manifest.
 load_draws <- function(model = c("di", "dd"), variant = "primary", dir = DRAWS_DIR) {
   model <- match.arg(model)

@@ -58,8 +58,9 @@ test_that("Withers preset follows the tumor alpha/beta", {
   expect_equal(withers_lambda(0.2, 10) / 0.2, 0.72, tolerance = 1e-12)
   q <- modifyList(p, list(ab = 5, lambda_di = withers_lambda(0.2, 5)))
   expect_equal(compute_all(35, 2, 47, q, std)$bed_di, 82.04, tolerance = 1e-6)
-  expect_equal(preset_matching(0.2, withers_lambda(0.2, 5), 28, ab = 5), "withers")
-  expect_equal(preset_matching(0.2, 0.144, 28, ab = 5), "custom")
+  six <- function(...) modifyList(d18_profile(), list(...))
+  expect_equal(profile_matching(six(alpha = 0.2, lambda_di = withers_lambda(0.2, 5), ab = 5)), "withers")
+  expect_equal(profile_matching(six(alpha = 0.2, lambda_di = 0.144, ab = 5)), "custom")
 })
 
 test_that("source presets carry their published values and clocks", {
@@ -76,9 +77,10 @@ test_that("source presets carry their published values and clocks", {
   a <- compute_all(c(35, 20, 33), c(2, 2.75, 2), c(47, 26, 38), q, std)
   expect_equal(a$bed_di, c(71.51428571, 70.12445771, 72.62857143), tolerance = 1e-8)
   expect_equal(a$bed_dd, c(71.51428571, 62.84730123, 68.64033914), tolerance = 1e-8)
-  expect_equal(preset_matching(0.35, 0.23, 28, ab = 10, lambda_dd = 0.4), "d18")
-  expect_equal(preset_matching(0.35, 0.23, 28, ab = 10, lambda_dd = 0.5), "custom")
-  expect_equal(preset_matching(0.2, 0.2, 28, ab = 10, lambda_dd = 0.5), "calculator")
+  six <- function(...) modifyList(d18_profile(), list(...))
+  expect_equal(profile_matching(six()), "d18")
+  expect_equal(profile_matching(six(lambda_dd = 0.5)), "custom")
+  expect_equal(profile_matching(six(alpha = 0.2, lambda_di = 0.2, lambda_dd = 0.5)), "calculator")
 })
 
 # --- 4. Search validity and trial-design options -----------------------------

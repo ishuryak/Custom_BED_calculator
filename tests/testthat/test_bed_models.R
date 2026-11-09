@@ -376,10 +376,11 @@ test_that("search range follows the reference number of fractions", {
 })
 
 test_that("preset matching recognizes presets and edited values", {
+  six <- function(...) modifyList(d18_profile(), list(...))
   pr <- tumor_presets()
-  for (nm in names(pr)) expect_equal(preset_matching(pr[[nm]]$alpha, pr[[nm]]$lambda_di, pr[[nm]]$Tk), nm)
-  expect_equal(preset_matching(0.2, 0.2, 27), "custom")
-  expect_equal(preset_matching(0.21, 0.2, 28), "custom")
-  expect_equal(preset_matching(NA, 0.2, 28), "custom")
-  expect_equal(preset_matching(0.35, round(log(2) / 3, 7), 21), "hyhope")  # value echoed by the browser
+  for (nm in names(pr)) expect_equal(profile_matching(modifyList(d18_profile(), resolve_preset(nm))), nm)
+  expect_equal(profile_matching(six(alpha = 0.2, lambda_di = 0.2, Tk = 27, lambda_dd = 0.5)), "custom")
+  expect_equal(profile_matching(six(alpha = 0.21, lambda_di = 0.2, lambda_dd = 0.5)), "custom")
+  expect_equal(profile_matching(six(alpha = NA_real_)), "custom")
+  expect_equal(profile_matching(six(lambda_di = round(log(2) / 3, 7), Tk = 21)), "hyhope")  # value echoed by the browser
 })
