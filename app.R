@@ -89,6 +89,10 @@ PROFILE_NAMES <- c(refit = "trial-fit point scenario", d18 = "scenario D18", cal
 # The refit explainer (docs/refit_explainer, built into www/ and served at the site root).
 REFIT_EXPLAINER_HTML <- "refit_explainer.html"
 REFIT_EXPLAINER_DOCX <- "refit_explainer.docx"
+# The short clinician text on how the tumor model was fitted (review 3, 2026-11-09), opened from
+# the main page, the Uncertainty page and Settings and sources.
+REFIT_BRIEF <- markdown::mark(file = "refit_in_brief.md")
+how_fitted_link <- function(id) actionLink(id, "How was the tumor model fitted?", class = "v4-how-fitted")
 # The values a complete profile sets (all six tumor fields).
 profile_values <- function(name) switch(name, refit = REFIT_PROFILE$values, d18 = d18_profile(), NULL)
 # Values of the directly entered ("fitted") DD mode: the refit's DD point values, or, if
@@ -383,11 +387,12 @@ V45_PAGES <- list(
       div(class = "table-scroll", style = "overflow-x: auto;", tableOutput("sens_table")),
       h5("Toxicity BED differences (do not depend on the tumor setting)"),
       tableOutput("sens_tox")))),
-    nav_panel("Uncertainty", page_head("Uncertainty", "unc"), unc_ui("unc")),
+    nav_panel("Uncertainty", page_head("Uncertainty", "unc"), how_fitted_link("how_fitted_unc"), unc_ui("unc")),
     nav_panel("Organs at risk", page_head("Organs at risk", "oar"), oar_ui("oar")),
     nav_panel("Settings and sources",
       page_head("Settings and sources", "settings",
                 "Parameters used by every page, including the main list of regimens, and where each comes from."),
+      how_fitted_link("how_fitted_settings"),
       navset_underline(id = "settings_tabs",
         nav_panel("Model settings",
       do.call(accordion, c(V3_SETTINGS_PANELS, list(id = "settings_inputs", open = "Tumor (DI and DD models)")))),
@@ -1572,9 +1577,8 @@ server <- function(input, output, session) {
     else if (!us$di && us$dd)
       div(class = "alert alert-warning", "The standard's DI tumor BED is not positive with these settings, so the DI model",
           "cannot be used for comparison and only the DD model was used.")
-    if (n > 0) return(tagList(dd_note, p(sprintf(paste(
-      "%d schedules qualify, from %d down to %d fractions. Each row gives the range of doses per fraction, checked in",
-      "0.05 Gy steps, that meets all three conditions."), n, max(s$m), min(s$m)))))
+    if (n > 0) return(tagList(dd_note, p(paste(v4_count_text(nrow(home_points()), n, s$m),
+      "Each row gives the range of doses per fraction, checked in 0.05 Gy steps, that meets all three conditions."))))
     div(class = "alert alert-warning",
         "No schedule of 5 to 30 fractions (5 a week, doses in 0.05 Gy steps) meets all three conditions with the current limits and model settings.",
         v4_empty_reason(h$reason))
@@ -1589,16 +1593,22 @@ server <- function(input, output, session) {
       `Dose per fraction (Gy)` = s$dose,
       `Total dose (Gy)` = s$total,
       `Time (days)` = sprintf("%g (%g fewer)", s$T, s$saved),
-      x = paste(s$d_di, "/", s$d_dd),
+      x = {
+        q <- v4_eqd2_ranges(home_points(), p$ab); q <- q[match(s$m, q$m), ]
+        paste(q$di, "/", q$dd)
+      },
       y = s$d_early,
       z = s$d_late,
       check.names = FALSE)
-    names(tbl)[5:7] <- c(sprintf("Tumor BED change, DI / DD (%s)", bed_unit(p$ab)),
+    # Tumor change in Gy EQD2 (review 4.2): the selection itself stays in BED.
+    names(tbl)[5:7] <- c(sprintf("Tumor dose change, DI / DD (Gy EQD2, α/β %g)", p$ab),
                          sprintf("Early toxicity BED change (%s)", bed_unit(p$ab_e)),
                          sprintf("Late toxicity BED change (%s)", bed_unit(p$ab_l)))
-    # Refit support is always shown (version 4.4.0); the model column and Notes stay under Details.
+    # Refit support and cautions are always shown; the model column, BED and Notes stay under Details.
     tbl$`Refit support` <- ifelse(nzchar(s$support), s$support, "not available")
+    tbl$`Caution` <- v4_caution(s)
     if (isTRUE(input$home_details)) {
+      tbl$`Tumor BED change, DI / DD` <- sprintf("%s / %s %s", s$d_di, s$d_dd, bed_unit(p$ab))
       tbl$`Tumor condition holds in` <- s$models
       tbl$`Notes` <- s$notes
     }
@@ -1711,13 +1721,17 @@ server <- function(input, output, session) {
 
   # The trials of the Bayesian refit, in a dialog opened from Details (version 4.4.0).
   observeEvent(input$home_trials, {
-    t <- v4_fit_trials()
-    showModal(modalDialog(
-      title = sprintf("Trials the tumor models were refitted to (%d trials, %d arms or strata)",
-                      length(unique(t$pmid)), nrow(t)),
-      size = "xl", easyClose = TRUE, footer = modalButton("Close"),
-      v4_fit_trials_intro(t, REFIT_EXPLAINER_HTML),
-      v4_fit_trials_table(t)))
+    # A failed reference check shows "list unavailable", never a wrong citation (review 2.3).
+    dlg <- v4_fit_trials_dialog(REFIT_EXPLAINER_HTML)
+    showModal(modalDialog(title = dlg$title, size = "xl", easyClose = TRUE, footer = modalButton("Close"), dlg$body))
+  })
+  for (id in c("how_fitted_home", "how_fitted_unc", "how_fitted_settings")) local({
+    id <- id
+    observeEvent(input[[id]], showModal(modalDialog(
+      title = "How the tumor model was fitted", size = "l", easyClose = TRUE, footer = modalButton("Close"),
+      HTML(sub("<h3>[^<]*</h3>", "", REFIT_BRIEF)),
+      tags$p(tags$a(href = REFIT_EXPLAINER_HTML, target = "_blank", rel = "noopener", "The full refit explainer"),
+             "gives the equations, priors, diagnostics and every fitted arm."))))
   })
 
   home_selected <- reactive({

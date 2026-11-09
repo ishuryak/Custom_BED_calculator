@@ -189,3 +189,57 @@ test_that("the menu has six destinations including the main page, and every form
            "sens_tox", "sens_summary", "preset", "alpha", "g", "dd_mode", "anchor_m", "about", "home_table")
   for (id in ids) expect_equal(lengths(regmatches(html, gregexpr(sprintf("id=\"%s\"", id), html))), 1, info = id)
 })
+
+# --- 4.1 / 4.2: counts, visible cautions, EQD2 display ----------------------------------------
+
+test_that("the count names dose and fraction combinations, for zero, one and many rows", {
+  expect_identical(v4_count_text(0, 0, integer()), "No dose and fraction combination qualifies.")
+  expect_identical(v4_count_text(1, 1, 20L), "1 dose and fraction combination qualifies, all with 20 fractions.")
+  expect_identical(v4_count_text(60, 15, 30:16),
+                   "60 dose and fraction combinations qualify, across 15 numbers of fractions (30 down to 16).")
+})
+
+test_that("EQD2 is a display of the same BED change: no eligibility or support changes (review 4.2)", {
+  expect_equal(v4_eqd2(5, 10), 4.1666667, tolerance = 1e-7)
+  expect_equal(v4_eqd2(5, 7), 3.8888889, tolerance = 1e-7)
+  expect_equal(v4_eqd2(5, 15), 4.4117647, tolerance = 1e-7)
+  expect_equal(v4_eqd2(5, 2.5), 2.7777778, tolerance = 1e-7)
+  expect_true(is.na(v4_eqd2(NA_real_, 10)))
+  withr::with_dir(app_abs, {
+    p <- modifyList(default_params(), refit_vals)
+    pts <- v4_regimens(p)$rows
+    q <- v4_eqd2_ranges(pts, p$ab)
+    x <- pts[pts$m == 18, ]
+    expect_identical(q$di[q$m == 18], v4_signed_range(x$d_di / 1.2))
+    expect_identical(q$m, sort(unique(pts$m), decreasing = TRUE))
+  })
+  shiny::testServer(app_dir, {
+    do.call(session$setInputs, modifyList(modifyList(v45_inputs, refit_vals), list(preset = "refit")))
+    tb <- output$home_table
+    expect_match(tb, "Tumor dose change, DI / DD (Gy EQD2, α/β 10)", fixed = TRUE)
+    expect_equal(nrow(home_points()), 69)                         # the trial-fit list (review 4.1 fixture)
+    expect_equal(sum(home_points()$qual_di & home_points()$qual_dd), 65)
+    # Extrapolation and low support are visible without Details.
+    expect_match(tb, "Caution", fixed = TRUE)
+    cau <- v4_caution(home_rows())
+    expect_true(all(grepl("outside trial data", cau[home_rows()$m <= 15])))
+    expect_true(any(grepl("support < 80%", cau, fixed = TRUE)))
+    expect_false(any(grepl("HYPNO test arm", cau, fixed = TRUE)))   # trial labels stay in Notes
+  })
+})
+
+test_that("D18 and the trial-fit point reproduce the review's fixtures (review 4.1)", {
+  withr::with_dir(app_abs, {
+    a <- v4_regimens(modifyList(default_params(), d18_profile()))$rows
+    b <- v4_regimens(modifyList(default_params(), refit_vals))$rows
+    key <- function(x) sprintf("%d/%.2f", x$m, x$d)
+    expect_equal(c(nrow(a), nrow(b)), c(60, 69))
+    expect_equal(length(intersect(key(a), key(b))), 58)
+    expect_setequal(setdiff(key(a), key(b)), c("19/2.75", "21/2.55"))
+    expect_equal(c(sum(a$qual_di & a$qual_dd), sum(b$qual_di & b$qual_dd)), c(17, 65))
+    expect_equal(c(sum(a$qual_di & !a$qual_dd), sum(b$qual_di & !b$qual_dd)), c(43, 4))
+    expect_equal(c(sum(!a$qual_di & a$qual_dd), sum(!b$qual_di & b$qual_dd)), c(0, 0))
+    row <- b[b$m == 18 & abs(b$d - 2.9) < 1e-8, ]
+    expect_equal(v4_refit_support(row, load_draws("di"), load_draws("dd")), 0.66025, tolerance = 1e-10)
+  })
+})

@@ -246,12 +246,12 @@ test_that("the support column and the failure explanations use the limits in for
   })
 })
 
-test_that("the main table has 8 columns, and 10 with Details", {
+test_that("the main table has 9 columns (Caution from 4.5.0), and 12 with Details", {
   shiny::testServer(app_dir, {
     do.call(session$setInputs, v4_defaults)
     n_cols <- function() lengths(regmatches(output$home_table, gregexpr("<th>", output$home_table, fixed = TRUE)))
-    session$setInputs(home_details = FALSE); expect_equal(n_cols(), 8)
-    session$setInputs(home_details = TRUE); expect_equal(n_cols(), 10)
+    session$setInputs(home_details = FALSE); expect_equal(n_cols(), 9)
+    session$setInputs(home_details = TRUE); expect_equal(n_cols(), 12)
   })
 })
 

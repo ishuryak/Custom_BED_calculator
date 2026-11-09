@@ -165,7 +165,7 @@ test_that("F02/F03: the main page text follows the settings and quotes HYPNO cor
       intro <- as.character(output$home_intro$html)
       expect_match(intro, sprintf("at most 5 %s below", bed_unit(b)), fixed = TRUE, info = b)
       expect_match(intro, sprintf("about %.1f Gy in 2-Gy fractions", 5 / (1 + 2 / b)), fixed = TRUE, info = b)
-      if (nrow(home_rows()) > 0) expect_match(output$home_table, sprintf("Tumor BED change, DI / DD (%s)", bed_unit(b)), fixed = TRUE)
+      if (nrow(home_rows()) > 0) expect_match(output$home_table, sprintf("Tumor dose change, DI / DD (Gy EQD2, α/β %g)", b), fixed = TRUE)
     }
     session$setInputs(ab = 10)
     for (b in c(5, 8)) { session$setInputs(ab_e = b)

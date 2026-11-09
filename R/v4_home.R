@@ -294,6 +294,37 @@ v4_range_example <- function(x, p, anchor, r0, margins = V4_MARGINS, grid = V4_G
 # alpha/beta 10 Gy but 2.8 Gy at 2.5 Gy.
 v4_margin_eqd2 <- function(margin, ab) margin / (1 + 2 / ab)
 
+# "60 dose and fraction combinations qualify, across 15 numbers of fractions (30 down to 16)."
+# Counts the qualifying grid points, not rows, so a row is not read as one schedule (review 4.1).
+v4_count_text <- function(n_points, n_rows, m) {
+  if (n_rows == 0) return("No dose and fraction combination qualifies.")
+  combos <- sprintf("%d dose and fraction combination%s %s", n_points, if (n_points == 1) "" else "s",
+                    if (n_points == 1) "qualifies" else "qualify")
+  if (n_rows == 1) sprintf("%s, all with %d fractions.", combos, m[1]) else
+    sprintf("%s, across %d numbers of fractions (%d down to %d).", combos, n_rows, max(m), min(m))
+}
+
+# The cautions of a summary row, shown without Details (review 4.1): its notes without the
+# trial-arm label (extrapolation, acute above HYPNO, low support). Display only: the summary
+# and its exports are unchanged, so saved exports still replay exactly.
+v4_caution <- function(s) vapply(seq_len(nrow(s)), function(i) {
+  n <- strsplit(s$notes[i], "; ", fixed = TRUE)[[1]]
+  paste(setdiff(n, if (nzchar(s$trial[i])) strsplit(s$trial[i], "; ", fixed = TRUE)[[1]]), collapse = "; ")
+}, "")
+
+# Display only (review 4.2, 2026-11-09): a tumor BED change expressed in Gy EQD2 at the same
+# alpha/beta b for regimen and standard, dBED / (1 + 2/b). Full precision until formatted; NA
+# stays NA. Selection, support and exports stay in BED.
+v4_eqd2 <- function(d_bed, ab) d_bed / (1 + 2 / ab)
+# Per number of fractions, the lowest and highest DI and DD tumor change in Gy EQD2, formatted
+# like the BED ranges (one decimal). points: v4_regimens()$rows.
+v4_eqd2_ranges <- function(points, ab) {
+  if (nrow(points) == 0) return(data.frame(m = integer(), di = character(), dd = character()))
+  out <- do.call(rbind, lapply(split(points, points$m), function(x)
+    data.frame(m = x$m[1], di = v4_signed_range(v4_eqd2(x$d_di, ab)), dd = v4_signed_range(v4_eqd2(x$d_dd, ab)))))
+  out[order(-out$m), , drop = FALSE]
+}
+
 # What the two tumor models are in the current settings: calibrated DD at the
 # actual anchor, directly entered DD, zero DI rate, or DD unavailable.
 v4_model_relation <- function(p, anchor) {

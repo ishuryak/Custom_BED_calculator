@@ -200,11 +200,11 @@ test_that("the main page lists the regimens and reacts to the model settings", {
     do.call(session$setInputs, v4_defaults)
     expect_equal(home_rows()$m, 30:16)
     expect_match(as.character(output$home_settings$html), "not fitted to outcome data", fixed = TRUE)
-    expect_match(as.character(output$home_msg$html), "15 schedules qualify, from 30 down to 16 fractions", fixed = TRUE)
+    expect_match(as.character(output$home_msg$html), "60 dose and fraction combinations qualify, across 15 numbers of fractions (30 down to 16).", fixed = TRUE)
     expect_match(as.character(output$home_msg$html), "0.05 Gy", fixed = TRUE)
     expect_false(grepl("DD model is not available", as.character(output$home_msg$html), fixed = TRUE))
     tb <- output$home_table
-    for (h in c("Tumor BED change, DI / DD (Gy₁₀)", "Early toxicity BED change (Gy₁₀)", "Late toxicity BED change (Gy₃)"))
+    for (h in c("Tumor dose change, DI / DD (Gy EQD2, α/β 10)", "Early toxicity BED change (Gy₁₀)", "Late toxicity BED change (Gy₃)"))
       expect_match(tb, h, fixed = TRUE)
     # Details columns and their footnotes are hidden until asked for; Refit support is
     # always shown from version 4.4.0 (test_v44_trials_support.R).

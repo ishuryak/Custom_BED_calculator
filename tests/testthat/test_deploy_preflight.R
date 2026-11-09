@@ -51,7 +51,7 @@ test_that(".Rhistory, .Renviron and the suite marker are neither tracked nor dep
 })
 
 test_that("the bundle check refuses a missing draws manifest and local-only files", {
-  need <- c("app.R", "about.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+  need <- c("app.R", "about.md", "refit_in_brief.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
             file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
   expect_true(check_bundle(need, app_abs))
   expect_error(check_bundle(setdiff(need, "draws/draws_manifest.json"), app_abs), "missing from the bundle")
@@ -62,7 +62,7 @@ test_that("the bundle check refuses a missing draws manifest and local-only file
 
 # Review S6 (2026-10-25): an untracked file could reach the bundle, so the deployed code was not the recorded revision.
 test_that("the bundle check refuses files that are not tracked by git", {
-  need <- c("app.R", "about.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+  need <- c("app.R", "about.md", "refit_in_brief.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
             file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
   expect_true(check_bundle(need, app_abs, tracked = need))
   expect_error(check_bundle(c(need, "R/scratch.R"), app_abs, tracked = need), "not committed to git.*R/scratch.R")
@@ -73,7 +73,7 @@ test_that("the bundle check refuses files that are not tracked by git", {
 # Review 6.4 (2026-11-09): a synthetic bundle without both refit explainer copies was accepted, and the
 # deploy tools library was put on the library path before it existed.
 test_that("the bundle check requires each linked document, present and not empty", {
-  need <- c("app.R", "about.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+  need <- c("app.R", "about.md", "refit_in_brief.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
             file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
   expect_true(check_bundle(need, app_abs))
   for (a in SERVED_ASSETS) expect_error(check_bundle(setdiff(need, a), app_abs), paste0("missing from the bundle.*", a))

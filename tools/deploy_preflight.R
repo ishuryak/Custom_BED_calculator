@@ -38,7 +38,7 @@ deploy_preflight <- function(app_name, expected_app, accounts, account, dirty,
 # explainer copies was accepted). Each must be in the bundle and not empty.
 SERVED_ASSETS <- c("www/refit_explainer.html", "www/refit_explainer.docx")
 check_bundle <- function(files, root = ".", tracked = NULL) {
-  need <- c("app.R", "about.md", SERVED_ASSETS,
+  need <- c("app.R", "about.md", "refit_in_brief.md", SERVED_ASSETS,
             file.path("R", list.files(file.path(root, "R"), pattern = "\\.R$")),
             file.path("data", list.files(file.path(root, "data"))),
             file.path("draws", list.files(file.path(root, "draws"))))
