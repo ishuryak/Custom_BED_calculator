@@ -89,9 +89,12 @@ test_that("E4 (version 3): one caveat line on each of the Report card, Results, 
 test_that("E1 (version 3): the Model and sources page links the v3 source branch and the live version 2", {
   shiny::testServer(app_dir, {
     set_open(session)
-    expect_true(grepl("href=\"https://github.com/ishuryak/Custom_BED_calculator/tree/v3\"",
+    # 4.5.0: the source link is the v4 branch; the retired version 1-3 sites are not linked as live.
+    expect_true(grepl("href=\"https://github.com/ishuryak/Custom_BED_calculator/tree/v4\"",
                       output$about$html, fixed = TRUE))
-    expect_true(grepl("custom_bed_calculator_v2", output$about$html, fixed = TRUE))
+    expect_false(grepl("custom_bed_calculator_v2", output$about$html, fixed = TRUE))
+    expect_false(grepl("{{REFIT_BRIEF}}", output$about$html, fixed = TRUE))
+    expect_true(grepl("Differences between randomized arms", output$about$html, fixed = TRUE))
   })
 })
 
@@ -253,5 +256,5 @@ test_that("D: a new export records the current version and the chosen settings (
 test_that("D: app and DESCRIPTION carry the same version", {
   desc <- read.dcf(file.path(app_abs, "DESCRIPTION"))
   expect_equal(unname(desc[1, "Version"]), APP_VERSION)
-  expect_equal(APP_VERSION, "4.4.0")   # 4.4.0: refit support always shown, fitted-trial list; 4.3.1: refit explainer linked; 4.3.0: review of 4.2.1 (F01-F12); 4.2.1: range explanation under Details; 4.2.0: main page 30 fx max, early/late columns, plot; 4.1.0: v4 review fixes; 4.0.0: simplified layout (main list + menu); 3.2.1: v3.2 review fixes; 3.2.0: 2026-10-26 review (3.1.0 was the verified-trial refit)
+  expect_equal(APP_VERSION, "4.5.0")   # 4.5.0: review of 4.4.0 (trial-fit default, six destinations, EQD2 display); 4.4.0: refit support always shown, fitted-trial list; 4.3.1: refit explainer linked; 4.3.0: review of 4.2.1 (F01-F12); 4.2.1: range explanation under Details; 4.2.0: main page 30 fx max, early/late columns, plot; 4.1.0: v4 review fixes; 4.0.0: simplified layout (main list + menu); 3.2.1: v3.2 review fixes; 3.2.0: 2026-10-26 review (3.1.0 was the verified-trial refit)
 })

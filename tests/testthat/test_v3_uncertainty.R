@@ -161,9 +161,11 @@ test_that("the refit numbers quoted on the About page match the shipped draws", 
   # 3.1: alpha/beta varies by draw, so lambda/alpha and g/alpha are in Gy at each draw's alpha/beta, not Gy10
   di <- load_draws("di", dir = draws_dir)
   q <- function(x) stats::quantile(x, c(.025, .5, .975), names = FALSE)
-  la <- q(di$lambda / di$alpha); ga <- q(di$g / di$alpha); tk <- q(di$Tk)
+  # 4.5.0 (review 3): quoted in Gy EQD2 per day, each draw converted at its own alpha/beta before the quantiles.
+  eq <- 1 + 2 / di$ab
+  la <- q(di$lambda / di$alpha / eq); ga <- q(di$g / di$alpha / eq); tk <- q(di$Tk)
   ab <- paste(readLines(file.path(app_abs, "about.md"), encoding = "UTF-8"), collapse = "\n")
-  expect_true(grepl(sprintf("%.2f Gy per day (95%% interval %.2f–%.2f)", la[2], la[1], la[3]), ab, fixed = TRUE))
+  expect_true(grepl(sprintf("background growth costs %.2f Gy EQD2 per day (95%% interval %.2f–%.2f)", ga[2], ga[1], ga[3]), ab, fixed = TRUE))
+  expect_true(grepl(sprintf("adds %.2f Gy EQD2 per day (%.2f–%.2f)", la[2], la[1], la[3]), ab, fixed = TRUE))
   expect_true(grepl(sprintf("onset near day %.0f (%.0f–%.0f)", tk[2], tk[1], tk[3]), ab, fixed = TRUE))
-  expect_true(grepl(sprintf("%.2f Gy per day (%.2f–%.2f) throughout", ga[2], ga[1], ga[3]), ab, fixed = TRUE))
 })

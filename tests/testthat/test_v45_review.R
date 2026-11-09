@@ -243,3 +243,16 @@ test_that("D18 and the trial-fit point reproduce the review's fixtures (review 4
     expect_equal(v4_refit_support(row, load_draws("di"), load_draws("dd")), 0.66025, tolerance = 1e-10)
   })
 })
+
+test_that("'How was the tumor model fitted?' is offered on Main, Uncertainty and Settings and sources (review 3)", {
+  e <- new.env(); withr::with_dir(app_abs, sys.source("app.R", envir = e))
+  html <- as.character(htmltools::renderTags(e$ui)$html)
+  for (id in c("how_fitted_unc", "how_fitted_settings")) expect_match(html, sprintf("id=\"%s\"", id), fixed = TRUE)
+  expect_match(as.character(e$REFIT_BRIEF), "Differences between randomized arms", fixed = TRUE)
+  shiny::testServer(app_dir, {
+    do.call(session$setInputs, v45_inputs)
+    expect_match(as.character(output$home_settings$html), "id=\"how_fitted_home\"", fixed = TRUE)
+    expect_silent(session$setInputs(how_fitted_home = 1))
+    expect_silent(session$setInputs(home_trials = 1))
+  })
+})

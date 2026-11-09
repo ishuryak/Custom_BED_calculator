@@ -1457,6 +1457,8 @@ server <- function(input, output, session) {
     txt <- gsub("{{VERSIONS}}", sprintf("Version %s of the Custom BED calculator (equations %s, selection rules %s, scenario set %s, uncertainty %s, organs %s).",
                                         APP_VERSION, EQUATION_VERSION, SELECTION_VERSION, SCENARIO_SET_VERSION, UNCERTAINTY_VERSION, OAR_VERSION),
                 txt, fixed = TRUE)
+    txt <- gsub("{{REFIT_BRIEF}}", paste(readLines("refit_in_brief.md", encoding = "UTF-8", warn = FALSE)[-1],
+                                          collapse = "\n"), txt, fixed = TRUE)
     rev <- deployed_revision_text()
     txt <- gsub("{{REVISION}}", rev, txt, fixed = TRUE)
     withMathJax(HTML(markdown::mark(text = txt, options = "+latex_math")))
@@ -1562,7 +1564,7 @@ server <- function(input, output, session) {
           "The trial-fit point values could not be read (%s), so the calculator started with scenario D18."), STARTUP$why)),
         if (same) tags$span(sprintf("Model settings: defaults. Tumor values: %s.", what)) else
           tags$span(tags$strong("Model settings changed."), sprintf("Tumor values: %s.", what)),
-        actionLink("open_settings", "View or change the settings"))
+        actionLink("open_settings", "View or change the settings"), " · ", how_fitted_link("how_fitted_home"))
   })
 
   output$home_msg <- renderUI({

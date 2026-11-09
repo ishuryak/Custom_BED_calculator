@@ -7,6 +7,19 @@
 library(chromote)
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
+# GET a served file with base R and check it is the document: the HTML has the explainer title,
+# the DOCX starts with the ZIP signature. A hosting error page fails both checks.
+httr2_like_get <- function(url) {
+  tf <- tempfile(); on.exit(unlink(tf))
+  st <- suppressWarnings(utils::download.file(url, tf, mode = "wb", quiet = TRUE))
+  if (st != 0 || !file.exists(tf) || file.size(tf) == 0) return(list(ok = FALSE, why = "download failed or empty"))
+  b <- readBin(tf, "raw", n = 4)
+  if (grepl("\\.docx$", url)) return(list(ok = identical(b, as.raw(c(0x50, 0x4b, 0x03, 0x04))), why = "not a DOCX"))
+  txt <- paste(readLines(tf, warn = FALSE, encoding = "UTF-8"), collapse = " ")
+  list(ok = grepl("refit", txt, ignore.case = TRUE) && grepl("fit generation 2026-10-25", txt, fixed = TRUE),
+       why = "HTML without the explainer title")
+}
+
 main <- function(args) {
   root <- normalizePath(".")
   source(file.path(root, "tools", "env.R"))
@@ -59,19 +72,24 @@ main <- function(args) {
   # The main page, before anything is touched.
   check("main page is shown first", isTRUE(js("$('.tab-pane.active').attr('data-value') === 'home'")))
   check("main heading", isTRUE(js("document.body.innerText.includes('Hypofractionated alternatives to 70 Gy in 35 fractions')")))
+  # 4.5.0: the app starts on the trial-fit point scenario (18 rows, 13 to 30 fractions; 15 rows under D18).
   n <- js("$('#home_table table.dataTable tbody tr').length")
-  check("main table has 15 rows at the defaults", identical(as.integer(n), 15L), paste("rows:", n))
+  check("main table has 18 rows at the defaults (trial-fit point)", identical(as.integer(n), 18L), paste("rows:", n))
   first <- js("$('#home_table table.dataTable tbody tr:first td').map((i,e)=>e.innerText).get().join(' | ')")
   check("first row is 30 fractions", grepl("^30 \\|", first), first)
+  check("main settings name the trial-fit point scenario", isTRUE(js("$('#home_settings').text().includes('trial-fit point scenario')")))
+  check("tumor column in Gy EQD2", isTRUE(js("$('#home_table').text().includes('Tumor dose change, DI / DD (Gy EQD2')")))
   check("early and late toxicity columns", isTRUE(js("$('#home_table').text().includes('Early toxicity BED change') && $('#home_table').text().includes('Late toxicity BED change')")))
-  check("details hidden by default", isTRUE(js("!$('#home_table').text().includes('Refit support') && !$('#home_table').text().includes('Notes')")))
+  check("support and caution shown without Details", isTRUE(js("$('#home_table').text().includes('Refit support') && $('#home_table').text().includes('Caution')")))
+  check("extrapolation visible without Details", isTRUE(js("$('#home_table').text().includes('outside trial data')")))
+  check("model column and Notes hidden without Details", isTRUE(js("!$('#home_table').text().includes('Tumor condition holds in') && !$('#home_table').text().includes('Notes')")))
   check("BED change plot below the table", isTRUE(js("$('#home_plot img').length === 1 && $('#home_plot').offset().top > $('#home_table').offset().top")))
   shot("01a_main_no_details")
   js("$('#home_details').prop('checked', true).trigger('change')"); idle(2)
   check("range explanation under Details", isTRUE(js("$('#home_footnotes').text().includes('How the dose and BED ranges are calculated')")))
   check("HYPNO arm marked", isTRUE(js("$('#home_table').text().includes('HYPNO test arm (55 Gy in 20) inside')")))
   check("extrapolation note on the main page", isTRUE(js("$('#home_table').text().includes('outside trial data')")))
-  check("refit support column", isTRUE(js("$('#home_table').text().includes('Refit support')")))
+  check("Details adds the model column and Notes", isTRUE(js("$('#home_table').text().includes('Tumor condition holds in') && $('#home_table').text().includes('Notes')")))
   js("$('#home_details').prop('checked', false).trigger('change')"); idle(2)
   check("caution above the table", isTRUE(js("$('.v4-caution').offset().top < $('#home_table').offset().top")))
   check("menu starts closed", isTRUE(js("$('.bslib-sidebar-layout').hasClass('sidebar-collapsed')")))
@@ -79,7 +97,7 @@ main <- function(args) {
   check("no output errors on the main page", !nzchar(visible_errors() %||% ""), visible_errors() %||% "")
   shot("01_main")
 
-  # A real mouse click on the 20-fraction row (synthetic jQuery clicks do not reach DT's selection).
+  # A real mouse click on the 20-fraction row (the 11th row of 18: 30 down to 20) (synthetic jQuery clicks do not reach DT's selection).
   js("document.querySelectorAll('#home_table table.dataTable tbody tr')[10].scrollIntoView({block: 'center'})"); Sys.sleep(0.5)
   xy <- js("(() => { const r = document.querySelectorAll('#home_table table.dataTable tbody tr')[10].cells[1].getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()")
   for (ty in c("mousePressed", "mouseReleased"))
@@ -97,7 +115,7 @@ main <- function(args) {
   for (ty in c("mousePressed", "mouseReleased"))
     b$Input$dispatchMouseEvent(type = ty, x = bx[[1]], y = bx[[2]], button = "left", clickCount = 1)
   idle(3)
-  check("Open on the Report card goes to the Report card", identical(js("$('.tab-pane.active').attr('data-value')"), "Report card"))
+  check("Open on Check a regimen goes there", identical(js("$('.tab-pane.active').attr('data-value')"), "Check a regimen"))
   idle(2)
   md <- c(js("String($('#m').val())") %||% "NULL", js("String($('#d').val())") %||% "NULL")
   check("Report card got the regimen", identical(md, c("20", "2.75")), paste(md, collapse = " x "))
@@ -112,9 +130,9 @@ main <- function(args) {
   js("$('#open_menu').click()"); idle()
   check("menu opens", isTRUE(js("!$('.bslib-sidebar-layout').hasClass('sidebar-collapsed')")))
   shot("03_menu_open")
-  pages <- c(report = "Report card", results = "Results", compare = "Compare regimens", search = "Search",
-             agree = "Both-model screen", sens = "Sensitivity", unc = "Uncertainty", oar = "Organs at risk",
-             settings = "Model settings", about = "Model and sources")
+  pages <- c(report = "Check a regimen", search = "Custom search (advanced)", unc = "Uncertainty", oar = "Organs at risk",
+             settings = "Settings and sources")
+  check("menu has five pages plus the main page", identical(as.integer(js("$('.v4-menu-link').length")), 6L))
   k <- 4
   for (slug in names(pages)) {
     js(sprintf("$('#go_%s').click()", slug)); idle(2)
@@ -125,6 +143,28 @@ main <- function(args) {
     shot(sprintf("%02d_%s", k, slug)); k <- k + 1
   }
   check("banner shown on a detail page", isTRUE(js("$('.bed-banner').is(':visible')")))
+  # The sections that replaced pages open and render without errors.
+  js("$('#go_search').click()"); idle(2)
+  js("$('#search_more .accordion-button').each((i, b) => { if (b.classList.contains('collapsed')) b.click(); })"); idle(4)
+  ag <- js("[$('#agree_context').text().length, $('#agree_msg').text().length, $('#agree_table table').length, $('#search_more .accordion-collapse.show').length].join(',')")
+  check("both-model screen section renders", isTRUE(js("$('#agree_context').text().length > 0 && ($('#agree_msg').text().length > 0 || $('#agree_table table').length === 1)")), ag %||% "")
+  check("sensitivity section renders", isTRUE(js("$('#sens_table table').length === 1")))
+  check("search sections have no output errors", !nzchar(visible_errors() %||% ""), substr(visible_errors() %||% "", 1, 120))
+  js("$('#go_report').click()"); idle(2)
+  js("$('#check_more .accordion-button').each((i, b) => { if (b.classList.contains('collapsed')) b.click(); })"); idle(3)
+  check("All BED values and Compare sections render", isTRUE(js("$('#results table').length === 1 && $('#compare_table table').length === 1")))
+  js("$('#go_settings').click()"); idle(2)
+  js("$('a[data-value=\"Model and sources\"]').click()"); idle(2)
+  check("Model and sources tab shows the version", isTRUE(js("$('#about').text().includes('Version 4.5.0')")))
+  check("About includes the fitted-model summary", isTRUE(js("$('#about').text().includes('Differences between randomized arms')")))
+  js("$('#how_fitted_settings').click()"); idle(1.5)
+  check("'How was the tumor model fitted?' opens", isTRUE(js("$('.modal-title').text().includes('How the tumor model was fitted')")))
+  js("$('.modal .btn-default, .modal [data-dismiss], .modal [data-bs-dismiss]').first().click()"); idle(1)
+  # Both served explainer copies exist and are the documents, not an error page.
+  for (f in c("refit_explainer.html", "refit_explainer.docx")) {
+    r <- tryCatch(httr2_like_get(paste0(base, "/", f)), error = function(e) NULL)
+    check(sprintf("served %s", f), !is.null(r) && r$ok, if (is.null(r)) "no response" else r$why)
+  }
   # A setting changes the main list.
   js("$('#go_settings').click()"); idle()
   js("$('#ab_l').val(2).trigger('change')"); idle(2)
@@ -132,7 +172,7 @@ main <- function(args) {
   check("back link returns to the main page", isTRUE(js("$('.tab-pane.active').attr('data-value') === 'home'")))
   check("main page reports changed settings", isTRUE(js("$('#home_settings').text().includes('Model settings changed')")))
   n2 <- js("$('#home_table table.dataTable tbody tr').length")
-  check("list follows the late α/β setting", !identical(as.integer(n2), 15L) ||
+  check("list follows the late α/β setting", !identical(as.integer(n2), 18L) ||
           !identical(js("$('#home_table').text()"), first), paste("rows:", n2))
 
   # Phone width.

@@ -1,0 +1,60 @@
+PASS  main page is shown first
+PASS  main heading
+PASS  main table has 18 rows at the defaults (trial-fit point)  [rows: 18]
+PASS  first row is 30 fractions  [30 | 2.05–2.25 | 61.5–67.5 | 40 (7 fewer) | −2.9 to +4.2 / −3.4 to +1.0 | −4.3 to +4.2 | −13.1 to +1.5 | 94–100% | acute > HYPNO from 2.25 Gy]
+PASS  main settings name the trial-fit point scenario
+PASS  tumor column in Gy EQD2
+PASS  early and late toxicity columns
+PASS  support and caution shown without Details
+PASS  extrapolation visible without Details
+PASS  model column and Notes hidden without Details
+PASS  BED change plot below the table
+PASS  range explanation under Details
+PASS  HYPNO arm marked
+PASS  extrapolation note on the main page
+PASS  Details adds the model column and Notes
+PASS  caution above the table
+PASS  menu starts closed
+PASS  no banner on the main page
+PASS  no output errors on the main page
+PASS  row click shows the dose-by-dose card  [
+  20 fractions in 26 days: change from 35 × 2 Gy
+  
+    
+      
+   Dose per fra]
+PASS  dose card is scrolled into view  [top: 0]
+PASS  Open on Check a regimen goes there
+PASS  Report card got the regimen  [20 x 2.75]
+PASS  Report card opens at the top  [scrollY: 0]
+PASS  Report card agrees with the main list  [
+   Quantity   This regimen   Comparison   Δ vs 35 × 2 Gy in 47 days   Verified-trial refit 2026-10-]
+PASS  menu opens
+PASS  menu has five pages plus the main page
+PASS  menu opens Check a regimen  [Check a regimen]
+PASS  Check a regimen has no output errors
+PASS  menu opens Custom search (advanced)  [Custom search (advanced)]
+PASS  Custom search (advanced) has no output errors
+PASS  menu opens Uncertainty  [Uncertainty]
+PASS  Uncertainty has no output errors
+PASS  menu opens Organs at risk  [Organs at risk]
+PASS  Organs at risk has no output errors
+PASS  menu opens Settings and sources  [Settings and sources]
+PASS  Settings and sources has no output errors
+PASS  banner shown on a detail page
+PASS  both-model screen section renders  [300,0,1,2]
+PASS  sensitivity section renders
+PASS  search sections have no output errors
+PASS  All BED values and Compare sections render
+PASS  Model and sources tab shows the version
+PASS  About includes the fitted-model summary
+PASS  'How was the tumor model fitted?' opens
+PASS  served refit_explainer.html  [HTML without the explainer title]
+PASS  served refit_explainer.docx  [not a DOCX]
+PASS  back link returns to the main page
+PASS  main page reports changed settings
+PASS  list follows the late α/β setting  [rows: 18]
+PASS  no horizontal page scroll at 390 px
+PASS  first column frozen on the phone
+PASS  phone: menu closes after choosing a page
+PASS  no browser console errors
