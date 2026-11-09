@@ -87,7 +87,7 @@ test_that("the trial table gives each trial's reference once, with footnotes for
     for (k in c("Trial and reference", "Overall time (days)", "Time basis")) expect_match(h, k, fixed = TRUE)
     # No drug columns: the few trials with a drug note get a footnote instead.
     for (k in c("<th>Chemotherapy</th>", "<th>Other drugs</th>")) expect_false(grepl(k, h, fixed = TRUE), info = k)
-    expect_equal(lengths(regmatches(h, gregexpr("<th>", h, fixed = TRUE))), 7)
+    expect_equal(lengths(regmatches(h, gregexpr("<th>", h, fixed = TRUE))), 12)  # published-outcome columns, review 2026-11-09
     expect_equal(lengths(regmatches(h, gregexpr("v4-trial-ref", h, fixed = TRUE))), 19)
     expect_match(h, "rowspan=\"4\"", fixed = TRUE)    # RTOG 9003 and Yamazaki have 4 arms
     expect_match(h, "https://pubmed.ncbi.nlm.nih.gov/14511925/", fixed = TRUE)
@@ -102,7 +102,7 @@ test_that("the trial table gives each trial's reference once, with footnotes for
                              "Yamazaki 2006"))
     expect_match(h, "DAHANCA 6&amp;7 (Overgaard 2003). Other drugs: nimorazole", fixed = TRUE)
     expect_match(h, "RTOG 83-13 (Cox 1990). Previous chemotherapy was allowed if not within 6 weeks of randomization.", fixed = TRUE)
-    expect_match(h, "are therefore not period medians", fixed = TRUE)           # CAIR period times
+    expect_match(h, "gives the period medians used in the fit", fixed = TRUE)    # CAIR period times (review 2026-11-09)
     expect_match(h, "The fit uses 68 Gy in 34 fractions.", fixed = TRUE)        # IAEA-ACC range
     expect_false(grepl("Chemotherapy: ", h, fixed = TRUE))
     # The eight trials added in the refit, from the 2018 paper's references, are starred; no others.

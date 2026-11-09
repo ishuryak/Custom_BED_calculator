@@ -11,9 +11,13 @@ lacks:
 - other_drugs: a radiosensitizer given within the arm, from the population notes that
   fit/build_provenance.py records (read in the publications on 2026-10-26);
 - arm_label: a readable arm name where the fitting file uses a bare abbreviation;
+- outcome_source: the publication the fitted outcome comes from (its page or table is the fitting
+  file's `location`, which the app shows per arm);
+- schedule_source: where the fitted schedule values were checked, when that is a companion report or a
+  specific table (SCHEDULE_SOURCES), empty otherwise;
 - trial_note: one note per trial for the dialog's footnotes: drugs given and what a reader
   should know about the schedule values used in the fit. Each sentence was checked on
-  2026-11-06 against the trial paper (fulltext_text/<PMID>.txt) or, where the PDF is not in
+  2026-11-06 (CAIR, Jackson and Princess Margaret again on 2026-11-09) against the trial paper (fulltext_text/<PMID>.txt) or, where the PDF is not in
   hand, against the full-text extraction quote (all_extract.json);
 - shuryak2018_ref: the trial's reference number in Shuryak, Hall and Brenner 2018
   (Radiother Oncol 127:20-26, PMID 29534828, Table 1 and references [23]-[55], read in the
@@ -89,26 +93,41 @@ TRIAL_NOTES = {
     "2180866": "Previous chemotherapy was allowed if not within 6 weeks of randomization. No arm included "
                "chemotherapy with radiotherapy.",
     "17011446": "Patients were treated first with 2.0 Gy and later with 1.8 Gy fractions, so each arm is shown as "
-                "two periods. The paper gives overall times only for whole arms (median 40 days for CAIR and 54 "
-                "days for control, with a planned CAIR time of 33 to 36 days). The period times used in the fit "
-                "(36 and 51 days, 40 and 54 days) are therefore not period medians, although the fitting data "
-                "label them so. Total doses ranged from 66 to 76 Gy.",
+                "two periods (23 CAIR and 21 control patients at 2.0 Gy, 28 and 28 at 1.8 Gy). The treatment report "
+                "(Skladowski 2000, Table 1, p.102) gives the period medians used in the fit: overall times of 36 "
+                "(CAIR) and 51 (control) days at 2.0 Gy and 40 and 54 days at 1.8 Gy, with median fraction numbers "
+                "of 35 and 35, and 40 and 40. The fit therefore uses 70 Gy in 35 fractions and 72 Gy in 40 fractions. "
+                "Delivered total doses varied: from 60 to 76 Gy in the 2.0 Gy period and from below 60 to 75.6 Gy in "
+                "the 1.8 Gy period. The 5-year local control rates are from the long-term report (Skladowski 2006, "
+                "Table 2, p.711).",
     "7569030": "The conventional arm allowed 70 Gy in 35 fractions over 7 weeks or 75 Gy in 44 fractions over "
                "9 weeks, and the split is not reported. The fit uses 70 Gy in 35 fractions. The trial's third arm "
                "(three fractions a day with misonidazole) is not used.",
     "20382075": "Both arms received 66 to 70 Gy in 33 to 35 fractions. The fit uses 68 Gy in 34 fractions.",
     "9165135": "Planned overall times were 45 to 48 days (once daily) and 22 to 25 days (twice daily). The fit uses "
-               "47.6 and 24.25 days, labeled as mean delivered times. These match the 2018 paper's Table 1 "
-               "(47.6 and 24.3 days) but were not checked against the trial paper.",
+               "the mean delivered times, 47.6 and 24.25 days (trial paper, Table 3, p.41). The fit applies 66 Gy in "
+               "33 fractions of 2 Gy to the whole twice-daily arm, although the last ten of its 41 patients received "
+               "62.8 Gy because the second daily fraction was reduced to 1.8 Gy (p.41). The trial reports one pooled "
+               "outcome per arm.",
     "24161568": "Schedules differed by T stage within each arm (T1: 66 Gy in 33 fractions or 63 Gy in 28, T2: "
                 "70 Gy in 35 or 67.5 Gy in 30). The fit uses fraction numbers weighted by each arm's T-stage mix.",
-    "32055717": "The overall times (median 29 days) are from the trial's earlier report (2007), not from the "
-                "2020 paper cited.",
+    "32055717": "The overall times used in the fit (median 29 days in each arm) are the delivered medians of the "
+                "trial's earlier report (Cummings 2007, Table 2, p.12). The outcomes are from the 2020 report.",
     "16169681": "Arms A (2.0 Gy) and B (2.25 Gy) each had two total doses by tumor extent, and the fit uses "
                 "these strata separately.",
     "20394851": "The 2018 and 2019 papers cited this trial through an earlier report (Dische 1997).",
 }
 
+
+# Where the schedule values used in the fit (doses, fraction numbers, overall times) were checked, when this
+# is a companion report or a specific table of the outcome paper. Empty otherwise. Read in the full texts
+# (fulltext_text/<PMID>.txt) and the PDFs on 2026-11-09.
+SCHEDULE_SOURCES = {
+    "17011446": "Skladowski et al. Radiother Oncol 2000 (PMID 10799721), Table 1, p.102: period medians",
+    "9165135": "Jackson et al. Radiother Oncol 1997 (PMID 9165135), Table 3, p.41: mean delivered times; "
+               "dose amendment, p.41",
+    "32055717": "Cummings et al. Radiother Oncol 2007 (PMID 17920715), Table 2, p.12: median delivered times",
+}
 
 def chemo_text(s):
     s = str(s).strip()
@@ -151,6 +170,8 @@ def main(argv):
                         arm_label=ARM_LABELS.get((r["ref_no"], r["arm"]), YAMAZAKI.get(r["arm"], "") if pmid == "16169681" else ""),
                         trial_note=" ".join(x for x in note if x),
                         citation=f"{p['first_author']} et al. {title}. {p['journal']} {p['year']}.",
+                        outcome_source=f"{p['first_author']} et al. {p['journal']} {p['year']} (PMID {pmid})",
+                        schedule_source=SCHEDULE_SOURCES.get(pmid, ""),
                         doi=p.get("doi", ""), chemotherapy=chemo.pop(),
                         other_drugs=OTHER_DRUGS.get(r["ref_no"], ""),
                         shuryak2018_ref=SHURYAK_2018_REF.get(pmid, "")))

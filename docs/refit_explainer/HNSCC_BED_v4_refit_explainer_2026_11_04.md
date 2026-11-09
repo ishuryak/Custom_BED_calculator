@@ -1,35 +1,35 @@
 ---
-title: "HNSCC BED calculator, version 4.3: how the tumor model was refitted to randomized trials"
+title: "HNSCC BED calculator: how the tumor model was refitted to randomized trials (fit generation 2026-10-25)"
 author: "Igor Shuryak, MD, PhD – is144@cumc.columbia.edu"
-date: "November 4, 2026"
+date: "November 9, 2026"
 ---
 
 # Summary
 
-This document explains the tumor-model refit behind the head and neck squamous cell carcinoma (HNSCC) biologically effective dose (BED) calculator, version 4.3.0 (https://ishuryak.shinyapps.io/custom_bed_calculator_v4/). It answers five questions. How was the refit done? Which trial arms differ from the 2018 paper? How does each trial enter the fit? How do the two repopulation models compare by the Akaike information criterion with small-sample correction (AICc)? How and why is the fit Bayesian?
+This document explains the Bayesian refit of the tumor models (fit generation 2026-10-25) used by the head and neck squamous cell carcinoma (HNSCC) biologically effective dose (BED) calculator (https://ishuryak.shinyapps.io/custom_bed_calculator_v4/). It answers five questions. How was the refit done? Which trial arms differ from the 2018 paper? How does each trial enter the fit? How do the two repopulation models compare by the Akaike information criterion with small-sample correction (AICc)? How and why is the fit Bayesian?
 
-- **Data.** The refit uses 45 arms from 19 randomized trials (8,279 patients). Every value was read from the trial's own full text and checked against a verbatim quote. The 2018 paper (Shuryak, Hall and Brenner) used 35 arms from 16 publications. Eleven of its trials are kept and re-read, five are dropped, and eight trials are new.
-- **Design.** Each trial has its own intercept, so only the randomized comparisons within a trial inform the radiobiological parameters. Differences between trials in stage, site, endpoint and era do not.
+- **Data.** The refit uses 45 arms or strata from 19 randomized trials, one study report (PubMed record) each, with 8,279 analyzed patients in 21 fitting units. Every value was read from full text. The 41 outcome values given in text or tables were checked against a verbatim quote, and four were read from published figures. Some doses and overall times come from a companion report or represent a mix of prescriptions within an arm (Section 2 and the fitted-trial list). The 2018 paper (Shuryak, Hall and Brenner) used 35 arms from 16 publications. Eleven of its trials are kept and re-read, five are dropped, and eight trials are new.
+- **Design.** Each of the 21 fitting units (a trial, or a dose period or tumor-size stratum within one) has its own baseline term. Randomized differences within a unit therefore provide the main information about dose and time, and the baselines absorb differences between trials in stage, site, endpoint and era. The baseline priors and the arm-level likelihood also affect the estimates.
 - **Models.** Two repopulation models are fitted. In the dose-independent (DI) model, accelerated regrowth starts on a fixed day. In the dose-dependent (DD) model, it starts once a set amount of cell kill is reached.
 - **Model comparison.** The 2018 paper found an AICc 40 units lower for DD. With one intercept per trial, that preference disappears. On the 2018 data DD is lower by only 3.9 units. On the current data DI is lower by 9.0 units, or 4.4 after allowing for overdispersion (more variation between arms than binomial sampling allows). Leave-one-trial-out prediction points the same way but within its noise. Neither model is decisively preferred, and the DD repopulation parameters are not identified by these trials.
-- **Why Bayesian.** About 24 within-trial contrasts must inform 5–6 structural parameters, one of which (tumor α/β) the trials cannot inform at all. The trial data are also overdispersed. A Bayesian fit makes each assumption an explicit prior, models the overdispersion, and gives joint parameter draws. The calculator turns those draws into an uncertainty interval for any schedule.
-- **Main result.** The reference is 70 Gy in 35 fractions of 2 Gy over 47 days. Against it, HYPNO's 55 Gy in 20 fractions loses 2.0 Gy₁₀ of effective tumor BED under DI (80% interval −4.3 to +1.0) and 3.3 Gy₁₀ under calibrated DD (−5.9 to −0.5). Effective tumor BED is the linear-quadratic BED minus the dose lost to tumor regrowth during treatment, and Gy₁₀ means BED computed with α/β = 10 Gy. Calibrated DD is the DD model with its onset tied to DI at the standard schedule, because DD cannot be fitted on its own. The 2018-based fit had put it at +1.4 Gy₁₀. Most of that shift comes from correcting the 2018 values, not from the new trials.
+- **Why Bayesian.** The 45 arms minus 21 units leave 24 within-unit contrast degrees of freedom to inform 5–6 structural parameters, one of which (tumor α/β) the trials cannot inform at all. The trial data are also overdispersed. A Bayesian fit makes each assumption an explicit prior, models the overdispersion, and gives joint parameter draws. The calculator turns those draws into an uncertainty interval for any schedule.
+- **Main result.** The reference is 70 Gy in 35 fractions of 2 Gy over 47 days. Against it, HYPNO's 55 Gy in 20 fractions loses 2.0 Gy of effective tumor BED under DI (full DI posterior, 80% interval −4.3 to +1.0) and 3.3 Gy under calibrated DD (4,000 paired draws, −5.9 to −0.5). Among the 1,000 DI draws paired with DD, the DI median is −1.9 Gy. Effective tumor BED is the linear-quadratic BED minus the dose lost to tumor regrowth during treatment. Each posterior draw uses its own α/β, so these changes are in Gy rather than Gy₁₀, which is reserved for a fixed α/β of 10 Gy. Calibrated DD is the DD model with its repopulation loss set equal to DI's at the standard schedule, because DD cannot be fitted on its own. The 2018-based fit had put it at +1.4 Gy. Most of that shift comes from correcting the 2018 values, not from the new trials.
 
-**Where the refit is used on the site.** The main page lists schedules under the default tumor parameters (scenario D18), which the developer chose and did not fit to outcome data. The refit enters in three places. It is a preset on the Model settings page. Under Details on the main page, its parameter draws give the "Refit support" column. It also supplies the draws for the Uncertainty page. The draws shipped with version 4.3.0 (draws version 3.2) come from the main fit described here.
+**Where the refit is used on the site.** The main page lists schedules under the default tumor parameters (scenario D18), which the developer chose and did not fit to outcome data. The refit enters in three places. It is a preset on the Model settings page. On the main page, its parameter draws give the "Refit support" column, which is always shown. It also supplies the draws for the Uncertainty page. The draws shipped with the calculator (draws version 3.2) come from the main fit described here.
 
 # 1. How the refitting analysis was done
 
 ## 1.1 Sources
 
-135 papers were in hand as full text: 99 PDFs downloaded through Columbia on 2026-10-22, 21 open-access or local PDFs, and 15 PubMed Central full texts. Each file passed an identity check (the digital object identifier (DOI) on the first two pages or the title on page 1). Forty-nine listed papers were not available at Columbia and were not used. No value was taken from an abstract or from memory.
+135 papers were in hand as full text: 99 PDFs downloaded through Columbia on 2026-10-22, 21 open-access or local PDFs, and 15 PubMed Central full texts. Each file passed an identity check (the digital object identifier (DOI) on the first two pages or the title on page 1). Forty-nine listed papers were not available at Columbia and were not used. No value was taken from a PubMed abstract alone or from memory.
 
 ## 1.2 Extraction and its checks
 
-Arm-level data were extracted from 68 trials (292 rows). Every value has a verbatim quote, and a script confirmed that each quote occurs in the paper's text and contains the value. The 33 trials that could enter a fit were then extracted a second time, blinded to the first. The two reads agree on 79 of the 80 primary rows. The 80th is a tie between two dose levels of Leclerc 2013, which was dropped as not randomized. A builder script assembles the fitting file and refuses any value that is not in a checked extraction row.
+Arm-level data were extracted from 68 trials (292 rows). Values given in text or tables were recorded with a verbatim quote, and a script confirmed that each quote occurs in the paper's text and contains the value. Four outcome values of the main fit were read from published figures (CHART and EORTC 22811) and cannot be checked this way. The 33 trials that could enter a fit were then extracted a second time, blinded to the first. The two reads agree on 79 of the 80 primary rows. The 80th is a tie between two dose levels of Leclerc 2013, which was dropped as not randomized. A builder script assembles the fitting file and refuses any value that is not in a checked extraction row.
 
 ## 1.3 Which trials enter the main fit
 
-The main fit includes randomized trials of definitive radiotherapy for non-nasopharyngeal HNSCC, early glottic cancer included, that compare fractionation schedules with tumor control reported by arm at 2 to 5 years. Five further rules apply:
+The main fit includes randomized trials of definitive radiotherapy for HNSCC, early glottic cancer included, that compare fractionation schedules with tumor control reported by arm at 2 to 5 years. The trials are predominantly non-nasopharyngeal, although RTOG 83-13 included some nasopharyngeal patients. No fitted arm included concurrent cytotoxic chemotherapy. DAHANCA 6&7 gave the radiosensitizer nimorazole to all patients except those with glottic cancer, in both arms. Five further rules apply:
 
 - A trial reporting only failure enters as 100 minus the failure percentage.
 - Values read off a published figure are used (two independent readings agreed within about 1 point).
@@ -41,8 +41,8 @@ The main fit includes randomized trials of definitive radiotherapy for non-nasop
 
 - **Overall time** is the delivered median or mean when the paper reports it, otherwise the planned time.
 - **Mixed fraction sizes** within an arm (for example a concomitant boost) are kept as components, so the linear-quadratic (LQ) BED is BED~LQ~ = Σd + Σd²/(α/β) over all fractions.
-- **Number controlled** is the reported control rate times the number analyzed, rounded. Most rates are Kaplan–Meier estimates (39 arms) and six are cumulative-incidence estimates, so this count is an approximation.
-- **Effective tumor BED** of a schedule is BED~LQ~ minus the BED lost to repopulation and background growth, (repopulation + gT)/α. Results are reported as the change against 35 × 2 Gy in 47 days, in Gy₁₀ when α/β is 10 Gy.
+- **Number controlled** is the reported control rate times the number analyzed, rounded. Most rates are Kaplan–Meier (actuarial) estimates (39 arms) and six are cumulative-incidence estimates, at 2, 3 or 5 years, so this count is an approximation. Each arm keeps its own endpoint and time point.
+- **Effective tumor BED** of a schedule is BED~LQ~ minus the BED lost to repopulation and background growth, (repopulation + gT)/α. Results are reported as the change against 35 × 2 Gy in 47 days. Posterior summaries use each draw's own α/β and are given in Gy. Gy₁₀ would mean BED at a fixed α/β of 10 Gy.
 
 ## 1.5 The two models
 
@@ -50,7 +50,7 @@ Tumor control probability (TCP) follows the Poisson form TCP = exp(−K S), wher
 
 $$\log(-\log \mathrm{TCP}_i) = c_j - \alpha\,(B_i - \bar{B}_j) + R_i + g\,(T_i - \bar{T}_j) + \sigma z_i$$
 
-Here *B*ᵢ is the arm's BED~LQ~ and *T*ᵢ its overall time in days, while B̄ⱼ and T̄ⱼ are the means within unit *j*. The unit's intercept is *c*ⱼ, α is the linear radiosensitivity and *g* the background growth rate per day. The term σ*z*ᵢ, with *z*ᵢ ~ N(0, 1), is the arm-level overdispersion. The repopulation term *R*ᵢ differs between the models:
+Here *B*ᵢ is the arm's BED~LQ~ and *T*ᵢ its overall time in days, while B̄ⱼ and T̄ⱼ are the means within unit *j*. The unit's intercept *c*ⱼ is its centered baseline on the log(−log) scale: the value at the unit's mean BED and mean time with the repopulation term and the arm deviation set to zero. α is the linear radiosensitivity and *g* the background growth rate per day. The term σ*z*ᵢ, with *z*ᵢ ~ N(0, 1), is the arm-level overdispersion. The repopulation term *R*ᵢ differs between the models:
 
 - **DI:** $R_i = \lambda\, s(T_i - T_k)$, with a fixed onset day *T*ₖ and rate λ per day.
 - **DD:** $R_i = \lambda_{DD}\, P_{kill,i}\, s\!\left(T_i - \frac{C}{\alpha}\,\frac{T_i}{B_i}\right)$, with $P_{kill,i} = 1 - e^{-\alpha B_i / T_i}$, the mean fraction of clonogens killed per day. Onset comes once a set BED, C/α, has been delivered, and the rate grows with the daily cell kill.
@@ -59,11 +59,11 @@ The function s(x) = log(1 + e³ˣ)/3 is a smooth version of max(0, x), the same 
 
 ## 1.6 Fitting and quality checks
 
-The DI and free DD models are fitted in Stan (CmdStan, 4 chains, 1500 warm-up and 2000 sampling iterations, fixed seed). The calibrated DD fits (Section 5.3) are smaller conditional fits, 4 chains of 600 warm-up and 250 sampling iterations, lengthened up to 16-fold until they pass. A fit is accepted only if every sampled parameter and every regimen contrast passes a fixed quality gate. The gate requires no divergent transitions, no hits of the maximum tree depth, R-hat at most 1.01, and bulk and tail effective sample size (ESS) at least 400. It also requires an estimated Bayesian fraction of missing information (E-BFMI, an energy diagnostic) of at least 0.3. The primary DI fit passes with maximum R-hat 1.002 and minimum bulk ESS 1,489, and all 45 arms fall inside their 90% posterior predictive interval. Four variants were fitted: primary, binomial (no overdispersion), the 2018 restrictions (α/β fixed at 10 Gy and *g* at 0.0154 per day), and a doubled-width α/β prior.
+The DI and free DD models are fitted in Stan (CmdStan, 4 chains, 1500 warm-up and 2000 sampling iterations, fixed seed). The calibrated DD fits (Section 5.3) are smaller conditional fits, 4 chains of 600 warm-up and 250 sampling iterations, lengthened up to 16-fold until they pass. A fit is accepted only if every sampled parameter and every regimen contrast passes a fixed quality gate. The gate requires no divergent transitions, no hits of the maximum tree depth, R-hat at most 1.01, and bulk and tail effective sample size (ESS) at least 400. It also requires an estimated Bayesian fraction of missing information (E-BFMI, an energy diagnostic) of at least 0.3. The primary DI fit passes with maximum R-hat 1.002 and minimum bulk ESS 1,489, and all 45 arms fall inside their 90% posterior predictive interval. That check is in-sample, since each prediction includes its unit's fitted baseline. Four variants were fitted: primary, binomial (no overdispersion), the 2018 restrictions (α/β fixed at 10 Gy and *g* at 0.0154 per day), and a doubled-width α/β prior.
 
 ## 1.7 Sensitivity fits
 
-HYPNO 55 Gy/20 against 35 × 2 Gy/47 d, tumor BED change in Gy₁₀, median (80% interval):
+HYPNO 55 Gy/20 against 35 × 2 Gy/47 d, tumor BED change in Gy (each draw's α/β), median (80% interval):
 
 | Data set | Arms | DI | Calibrated DD | α/β median (Gy) |
 |---|---|---|---|---|
@@ -145,9 +145,9 @@ These eight trials add 17 arms. The 28 other arms come from the eleven kept tria
 
 ## 2.4 Where the change in result comes from
 
-The DI result for HYPNO moved from +1.4 Gy₁₀ (fit to the 2018 table) to about −2 Gy₁₀. To separate the causes, the DI model was refitted step by step. These runs used an earlier version of the trial set, which still included ARTSCAN, took RTOG 9003 rates from the 2014 update and treated mixed fraction sizes as one average size. The re-read values behind the last two rows therefore differ slightly from those in Section 2.1:
+The DI result for HYPNO moved from +1.4 Gy (fit to the 2018 table) to about −2 Gy. To separate the causes, the DI model was refitted step by step. These runs used an earlier version of the trial set, which still included ARTSCAN, took RTOG 9003 rates from the 2014 update and treated mixed fraction sizes as one average size. The re-read values behind the last two rows therefore differ slightly from those in Section 2.1:
 
-| Data | HYPNO median (Gy₁₀) |
+| Data | HYPNO median (Gy) |
 |---|---|
 | 2018 Table 1 as published | +1.4 |
 | 2018 Table 1 without Leclerc | +1.4 |
@@ -161,59 +161,59 @@ Most of the change therefore comes from correcting the 2018 values, not from the
 
 **Each arm's value comes from its own paper.** The endpoint and time point are the ones that trial reports (Section 2), and the number analyzed is the count for that endpoint.
 
-**Each trial has its own intercept.** The 2018 paper explained differences in tumor control between trials with three shared clonogen numbers, one per stage group (T1–2, T3, T4). Refitting that structure needs each trial's stage mix, which Table 1 does not give and which many papers report only in part. The refit instead gives each fitting unit its own intercept *c*ⱼ. The intercept absorbs anything that shifts a whole trial's control up or down: stage mix, tumor site, the endpoint and its time point, patient selection and treatment era. α, *g*, the repopulation parameters and σ are shared by all trials. As a result, a trial informs them only through how its randomized arms differ from one another, which is the comparison randomization protects. The cost is that a trial with one usable contrast contributes one piece of information, however many patients it has.
+**Each fitting unit has its own baseline.** The 2018 paper explained differences in tumor control between trials with three shared clonogen numbers, one per stage group (T1–2, T3, T4). Refitting that structure needs each trial's stage mix, which Table 1 does not give and which many papers report only in part. The refit instead gives each fitting unit its own intercept *c*ⱼ. The intercept absorbs anything that shifts a whole unit's control up or down: stage mix, tumor site, the endpoint and its time point, patient selection and treatment era. α, *g*, the repopulation parameters and σ are shared by all trials. As a result, randomized differences between a unit's arms provide the main information about them, which is the comparison randomization protects. The intercept priors and the arm-level likelihood still have some influence. The displayed control of an arm combines its unit's baseline with its own regimen, time, endpoint and arm-level variation. The cost is that a trial with one usable contrast contributes one piece of information, however many patients it has.
 
-**Each trial's fit is checked against its own data.** The table below compares each arm's observed control with the primary DI fit's posterior predictive interval. The prediction uses that trial's fitted intercept, so this is an in-sample check with limited power to detect misfit. All 45 arms fall inside their 90% interval.
+**Each trial's fit is checked against its own data.** The table below compares each arm's published control rate, and the rounded count the likelihood used, with the primary DI fit's posterior predictive interval. The prediction uses that trial's fitted intercept, so this is an in-sample check with limited power to detect misfit. All 45 arms fall inside their 90% interval.
 
-| Trial | Arm | N | Observed (%) | Predicted median (90% interval) |
-|---|---|---|---|---|
-| CAIR, 2.0 Gy period | CAIR | 23 | 73.9 | 60.9 (39.1–78.3) |
-| | control | 21 | 28.6 | 42.9 (19.0–66.7) |
-| CAIR, 1.8 Gy period | CAIR | 28 | 78.6 | 64.3 (46.4–82.1) |
-| | control | 28 | 35.7 | 46.4 (28.6–67.9) |
-| CAIR vs concomitant boost | CAIR | 172 | 62.8 | 63.4 (54.7–72.1) |
-| | concomitant boost | 171 | 64.9 | 64.3 (55.0–72.5) |
-| CHART | CHART | 550 | 45.1 | 45.5 (37.1–53.3) |
-| | conventional | 365 | 49.9 | 49.6 (40.8–57.5) |
-| DAHANCA 6&7 | 6 per week | 750 | 70.0 | 68.8 (63.1–74.1) |
-| | 5 per week | 726 | 60.1 | 61.4 (55.2–67.5) |
-| EORTC 22791 | conventional | 159 | 40.3 | 45.3 (35.2–55.3) |
-| | hyperfractionated | 166 | 59.0 | 54.2 (44.0–63.3) |
-| EORTC 22811 | conventional | 168 | 26.8 | 25.0 (16.7–33.9) |
-| | three per day | 163 | 22.7 | 24.5 (16.6–33.7) |
-| EORTC 22851 | conventional | 255 | 45.9 | 41.2 (31.4–49.8) |
-| | accelerated | 257 | 59.1 | 64.2 (56.0–72.0) |
-| Ghoshal | concomitant boost | 143 | 73.4 | 68.5 (59.4–76.9) |
-| | conventional | 142 | 54.2 | 59.2 (48.6–69.0) |
-| Hliniak | conventional | 193 | 76.2 | 76.2 (68.4–82.9) |
-| | accelerated | 188 | 80.9 | 80.9 (74.5–86.7) |
-| IAEA-ACC | 6 per week | 452 | 42.0 | 40.9 (33.6–48.5) |
-| | 5 per week | 448 | 29.9 | 31.0 (23.9–38.8) |
-| Jackson | once daily | 41 | 43.9 | 36.6 (22.0–53.7) |
-| | twice daily | 41 | 48.8 | 56.1 (39.0–73.2) |
-| KROG 0201 | 2.0 Gy | 82 | 78.0 | 81.7 (70.7–90.2) |
-| | 2.25 Gy | 74 | 87.8 | 85.1 (75.7–91.9) |
-| Princess Margaret | hyperfractionated | 169 | 49.1 | 46.7 (36.7–56.2) |
-| | 2.55 Gy daily | 162 | 40.1 | 42.6 (32.7–52.5) |
-| RTOG 83-13 | 67.2 Gy | 63 | 25.4 | 30.2 (19.0–42.9) |
-| | 72.0 Gy | 58 | 36.2 | 34.5 (22.4–48.3) |
-| | 76.8 Gy | 116 | 42.2 | 39.7 (29.3–50.9) |
-| RTOG 88-09 | split course | 38 | 55.3 | 47.4 (28.9–63.2) |
-| | concomitant boost | 32 | 43.8 | 56.2 (37.5–71.9) |
-| RTOG 9003 | standard | 268 | 45.9 | 45.1 (36.9–53.4) |
-| | hyperfractionated | 263 | 54.4 | 56.7 (48.7–64.3) |
-| | accelerated, split | 274 | 47.4 | 45.6 (37.2–53.6) |
-| | concomitant boost | 268 | 54.5 | 55.2 (47.8–62.7) |
-| RTOG 9512 | once daily | 119 | 67.2 | 66.4 (55.5–75.6) |
-| | twice daily | 120 | 73.3 | 75.0 (65.8–82.5) |
-| TROG 91.01 | conventional | 171 | 46.8 | 48.5 (38.0–57.9) |
-| | accelerated | 172 | 51.7 | 50.6 (40.7–59.9) |
-| Yamazaki, smaller tumors | 2.0 Gy | 31 | 77.4 | 83.9 (67.7–96.8) |
-| | 2.25 Gy | 31 | 90.3 | 83.9 (71.0–96.8) |
-| Yamazaki, larger tumors | 2.0 Gy | 57 | 77.2 | 84.2 (71.9–93.0) |
-| | 2.25 Gy | 61 | 91.8 | 86.9 (75.4–93.4) |
+| Trial | Arm | N | Published (%) | Count in fit (%) | Predicted median (90% interval) |
+|---|---|---|---|---|---|
+| CAIR, 2.0 Gy period | CAIR | 23 | 73 | 73.9 | 60.9 (39.1–78.3) |
+| | control | 21 | 30 | 28.6 | 42.9 (19.0–66.7) |
+| CAIR, 1.8 Gy period | CAIR | 28 | 78 | 78.6 | 64.3 (46.4–82.1) |
+| | control | 28 | 35 | 35.7 | 46.4 (28.6–67.9) |
+| CAIR vs concomitant boost | CAIR | 172 | 63 | 62.8 | 63.4 (54.7–72.1) |
+| | concomitant boost | 171 | 65 | 64.9 | 64.3 (55.0–72.5) |
+| CHART | CHART | 550 | 45 | 45.1 | 45.5 (37.1–53.3) |
+| | conventional | 365 | 50 | 49.9 | 49.6 (40.8–57.5) |
+| DAHANCA 6&7 | 6 per week | 750 | 70 | 70.0 | 68.8 (63.1–74.1) |
+| | 5 per week | 726 | 60 | 60.1 | 61.4 (55.2–67.5) |
+| EORTC 22791 | conventional | 159 | 40 | 40.3 | 45.3 (35.2–55.3) |
+| | hyperfractionated | 166 | 59 | 59.0 | 54.2 (44.0–63.3) |
+| EORTC 22811 | conventional | 168 | 27 (figure) | 26.8 | 25.0 (16.7–33.9) |
+| | three per day | 163 | 23 (figure) | 22.7 | 24.5 (16.6–33.7) |
+| EORTC 22851 | conventional | 255 | 46 | 45.9 | 41.2 (31.4–49.8) |
+| | accelerated | 257 | 59 | 59.1 | 64.2 (56.0–72.0) |
+| Ghoshal | concomitant boost | 143 | 73.6 | 73.4 | 68.5 (59.4–76.9) |
+| | conventional | 142 | 54.5 | 54.2 | 59.2 (48.6–69.0) |
+| Hliniak | conventional | 193 | 76 | 76.2 | 76.2 (68.4–82.9) |
+| | accelerated | 188 | 81 | 80.9 | 80.9 (74.5–86.7) |
+| IAEA-ACC | 6 per week | 452 | 42 | 42.0 | 40.9 (33.6–48.5) |
+| | 5 per week | 448 | 30 | 29.9 | 31.0 (23.9–38.8) |
+| Jackson | once daily | 41 | 44.3 | 43.9 | 36.6 (22.0–53.7) |
+| | twice daily | 41 | 49.1 | 48.8 | 56.1 (39.0–73.2) |
+| KROG 0201 | 2.0 Gy | 82 | 77.8 | 78.0 | 81.7 (70.7–90.2) |
+| | 2.25 Gy | 74 | 88.5 | 87.8 | 85.1 (75.7–91.9) |
+| Princess Margaret | hyperfractionated | 169 | 49 | 49.1 | 46.7 (36.7–56.2) |
+| | 2.55 Gy daily | 162 | 40 | 40.1 | 42.6 (32.7–52.5) |
+| RTOG 83-13 | 67.2 Gy | 63 | 25 | 25.4 | 30.2 (19.0–42.9) |
+| | 72.0 Gy | 58 | 37 | 36.2 | 34.5 (22.4–48.3) |
+| | 76.8 Gy | 116 | 42 | 42.2 | 39.7 (29.3–50.9) |
+| RTOG 88-09 | split course | 38 | 55 (45 failure) | 55.3 | 47.4 (28.9–63.2) |
+| | concomitant boost | 32 | 44 (56 failure) | 43.8 | 56.2 (37.5–71.9) |
+| RTOG 9003 | standard | 268 | 46.0 | 45.9 | 45.1 (36.9–53.4) |
+| | hyperfractionated | 263 | 54.4 | 54.4 | 56.7 (48.7–64.3) |
+| | accelerated, split | 274 | 47.5 | 47.4 | 45.6 (37.2–53.6) |
+| | concomitant boost | 268 | 54.5 | 54.5 | 55.2 (47.8–62.7) |
+| RTOG 9512 | once daily | 119 | 67 | 67.2 | 66.4 (55.5–75.6) |
+| | twice daily | 120 | 73 | 73.3 | 75.0 (65.8–82.5) |
+| TROG 91.01 | conventional | 171 | 47 | 46.8 | 48.5 (38.0–57.9) |
+| | accelerated | 172 | 52 | 51.7 | 50.6 (40.7–59.9) |
+| Yamazaki, smaller tumors | 2.0 Gy | 31 | 76 | 77.4 | 83.9 (67.7–96.8) |
+| | 2.25 Gy | 31 | 91 | 90.3 | 83.9 (71.0–96.8) |
+| Yamazaki, larger tumors | 2.0 Gy | 57 | 78 | 77.2 | 84.2 (71.9–93.0) |
+| | 2.25 Gy | 61 | 92 | 91.8 | 86.9 (75.4–93.4) |
 
-The observed percentages are the rounded counts divided by N, so they can differ from the published rate by up to 1.4 points in the smallest arms.
+Published is the rate each trial reported, at its own endpoint and time point. For RTOG 88-09 it is 100 minus the reported cumulative incidence of local-regional failure (45% and 56%). That complement also counts patients who had a competing event, such as death without failure. Count in fit is the rounded count divided by N, which is what the likelihood uses. At one decimal it differs from the published rate in 40 of the 45 arms, by up to 1.43 percentage points (Yamazaki, smaller tumors, 2.0 Gy).
 
 **Each trial's out-of-sample result.** In leave-one-trial-out cross-validation, each of the 19 trials was removed in turn and the DI and free DD models were refitted to the other 18. In each fitting unit of the removed trial, the observed control of the first arm fixed the intercept, and the other arms (24 in total) were predicted. The score is this conditional log predictive density, where higher is better. It does not include the uncertainty of the first arm's observed rate:
 
@@ -240,9 +240,9 @@ The observed percentages are the rounded counts divided by N, so they can differ
 | Yamazaki (both strata) | −7.44 | −8.06 | −0.61 |
 | **Total** | **−99.12** | **−102.68** | **−3.56 (standard error 5.37)** |
 
-DI predicts 13 of the 19 trials better, although three of these differences (EORTC 22811, Princess Margaret, RTOG 9512) are below 0.05 and amount to ties. CAIR favors DI most and EORTC 22851 favors DD most. The free DD fits in this exercise had 415 divergent transitions across folds (175 of them in the fold without RTOG 83-13) against none for DI, so the DD scores are less reliable.
+DI predicts 13 of the 19 trials better, although three of these differences (EORTC 22811, Princess Margaret, RTOG 9512) are below 0.05 and amount to ties. CAIR favors DI most and EORTC 22851 favors DD most. The free DD fits in this exercise had 415 divergent transitions across folds (175 of them in the fold without RTOG 83-13) against none for DI, so the DD scores are less reliable. Neither these folds nor the agreement of the two linked models is an independent clinical validation.
 
-**No single trial drives the HYPNO result.** This check used the earlier trial set described in Section 2.4 (47 arms in 22 units, ARTSCAN included), where the HYPNO median with all units is −2.4 Gy₁₀. When the DI model was refitted 22 times, each time without one fitting unit, the HYPNO median ranged from −3.0 Gy₁₀ (without RTOG 9003) to −1.6 (without EORTC 22791). The onset day *T*ₖ stayed between 37.4 and 39.3 days.
+**No single trial drives the HYPNO result.** This check used the earlier trial set described in Section 2.4 (47 arms in 22 units, ARTSCAN included), where the HYPNO median with all units is −2.4 Gy. When the DI model was refitted 22 times, each time without one fitting unit, the HYPNO median ranged from −3.0 Gy (without RTOG 9003) to −1.6 (without EORTC 22791). The onset day *T*ₖ stayed between 37.4 and 39.3 days.
 
 # 4. Model-versus-model AICc
 
@@ -263,7 +263,7 @@ How to read these numbers:
 - **The published 40-unit preference for DD does not survive per-trial intercepts.** The per-arm log-likelihood differences printed in the 2018 Table 1 sum to 20.2, consistent with the reported 40. The 2018 models explained between-trial differences in control through three shared stage-based clonogen numbers plus their time and dose terms. Two explanations are plausible, and neither was tested separately. First, much of DD's advantage may have come from fitting differences between trials, which randomization does not protect. Second, the 2018 DI fit pushed its clonogen numbers to their lower limit of 10, as that paper notes, so a bound may have constrained DI. With per-trial intercepts only within-trial contrasts remain, no such bound applies, and the difference falls to 3.9 units.
 - **On the corrected and expanded data, the sign reverses.** DI is preferred by 9.0 units, or about 4 once overdispersion is allowed for. That is below the threshold of 10 that the 2018 paper used for significant support.
 - **The other checks agree.** Leave-one-trial-out favors DI by 3.6 log units, with a standard error of 5.4, so the difference is within noise. The free Bayesian DD fit fails the quality gate (28–74 divergent transitions per variant), and its rate and onset constant mostly reproduce their priors (onset constant *C* median 10.5 against a prior median of 10).
-- **The calculator therefore keeps both models.** It treats DI as the fitted model and DD as a variant calibrated to DI (Section 5.3). It reports where the two disagree instead of choosing one.
+- **The calculator therefore keeps both models.** It treats DI as the fitted model and DD as a variant calibrated to DI (Section 5.3). It reports where the two disagree instead of choosing one. The free DD model compared in this section is not the calibrated DD that the calculator uses.
 
 In the DD fit with *g* estimated, *g* sits at its upper bound of 0.021 per day, so that row's DD likelihood may be slightly limited by the bound.
 
@@ -271,10 +271,10 @@ In the DD fit with *g* estimated, *g* sits at its upper bound of 0.021 per day, 
 
 ## 5.1 Why a Bayesian fit
 
-1. **Few contrasts for the parameters.** 45 arms minus 21 intercepts leave about 24 within-unit contrasts to inform α, α/β, λ, *T*ₖ, *g* and σ. Maximum likelihood with this little information gives point estimates at parameter bounds and confidence intervals that depend on approximations. Priors keep each parameter in its plausible range and state openly what is assumed.
+1. **Few contrasts for the parameters.** 45 arms minus 21 intercepts leave 24 within-unit contrast degrees of freedom to inform α, α/β, λ, *T*ₖ, *g* and σ. Maximum likelihood with this little information gives point estimates at parameter bounds and confidence intervals that depend on approximations. Priors keep each parameter in its plausible range and state openly what is assumed.
 2. **One parameter is not informed by the data at all.** The trials span only 1.15–2.55 Gy per fraction, too narrow a range to estimate tumor α/β. Its posterior (median 10.6 Gy, 95% interval 6.6–19.1) essentially reproduces its prior (95% 5–20 Gy). A Bayesian fit passes that prior uncertainty into every schedule's result. A fixed α/β of 10 Gy, as in 2018, would hide it.
 3. **Overdispersion.** Arms vary more than binomial sampling allows. On the 2018 data, Pearson χ²/df was 3.65 with per-trial intercepts. Ignoring this makes intervals too narrow and model comparisons overconfident. The arm-level term σ*z*ᵢ absorbs it.
-4. **Joint uncertainty, delivered as draws.** The calculator needs, for any schedule a user types, an interval for the change in tumor BED. That change depends on α, α/β, λ, *T*ₖ and *g* together, and those parameters are correlated. Posterior draws give the answer for any schedule by evaluating it once per draw. The calculator's "Refit support" column, the share of paired DI and calibrated-DD draws in which a schedule meets the tumor condition (within 5 Gy₁₀ of the standard schedule under DI or DD), is computed this way. Profile-likelihood intervals for single parameters, as in 2018, cannot provide it.
+4. **Joint uncertainty, delivered as draws.** The calculator needs, for any schedule a user types, an interval for the change in tumor BED. That change depends on α, α/β, λ, *T*ₖ and *g* together, and those parameters are correlated. Posterior draws give the answer for any schedule by evaluating it once per draw. The calculator's "Refit support" column, the share of the 4,000 paired DI and calibrated-DD draws in which a schedule meets the tumor condition under DI or DD (by default within 5 Gy BED of the standard schedule, a margin the user can change), is computed this way. Profile-likelihood intervals for single parameters, as in 2018, cannot provide it.
 5. **Built-in checks.** Posterior predictive intervals for every arm (Section 3) and leave-one-trial-out scores come directly from the draws.
 
 Stan never runs inside the app. The fitted draws are exported once, checked against the quality gate and their content hashes, and shipped with the site.
@@ -302,11 +302,11 @@ Priors from earlier pooled analyses of the same trials (for example Withers or F
 The free DD fit is not identified: its rate and onset constant reproduce their priors, and it fails the quality gate. The calculator therefore uses a calibrated DD, fitted conditionally on the DI posterior. For each of 1,000 DI draws:
 
 1. α, α/β and *g* are taken from the DI draw.
-2. The DD onset constant is solved so that DD repopulation at the anchor schedule (35 × 2 Gy in 47 days) equals DI repopulation there. Both models therefore give the same effective tumor BED for the standard schedule.
+2. The DD onset constant is solved so that the DD repopulation loss at the anchor schedule (35 × 2 Gy in 47 days) equals the DI loss there. Both models therefore give the same effective tumor BED for the standard schedule. This equality is imposed, and the onset days need not agree: at the point values the DI onset is 37.3 days and the DD onset at the anchor is 38.3 days.
 3. λ~DD~, the intercepts and σ are fitted to all 45 arms, with a soft penalty against any arm's onset falling before day 7.
 4. Each conditional fit must pass the same gate (4 chains, lengthened and retried when needed). Four DD draws are kept per DI draw, giving 4,000 paired rows.
 
-The two models agree by construction at the standard schedule and differ only in how they extrapolate to shorter or longer courses, which is the question the calculator asks. Their agreement at the anchor is therefore not independent confirmation. All 1,000 conditional fits pass the gate (0 divergences, R-hat at most 1.010, bulk ESS at least 400). λ~DD~ has median 0.41 per day (95% interval 0.12–1.04), narrower than its prior.
+The two models agree by construction at the standard schedule and nowhere else. They differ for any other schedule, including one of the same length: at the point values, 35 × 2.1 Gy in 47 days gains 4.94 Gy over 35 × 2 Gy in 47 days under DI and 3.02 Gy under DD, because DD onset depends on the daily cell kill. Their agreement at the anchor is therefore not independent confirmation. All 1,000 conditional fits pass the gate (0 divergences, R-hat at most 1.010, bulk ESS at least 400). λ~DD~ has median 0.41 per day (95% interval 0.12–1.04), narrower than its prior.
 
 ## 5.4 Posterior estimates (primary DI fit)
 
@@ -321,11 +321,13 @@ The two models agree by construction at the standard schedule and differ only in
 | *g*/α, BED lost per day throughout (Gy) | 0.28 (0.11–0.48) |
 | σ (arm-level overdispersion) | 0.065 (0.004–0.174) |
 
-The small α (about 0.04 per Gy) is a population-level slope. It reflects patient-to-patient variation within each arm, not cell-line radiosensitivity. It does not change BED differences, but it makes any absolute tumor-control prediction shallow.
+In the 4,000 paired draws shipped with the calculator, computed within each draw and converted to EQD2 with that draw's α/β, background growth costs 0.23 Gy EQD2 per day from the first day (95% interval 0.10–0.40). Well after onset, accelerated repopulation adds 0.53 Gy EQD2 per day (0.18–0.99), for a combined late-course loss of 0.76 Gy EQD2 per day (0.46–1.24). The onset midpoint has median 37.3 days, counting the first day as day 1 (23.7–42.8). The background rate and the fraction-size sensitivity (α/β) remain largely set by their priors.
+
+The small α (about 0.04 per Gy) is a population-level slope, not a cell-line radiosensitivity. It can have several interpretations, and these data do not show that patient-to-patient variation is its cause. It does change BED differences. With the other rates fixed and DD recalibrated, raising α from 0.0443 to 0.09 per Gy moves 55 Gy in 20 fractions over 26 days against 70 Gy in 35 fractions over 47 days from −1.90 Gy (DI) and −2.63 Gy (DD) to −7.98 Gy under both. It also makes any absolute tumor-control prediction shallow.
 
 ## 5.5 What the refit says about common schedules
 
-Tumor BED change against 35 × 2 Gy in 47 days, Gy₁₀, median (80% interval), paired DI and calibrated-DD draws:
+Tumor BED change against 35 × 2 Gy in 47 days, Gy (each draw's α/β), median (80% interval), 4,000 paired DI and calibrated-DD draws:
 
 | Schedule | DI | Calibrated DD | Same sign in |
 |---|---|---|---|
@@ -340,18 +342,19 @@ Tumor BED change against 35 × 2 Gy in 47 days, Gy₁₀, median (80% interval),
 | 70 Gy/35, 6 per week (40 d) | +6.1 (+4.5 to +8.1) | +2.0 (+1.1 to +2.8) | 100% |
 | 68 × 1.2 Gy twice daily (47 d) | +7.6 (+6.1 to +8.9) | +4.6 (+2.0 to +6.5) | 98% |
 
-The DI column here uses the 1,000 DI draws paired with DD. The full DI posterior gives HYPNO −2.0 (−4.3 to +1.0). Across all 55 pairs of these schedules, the two models rank the pair the same way 91.9% of the time. They agree on hypofractionation to 15–20 fractions and on dropping the last week. On strong acceleration and twice-daily treatment they agree in sign, but DI predicts a gain 3–4 Gy₁₀ larger. The sign disagreements are mainly for 2 Gy courses of 38–40 days and for 60 Gy in 25 fractions, by 2–3 Gy₁₀. DI's onset near day 37 credits such courses with the full gain from shortening, and DD's earlier onset does not. Schedules above 2.55 Gy per fraction (HYPNO, 17 × 3.05 Gy, HYHOPE) are extrapolations under both models.
+The DI column here uses the 1,000 DI draws paired with DD. The full DI posterior gives HYPNO −2.0 (−4.3 to +1.0). Across all 55 pairs of these schedules, the two models rank the pair the same way 91.9% of the time. They agree on hypofractionation to 15–20 fractions and on dropping the last week. On strong acceleration and twice-daily treatment they agree in sign, but DI predicts a gain 3–4 Gy larger. The sign disagreements are mainly for 2 Gy courses of 38–40 days and for 60 Gy in 25 fractions, by 2–3 Gy. DI's onset near day 37 credits such courses with the full gain from shortening. DD's onset comes earlier when the daily dose is delivered faster, so it credits less. Schedules above 2.55 Gy per fraction (HYPNO, 17 × 3.05 Gy, HYHOPE) are extrapolations under both models.
 
 # 6. Limitations
 
-- **Endpoints differ between trials.** They include local or locoregional control, Kaplan–Meier or competing-risk estimates, and 2 to 5 years of follow-up. The per-trial intercept absorbs a constant difference between trials, but not a difference in how an endpoint responds to dose or time.
-- **Approximate likelihood.** The binomial likelihood is applied to rounded counts built from actuarial rates. The "effective N halved" sensitivity fit changes HYPNO by 0.1 Gy₁₀.
+- **Endpoints differ between trials.** They include local or locoregional control, 39 Kaplan–Meier and six cumulative-incidence estimates, and time points of 2, 3 or 5 years. The per-trial intercept absorbs a constant difference between trials, but not a difference in how an endpoint responds to dose or time.
+- **Approximate likelihood.** The binomial likelihood is applied to rounded counts built from actuarial rates. The "effective N halved" sensitivity fit changes HYPNO by 0.1 Gy.
 - **No stage adjustment.** Arms within a trial are assumed comparable by randomization, and arms are not adjusted for stage mix.
 - **RTOG 83-13** includes 8–10% nasopharyngeal patients, who cannot be removed from the arm-level control.
 - **Values read off figures** come from CHART and EORTC 22811. Overall time is derived for RTOG 83-13 and approximated for EORTC 22811.
 - **Small arms** come from CAIR (strata of 21–28 patients), Jackson (41 per arm) and Yamazaki (strata of 31–61).
+- **Representative schedules.** Some arms enter with one schedule for a mix of prescriptions. In Jackson's twice-daily arm, the fit uses 66 Gy in 33 fractions for all 41 patients, although the last ten received 62.8 Gy. At the fitted parameters, encoding that amendment lowers the arm's predicted control by about 1.4 percentage points. The fit itself was not repeated with it. CAIR uses the median fraction numbers of each period, KROG 0201 a T-stage-weighted fraction number, and IAEA-ACC and EORTC 22811 one prescription where the protocol allowed several.
 - **Overall-time rule.** Using the planned rather than the delivered overall time moves HYPNO's DI change to about zero.
-- **Chemotherapy is not modeled.** The parameters come from radiotherapy-alone trials, and adding same-chemotherapy trials moves HYPNO toward zero (−1.0 Gy₁₀ under DI).
+- **Chemotherapy is not modeled.** No fitted arm included concurrent cytotoxic chemotherapy, and adding same-chemotherapy trials moves HYPNO toward zero (−1.0 Gy under DI). A chemotherapy interaction, a patient's control probability, an organ toxicity probability and a noninferiority margin cannot be read from a BED difference or from a share of model draws.
 - **Tumor α/β is set by its prior,** and the DD repopulation parameters are not identified by these trials.
 - **The AICc comparison** in Section 4 omits overdispersion except through the QAICc correction, and it fixes α/β and *g*.
 
@@ -359,7 +362,7 @@ The DI column here uses the 1,000 DI draws paired with DD. The full DI posterior
 
 - Shuryak I, Hall EJ, Brenner DJ. Dose dependence of accelerated repopulation in head and neck cancer: supporting evidence and clinical implications. Radiother Oncol 2018;127:20–26. https://pubmed.ncbi.nlm.nih.gov/29534828/
 - Trial sources used in the main fit, with PubMed identifiers (PMID):
-    - CAIR, Skladowski 2006 (https://pubmed.ncbi.nlm.nih.gov/17011446/)
+    - CAIR, Skladowski 2006 (https://pubmed.ncbi.nlm.nih.gov/17011446/), outcomes (Table 2, p.711). Period schedules from the treatment report, Skladowski 2000 (https://pubmed.ncbi.nlm.nih.gov/10799721/, Table 1, p.102)
     - CAIR vs concomitant boost, Skladowski 2013 (https://pubmed.ncbi.nlm.nih.gov/22836063/)
     - CHART, Saunders 2010 (https://pubmed.ncbi.nlm.nih.gov/20394851/)
     - DAHANCA 6&7, Overgaard 2003 (https://pubmed.ncbi.nlm.nih.gov/14511925/)
@@ -369,9 +372,9 @@ The DI column here uses the 1,000 DI draws paired with DD. The full DI posterior
     - Ghoshal 2008 (https://pubmed.ncbi.nlm.nih.gov/18343310/)
     - Hliniak 2002 (https://pubmed.ncbi.nlm.nih.gov/11830307/)
     - IAEA-ACC, Overgaard 2010 (https://pubmed.ncbi.nlm.nih.gov/20382075/)
-    - Jackson 1997 (https://pubmed.ncbi.nlm.nih.gov/9165135/)
+    - Jackson 1997 (https://pubmed.ncbi.nlm.nih.gov/9165135/), outcomes (p.39 and Fig. 1) and mean delivered times (Table 3, p.41)
     - KROG 0201, Moon 2014 (https://pubmed.ncbi.nlm.nih.gov/24161568/)
-    - Princess Margaret, O'Sullivan 2020 (https://pubmed.ncbi.nlm.nih.gov/32055717/)
+    - Princess Margaret, O'Sullivan 2020 (https://pubmed.ncbi.nlm.nih.gov/32055717/), outcomes. Delivered median times from Cummings 2007 (https://pubmed.ncbi.nlm.nih.gov/17920715/, Table 2, p.12)
     - RTOG 83-13, Cox 1990 (https://pubmed.ncbi.nlm.nih.gov/2180866/)
     - RTOG 88-09, Fu 1995 (https://pubmed.ncbi.nlm.nih.gov/7790243/)
     - RTOG 9003, Fu 2000 (https://pubmed.ncbi.nlm.nih.gov/10924966/)
