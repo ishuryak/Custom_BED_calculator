@@ -143,3 +143,16 @@ def test_sbc_prior_draws_follow_the_registered_priors():
     assert np.mean(col("sigma_arm")) == pytest.approx(0.5 * math.sqrt(2 / math.pi), rel=0.06)
     y = sbc.prior_draw(np.random.default_rng(1), d)[1]
     assert len(y) == d["I"] and all(0 <= a <= n for a, n in zip(y, d["N"]))
+
+
+def test_an_arm_entering_the_analysis_twice_is_refused(monkeypatch):
+    real = s5.read
+
+    def doubled(name):
+        rows = real(name)
+        if name == "endpoint_mapping.csv":
+            rows = rows + [dict(r, outcome_id="O055") for r in rows if r["outcome_id"] == "O055"]
+        return rows
+    monkeypatch.setattr(s5, "read", doubled)
+    with pytest.raises(ValueError, match="GuptaP_CFCCT"):
+        s5.load_rows()

@@ -55,11 +55,21 @@ def copy_sources(tmp_path):
     return tmp_path / "data/early_tox/source"
 
 
-def add_rows(src, arm_row, outcome_row):
+def add_rows(src, arm_row, outcome_row, map_row=None):
     with open(src / "arm_curation.csv", "a") as f:
         f.write(arm_row + "\n")
     with open(src / "outcome_curation.csv", "a") as f:
         f.write(outcome_row + "\n")
+    if map_row:
+        with open(src / "extraction_map.csv", "a") as f:
+            f.write(map_row + "\n")
+
+
+def replace_in(src, name, old, new):
+    p = src / name
+    text = p.read_text()
+    assert old in text
+    p.write_text(text.replace(old, new))
 
 
 def test_a_count_found_in_neither_extraction_is_refused(tmp_path):
@@ -68,7 +78,7 @@ def test_a_count_found_in_neither_extraction_is_refused(tmp_path):
     # The Ghoshal conventional-arm conflict: the table says 27, the Discussion says 23.
     p.write_text(p.read_text().replace("O017,Ghoshal_CF,Ghoshal_S_2008,grade_3_4_mucositis,142,27,",
                                        "O017,Ghoshal_CF,Ghoshal_S_2008,grade_3_4_mucositis,142,23,"))
-    with pytest.raises(ValueError, match="O017: 23/142 not found"):
+    with pytest.raises(ValueError, match=r"O017: extraction A1#\d+ holds 27/142, not 23/142"):
         load_builder().build(str(tmp_path))
 
 
@@ -76,7 +86,7 @@ def test_a_count_found_in_only_one_extraction_is_refused(tmp_path):
     # Horiot 1992: only extraction A1 recorded a functional mucosal G3-G4 row (64/158).
     src = copy_sources(tmp_path)
     add_rows(src, "X_EO,EORTC22791,EORTC 22791,Horiot_JC_1992,CF,candidate,C1,x,none,x,W5 35d[2.0],x",
-             "O900,X_EO,Horiot_JC_1992,grade_3_4_mucositis,158,64,,usable,x")
+             "O900,X_EO,Horiot_JC_1992,grade_3_4_mucositis,158,64,,usable,x", "O900,A,,31,x")
     with pytest.raises(ValueError, match="O900: 64/158 found in only one extraction"):
         load_builder().build(str(tmp_path))
 
@@ -99,7 +109,67 @@ def test_only_mucositis_rows_confirm_a_count():
     assert not b.is_mucositis_endpoint("feeding_tube")
     ex = b.load_extractions(os.path.join(ROOT, "docs", "development", "2026_11_10_early_toxicity", "extraction"))
     e1, e2 = ex["E"]
-    assert not b.matches(e1, "Ortholan_C_2026", 91, 11) and b.matches(e2, "Ortholan_C_2026", 91, 11)
+    o = dict(outcome_id="O068", report_prefix="Ortholan_C_2026", endpoint_class="grade_3_plus_mucositis")
+    hits1 = [r for r in e1 if not b.row_problem(r, o, 91, 11)]
+    hits2 = [r for r in e2 if not b.row_problem(r, o, 91, 11)]
+    assert not hits1 and len(hits2) == 1
+
+
+# Identity checks (review finding F7, 2026-11-11). Each must fail on identity, not on chance.
+def test_a_count_moved_to_another_arms_value_is_refused(tmp_path):
+    # Gupta P conventional arm 8/30 changed to 15/30, which is the boost + cisplatin arm's count.
+    src = copy_sources(tmp_path)
+    replace_in(src, "outcome_curation.csv", "O055,GuptaP_CFCCT,Gupta_P_2020,grade_3_mucositis,30,8,",
+               "O055,GuptaP_CFCCT,Gupta_P_2020,grade_3_mucositis,30,15,")
+    with pytest.raises(ValueError, match=r"O055: extraction D1#\d+ holds 8/30, not 15/30"):
+        load_builder().build(str(tmp_path))
+
+
+def test_one_extraction_row_cannot_confirm_two_outcomes(tmp_path):
+    # A second outcome with the same arm, numbers and extraction rows as O055 (different class).
+    src = copy_sources(tmp_path)
+    m = {r.split(",")[0]: r for r in (src / "extraction_map.csv").read_text().splitlines()[1:]}
+    with open(src / "outcome_curation.csv", "a") as f:
+        f.write("O902,GuptaP_CFCCT,Gupta_P_2020,grade_3_4_mucositis,30,8,,usable,x\n")
+    with open(src / "extraction_map.csv", "a") as f:
+        f.write(",".join(["O902"] + m["O055"].split(",")[1:]) + "\n")
+    with pytest.raises(ValueError, match=r"O902: extraction row D1#\d+ already confirms O055"):
+        load_builder().build(str(tmp_path))
+
+
+def test_grade_2_and_wrong_report_rows_are_refused():
+    b = load_builder()
+    o = dict(outcome_id="X", report_prefix="Gupta_P_2020", endpoint_class="grade_3_mucositis")
+    row = dict(report_file="Gupta_P_2020_x.pdf", denominator=30, events=8, endpoint="max_grade_ge3_mucositis")
+    assert b.row_problem(row, o, 30, 8) == ""
+    assert "grade 2" in b.row_problem(dict(row, endpoint="other:mucositis grade 2"), o, 30, 8)
+    assert "grade 2" in b.row_problem(dict(row, endpoint="other:mucositis grade >=2"), o, 30, 8)
+    assert b.row_problem(dict(row, endpoint="other:mucositis grade 3-4"), o, 30, 8) == ""
+    assert "is from" in b.row_problem(dict(row, report_file="Tallari_RV_2017_x.pdf"), o, 30, 8)
+    assert "not mucositis" in b.row_problem(dict(row, endpoint="other:pharyngeal grade 3"), o, 30, 8)
+
+
+def test_duplicate_outcome_ids_and_map_rows_are_refused(tmp_path):
+    src = copy_sources(tmp_path)
+    lines = (src / "outcome_curation.csv").read_text().splitlines()
+    dup = next(l for l in lines if l.startswith("O055,"))
+    with open(src / "outcome_curation.csv", "a") as f:
+        f.write(dup + "\n")
+    with pytest.raises(ValueError, match="O055: duplicate outcome_id"):
+        load_builder().build(str(tmp_path))
+    src2 = copy_sources(tmp_path / "b")
+    mline = next(l for l in (src2 / "extraction_map.csv").read_text().splitlines() if l.startswith("O055,"))
+    with open(src2 / "extraction_map.csv", "a") as f:
+        f.write(mline + "\n")
+    with pytest.raises(ValueError, match="O055: duplicate row in extraction_map.csv"):
+        load_builder().build(str(tmp_path / "b"))
+
+
+def test_every_outcome_records_the_rows_that_confirm_it(built):
+    _, outcomes, _, _, _ = built
+    for o in outcomes:
+        rows = o["extraction_rows"].split(";")
+        assert len(rows) == (1 if o["outcome_id"] in ("O067", "O068") else 2), o["outcome_id"]
 
 
 def test_duplicate_reports_add_no_counts_even_when_both_extractions_agree(tmp_path):
@@ -107,7 +177,7 @@ def test_duplicate_reports_add_no_counts_even_when_both_extractions_agree(tmp_pa
     # screening log marks the report a duplicate, so the builder must refuse it.
     src = copy_sources(tmp_path)
     add_rows(src, "X_MAC,CAIR1,CAIR,Maciejewski_B_1996,Arm A,candidate,C1,x,none,x,W7 35d[2.0],x",
-             "O901,X_MAC,Maciejewski_B_1996,confluent_mucositis,23,11,,usable,x")
+             "O901,X_MAC,Maciejewski_B_1996,confluent_mucositis,23,11,,usable,x", "O901,A,0,0,x")
     with pytest.raises(ValueError, match="O901: report Maciejewski_B_1996 is screened as 'duplicate'"):
         load_builder().build(str(tmp_path))
 

@@ -6,13 +6,16 @@ Usage:
 Inputs (committed):
     data/early_tox/source/arm_curation.csv       one row per arm: role, context, therapy, schedule pattern
     data/early_tox/source/outcome_curation.csv   one row per arm outcome: expected denominator and events
+    data/early_tox/source/extraction_map.csv     the exact row of each extraction that confirms each outcome
     docs/development/2026_11_10_early_toxicity/extraction/out_{A,B,C,D,E}{1,2}.json
                                                  two independent extractions per batch of reports
 Outputs (data/early_tox/):
     arms.csv, outcomes.csv, arm_schedules.csv, arm_fractions.csv, evidence_families.csv
 
-An outcome is written only if BOTH independent extractions of its report contain the same
-denominator and event count. Quotes, locations, scales and assessment windows are copied from the
+An outcome is written only if BOTH independent extractions confirm it through the rows named in
+extraction_map.csv: same report, same denominator and event count, a mucositis endpoint compatible
+with the outcome's class and never a grade 2 threshold, and no row confirming two outcomes
+(identity matching added 2026-11-11, review finding F7). Quotes, locations, scales and assessment windows are copied from the
 extraction, never typed here.
 
 Schedule pattern grammar (one variant; variants separated by " | ", optional weight "{w}"):
@@ -114,9 +117,27 @@ def is_mucositis_endpoint(endpoint):
     return ep in ("max_grade_ge3_mucositis", "confluent_mucositis") or (ep.startswith("other:") and "mucos" in ep)
 
 
-def matches(rows, prefix, n, e):
-    return [r for r in rows if r["report_file"].startswith(prefix) and is_mucositis_endpoint(r.get("endpoint"))
-            and as_int(r.get("denominator")) == n and as_int(r.get("events")) == e]
+GRADE2_ONLY = re.compile(r"grade\s*(2|ii)\b(?!\s*[-–+]\s*(3|4|iii|iv))|>=\s*2|ge2|grade_2", re.I)
+CONFLUENT_CLASSES = ("confluent", "diffuse")
+
+
+def row_problem(r, o, n, e):
+    """Why an extraction row cannot confirm outcome o (n events e), or '' if it can."""
+    if not r["report_file"].startswith(o["report_prefix"]):
+        return f"is from {r['report_file'][:40]}, not {o['report_prefix']}"
+    if as_int(r.get("denominator")) != n or as_int(r.get("events")) != e:
+        return f"holds {r.get('events')}/{r.get('denominator')}, not {e}/{n}"
+    ep = (r.get("endpoint") or "")
+    if not is_mucositis_endpoint(ep):
+        return f"endpoint {ep!r} is not mucositis"
+    if GRADE2_ONLY.search(ep):
+        return f"endpoint {ep!r} is a grade 2 threshold"
+    if any(c in o["endpoint_class"] for c in CONFLUENT_CLASSES):
+        if not (ep in ("confluent_mucositis", "max_grade_ge3_mucositis") or ep.lower().startswith("other:")):
+            return f"endpoint {ep!r} does not fit class {o['endpoint_class']}"
+    elif ep == "confluent_mucositis" and "dische" not in o["endpoint_class"]:
+        return f"endpoint {ep!r} does not fit class {o['endpoint_class']}"
+    return ""
 
 
 def build(root):
@@ -156,7 +177,12 @@ def build(root):
                          schedule_variants=" ".join(variants), pattern_notes=a["pattern_notes"]))
 
     screening = {s["report_prefix"]: s["decision"] for s in read_csv(os.path.join(src, "screening_log.csv"))}
-    outcomes = []
+    xmap = {}
+    for m in read_csv(os.path.join(src, "extraction_map.csv")):
+        if m["outcome_id"] in xmap:
+            raise ValueError(f"{m['outcome_id']}: duplicate row in extraction_map.csv")
+        xmap[m["outcome_id"]] = m
+    outcomes, seen_outcomes, seen_arm_endpoint, used_rows = [], set(), set(), {}
     for o in outs_in:
         decision = screening.get(o["report_prefix"])
         if decision not in ("included", "included_sensitivity", "benchmark"):
@@ -169,22 +195,46 @@ def build(root):
         n, e = as_int(o["denominator"]), as_int(o["events"])
         if n is None or e is None or not 0 <= e <= n:
             raise ValueError(f"{o['outcome_id']}: invalid count {o['events']}/{o['denominator']}")
-        hits = None
-        for batch, (x1, x2) in ex.items():
-            h1, h2 = matches(x1, o["report_prefix"], n, e), matches(x2, o["report_prefix"], n, e)
-            if h1 or h2:
-                if not (h1 and h2):
-                    single_ok = (o["status"] == SINGLE_OK_STATUS and arm["role"] == "sensitivity"
-                                 and len(o["note"]) > 40)
-                    if not single_ok:
-                        raise ValueError(f"{o['outcome_id']}: {e}/{n} found in only one extraction of batch {batch}")
-                    r = (h1 or h2)[0]
-                    hits = (batch, r, None)
-                else:
-                    hits = (batch, h1[0], h2[0])
-        if hits is None:
+        if o["outcome_id"] in seen_outcomes:
+            raise ValueError(f"{o['outcome_id']}: duplicate outcome_id")
+        seen_outcomes.add(o["outcome_id"])
+        key = (o["arm_id"], o["endpoint_class"])
+        if key in seen_arm_endpoint:
+            raise ValueError(f"{o['outcome_id']}: second outcome for arm {key[0]} and endpoint {key[1]}")
+        seen_arm_endpoint.add(key)
+        mp = xmap.get(o["outcome_id"])
+        if mp is None:
+            raise ValueError(f"{o['outcome_id']}: no row in extraction_map.csv")
+        batch = mp["batch"]
+        if batch not in ex:
+            raise ValueError(f"{o['outcome_id']}: unknown extraction batch {batch!r}")
+        picked = []
+        for k, col in ((0, "row_extraction_1"), (1, "row_extraction_2")):
+            if mp[col] == "":
+                picked.append(None)
+                continue
+            idx = int(mp[col])
+            rows_k = ex[batch][k]
+            if not 0 <= idx < len(rows_k):
+                raise ValueError(f"{o['outcome_id']}: extraction {batch}{k + 1} has no row {idx}")
+            r = rows_k[idx]
+            tag = (batch, k, idx)
+            if tag in used_rows:
+                raise ValueError(f"{o['outcome_id']}: extraction row {batch}{k + 1}#{idx} already confirms {used_rows[tag]}")
+            used_rows[tag] = o["outcome_id"]
+            problem = row_problem(r, o, n, e)
+            if problem:
+                raise ValueError(f"{o['outcome_id']}: extraction {batch}{k + 1}#{idx} {problem}")
+            picked.append((idx, r))
+        if picked[0] is None and picked[1] is None:
             raise ValueError(f"{o['outcome_id']}: {e}/{n} not found in any extraction of {o['report_prefix']}")
-        batch, r1, r2 = hits
+        if picked[0] is None or picked[1] is None:
+            single_ok = (o["status"] == SINGLE_OK_STATUS and arm["role"] == "sensitivity" and len(o["note"]) > 40)
+            if not single_ok:
+                raise ValueError(f"{o['outcome_id']}: {e}/{n} found in only one extraction of batch {batch}")
+        first = picked[0] or picked[1]
+        r1, r2 = first[1], (picked[1][1] if picked[0] and picked[1] else None)
+        rows_used = ";".join(f"{batch}{k + 1}#{p[0]}" for k, p in enumerate(picked) if p)
         outcomes.append(dict(
             outcome_id=o["outcome_id"], arm_id=o["arm_id"], family_id=arm["family_id"], role=arm["role"],
             endpoint_class=o["endpoint_class"], endpoint_as_written=r1.get("endpoint_as_written", ""),
@@ -195,6 +245,7 @@ def build(root):
             report_file=r1["report_file"],
             extraction_agreement=(f"batch {batch}: both extractions" if r2 is not None
                                   else f"batch {batch}: one extraction, adjudicated (see note)"),
+            extraction_rows=rows_used,
             note=o["note"]))
 
     families = defaultdict(lambda: dict(roles=set(), reports=set(), arms=0))

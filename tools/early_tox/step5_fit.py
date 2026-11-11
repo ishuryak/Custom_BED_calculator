@@ -137,6 +137,9 @@ def load_rows(w1_only=False, m4=False, drop_chemo=False, drop_family=None):
         rows.append(dict(outcome_id=m["outcome_id"], arm_id=m["arm_id"], family=m["family_id"],
                          scale_group=m["scale_group"], N=int(o["denominator"]), y=int(o["events"]),
                          variants=variants, chemo_text=a["planned_systemic_therapy"]))
+    ids = [r["arm_id"] for r in rows]
+    if len(ids) != len(set(ids)):
+        raise ValueError(f"arm(s) entered twice: {sorted({a for a in ids if ids.count(a) > 1})}")
     fams = sorted({r["family"] for r in rows})
     for f in fams:
         if sum(1 for r in rows if r["arm_id"] == REF_ARM.get(f)) != 1:
