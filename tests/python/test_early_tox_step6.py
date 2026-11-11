@@ -159,3 +159,12 @@ def test_repair_half_time_reaches_the_external_contrasts():
     c = s6.family_data("RTOG9003", rows, dict(halftime_h=2.0))
     assert not np.allclose(a["dQ"], b["dQ"]) and not np.allclose(a["dQ"], c["dQ"])
     assert np.allclose(a["dD"], b["dD"]) and np.allclose(a["dTe"], b["dTe"])
+
+
+def test_conditional_check_runs_on_fit_shaped_draws_with_a_scale_group_offset():
+    # Fitted caches carry delta_all and groups, not delta (smoke run found the gap, 2026-11-11).
+    d = fake_draws(S=100)
+    del d["delta"]
+    d.update(delta_all=np.full((100, 1), 0.3), groups=np.array(["G2"]))
+    c = s6.contrast_check(dict(fake_family(), group="G2"), d, 1, 10)
+    assert len(c) == 2 and np.isfinite(c[0]["predicted_count_median"])

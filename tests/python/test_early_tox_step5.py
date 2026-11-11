@@ -221,6 +221,10 @@ def test_gate_requires_every_quantity_finite_and_checks_constants():
     assert not ok(cand, drop=("zarm[3]",))                 # an arm effect missing from the summary
     assert not ok(cand, rhat=1.02)
     assert not ok(bench, bench_ab=11.0)                    # fixed benchmark constant moved
+    assert ok(bench, bench_ab=float(f"{bench['ab_fix']:.6g}"))   # CmdStan's 6-figure rounding is fine
+    sr = _fake_summary(bench)
+    sr.loc["r", "Mean"] = float(f"{bench['r_fix']:.6g}")         # 0.792168 printed for 0.79216821
+    assert s5.gate_from_summary(sr, bench, 0, [0.9] * 4, 0)["gate_pass"]
     s = _fake_summary(cand)
     assert not s5.gate_from_summary(s, cand, 1, [0.9] * 4, 0)["gate_pass"]        # a divergence
     assert not s5.gate_from_summary(s, cand, 0, [0.9, 0.2, 0.9, 0.9], 0)["gate_pass"]   # low E-BFMI

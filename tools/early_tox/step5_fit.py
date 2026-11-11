@@ -337,7 +337,10 @@ def gate_from_summary(s, data, divergences, ebfmi, treedepth_hits):
     fixed_ok = True
     if data["fixed_E"]:
         for q, v in (("ab", data["ab_fix"]), ("r", data["r_fix"])):
-            fixed_ok &= q in s.index and abs(float(s.loc[q, "Mean"]) - v) < 1e-9 and float(s.loc[q, "StdDev"]) < 1e-9
+            # CmdStan prints 6 significant figures, so compare relatively; a constant has no spread
+            sd = float(s.loc[q, "StdDev"]) if q in s.index else float("nan")
+            fixed_ok &= (q in s.index and abs(float(s.loc[q, "Mean"]) - v) <= 1e-5 * abs(v)
+                         and (not np.isfinite(sd) or sd < 1e-6))
     finite = vals.loc[[q for q in present if q not in nonfinite]]
     out = dict(divergences=int(divergences), missing=missing, nonfinite=nonfinite, fixed_constants_ok=bool(fixed_ok),
                rhat=float(finite["R_hat"].max()) if len(finite) else float("nan"),

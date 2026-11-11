@@ -202,6 +202,8 @@ def contrast_check(fd, draws_fit, seed, inner):
     log OR is computed on replicates and data (observed scale). The latent log OR, also weighted, is
     reported separately. ESS of the weights is recorded."""
     rng = np.random.default_rng(seed)
+    if "delta" not in draws_fit:                                           # fitted draws: attach the group offset
+        draws_fit = dict(draws_fit, delta=group_delta(draws_fit, fd["group"], list(draws_fit["groups"]), rng))
     eta, arm = latent_draws(draws_fit, fd, inner, rng)
     p = arm_probabilities(draws_fit, fd, eta, arm)                         # (S, inner, I)
     y, N, r = fd["y"], fd["N"], fd["ref"]
