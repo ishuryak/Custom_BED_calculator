@@ -116,3 +116,27 @@ def test_overdispersion_switch_reaches_the_fit_and_finished_units_are_skipped(mo
     stamp = os.path.getmtime(tmp_path / "od" / "U02" / "diagnostics.json")
     s5.run_unit(model, "U02", str(tmp_path / "od"), smoke=True, od=True)
     assert os.path.getmtime(tmp_path / "od" / "U02" / "diagnostics.json") == stamp
+
+
+def test_leave_one_family_out_removes_exactly_that_family():
+    assert len(s5.LOFO_UNITS) == 15
+    base, _ = s5.load_rows()
+    for name, (_, st) in s5.LOFO_UNITS.items():
+        rows, fams = s5.load_rows(drop_family=st["drop_family"])
+        assert st["drop_family"] not in fams and len(fams) == 14
+        assert len(rows) == len(base) - sum(1 for x in base if x["family"] == st["drop_family"])
+
+
+def test_sbc_prior_draws_follow_the_registered_priors():
+    sbc = load("step5_sbc")
+    d = s5.stan_data(*s5.load_rows(), 7.0, dict(use_od=1))
+    rng = np.random.default_rng(0)
+    th = [sbc.prior_draw(rng, d)[0] for _ in range(4000)]
+    col = lambda k: np.array([t[k] for t in th])
+    assert np.std(np.log(col("ab"))) == pytest.approx(0.354, rel=0.06)
+    assert np.mean(np.log(col("ab"))) == pytest.approx(math.log(10), abs=0.03)
+    assert np.mean(np.log(col("r"))) == pytest.approx(math.log(0.8), abs=0.04)
+    assert np.mean(col("Lstar")) == pytest.approx(math.sqrt(2 / math.pi), rel=0.06)     # HalfNormal(1)
+    assert np.mean(col("sigma_arm")) == pytest.approx(0.5 * math.sqrt(2 / math.pi), rel=0.06)
+    y = sbc.prior_draw(np.random.default_rng(1), d)[1]
+    assert len(y) == d["I"] and all(0 <= a <= n for a, n in zip(y, d["N"]))

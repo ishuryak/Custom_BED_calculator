@@ -1,7 +1,7 @@
 """Plan step 5: first refit of early (acute mucosal) toxicity to randomized-arm counts.
 
 Usage:
-    python3 tools/early_tox/step5_fit.py [--units U02,U03] [--smoke] [--out DIR]
+    python3 tools/early_tox/step5_fit.py [--units U02,U03 | --lofo] [--od] [--smoke] [--out DIR]
 
 Decisions applied (Igor Shuryak, 2026-11-11, "C1-C3 as recommended, go"):
     C1  within-trial chemotherapy term gamma ~ N(0, 1) on the log-odds scale, coded per arm against
@@ -93,6 +93,8 @@ UNITS = {
     "U11": ("candidate, plus IAEA-ACC, Pinto, Poddar (M4)", dict(m4=True)),
     "U14": ("candidate without the chemotherapy term (plan as written)", dict(use_gamma=0)),
 }
+# Leave-one-family-out influence of the primary candidate (U02 settings), one unit per family.
+LOFO_UNITS = {f"L_{f}": (f"candidate without family {f}", dict(drop_family=f)) for f in sorted(s4.REF_ARM)}
 REPORT_PARAMS = ["Lstar", "kappa", "ab", "r", "gamma[1]", "sigma_arm[1]", "m0", "tau0"]
 
 
@@ -101,7 +103,7 @@ def read(name):
         return list(csv.DictReader(f))
 
 
-def load_rows(w1_only=False, m4=False, drop_chemo=False):
+def load_rows(w1_only=False, m4=False, drop_chemo=False, drop_family=None):
     """Arm rows for one analysis set, with D, Q (3.2 h repair) and elapsed-time terms per arm."""
     fr = {}
     for r in read("arm_fractions.csv"):
@@ -114,7 +116,7 @@ def load_rows(w1_only=False, m4=False, drop_chemo=False):
         keep = m["in_primary"] == "1" or (m4 and m["analysis_set"] == "sensitivity")
         if not keep or (w1_only and m["in_primary"] == "1" and m["window"] != "W1"):
             continue
-        if drop_chemo and m["family_id"] in CHEMO_FAMILIES:
+        if (drop_chemo and m["family_id"] in CHEMO_FAMILIES) or m["family_id"] == drop_family:
             continue
         o, a = out[m["outcome_id"]], arms[m["arm_id"]]
         variants = []
@@ -200,14 +202,15 @@ def diagnostics(fit, names):
 
 
 def run_unit(model, name, out_dir, smoke=False, od=False):
-    desc, settings = UNITS[name]
+    desc, settings = {**UNITS, **LOFO_UNITS}[name]
     settings = dict(settings, use_od=1) if od else settings
     udir = os.path.join(out_dir, name)
     if os.path.exists(os.path.join(udir, "diagnostics.json")):
         print(f"{name}: done, skipped", flush=True)
         return
     os.makedirs(udir, exist_ok=True)
-    rows, fams = load_rows(settings.get("w1_only", False), settings.get("m4", False), settings.get("drop_chemo", False))
+    rows, fams = load_rows(settings.get("w1_only", False), settings.get("m4", False), settings.get("drop_chemo", False),
+                           settings.get("drop_family"))
     Tk = settings.get("Tk", 7.0)
     data = stan_data(rows, fams, Tk, settings)
     free = wait_for_memory()
@@ -253,6 +256,7 @@ def run_unit(model, name, out_dir, smoke=False, od=False):
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--units", default=",".join(UNITS))
+    ap.add_argument("--lofo", action="store_true", help="run the leave-one-family-out units instead")
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--od", action="store_true", help="add arm-level overdispersion to every unit (C3)")
     ap.add_argument("--out", default=OUT_DEFAULT)
@@ -260,7 +264,7 @@ def main(argv):
     out = os.path.join(a.out + ("_smoke" if a.smoke else ""), "overdispersed" if a.od else "binomial")
     os.makedirs(out, exist_ok=True)
     model = compile_model()
-    for u in a.units.split(","):
+    for u in (list(LOFO_UNITS) if a.lofo else a.units.split(",")):
         run_unit(model, u, out, smoke=a.smoke, od=a.od)
 
 

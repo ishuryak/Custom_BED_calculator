@@ -320,3 +320,54 @@ parameters:
       date: "2026-11-10"
       range: [0, 3]
       assumption_ack: true
+  # Early-toxicity plan step 5 (2026-11-11): priors added by decisions C1, C3 and M1, and the
+  # simulation-based calibration (tools/early_tox/step5_sbc.py, seed 20261112).
+  - id: et_prior_gamma
+    description: "Step 5 prior (C1): within-trial chemotherapy log-odds effect, normal(0, 1); arm coded +1/-1/0 against its family reference by cumulative planned concurrent dose"
+    units: "logit"
+    source: user_supplied
+    value: 0
+    distribution:
+      family: normal
+      params: {mean: 0, sd: 1}
+    user_supplied:
+      provided_by: "analyst proposal (Claude), adopted as decision C1 by Igor Shuryak"
+      date: "2026-11-11"
+      range: [-2, 2]
+      assumption_ack: true
+  - id: et_prior_sigma_arm
+    description: "Step 5 prior (C3): arm-level overdispersion SD on the log-odds scale, half-normal(0.5)"
+    units: "logit"
+    source: user_supplied
+    value: 0.5
+    distribution:
+      family: normal
+      params: {mean: 0, sd: 0.5}
+    user_supplied:
+      provided_by: "analyst proposal (Claude), adopted as decision C3 by Igor Shuryak"
+      date: "2026-11-11"
+      range: [0, 1.5]
+      assumption_ack: true
+  - id: et_prior_delta
+    description: "Step 5 prior (M1): scale-family baseline offsets (CTCAE v4 group G2; 'other' for Pinto in the M4 sensitivity fit) relative to G1, normal(0, 1)"
+    units: "logit"
+    source: user_supplied
+    value: 0
+    distribution:
+      family: normal
+      params: {mean: 0, sd: 1}
+    user_supplied:
+      provided_by: "analyst choice (Claude) implementing decision M1 (Igor Shuryak); scale not set by D3"
+      date: "2026-11-11"
+      range: [-2, 2]
+      assumption_ack: true
+  - id: et_sbc_reps
+    description: "SBC design: replicates drawn from the step 5 priors (et_prior_*) on the real primary design, each fitted with 2 chains x 500 draws and ranked among 100 thinned draws"
+    units: "count"
+    source: user_supplied
+    value: 500
+    user_supplied:
+      provided_by: "analyst choice (Claude)"
+      date: "2026-11-11"
+      range: [200, 1000]
+      assumption_ack: true
