@@ -84,3 +84,49 @@ test_that("fixed toxicity in research mode reproduces the point model", {
   e <- bed_early_draws(20, 2.75, overall_time(20), tx)[1, ]
   expect_equal(e, rep(compute_all(20, 2.75, overall_time(20), p_fit, default_anchor())$bed_early, 3), tolerance = 1e-9)
 })
+
+# Review R5 (v4.6): the runtime package is validated as a whole, and the exact posterior is pinned.
+pkg_copy <- function(edit = NULL, draws_edit = NULL) {
+  tmp <- tempfile(); dir.create(tmp)
+  file.copy(file.path(app_abs, "draws", c(EARLY_FIT_MANIFEST, EARLY_FIT_FILE, "early_fit_trials.csv")), tmp)
+  m <- jsonlite::fromJSON(file.path(tmp, EARLY_FIT_MANIFEST), simplifyVector = FALSE)
+  if (!is.null(draws_edit)) {
+    d <- utils::read.csv(file.path(tmp, EARLY_FIT_FILE))
+    utils::write.csv(draws_edit(d), file.path(tmp, EARLY_FIT_FILE), row.names = FALSE)
+    m$files[[EARLY_FIT_FILE]]$sha256 <- digest::digest(file = file.path(tmp, EARLY_FIT_FILE), algo = "sha256")
+  }
+  if (!is.null(edit)) m <- edit(m)
+  jsonlite::write_json(m, file.path(tmp, EARLY_FIT_MANIFEST), auto_unbox = TRUE, digits = NA, pretty = TRUE)
+  tmp
+}
+
+test_that("a package with failed diagnostics, wrong point values or unknown definitions is unavailable", {
+  expect_true(load_early_fit(pkg_copy())$ok)
+  cases <- list(
+    list(function(m) { m$gate$passed <- FALSE; m }, "diagnostics do not meet the gate"),
+    list(function(m) { m$gate$divergences <- 99; m }, "diagnostics do not meet the gate"),
+    list(function(m) { m$point_values$r_e <- 100; m }, "not the median of the draws"),
+    list(function(m) { m$evaluator <- "other-evaluator"; m }, "unsupported evaluator"),
+    list(function(m) { m$schema <- NULL; m }, "unknown package schema"),
+    list(function(m) { m$fixed$repair_halftime_h <- 2; m }, "unsupported evaluator settings"))
+  for (cs in cases) {
+    f <- load_early_fit(pkg_copy(cs[[1]]))
+    expect_false(f$ok); expect_match(f$reason, cs[[2]], fixed = TRUE)
+  }
+  bad <- pkg_copy(); writeLines("{not json", file.path(bad, EARLY_FIT_MANIFEST))
+  expect_false(load_early_fit(bad)$ok)                      # no uncaught parse error
+})
+
+test_that("reordered draws with a matching hash load, but an old exact scenario refuses to replay", {
+  rev_dir <- pkg_copy(draws_edit = function(d) { d <- d[rev(seq_len(nrow(d))), ]; d$draw <- seq_len(nrow(d)); d })
+  f2 <- load_early_fit(rev_dir)
+  expect_true(f2$ok)                                         # same medians, a different exact posterior
+  expect_false(identical(f2$draws_sha256, fit$draws_sha256))
+  eb <- list(model = "fitted", model_id = fit$model_id, ab_e = fit$point$ab_e, r_e = fit$point$r_e,
+             Tk_e = fit$point$Tk_e, h_e = fit$point$h_e, draws_sha256 = fit$draws_sha256,
+             package_sha256 = fit$package_sha256, evaluator = EARLY_FIT_EVALUATOR,
+             calendar = list(fx_per_week = 5, start_weekday = 1, skip_days = list()))
+  for (f in c("oar.R", "export.R")) source(file.path(app_abs, "R", f), local = TRUE)
+  expect_true(early_is_relative(apply_early_block(list(), eb, fit)))
+  expect_error(apply_early_block(list(), eb, f2), "not the installed one")
+})

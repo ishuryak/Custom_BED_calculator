@@ -123,6 +123,9 @@ early_block <- function(p) {
   if (!early_is_relative(p)) return(NULL)
   cal <- if (is.null(p$calendar_e)) default_calendar() else p$calendar_e
   list(model = "fitted", model_id = p$early_model_id, ab_e = p$ab_e, r_e = p$r_e, Tk_e = p$Tk_e, h_e = p$h_e,
+       draws_sha256 = p$early_draws_sha256, package_sha256 = p$early_package_sha256,
+       evaluator = EARLY_FIT_EVALUATOR,
+       row_order = "joint posterior rows in file order; row k of the early draws is used with simulation k",
        calendar = list(fx_per_week = cal$fx_per_week, start_weekday = cal$start_weekday,
                        skip_days = as.list(cal$skip_days)),
        formula = "E = D + Q/ab - r * max(0, T_elapsed - Tk), incomplete repair (half-time h_e hours), exact hinge",
@@ -139,6 +142,9 @@ apply_early_block <- function(p, eb, fit = load_early_fit()) {
     replay_fail("it used fitted early-toxicity model ", eb$model_id, ", not this calculator's ", fit$model_id, ".")
   for (k in c("ab_e", "r_e", "Tk_e", "h_e"))
     if (!same_num(eb[[k]], fit$point[[k]])) replay_fail("its fitted early-toxicity value ", k, " differs from the installed model.")
+  if (!identical(as.character(eb$draws_sha256), fit$draws_sha256) || !identical(as.character(eb$package_sha256), fit$package_sha256))
+    replay_fail("its early-toxicity posterior (draws or package SHA-256) is not the installed one, so exact replay is impossible.")
+  if (!identical(as.character(eb$evaluator), EARLY_FIT_EVALUATOR)) replay_fail("it used an unsupported early-toxicity evaluator.")
   cc <- eb$calendar
   cal <- list(fx_per_week = check_num(cc$fx_per_week, "early calendar fx_per_week", 5, 6, TRUE),
               start_weekday = check_num(cc$start_weekday, "early calendar start_weekday", 1, 6, TRUE),

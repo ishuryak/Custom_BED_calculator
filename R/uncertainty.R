@@ -185,27 +185,49 @@ EARLY_FIT_FILE <- "early_fit_draws.csv"
 
 # The fitted model's manifest, joint draws and point values, or ok = FALSE with a reason. The
 # draws file must match the sha256 in its manifest; anything else makes research mode unavailable.
+EARLY_FIT_SCHEMA <- "early-fit-package-1"
+EARLY_FIT_EVALUATOR <- "early-bed-fit-1"
+
+# The fitted model's package (manifest, joint draws, point values), fully validated (review R5), or
+# ok = FALSE with a reason. Never throws: a malformed package makes research mode unavailable.
 load_early_fit <- function(dir = DRAWS_DIR) {
   fail <- function(why) list(ok = FALSE, reason = why)
   mp <- file.path(dir, EARLY_FIT_MANIFEST); dp <- file.path(dir, EARLY_FIT_FILE)
   if (!file.exists(mp) || !file.exists(dp)) return(fail("the fitted early-toxicity files are not installed"))
-  man <- tryCatch(jsonlite::fromJSON(mp, simplifyVector = FALSE), error = function(e) NULL)
-  if (is.null(man)) return(fail("the fitted early-toxicity manifest cannot be read"))
-  got <- digest::digest(readBin(dp, "raw", n = file.size(dp)), algo = "sha256", serialize = FALSE)
-  if (!identical(got, man$files[[EARLY_FIT_FILE]]$sha256))
-    return(fail("the fitted early-toxicity draws do not match their manifest"))
-  dr <- utils::read.csv(dp)
-  if (!all(c("ab_e", "r_e", "kappa") %in% names(dr)) || nrow(dr) != man$n_draws ||
-      any(!is.finite(as.matrix(dr[c("ab_e", "r_e", "kappa")]))) || any(dr$ab_e <= 0))
-    return(fail("the fitted early-toxicity draws are incomplete"))
-  list(ok = TRUE, manifest = man, draws = dr, model_id = man$model_id,
-       point = list(ab_e = man$point_values$ab_e, r_e = man$point_values$r_e,
-                    Tk_e = man$fixed$Tk_e_elapsed_days, h_e = man$fixed$repair_halftime_h))
+  tryCatch({
+    man <- jsonlite::fromJSON(mp, simplifyVector = FALSE)
+    need <- function(ok, what) if (!isTRUE(ok)) stop(what, call. = FALSE)
+    need(identical(man$schema, EARLY_FIT_SCHEMA), "unknown package schema")
+    need(is.character(man$evaluator) && startsWith(man$evaluator, EARLY_FIT_EVALUATOR), "unsupported evaluator")
+    fx <- man$fixed
+    need(identical(fx$hinge, "exact") && identical(fx$clock, "elapsed days") &&
+         identical(as.numeric(fx$Tk_e_elapsed_days), 7) && identical(as.numeric(fx$repair_halftime_h), 3.2),
+         "unsupported evaluator settings")
+    g <- man$gate
+    need(is.logical(g$passed) && isTRUE(g$passed) && identical(as.numeric(g$divergences), 0) &&
+         is.numeric(g$rhat) && g$rhat < 1.01 && g$ess_bulk > 400 && g$ess_tail > 400 && g$ebfmi_min >= 0.3,
+         "its recorded diagnostics do not meet the gate")
+    got <- digest::digest(readBin(dp, "raw", n = file.size(dp)), algo = "sha256", serialize = FALSE)
+    need(identical(got, man$files[[EARLY_FIT_FILE]]$sha256), "the draws do not match their manifest")
+    need(is.character(man$files[["early_fit_trials.csv"]]$sha256), "the trial list is not in the manifest")
+    dr <- utils::read.csv(dp)
+    cols <- c("ab_e", "r_e", "kappa")
+    need(all(cols %in% names(dr)) && nrow(dr) == man$n_draws && nrow(dr) == 4000 &&
+         all(is.finite(as.matrix(dr[cols]))) && all(as.matrix(dr[cols]) > 0), "the draws are incomplete or out of range")
+    pt <- man$point_values
+    for (k in c("ab_e", "r_e"))
+      need(is.numeric(pt[[k]]) && abs(pt[[k]] - stats::median(dr[[k]])) <= 5e-4 * max(1, abs(stats::median(dr[[k]]))),
+           paste("the point value", k, "is not the median of the draws"))
+    list(ok = TRUE, manifest = man, draws = dr, model_id = man$model_id, draws_sha256 = got,
+         package_sha256 = digest::digest(readBin(mp, "raw", n = file.size(mp)), algo = "sha256", serialize = FALSE),
+         point = list(ab_e = pt$ab_e, r_e = pt$r_e, Tk_e = fx$Tk_e_elapsed_days, h_e = fx$repair_halftime_h))
+  }, error = function(e) fail(paste("the fitted early-toxicity package is invalid:", conditionMessage(e))))
 }
 
 # The early-toxicity parameters of research mode (point values) merged into a parameter list.
 fitted_early_params <- function(p, fit, calendar = default_calendar())
-  modifyList(p, c(fit$point, list(early_model = "fitted", early_model_id = fit$model_id, calendar_e = calendar)))
+  modifyList(p, c(fit$point, list(early_model = "fitted", early_model_id = fit$model_id, calendar_e = calendar,
+                                  early_draws_sha256 = fit$draws_sha256, early_package_sha256 = fit$package_sha256)))
 
 # n toxicity draws for research mode: late and organ values from the stated priors (same seed as
 # Fowler mode), early values from the fitted joint posterior (all 4,000 in order when n = 4,000,

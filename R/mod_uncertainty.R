@@ -72,8 +72,11 @@ unc_server <- function(id, settings, oar_policy) {
       s <- settings()
       pol <- oar_policy()
       organ_ab <- if (is.null(pol)) default_oar_ab() else pol$ab
+      fit <- if (early_is_relative(s$p)) load_early_fit() else NULL
+      if (!is.null(fit)) validate(need(isTRUE(fit$ok) && identical(fit$draws_sha256, s$p$early_draws_sha256),
+                                       "The fitted early-toxicity posterior changed since the settings were made; reload the app."))
       tx <- if (identical(input$tox_source, "fixed")) fixed_toxicity_draws(s$p, nrow(draws()$di), organ_ab) else
-        if (early_is_relative(s$p)) early_fit_toxicity_draws(nrow(draws()$di), load_early_fit()) else toxicity_draws(nrow(draws()$di))
+        if (early_is_relative(s$p)) early_fit_toxicity_draws(nrow(draws()$di), fit) else toxicity_draws(nrow(draws()$di))
       if (early_is_relative(s$p)) attr(tx, "calendar") <- s$p$calendar_e      # research mode: the fitted joint draws
       tx
     })
