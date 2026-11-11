@@ -98,7 +98,7 @@ build_scenario <- function(p, ref, anchor, search, context, analysis = "candidat
                        c_over_alpha = if (is.finite(cal$c_over_alpha)) cal$c_over_alpha else NULL,
                        onset_anchor = if (is.finite(cal$onset_ref)) cal$onset_ref else NULL),
     search = search)
-  if (!is.null(early_block(p))) sc$early <- early_block(p)
+  if (!is.null(early_block(p))) sc$early <- early_block(p, comparison = ref)
   if (analysis == "agreement") {
     abv <- if (is.null(agreement$ab_values)) SCENARIO_AB_VALUES else agreement$ab_values
     sc$agreement <- list(
@@ -119,18 +119,36 @@ build_scenario <- function(p, ref, anchor, search, context, analysis = "candidat
 
 # Research mode for early toxicity (version 4.6): the block that identifies the fitted model, or
 # NULL in Fowler mode (so Fowler-mode files and their IDs are exactly as before).
-early_block <- function(p) {
+cal_record <- function(cal) list(fx_per_week = cal$fx_per_week, start_weekday = cal$start_weekday,
+                                 skip_days = as.list(if (is.null(cal$skip_days)) integer() else cal$skip_days))
+cal_parse <- function(cc, what) {
+  if (!is.list(cc)) replay_fail("the ", what, " calendar is missing.")
+  fpw <- check_num(cc$fx_per_week, paste(what, "calendar fx_per_week"), 5, 6, TRUE)
+  list(fx_per_week = fpw, start_weekday = check_num(cc$start_weekday, paste(what, "calendar start_weekday"), 1, fpw, TRUE),
+       skip_days = check_skip_days(unlist(cc$skip_days)))
+}
+
+early_block <- function(p, regimen = NULL, comparison = NULL) {
   if (!early_is_relative(p)) return(NULL)
   cal <- if (is.null(p$calendar_e)) default_calendar() else p$calendar_e
-  list(model = "fitted", model_id = p$early_model_id, ab_e = p$ab_e, r_e = p$r_e, Tk_e = p$Tk_e, h_e = p$h_e,
+  eb <- list(model = "fitted", model_id = p$early_model_id, ab_e = p$ab_e, r_e = p$r_e, Tk_e = p$Tk_e, h_e = p$h_e,
        draws_sha256 = p$early_draws_sha256, package_sha256 = p$early_package_sha256,
        evaluator = EARLY_FIT_EVALUATOR,
        row_order = "joint posterior rows in file order; row k of the early draws is used with simulation k",
        calendar = list(fx_per_week = cal$fx_per_week, start_weekday = cal$start_weekday,
                        skip_days = as.list(cal$skip_days)),
        formula = "E = D + Q/ab - r * max(0, T_elapsed - Tk), incomplete repair (half-time h_e hours), exact hinge",
-       meaning = "research scenario: trial-count fit of grade >= 3 acute mucositis; Fowler 2003 is the default")
+       meaning = "research scenario: trial-count fit of grade >= 3 acute mucositis; Fowler 2003 is the default",
+       schedule_semantics = "each regimen's repair term uses its own calendar's treatment days (version 4.6 review R3)")
+  if (!is.null(regimen)) eb$regimen_calendar <- cal_record(regimen_calendar(regimen))
+  if (!is.null(comparison)) eb$comparison_calendar <- cal_record(regimen_calendar(comparison))
+  eb
 }
+
+# The regimen and comparison calendars recorded in an early block (NULL when not recorded).
+early_calendars <- function(eb) list(
+  regimen = if (is.null(eb$regimen_calendar)) NULL else cal_parse(eb$regimen_calendar, "regimen"),
+  comparison = if (is.null(eb$comparison_calendar)) NULL else cal_parse(eb$comparison_calendar, "comparison"))
 
 # Apply a recorded early block to replayed parameters: only the installed fitted model with the same
 # identity and point values can reproduce it.
@@ -145,11 +163,7 @@ apply_early_block <- function(p, eb, fit = load_early_fit()) {
   if (!identical(as.character(eb$draws_sha256), fit$draws_sha256) || !identical(as.character(eb$package_sha256), fit$package_sha256))
     replay_fail("its early-toxicity posterior (draws or package SHA-256) is not the installed one, so exact replay is impossible.")
   if (!identical(as.character(eb$evaluator), EARLY_FIT_EVALUATOR)) replay_fail("it used an unsupported early-toxicity evaluator.")
-  cc <- eb$calendar
-  cal <- list(fx_per_week = check_num(cc$fx_per_week, "early calendar fx_per_week", 5, 6, TRUE),
-              start_weekday = check_num(cc$start_weekday, "early calendar start_weekday", 1, 6, TRUE),
-              skip_days = check_skip_days(unlist(cc$skip_days)))
-  fitted_early_params(p, fit, calendar = cal)
+  fitted_early_params(p, fit, calendar = cal_parse(eb$calendar, "candidate"))
 }
 
 # The DD model's settings: calibrated (default) or fitted with its own values.
@@ -250,6 +264,7 @@ check_inputs <- function(sc) {
   }
 
   ref <- check_regimen(sc$comparison, "comparison")
+  if (!is.null(sc$early)) ref$calendar <- early_calendars(sc$early)$comparison
   anchor <- check_regimen(sc$anchor, "anchor")
 
   # Every saved calibration field must describe the inputs.
@@ -533,7 +548,10 @@ uncertainty_scenario <- function(s, variant, tox_source, search = NULL, oar = NU
                toxicity = list(source = tox_source, seed = TOXICITY_SEED, rng = TOXICITY_RNG, prior = toxicity_prior()),
                search_draws = SEARCH_DRAWS,
                wording = "shares of simulated parameter draws under the stated models and priors"))
-  if (!is.null(early_block(s$p))) sc$early <- early_block(s$p)
+  if (!is.null(early_block(s$p))) {
+    sc$early <- early_block(s$p, s$regimen, s$ref)
+    sc$uncertainty$toxicity$prior_use <- prior_use(tox_source)
+  }
   if (!is.null(search)) {
     sc$search <- list(rule = search$rule, tox_share_min = search$tox_share / 100,
                       m_range = s$m_range, d_step = s$d_step, d_max = s$d_max,
@@ -553,6 +571,18 @@ constraints_sha256 <- function(path = file.path("data", "oar_constraints.csv")) 
 # Strict validation of an uncertainty scenario read back with
 # jsonlite::fromJSON(): every field that changes the replay must be
 # supported, or the file is refused. Returns the inputs to recompute.
+# Research mode: which entries of the recorded toxicity prior the calculation used (review R8 of
+# version 4.6). The early entries are replaced by the trial-count fit; fixed toxicity uses no prior.
+prior_use <- function(tox_source) {
+  early <- c("ab_e", "alpha_e", "Tp_e", "Tk_e")
+  other <- c("ab_l", "ab_cord", "ab_oar")
+  if (identical(tox_source, "fixed"))
+    return(c(setNames(as.list(rep("not used: early values are the trial-count fit's posterior medians (params_fixed_toxicity)", 4)), early),
+             setNames(as.list(rep("not used: fixed value in params_fixed_toxicity", 3)), other)))
+  c(setNames(as.list(rep("not used: early values are the trial-count fit's joint posterior draws (see early)", 4)), early),
+    setNames(as.list(rep("used: drawn from this prior, independently of the early and tumor draws", 3)), other))
+}
+
 validate_uncertainty_scenario <- function(sc, draws_dir = DRAWS_DIR) {
   if (!identical(sc$analysis, "uncertainty")) replay_fail("not an uncertainty analysis.")
   uv <- as.character(sc$uncertainty_version)
@@ -583,6 +613,8 @@ validate_uncertainty_scenario <- function(sc, draws_dir = DRAWS_DIR) {
   source <- check_choice(tox$source, "toxicity source", c("prior", "fixed"))
   seed <- check_num(tox$seed, "toxicity seed", 1, .Machine$integer.max, TRUE)
   if (!identical(tox$rng, TOXICITY_RNG)) replay_fail("random-number generator '", tox$rng, "' is not ", TOXICITY_RNG, ".")
+  if (!is.null(sc$early) && !identical(lapply(tox$prior_use, as.character), prior_use(source)))
+    replay_fail("its record of which toxicity prior entries were used is missing or differs from this calculator's.")
   now_prior <- jsonlite::fromJSON(scenario_json(toxicity_prior()), simplifyVector = TRUE)
   if (!isTRUE(all.equal(canonicalize(now_prior), canonicalize(tox$prior), tolerance = 1e-12)))
     replay_fail("the recorded toxicity prior differs from the one this calculator draws from.")
@@ -605,6 +637,12 @@ validate_uncertainty_scenario <- function(sc, draws_dir = DRAWS_DIR) {
                ab_oar = check_num(q$ab_oar, "ab_oar", 0.01, 100))
   }
   reg <- check_regimen(sc$regimen, "regimen"); ref <- check_regimen(sc$comparison, "comparison")
+  if (!is.null(sc$early)) {
+    ec <- early_calendars(sc$early); reg$calendar <- ec$regimen; ref$calendar <- ec$comparison
+    for (x in list(list(reg, "regimen"), list(ref, "comparison")))      # the recorded dates must give the recorded time
+      if (is.null(fit_treatment_days(x[[1]]$m, x[[1]]$T, regimen_calendar(x[[1]]))))
+        replay_fail("the ", x[[2]], "'s recorded calendar cannot give ", x[[1]]$m, " fractions in ", x[[1]]$T, " days.")
+  }
   threshold <- check_num(sc$threshold, "threshold", -1000, 1000)
   modes <- c("hypno", "reference")
   lim <- list(early = list(mode = check_choice(sc$limits$early$mode, "early limit", modes),
@@ -666,6 +704,7 @@ rerun_uncertainty <- function(sc, part = c("summary", "search"), draws_dir = DRA
   v <- validate_uncertainty_scenario(sc, draws_dir)
   if (part == "summary") {
     regs <- data.frame(m = v$reg$m, d = v$reg$d, T = v$reg$T)
+    attr(regs, "calendar") <- regimen_calendar(v$reg)
     td <- tumor_deltas(regs, v$ref, v$di, v$dd)
     tox <- toxicity_ok_draws(regs, v$ref, v$tx, v$limits, if (is.null(v$oar_fun)) NULL else v$oar_fun(regs, v$tx))
     return(summarize_draws(regs, td, tox, v$threshold))

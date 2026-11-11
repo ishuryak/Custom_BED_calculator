@@ -252,11 +252,14 @@ V3_SETTINGS_PANELS <- list(
         num("anchor_d", "Anchor dose per fraction (Gy)", 2, 0.1, 30, 0.05),
         uiOutput("anchor_note")),
       accordion_panel("Early toxicity (acute mucosa)",
-        num("ab_e", "α/β, mucosa (Gy)", 10, 0.5, 100, 1),
-        num("alpha_e", "α, mucosa (1/Gy)", 0.35, 0.01, 2, 0.01),
-        num("Tp_e", "Mucosal doubling time during repopulation (days)", 2.5, 0.1, 50, 0.1),
-        num("Tk_e", "Onset of mucosal repopulation (days, elapsed)", 7, 0, 100, 1),
-        uiOutput("lambda_e_shown"),
+        conditionalPanel("input.early_model == 'fitted'", uiOutput("early_fit_values")),
+        conditionalPanel("input.early_model != 'fitted'",
+          helpText("Fowler 2003 model (the default). These values are used only while Fowler 2003 is selected on the main page."),
+          num("ab_e", "α/β, mucosa (Gy)", 10, 0.5, 100, 1),
+          num("alpha_e", "α, mucosa (1/Gy)", 0.35, 0.01, 2, 0.01),
+          num("Tp_e", "Mucosal doubling time during repopulation (days)", 2.5, 0.1, 50, 0.1),
+          num("Tk_e", "Onset of mucosal repopulation (days, elapsed)", 7, 0, 100, 1),
+          uiOutput("lambda_e_shown")),
         checkboxInput("chemo", "Concurrent chemotherapy: lower the Fowler zone only (no BED changes)", FALSE),
         helpText("This box has one effect: it lowers the Fowler acute zone by 3-5 Gy₁₀ where that zone is shown or used",
                  "as the early limit. It changes nothing under the default (HYPNO) early limit. No BED includes a",
@@ -639,7 +642,7 @@ server <- function(input, output, session) {
               pt$ab_e, pt$r_e, pt$Tk_e, pt$h_e),
       " It predicted held-out trials better on average than Fowler's parameters, but its advantage came mostly from",
       " accelerated trials: for shorter hypofractionated courses the evidence is mixed (HYPNO depends on its",
-      " chemotherapy, ELAN-RT favored Fowler). The +5 limit is a numerical margin on this model's BED scale; its",
+      " chemotherapy, ELAN-RT favored Fowler). The +5 limit is a numerical margin on this model's BED scale. Its",
       " clinical risk meaning is not established. Fowler 2003 remains the default.",
       tags$span(class = "text-muted small", sprintf(" Model %s.", EARLY_FIT$model_id)))
   })
@@ -666,15 +669,15 @@ server <- function(input, output, session) {
     cmp <- choice_or("comparator", "custom")
     if (cmp != "custom") {
       r <- comparator_presets()[[cmp]]
-      return(list(m = r$m, d = r$d, T = r$T, label = r$label))
+      return(list(m = r$m, d = r$d, T = r$T, label = r$label, calendar = r$calendar))
     }
     m <- checked("ref_m")
     cal <- list(fx_per_week = as.integer(choice_or("ref_fx_week", 5)), start_weekday = 1, skip_days = integer())
-    list(m = m, d = checked("ref_d"), T = time_for(m, input$ref_auto_T, "ref_T", cal))
+    list(m = m, d = checked("ref_d"), T = time_for(m, input$ref_auto_T, "ref_T", cal), calendar = cal)
   })
   regimen <- reactive({
     m <- checked("m")
-    list(m = m, d = checked("d"), T = time_for(m, input$auto_T, "T", calendar()))
+    list(m = m, d = checked("d"), T = time_for(m, input$auto_T, "T", calendar()), calendar = calendar())
   })
   fixed_anchor <- reactive({
     m <- checked_or("anchor_m", 35)
@@ -695,13 +698,41 @@ server <- function(input, output, session) {
     }
   }, ignoreInit = TRUE)
 
+  # Research mode needs the actual treatment dates; a typed time the calendar cannot give is not
+  # spread over invented gaps (review R3 of version 4.6).
+  early_time_note <- function(r, fix) {
+    if (!early_is_relative(params())) return(NULL)
+    cal <- regimen_calendar(r)
+    if (!is.null(fit_treatment_days(r$m, r$T, cal))) return(NULL)
+    div(class = "text-danger small", sprintf(paste(
+      "Early BED with the trial-count fit is not available for this entry: %d fractions on this calendar (%s) end on day %g,",
+      "not day %g, and the fit needs the actual treatment dates. %s"),
+      r$m, calendar_text(cal), schedule_time(r$m, cal$fx_per_week, cal$start_weekday, cal$skip_days), r$T, fix))
+  }
   output$T_shown <- renderUI({
     r <- regimen()
-    helpText(sprintf("Used: %d fractions, %g days (%s), total dose %.2f Gy.", r$m, r$T, calendar_text(calendar()), r$m * r$d))
+    tagList(helpText(sprintf("Used: %d fractions, %g days (%s), total dose %.2f Gy.", r$m, r$T, calendar_text(calendar()), r$m * r$d)),
+            early_time_note(r, "Enter the missed treatment days as skipped days, or use the calendar's overall time."))
   })
   output$ref_T_shown <- renderUI({
     r <- ref()
-    helpText(sprintf("Used: %d fractions, %g days, total dose %.2f Gy.", r$m, r$T, r$m * r$d))
+    tagList(helpText(sprintf("Used: %d fractions, %g days, total dose %.2f Gy.", r$m, r$T, r$m * r$d)),
+            early_time_note(r, "Use the calendar's overall time for the comparison."))
+  })
+  # Research mode: the fitted values in use, read-only; the Fowler fields are hidden and unused (review R8).
+  output$early_fit_values <- renderUI({
+    if (!identical(input$early_model, "fitted")) return(NULL)
+    if (!isTRUE(EARLY_FIT$ok)) return(div(class = "alert alert-danger", "The trial-count fit is not available: ", EARLY_FIT$reason, "."))
+    pt <- EARLY_FIT$point
+    div(class = "alert alert-info",
+      tags$strong("Trial-count fit in use (research). "), "These values are fixed by the fit and cannot be edited here:",
+      tags$ul(
+        tags$li(sprintf("Mucosal α/β: %.4f Gy", pt$ab_e)),
+        tags$li(sprintf("Fitted time-loss rate: %.4f Gy of BED per day after onset", pt$r_e)),
+        tags$li(sprintf("Onset: day %g (elapsed, fixed for this scenario)", pt$Tk_e)),
+        tags$li(sprintf("Repair half-time between fractions: %g hours", pt$h_e))),
+      sprintf("Posterior medians of model %s. ", EARLY_FIT$model_id),
+      "The Fowler 2003 fields are hidden and not used. Switch back to Fowler 2003 on the main page to edit them.")
   })
   output$lambda_e_shown <- renderUI(
     helpText(sprintf(paste("Mucosal repopulation rate = ln2 / doubling time = %.3f per day.",
@@ -780,8 +811,8 @@ server <- function(input, output, session) {
 
   both <- reactive({
     r <- regimen(); rf <- ref(); a <- anchor()
-    rbind(compute_all(r$m, r$d, r$T, params(), a),
-          compute_all(rf$m, rf$d, rf$T, params(), a))
+    rbind(compute_all(r$m, r$d, r$T, params(), a, regimen_calendar(r)),     # each regimen's own dates (review R3)
+          compute_all(rf$m, rf$d, rf$T, params(), a, regimen_calendar(rf)))
   })
 
   fmt <- function(x, plus = FALSE) {
@@ -894,8 +925,8 @@ server <- function(input, output, session) {
 
   bench <- reactive({
     bm <- benchmark_regimens(); rf <- ref(); a <- anchor(); p <- params()
-    x <- compute_all(bm$m, bm$d, bm$T, p, a)
-    r0 <- compute_all(rf$m, rf$d, rf$T, p, a)
+    x <- compute_all(bm$m, bm$d, bm$T, p, a, benchmark_calendars(bm))
+    r0 <- compute_all(rf$m, rf$d, rf$T, p, a, regimen_calendar(rf))
     list(bm = bm, x = x, r0 = r0)
   })
 
@@ -942,7 +973,7 @@ server <- function(input, output, session) {
   # Toxicity BEDs do not depend on the DD anchor, so the default anchor is used.
   hypno_caps <- reactive({
     h <- comparator_presets()$hypno_test
-    a <- compute_all(h$m, h$d, h$T, params(), default_anchor())
+    a <- compute_all(h$m, h$d, h$T, params(), default_anchor(), regimen_calendar(h))
     list(early = a$bed_early, late = a$bed_late)
   })
 
@@ -950,7 +981,7 @@ server <- function(input, output, session) {
     sr <- search(); rf <- ref()
     if (isTRUE(sr$blocked) || input$early_mode %in% c("hypno", "fenwick")) return(NULL)
     e <- hypno_caps()$early
-    r0 <- compute_all(rf$m, rf$d, rf$T, params(), anchor())$bed_early
+    r0 <- compute_all(rf$m, rf$d, rf$T, params(), anchor(), regimen_calendar(rf))$bed_early
     cap <- if (is.null(sr$cap)) r0 + checked("tol_early") else sr$cap
     u <- early_unit()
     helpText(sprintf(paste("For comparison, HYPNO's 55 Gy in 20 fractions has early BED %.1f %s,",
@@ -1009,7 +1040,7 @@ server <- function(input, output, session) {
   # One line naming what an analysis compares against and with which limits.
   limits_text <- function(rf) {
     p <- params(); ta <- tox_args()
-    r0 <- compute_all(rf$m, rf$d, rf$T, p, anchor())
+    r0 <- compute_all(rf$m, rf$d, rf$T, p, anchor(), regimen_calendar(rf))
     u_e <- early_unit(); u_l <- bed_unit(p$ab_l)
     early <- if (isTRUE(ta$fenwick)) "Fenwick 2008 boundary (cell-kill BED, depends on overall time)" else
       if (is.null(ta$early_cap)) sprintf("%.2f %s (comparison %.2f + %g)", r0$bed_early + ta$tol_early, u_e, r0$bed_early, ta$tol_early) else
@@ -1371,12 +1402,14 @@ server <- function(input, output, session) {
     div(class = "alert alert-primary", style = "padding:0.45rem 0.8rem; margin-bottom:0.5rem;",
         tags$strong("Evaluating "), regimen_text(r), tags$strong(" against "), regimen_text(rf),
         sprintf(" · tumor threshold %+g Gy · %s · tumor values: %s", checked("min_gain"), dd,
-                PROFILE_NAMES[[active_profile()]]), extrap)
+                PROFILE_NAMES[[active_profile()]]),
+        tags$div(class = "v4-banner-early", early_model_text(p), ". ",
+                 actionLink("banner_early", "Change the early-toxicity model on the main page")), extrap)
   })
 
   limit_values <- reactive({
     ta <- tox_args(); rf <- ref(); p <- params()
-    r0 <- compute_all(rf$m, rf$d, rf$T, p, anchor())
+    r0 <- compute_all(rf$m, rf$d, rf$T, p, anchor(), regimen_calendar(rf))
     early <- if (isTRUE(ta$fenwick)) NA_real_ else if (is.null(ta$early_cap)) r0$bed_early + ta$tol_early else ta$early_cap
     late <- if (is.null(ta$late_cap)) r0$bed_late + ta$tol_late else ta$late_cap
     list(early = early, late = late, fenwick = isTRUE(ta$fenwick))
@@ -1482,10 +1515,12 @@ server <- function(input, output, session) {
                                        m = m, d = d, T = overall_time(m))
     }
     bm <- benchmark_regimens()
-    for (i in seq_len(nrow(bm))) regs[[length(regs) + 1]] <- list(name = bm$name[i], m = bm$m[i], d = bm$d[i], T = bm$T[i])
-    r0 <- compute_all(rf$m, rf$d, rf$T, p, a)
+    bcal <- benchmark_calendars(bm)
+    for (i in seq_len(nrow(bm))) regs[[length(regs) + 1]] <- list(name = bm$name[i], m = bm$m[i], d = bm$d[i], T = bm$T[i],
+                                                                  calendar = bcal[[i]])
+    r0 <- compute_all(rf$m, rf$d, rf$T, p, a, regimen_calendar(rf))
     cols <- lapply(regs, function(x) {
-      v <- compute_all(x$m, x$d, x$T, p, a)
+      v <- compute_all(x$m, x$d, x$T, p, a, regimen_calendar(x))
       c(sprintf("%d × %g Gy", x$m, x$d), sprintf("%g", x$m * x$d), sprintf("%g", x$T),
         tumor_delta_txt(v$bed_di, r0$bed_di), tumor_delta_txt(v$bed_dd, r0$bed_dd),
         sprintf("%.1f", v$bed_early), sprintf("%.1f", v$bed_late),
@@ -1519,6 +1554,7 @@ server <- function(input, output, session) {
     session$sendCustomMessage("v4-top", TRUE)   # each page opens at its top
   }
   observeEvent(input$go_home, go_to("home"))
+  observeEvent(input$banner_early, go_to("home"))
   for (title in names(V4_MENU)) local({
     page <- title; slug <- V4_MENU[[title]]
     observeEvent(input[[paste0("go_", slug)]], go_to(page))
@@ -1557,7 +1593,7 @@ server <- function(input, output, session) {
   home <- reactive(v4_regimens(params(), anchor(), margins = margins()))
   hypno_early <- reactive({
     hy <- comparator_presets()$hypno_test
-    compute_all(hy$m, hy$d, hy$T, params(), anchor())$bed_early
+    compute_all(hy$m, hy$d, hy$T, params(), anchor(), regimen_calendar(hy))$bed_early
   })
   data_support <- tumor_data_support()
   # One evaluated snapshot of the main list: inputs, draws (read once), points with support,

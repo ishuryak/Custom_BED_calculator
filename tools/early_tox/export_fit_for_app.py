@@ -105,7 +105,8 @@ def fixture_cases():
         return out
     spec = [("35x2 Mon 5/wk", 35, 2.0, 5, 1, ()), ("20x2.75 Mon 5/wk", 20, 2.75, 5, 1, ()),
             ("30x2.2 6/wk", 30, 2.2, 6, 1, ()), ("33x2 6/wk Wed", 33, 2.0, 6, 3, ()),
-            ("25x2.4 skip 12,13", 25, 2.4, 5, 1, (12, 13)), ("5x5 Mon", 5, 5.0, 5, 1, ())]
+            ("25x2.4 skip 12,13", 25, 2.4, 5, 1, (12, 13)), ("5x5 Mon", 5, 5.0, 5, 1, ()),
+            ("20x2.75 skip 4,5,8", 20, 2.75, 5, 1, (4, 5, 8)), ("33x2 6/wk Mon", 33, 2.0, 6, 1, ())]   # review R3 fixtures
     return [(n_, m, d, cal(m, pw, st, sk), dict(fx_per_week=pw, start_weekday=st, skip_days=list(sk)))
             for n_, m, d, pw, st, sk in spec]
 

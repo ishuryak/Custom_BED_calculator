@@ -130,3 +130,42 @@ test_that("reordered draws with a matching hash load, but an old exact scenario 
   expect_true(early_is_relative(apply_early_block(list(), eb, fit)))
   expect_error(apply_early_block(list(), eb, f2), "not the installed one")
 })
+
+# Review R3 (v4.6): each regimen's repair term uses its own treatment dates; no inferred calendar.
+test_that("custom calendars use their own dates, matching the independent Python evaluator", {
+  fx <- jsonlite::fromJSON(file.path(app_abs, "tests", "testthat", "fixtures", "early_fit_evaluator.json"), simplifyVector = FALSE)
+  pick <- function(nm) Filter(function(cs) cs$name == nm && abs(cs$ab - fit$point$ab_e) < 1e-9, fx$cases)[[1]]
+  a <- pick("20x2.75 skip 4,5,8"); b <- pick("33x2 6/wk Mon")
+  cal_a <- list(fx_per_week = 5, start_weekday = 1, skip_days = c(4L, 5L, 8L))
+  cal_b <- list(fx_per_week = 6, start_weekday = 1, skip_days = integer())
+  ea <- compute_all(20, 2.75, 31, p_fit, default_anchor(), cal_a)$bed_early
+  eb <- compute_all(33, 2, 38, p_fit, default_anchor(), cal_b)$bed_early
+  # the review's numbers use the app's point values (4 decimals); the fixture uses the unrounded medians
+  expect_equal(ea, 31.11404545, tolerance = 1e-6); expect_equal(eb, 29.73698842, tolerance = 1e-6)
+  expect_equal(bed_early_fit(20, 2.75, 31, a$ab, a$r, fx$Tk, fx$halftime_h, cal_a), a$E, tolerance = 1e-6)
+  expect_equal(bed_early_fit(33, 2, 38, b$ab, b$r, fx$Tk, fx$halftime_h, cal_b), b$E, tolerance = 1e-6)
+  # the same m and T on different calendars give different repair terms; never silently the default
+  expect_false(isTRUE(all.equal(ea, compute_all(20, 2.75, 31, modifyList(p_fit, list(calendar_e = NULL)), default_anchor(),
+                                                list(fx_per_week = 5, start_weekday = 3, skip_days = c(4L, 5L)))$bed_early)))
+})
+
+test_that("an overall time that the calendar cannot produce gives no repair-aware result", {
+  expect_true(is.na(compute_all(20, 2.75, 40, p_fit, default_anchor(), default_calendar())$bed_early))
+  expect_false(is.na(compute_all(20, 2.75, 40, p_fowler, default_anchor())$bed_early))     # Fowler mode unaffected
+})
+
+test_that("search candidates and the comparator use their own calendars; equal regimens still give zero", {
+  ref6 <- list(m = 33, d = 2, T = 38, calendar = list(fx_per_week = 6, start_weekday = 1, skip_days = integer()))
+  s <- suggest_regimens(p_fit, ref6, m_range = 15:30, tol_early = 5, min_gain = -10)
+  r0 <- compute_all(33, 2, 38, p_fit, default_anchor(), ref6$calendar)$bed_early
+  f <- attr(s, "feasible")
+  expect_true(nrow(f) > 0)
+  expect_equal(f$d_early, f$bed_early - r0, tolerance = 1e-9)
+  tx <- early_fit_toxicity_draws(4000, fit)
+  e1 <- bed_early_draws(33, 2, 38, tx, ref6$calendar)[1, ]
+  regs <- data.frame(m = 33, d = 2, T = 38); attr(regs, "calendar") <- ref6$calendar
+  ok <- toxicity_ok_draws(regs, ref6, tx, list(early = list(mode = "reference", tol = 0), late = list(mode = "reference", tol = 0)))
+  expect_true(all(ok$early_ok))                                              # equal schedule: support 1 in every draw
+  e2 <- bed_early_draws(33, 2, 38, tx, default_calendar())[1, ]
+  expect_true(all(is.na(e2)))                                                # wrong calendar for T: unavailable, not guessed
+})

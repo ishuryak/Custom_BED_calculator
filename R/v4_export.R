@@ -81,7 +81,7 @@ main_compute <- function(p, anchor, draws, data_d_max, margins = V4_MARGINS) {
   pts <- h$rows
   if (!is.null(draws) && nrow(pts) > 0) pts$support <- v4_refit_support(pts, draws$di, draws$dd, margin = margins$tumor)
   hy <- comparator_presets()$hypno_test
-  hypno_early <- compute_all(hy$m, hy$d, hy$T, p, anchor)$bed_early
+  hypno_early <- compute_all(hy$m, hy$d, hy$T, p, anchor, regimen_calendar(hy))$bed_early
   list(points = pts, summary = v4_summary(pts, hypno_early = hypno_early, data_d_max = data_d_max),
        reason = h$reason)
 }

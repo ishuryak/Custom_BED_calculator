@@ -41,7 +41,7 @@ v4_regimens <- function(p, anchor = default_anchor(), standard = V4_STANDARD,
   if (is.null(rows)) rows <- empty_suggestions()[, setdiff(names(empty_suggestions()), "next_step")]
   rows <- rows[order(rows$m, rows$d), , drop = FALSE]
   rownames(rows) <- NULL
-  list(rows = rows, standard = compute_all(standard$m, standard$d, standard$T, p, anchor),
+  list(rows = rows, standard = compute_all(standard$m, standard$d, standard$T, p, anchor, default_calendar()),
        reason = attr(s, "reason"), margins = margins)
 }
 
@@ -241,7 +241,7 @@ v4_endpoint_words <- function(e, name, k = 1) {
 # validity rules (review F01 of 2026-10-31): a model whose standard BED is not
 # positive, or that is unavailable, never credits a schedule.
 v4_failed_conditions <- function(m, d, p, anchor, r0, margins = V4_MARGINS) {
-  x <- compute_all(m, d, overall_time(m), p, anchor)
+  x <- compute_all(m, d, overall_time(m), p, anchor, default_calendar())
   e <- v4_tumor_endpoints(x, p, anchor, r0)
   meets <- function(en) isTRUE(en$valid[1]) && en$delta[1] >= -margins$tumor - 1e-9
   c(if (!(meets(e$di) || meets(e$dd)))

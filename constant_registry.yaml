@@ -64,6 +64,21 @@ constants:
     provenance: design
     why: Point-dose conversions above 5 Gy per fraction are flagged as LQ extrapolation (plan section B2).
     sites: ["R/oar.R:14"]
+  early_fit_n_draws:
+    value: 4000
+    provenance: derived
+    why: >
+      Joint posterior draws in the app's early-toxicity package (the primary
+      fit's kept draws). The exporter refuses a unit with any
+      other count and the app refuses a package with any other count.
+    source:
+      kind: json
+      file: draws/early_fit_manifest.json
+      key: n_draws
+    sites:
+      - "R/uncertainty.R:@nrow\\(dr\\) == 4000"
+      - "tools/early_tox/export_fit_for_app.py:@if len\\(rows\\) != 4000"
+    tolerance: 0
   search_draws:
     value: 1000
     provenance: design

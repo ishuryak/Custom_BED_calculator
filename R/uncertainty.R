@@ -165,9 +165,9 @@ bed_dd_draws <- function(m, d, T, dr) {
 
 # Acute (Fowler-type) BED for every regimen and draw; T is inclusive and is
 # converted to the elapsed clock as in compute_all().
-bed_early_draws <- function(m, d, T, tx) {
+bed_early_draws <- function(m, d, T, tx, cal = NULL) {
   if (!is.null(tx$r_e)) {                                   # research mode: fitted model, no hinge smoothing
-    cal <- if (is.null(attr(tx, "calendar"))) default_calendar() else attr(tx, "calendar")
+    if (is.null(cal)) cal <- if (is.null(attr(tx, "calendar"))) default_calendar() else attr(tx, "calendar")
     S <- early_repair_S(m, T, cal, tx$h_e[1])
     hinge <- pmax(0, acute_model_time(T, "elapsed") - tx$Tk_e[1])
     return(matrix(m * d, length(m), nrow(tx)) + outer(S * d^2, 1 / tx$ab_e) - outer(hinge, tx$r_e))
@@ -336,14 +336,14 @@ tumor_deltas <- function(regs, ref, di, dd) {
 toxicity_ok_draws <- function(regs, ref, tx, limits, oar = NULL) {
   hy <- comparator_presets()$hypno_test
   base_early <- switch(limits$early$mode,
-    hypno = bed_early_draws(hy$m, hy$d, hy$T, tx)[1, ],
-    reference = bed_early_draws(ref$m, ref$d, ref$T, tx)[1, ] + limits$early$tol,
+    hypno = bed_early_draws(hy$m, hy$d, hy$T, tx, regimen_calendar(hy))[1, ],
+    reference = bed_early_draws(ref$m, ref$d, ref$T, tx, regimen_calendar(ref))[1, ] + limits$early$tol,
     stop("Under uncertainty the early limit must be 'hypno' or 'reference' (the Fowler and Fenwick limits are tied to fixed parameter values)."))
   base_late <- switch(limits$late$mode,
     hypno = bed_late_draws(hy$m, hy$d, tx$ab_l)[1, ],
     reference = bed_late_draws(ref$m, ref$d, tx$ab_l)[1, ] + limits$late$tol,
     stop("unknown late limit: ", limits$late$mode))
-  e <- bed_early_draws(regs$m, regs$d, regs$T, tx)
+  e <- bed_early_draws(regs$m, regs$d, regs$T, tx, attr(regs, "calendar"))   # the regimen's own dates (review R3)
   l <- bed_late_draws(regs$m, regs$d, tx$ab_l)
   relative <- !is.null(tx$r_e)                             # research mode: compared with the standard only
   ok_e <- (if (relative) is.finite(e) else e > 0) & sweep(e, 2, base_early + 1e-9, "<=")

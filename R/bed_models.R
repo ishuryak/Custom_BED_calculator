@@ -181,20 +181,23 @@ repair_sum <- function(days, h) {
   sum(exp(-log(2) / h * dt))
 }
 
-# Treatment days of m once-daily fractions ending on day T: the given calendar, else the default
-# calendar, else (an overall time typed longer than either allows) the given calendar's days.
+# Treatment days of m once-daily fractions on calendar `cal` (review R3, v4.6): the regimen's own
+# dates. They must reproduce the stated overall time T; otherwise the repair-aware early BED is not
+# computed (NULL here, NA in the result) rather than inventing where extra days fell.
 fit_treatment_days <- function(m, T, cal) {
-  for (cc in list(cal, default_calendar())) {
-    dd <- treatment_days(m, cc$fx_per_week, cc$start_weekday, cc$skip_days)
-    if (dd[m] == T) return(dd)
-  }
-  treatment_days(m, cal$fx_per_week, cal$start_weekday, cal$skip_days)
+  dd <- treatment_days(m, cal$fx_per_week, cal$start_weekday, if (is.null(cal$skip_days)) integer() else cal$skip_days)
+  if (dd[m] == T) dd else NULL
 }
 
+# One calendar per regimen: `cal` is a single calendar (used for all) or a list of calendars.
+calendars_for <- function(cal, n) if (!is.null(cal$fx_per_week)) rep(list(cal), n) else cal
+
 early_repair_S <- function(m, T, cal, h) {
-  key <- paste(m, T)
+  cals <- calendars_for(cal, length(m))
+  key <- paste(m, T, vapply(cals, function(c) paste(c$fx_per_week, c$start_weekday, paste(c$skip_days, collapse = ",")), ""))
   u <- !duplicated(key)
-  S_u <- mapply(function(mm, TT) repair_sum(fit_treatment_days(mm, TT, cal), h), m[u], T[u])
+  S_u <- mapply(function(mm, TT, cc) { dd <- fit_treatment_days(mm, TT, cc); if (is.null(dd)) NA_real_ else repair_sum(dd, h) },
+                m[u], T[u], cals[u])
   unname(S_u[match(key, key[u])])
 }
 
@@ -203,7 +206,20 @@ bed_early_fit <- function(m, d, T, ab, r, Tk, h, cal = default_calendar()) {
   m * d + S * d^2 / ab - r * pmax(0, acute_model_time(T, "elapsed") - Tk)
 }
 
+# The calendar of a regimen object (list with m, d, T and optionally calendar).
+regimen_calendar <- function(r) if (is.null(r$calendar)) default_calendar() else r$calendar
+
 early_is_relative <- function(p) identical(p$early_model, "fitted")
+
+# One line naming the early-toxicity model and the values actually used (review R8 of version 4.6).
+early_model_text <- function(p) {
+  if (early_is_relative(p))
+    return(sprintf(paste("Early toxicity: trial-count fit (research model %s; mucosal α/β %.2f Gy, time-loss rate %.2f",
+                         "Gy of BED per day from day %g, %g-hour repair; posterior medians)"),
+                   p$early_model_id, p$ab_e, p$r_e, p$Tk_e, p$h_e))
+  sprintf("Early toxicity: Fowler 2003 values (mucosal α/β %g Gy, α %g per Gy, doubling time %.3g days, onset day %g)",
+          p$ab_e, p$alpha_e, log(2) / p$lambda_e, p$Tk_e)
+}
 
 # Late toxicity BED: LQ only, no repopulation. alpha does not enter.
 bed_late <- function(m, d, ab_l) bed_lq(m, d, ab_l)
@@ -212,12 +228,13 @@ bed_late <- function(m, d, ab_l) bed_lq(m, d, ab_l)
 # inclusive calendar count). p: list with alpha, ab, lambda_di, lambda_dd, Tk,
 # g, ab_e, alpha_e, lambda_e, Tk_e, clock_e, ab_l. anchor: list(m, d, T), the
 # regimen at which the DD model is calibrated.
-compute_all <- function(m, d, T, p, anchor) {
+compute_all <- function(m, d, T, p, anchor, early_cal = NULL) {
   g <- if (is.null(p$g)) 0 else p$g
   clock_e <- if (is.null(p$clock_e)) "elapsed" else p$clock_e
   cal <- dd_setup(p, anchor)
   early <- if (early_is_relative(p))
-    bed_early_fit(m, d, T, p$ab_e, p$r_e, p$Tk_e, p$h_e, if (is.null(p$calendar_e)) default_calendar() else p$calendar_e)
+    bed_early_fit(m, d, T, p$ab_e, p$r_e, p$Tk_e, p$h_e,
+                  if (!is.null(early_cal)) early_cal else if (!is.null(p$calendar_e)) p$calendar_e else default_calendar())
   else bed_early(m, d, acute_model_time(T, clock_e), p$ab_e, p$alpha_e, p$lambda_e, p$Tk_e)
   late <- bed_late(m, d, p$ab_l)
   data.frame(
@@ -294,7 +311,10 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   out <- empty_suggestions()
   blocked <- function(reason) { attr(out, "reason") <- reason; out }
   cal <- dd_setup(p, anchor)
-  r0 <- compute_all(ref$m, ref$d, ref$T, p, anchor)
+  r0 <- compute_all(ref$m, ref$d, ref$T, p, anchor, regimen_calendar(ref))
+  # candidates' dates matter only to the research model's repair term (Fowler needs none)
+  cand_cal <- if (!early_is_relative(p)) NULL else if (is.null(calendar)) default_calendar() else
+    list(fx_per_week = calendar$fx_per_week, start_weekday = calendar$start_weekday, skip_days = integer())
   dd_available <- cal$status != "infeasible"
   di_usable <- tumor_endpoint(1, r0$bed_di)$ref_valid
   dd_usable <- tumor_endpoint(1, r0$bed_dd, dd_available)$ref_valid
@@ -325,7 +345,7 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   if (nrow(g) == 0) return(blocked("no_shorter_regimen"))
 
   evaluate <- function(m, d, T) {
-    a <- compute_all(m, d, T, p, anchor)
+    a <- compute_all(m, d, T, p, anchor, cand_cal)
     e_di <- tumor_endpoint(a$bed_di, r0$bed_di)
     e_dd <- tumor_endpoint(a$bed_dd, r0$bed_dd, dd_available)
     a$d_di <- e_di$delta
@@ -424,9 +444,9 @@ default_anchor <- function() list(m = 35, d = 2, T = 47)
 # overall times for a Monday start.
 comparator_presets <- function() {
   list(
-    hypno_test = list(m = 20, d = 2.75, T = 26,
+    hypno_test = list(m = 20, d = 2.75, T = 26, calendar = list(fx_per_week = 5, start_weekday = 1, skip_days = integer()),
                       label = "HYPNO test arm: 55 Gy in 20 fractions, 5 fractions/week (26 days)"),
-    hypno_control = list(m = 33, d = 2, T = 38,
+    hypno_control = list(m = 33, d = 2, T = 38, calendar = list(fx_per_week = 6, start_weekday = 1, skip_days = integer()),
                          label = "HYPNO control arm: 66 Gy in 33 fractions, 6 fractions/week (38 days)"))
 }
 
@@ -438,9 +458,12 @@ benchmark_regimens <- function() {
     name = c("HYPNO test arm: 55 Gy in 20 fractions, 5 fractions/week",
              "HYPNO control arm: 66 Gy in 33 fractions, 6 fractions/week",
              "HYHOPE: 46.5 Gy in 15 fractions (favorable-risk HPV-positive oropharynx)"),
-    m = c(20, 33, 15), d = c(2.75, 2, 3.1), T = c(26, 38, 19),
+    m = c(20, 33, 15), d = c(2.75, 2, 3.1), T = c(26, 38, 19), fx_per_week = c(5, 6, 5),
     stringsAsFactors = FALSE)
 }
+
+# The calendars of benchmark rows (Monday start, their own fractions per week).
+benchmark_calendars <- function(bm) lapply(bm$fx_per_week, function(f) list(fx_per_week = f, start_weekday = 1, skip_days = integer()))
 
 # Withers et al. 1988: about 0.6 Gy per day, in 2-Gy fractions, compensates
 # repopulation after about 4 weeks. In BED at tumor alpha/beta ab this is

@@ -28,8 +28,7 @@ unc_ui <- function(id) {
       selectInput(ns("tumor_crit"), "Tumor criterion for the joint share",
                   c("DI model" = "di", "both models (paired draws)" = "both",
                     "DD model (calibrated to DI)" = "dd"), selected = "both"),
-      radioButtons(ns("tox_source"), "Toxicity parameters",
-                   c("Uncertain (stated priors)" = "prior", "Fixed (the Model settings values)" = "fixed"))),
+      radioButtons(ns("tox_source"), "Toxicity parameters", tox_source_choices(FALSE))),
     uiOutput(ns("context")),
     h5("Evaluated regimen against the comparison"),
     div(style = "overflow-x:auto;", tableOutput(ns("summary"))),
@@ -63,9 +62,24 @@ unc_ui <- function(id) {
     downloadButton(ns("download"), "Download the uncertainty analysis (ZIP)"))
 }
 
+# Labels of the toxicity options. Research mode: the early values come from the trial-count fit (its joint
+# posterior draws, or its posterior medians when fixed); late and organ alpha/beta keep their own sources.
+tox_source_choices <- function(fitted) {
+  if (!fitted) return(c("Uncertain (stated priors)" = "prior", "Fixed (the Model settings values)" = "fixed"))
+  c("Uncertain: early from the trial-count fit's posterior draws; late and organ α/β from stated priors" = "prior",
+    "Fixed: early at the trial-count fit's posterior medians; late and organ α/β from Model settings and Organs at risk" = "fixed")
+}
+
 unc_server <- function(id, settings, oar_policy) {
   moduleServer(id, function(input, output, session) {
     draws <- reactive(list(di = load_draws("di", input$variant), dd = load_draws("dd", input$variant)))
+    # The toxicity options name their sources for the active early model (review R8 of version 4.6).
+    observe({
+      fitted <- tryCatch(early_is_relative(settings()$p), error = function(e) NULL)   # settings incomplete: wait
+      req(!is.null(fitted))
+      updateRadioButtons(session, "tox_source", choices = tox_source_choices(fitted),
+                         selected = isolate(if (is.null(input$tox_source)) "prior" else input$tox_source))
+    })
     # Fixed toxicity: the sidebar values and the organ alpha/beta of the
     # Organs at risk page (one effective parameter set, also exported).
     tx_all <- reactive({
@@ -95,6 +109,7 @@ unc_server <- function(id, settings, oar_policy) {
     one <- reactive({
       s <- settings(); r <- s$regimen
       regs <- data.frame(m = r$m, d = r$d, T = r$T)
+      attr(regs, "calendar") <- regimen_calendar(r)           # the evaluated regimen's own dates (review R3)
       td <- tumor_deltas(regs, s$ref, draws()$di, draws()$dd)
       tox <- toxicity_ok_draws(regs, s$ref, tx_all(), limits(), if (is.null(oar_fun())) NULL else oar_fun()(regs, tx_all()))
       list(td = td, tox = tox, sum = summarize_draws(regs, td, tox, s$threshold))
@@ -122,8 +137,18 @@ unc_server <- function(id, settings, oar_policy) {
                   regimen_text(s$regimen), regimen_text(s$ref), s$threshold,
                   if (s$early_mode == "hypno") "HYPNO 55 Gy/20 under the same draw" else sprintf("comparison + %g Gy under the same draw", s$tol_early),
                   if (s$late_mode == "hypno") "HYPNO 55 Gy/20" else sprintf("comparison + %g Gy", s$tol_late),
-                  oar_context_text()))
+                  oar_context_text()),
+          tags$div(early_source_text(s$p, input$tox_source)))
     })
+    early_source_text <- function(p, src) {
+      if (!early_is_relative(p))
+        return(if (identical(src, "fixed")) paste0(early_model_text(p), ", fixed.") else
+          "Early toxicity: Fowler 2003 model with its parameters drawn from the stated priors.")
+      if (identical(src, "fixed")) return(paste0(early_model_text(p), ", fixed."))
+      sprintf(paste("Early toxicity: trial-count fit (research model %s), its 4,000 joint posterior draws in file order;",
+                    "the Fowler priors are not used. Early draws are paired with tumor draws independently (an assumption)."),
+              p$early_model_id)
+    }
     oar_context_text <- function() {
       pol <- oar_policy()
       if (is.null(pol)) return(" Organ limits: not applied.")
