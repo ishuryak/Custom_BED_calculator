@@ -30,17 +30,19 @@ def test_mapping_matches_the_approved_decisions():
     rows = mp.build(ROOT)
     assert [{k: str(v) for k, v in r.items()} for r in rows] == committed("endpoint_mapping.csv")
     prim = [r for r in rows if r["in_primary"]]
-    assert len(prim) == 35 and len({r["family_id"] for r in prim}) == 15
+    assert len(prim) == 51 and len({r["family_id"] for r in prim}) == 22
     # M1: CTCAE v4 trials pooled (scale group G2)
-    assert {r["family_id"] for r in prim if r["scale_group"] == "G2"} == {"Tandon", "Sikdar", "Shivananjappa"}
-    # M2: W1-only sensitivity is the nine families with a stated window
+    assert {r["family_id"] for r in prim if r["scale_group"] == "G2"} == {"Tandon", "Sikdar", "Shivananjappa", "Grover"}
+    # M2: W1-only sensitivity is the families with a stated window
     assert {r["family_id"] for r in rows if r["in_w1_sensitivity"]} == {
-        "CAIR1", "EORTC22851", "GORTEC9902", "ORO9301", "PMH_HF", "RTOG0129", "RTOG9003", "Tandon", "Vienna"}
+        "CAIR1", "EORTC22851", "GORTEC9902", "ORO9301", "PMH_HF", "RTOG0129", "RTOG9003", "Tandon", "Vienna",
+        "DAHANCA67", "Tallari", "GuptaM", "GuptaP"}
     # M3: CAIR primary uses the approximate EORTC III-IV count, severe confluent is secondary
     cair = {r["outcome_id"]: r["analysis_set"] for r in rows if r["family_id"] == "CAIR1"}
     assert cair == {"O018": "primary", "O019": "primary", "O020": "secondary", "O021": "secondary"}
     # M4 and the benchmark
-    assert {r["family_id"] for r in rows if r["analysis_set"] == "sensitivity"} == {"IAEA_ACC", "Pinto", "Poddar"}
+    assert {r["family_id"] for r in rows if r["analysis_set"] == "sensitivity"} == {
+        "IAEA_ACC", "Pinto", "Poddar", "Sanchiz", "Dwivedi", "ELAN"}
     assert {r["family_id"] for r in rows if r["analysis_set"] == "benchmark"} == {"HYPNO"}
 
 
@@ -58,9 +60,9 @@ def design():
 def test_reference_arms_have_zero_contrast_and_every_family_has_one(design):
     rows, fams = design
     dE, _, ref = s4.contrasts(rows, fams, 10.0, s4.ev.fowler_rate(), 7.0)
-    assert len(ref) == 15
+    assert len(ref) == 22
     assert all(dE[i] == 0 for i in ref.values())
-    assert sum(1 for x in dE if x != 0) >= 18
+    assert sum(1 for x in dE if x != 0) >= 26
 
 
 def test_onset_drops_out_at_7_days_but_not_at_20(design):

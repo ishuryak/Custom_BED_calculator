@@ -41,8 +41,10 @@ def test_committed_tables_match_a_fresh_build(built):
 
 def test_every_count_is_in_both_independent_extractions(built):
     _, outcomes, _, _, _ = built
-    assert len(outcomes) == 45
-    assert all(o["extraction_agreement"].endswith("both extractions") for o in outcomes)
+    assert len(outcomes) == 68
+    single = {o["outcome_id"] for o in outcomes if not o["extraction_agreement"].endswith("both extractions")}
+    assert single == {"O067", "O068"}            # ELAN-RT, adjudicated, sensitivity only
+    assert all(o["role"] == "sensitivity" for o in outcomes if o["outcome_id"] in single)
     assert all(o["value_quote"] and o["value_location"] for o in outcomes)
     assert all(0 <= int(o["events"]) <= int(o["denominator"]) for o in outcomes)
 
@@ -71,12 +73,33 @@ def test_a_count_found_in_neither_extraction_is_refused(tmp_path):
 
 
 def test_a_count_found_in_only_one_extraction_is_refused(tmp_path):
-    # Cummings 2007: only extraction A2 recorded the pharynx grade 3-4 row (24/154).
+    # Horiot 1992: only extraction A1 recorded a functional mucosal G3-G4 row (64/158).
     src = copy_sources(tmp_path)
-    add_rows(src, "X_PMH,PMH_HF,PMH,Cummings_B_2007,CF,candidate,C1,x,none,x,W5 20d[2.55],x",
-             "O900,X_PMH,Cummings_B_2007,pharynx_grade_3_4,154,24,,usable,x")
-    with pytest.raises(ValueError, match="O900: 24/154 found in only one extraction"):
+    add_rows(src, "X_EO,EORTC22791,EORTC 22791,Horiot_JC_1992,CF,candidate,C1,x,none,x,W5 35d[2.0],x",
+             "O900,X_EO,Horiot_JC_1992,grade_3_4_mucositis,158,64,,usable,x")
+    with pytest.raises(ValueError, match="O900: 64/158 found in only one extraction"):
         load_builder().build(str(tmp_path))
+
+
+def test_adjudicated_single_extraction_is_refused_for_a_candidate_arm(tmp_path):
+    # The ELAN-RT exception holds only for sensitivity arms with an explanatory note.
+    src = copy_sources(tmp_path)
+    p = src / "arm_curation.csv"
+    p.write_text(p.read_text().replace("ELAN_HSC,ELAN,ELAN-RT,Ortholan_C_2026,HSC-RT 55 Gy / 20 split course,sensitivity",
+                                       "ELAN_HSC,ELAN,ELAN-RT,Ortholan_C_2026,HSC-RT 55 Gy / 20 split course,candidate"))
+    with pytest.raises(ValueError, match="O068: 11/91 found in only one extraction"):
+        load_builder().build(str(tmp_path))
+
+
+def test_only_mucositis_rows_confirm_a_count():
+    # E1 has a pharyngeal grade 3 row of 11/91 for ELAN-RT; it must not confirm the mucositis count.
+    b = load_builder()
+    assert b.is_mucositis_endpoint("confluent_mucositis") and b.is_mucositis_endpoint("other:Mucositis grade 4")
+    assert not b.is_mucositis_endpoint("other:pharyngeal_toxicity_grade3")
+    assert not b.is_mucositis_endpoint("feeding_tube")
+    ex = b.load_extractions(os.path.join(ROOT, "docs", "development", "2026_11_10_early_toxicity", "extraction"))
+    e1, e2 = ex["E"]
+    assert not b.matches(e1, "Ortholan_C_2026", 91, 11) and b.matches(e2, "Ortholan_C_2026", 91, 11)
 
 
 def test_duplicate_reports_add_no_counts_even_when_both_extractions_agree(tmp_path):

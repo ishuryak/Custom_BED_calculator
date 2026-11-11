@@ -55,6 +55,9 @@ REF_ARM = {
     "Ghoshal": "Ghoshal_CF", "CAIR1": "CAIR1_CF", "Vienna": "Vienna_CF", "ORO9301": "Olmi_CF",
     "Bartelink2002": "Bartelink_CF", "Tandon": "Tandon_SIB", "Sikdar": "Sikdar_SEQ",
     "Shivananjappa": "Shivananjappa_CONV", "Mani": "Mani_SEQ",
+    # primary families added 2026-11-11
+    "DAHANCA67": "DAHANCA7_5F", "GhoshLaskar": "GhoshLaskar_RT", "Grover": "Grover_SEQ",
+    "GuptaM": "GuptaM_5F", "GuptaP": "GuptaP_CFCCT", "Tallari": "Tallari_CF", "Singh": "Singh_5F",
 }
 
 

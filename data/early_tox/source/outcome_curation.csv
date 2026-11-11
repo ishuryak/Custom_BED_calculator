@@ -8,7 +8,7 @@ O006,RTOG9003_AFXS,Fu_KK_2000,grade_3_4_mucositis,274,112,,usable,
 O007,RTOG9003_AFXC,Fu_KK_2000,grade_3_4_mucositis,268,123,,usable,
 O008,RTOG0129_SFX,Nguyen_Tan_PF_2014,grade_3_4_mucositis,361,141,,usable,"NCI CTC v2 mucositis/stomatitis grade 3-5, within 90 days of start of RT"
 O009,RTOG0129_AFXC,Nguyen_Tan_PF_2014,grade_3_4_mucositis,360,119,,usable,
-O010,EORTC22791_CF,Horiot_JC_1992,diffuse_mucositis_top_grade,158,78,,usable,"EORTC objective mucosal scale tops at grade 3 = diffuse mucositis; scored during treatment"
+O010,EORTC22791_CF,Horiot_JC_1992,diffuse_mucositis_top_grade,158,78,,usable,EORTC objective mucosal scale tops at grade 3 = diffuse mucositis; scored during treatment
 O011,EORTC22791_HF,Horiot_JC_1992,diffuse_mucositis_top_grade,162,108,,usable,
 O012,EORTC22851_CF,Horiot_JC_1997,grade_3_4_mucositis,245,123,,usable,objective mucosal reaction grade 3-4 (physician scored)
 O013,EORTC22851_AF,Horiot_JC_1997,grade_3_4_mucositis,240,160,,usable,
@@ -16,7 +16,7 @@ O014,PMH_CF,Cummings_B_2007,grade_3_4_mucositis,154,70,,usable,RTOG/EORTC acute 
 O015,PMH_HF,Cummings_B_2007,grade_3_4_mucositis,156,97,,usable,
 O016,Ghoshal_CB,Ghoshal_S_2008,grade_3_4_mucositis,143,51,,usable,RTOG/EORTC mucous membrane grade 3+4; acute window not stated
 O017,Ghoshal_CF,Ghoshal_S_2008,grade_3_4_mucositis,142,27,,usable,"Table 4 gives 27 (19%); the Discussion says 23/142. Table used, conflict flagged"
-O018,CAIR1_CAIR,Skladowski_K_2000,grade_3_4_mucositis_from_dische,50,48,,usable,"peak acute mucosal reaction approximated to EORTC grade III-IV from the modified Dische score; first 2 months"
+O018,CAIR1_CAIR,Skladowski_K_2000,grade_3_4_mucositis_from_dische,50,48,,usable,peak acute mucosal reaction approximated to EORTC grade III-IV from the modified Dische score; first 2 months
 O019,CAIR1_CF,Skladowski_K_2000,grade_3_4_mucositis_from_dische,49,35,,usable,
 O020,CAIR1_CAIR,Skladowski_K_2000,severe_confluent_dische,50,31,,usable,"severe confluent mucositis, maximum Dische score above 15 (different threshold from O018)"
 O021,CAIR1_CF,Skladowski_K_2000,severe_confluent_dische,49,13,,usable,
@@ -38,9 +38,32 @@ O036,Mani_SIB,Mani_N_2022,grade_3_mucositis,17,2,,usable,RTOG acute mucosa grade
 O037,Mani_SEQ,Mani_N_2022,grade_3_mucositis,17,1,,usable,
 O038,IAEA_ACC6,Overgaard_J_2010,confluent_mucositis,441,45,,usable,scale not stated; ascertainment suspect (see arm notes)
 O039,IAEA_ACC5,Overgaard_J_2010,confluent_mucositis,439,22,,usable,
-O040,Pinto_CF,Pinto_LH_1991,confluent_mucositis_own_scale,48,17,,usable,"paper's own 4-point scale; integers printed in Fig. 7; may not be the maximum per patient"
+O040,Pinto_CF,Pinto_LH_1991,confluent_mucositis_own_scale,48,17,,usable,paper's own 4-point scale; integers printed in Fig. 7; may not be the maximum per patient
 O041,Pinto_HF,Pinto_LH_1991,confluent_mucositis_own_scale,50,24,,usable,
 O042,Poddar_6F,Poddar_J_2017,grade_3_mucositis_end_of_rt,25,19,76,usable,"CTCAE v4.0 grade at treatment completion, patients who completed treatment"
 O043,Poddar_5F,Poddar_J_2017,grade_3_mucositis_end_of_rt,25,16,64,usable,
-O044,HYPNO_HFX,Bentzen_2026,grade_3_plus_mucositis,373,190,50.9,usable,"CTCAE v4.0 maximum grade 3+; benchmark only"
+O044,HYPNO_HFX,Bentzen_2026,grade_3_plus_mucositis,373,190,50.9,usable,CTCAE v4.0 maximum grade 3+; benchmark only
 O045,HYPNO_NFX,Bentzen_2026,grade_3_plus_mucositis,380,208,54.7,usable,
+O046,DAHANCA7_5F,Mortensen_HR_2012,confluent_mucositis,383,187,,usable,DAHANCA confluent mucositis (Dische-based); by treatment received
+O047,DAHANCA7_6F,Mortensen_HR_2012,confluent_mucositis,398,269,,usable,
+O048,GhoshLaskar_RT,Ghosh-Laskar_S_2016,grade_3_4_mucositis,57,12,,usable,RTOG grade 3-4
+O049,GhoshLaskar_CRT,Ghosh-Laskar_S_2016,grade_3_4_mucositis,65,23,,usable,
+O050,GhoshLaskar_ACC,Ghosh-Laskar_S_2016,grade_3_4_mucositis,64,20,,usable,
+O051,Grover_SEQ,Grover_2021,grade_3_mucositis,51,23,,usable,CTCAE v4.03 grade 3; completers
+O052,Grover_SIB,Grover_2021,grade_3_mucositis,50,20,,usable,
+O053,GuptaM_5F,Gupta_M_2015,confluent_mucositis,54,9,,usable,Table 5 confluent (text calls it grade 3); Discussion's 63.7% vs 19.8% contradicts the table
+O054,GuptaM_6F,Gupta_M_2015,confluent_mucositis,55,18,,usable,
+O055,GuptaP_CFCCT,Gupta_P_2020,grade_3_mucositis,30,8,,usable,RTOG grade 3
+O056,GuptaP_CBRT,Gupta_P_2020,grade_3_mucositis,30,10,,usable,
+O057,GuptaP_CBRTCCT,Gupta_P_2020,grade_3_mucositis,30,15,,usable,
+O058,Tallari_CF,Tallari_RV_2017,grade_3_mucositis,48,9,,usable,RTOG grade 3 ever (grade columns overlap)
+O059,Tallari_HF,Tallari_RV_2017,grade_3_mucositis,47,14,,usable,
+O060,Singh_5F,Singh_S_2024,grade_3_4_mucositis,40,19,,usable,"RTOG grade III + IV, Table 5"
+O061,Singh_6F,Singh_S_2024,grade_3_4_mucositis,41,26,,usable,
+O062,Sanchiz_A,Sanchiz_F_1990,grade_3_mucositis,277,14,,usable,WHO grade 3; sensitivity only
+O063,Sanchiz_B,Sanchiz_F_1990,grade_3_mucositis,282,11,,usable,
+O064,Sanchiz_C,Sanchiz_F_1990,grade_3_mucositis,300,31,,usable,
+O065,Dwivedi_CF,Dwivedi_2023,grade_3_plus_mucositis,34,5,,usable,scale not named; completers; sensitivity only
+O066,Dwivedi_HF,Dwivedi_2023,grade_3_plus_mucositis,34,11,,usable,
+O067,ELAN_SF,Ortholan_C_2026,grade_3_plus_mucositis,93,18,,adjudicated_single,"Table 3 mucositis grade 3 (16) + grade 4 (2); row hidden under a print banner, recovered by extractor E2 from the vector layer and confirmed by Claude (grades sum to the any-grade totals 71 and 79; grade >=2 matches the text 44 and 54); not in E1. Sensitivity only"
+O068,ELAN_HSC,Ortholan_C_2026,grade_3_plus_mucositis,91,11,,adjudicated_single,"grade 3 (11), grade 4-5 (0); mucositis row recovered by E2 and confirmed by Claude as for ELAN_SF. E1's 11/91 is the pharyngeal grade 3 count, not mucositis. Sensitivity only"

@@ -27,22 +27,24 @@ def test_chemo_coding_matches_the_planned_therapy_of_every_arm():
         rows, fams = s5.load_rows(m4=m4)
         ref = {f: next(x for x in rows if x["arm_id"] == s5.REF_ARM[f]) for f in fams}
         for x in rows:
-            differs = x["chemo_text"] != ref[x["family"]]["chemo_text"]
+            differs = x["chemo_text"] != ref[x["family"]]["chemo_text"] and x["arm_id"] not in s5.CHEMO_SAME_DOSE
             assert (s5.CHEMO_CUMULATIVE.get(x["arm_id"], 0) != 0) == differs, x["arm_id"]
-    assert {a.split("_")[0] for a in s5.CHEMO_CUMULATIVE} <= {"GORTEC9902", "RTOG0129", "Vienna", "Olmi", "Bartelink"}
+    assert {a.split("_")[0] for a in s5.CHEMO_CUMULATIVE} <= {
+        "GORTEC9902", "RTOG0129", "Vienna", "Olmi", "Bartelink", "GhoshLaskar", "GuptaP", "Sanchiz"}
+    assert not set(s5.CHEMO_SAME_DOSE) & set(s5.CHEMO_CUMULATIVE)
     assert set(s5.CHEMO_ONOFF) <= set(s5.CHEMO_CUMULATIVE)
     assert all(s5.CHEMO_ONOFF[k] == s5.CHEMO_CUMULATIVE[k] for k in s5.CHEMO_ONOFF)
 
 
 def test_analysis_sets_have_the_approved_sizes():
     rows, fams = s5.load_rows()
-    assert (len(rows), len(fams)) == (35, 15)
+    assert (len(rows), len(fams)) == (51, 22)
     rows, fams = s5.load_rows(w1_only=True)
-    assert (len(rows), len(fams)) == (23, 9)
+    assert (len(rows), len(fams)) == (32, 13)
     rows, fams = s5.load_rows(drop_chemo=True)
-    assert len(fams) == 10 and not set(fams) & s5.CHEMO_FAMILIES
+    assert len(fams) == 15 and not set(fams) & s5.CHEMO_FAMILIES
     rows, fams = s5.load_rows(m4=True)
-    assert (len(rows), len(fams)) == (41, 18)
+    assert (len(rows), len(fams)) == (64, 28)
 
 
 def test_stan_contrasts_reproduce_the_step4_evaluator():
@@ -55,7 +57,7 @@ def test_stan_contrasts_reproduce_the_step4_evaluator():
     assert [x["arm_id"] for x in rows] == [x["arm_id"] for x in rows4]
     assert np.allclose(dE, dE4, atol=1e-9)
     refs = [i for i, x in enumerate(rows) if x["arm_id"] == s5.REF_ARM[x["family"]]]
-    assert len(refs) == 15
+    assert len(refs) == 22
     assert all(d["dD"][i] == d["dQ"][i] == d["dTe"][i] == d["chemo"][i] == 0 for i in refs)
     # ORO 93-01: identical schedules, chemotherapy differs
     oro = [i for i, x in enumerate(rows) if x["arm_id"] == "Olmi_CFCT"][0]
@@ -66,9 +68,10 @@ def test_scale_groups_and_decision_schedules():
     rows, fams = s5.load_rows(m4=True)
     d = s5.stan_data(rows, fams, 7.0, {})
     grp = np.array(d["grp"])
-    assert d["G"] == 2 and grp.shape == (18, 2)
-    assert {fams[j] for j in range(18) if grp[j, 0]} == {"Tandon", "Sikdar", "Shivananjappa", "Poddar"}
-    assert {fams[j] for j in range(18) if grp[j, 1]} == {"Pinto"}
+    J = len(fams)
+    assert d["G"] == 2 and grp.shape == (J, 2)
+    assert {fams[j] for j in range(J) if grp[j, 0]} == {"Tandon", "Sikdar", "Shivananjappa", "Poddar", "Grover"}
+    assert {fams[j] for j in range(J) if grp[j, 1]} == {"Pinto", "Sanchiz", "Dwivedi"}
     # decision contrasts equal early BED differences from the evaluator (3.2 h repair)
     for Tk in (7.0, 21.0):
         d = s5.stan_data(*s5.load_rows(), Tk, {})
@@ -119,11 +122,11 @@ def test_overdispersion_switch_reaches_the_fit_and_finished_units_are_skipped(mo
 
 
 def test_leave_one_family_out_removes_exactly_that_family():
-    assert len(s5.LOFO_UNITS) == 15
+    assert len(s5.LOFO_UNITS) == 22
     base, _ = s5.load_rows()
     for name, (_, st) in s5.LOFO_UNITS.items():
         rows, fams = s5.load_rows(drop_family=st["drop_family"])
-        assert st["drop_family"] not in fams and len(fams) == 14
+        assert st["drop_family"] not in fams and len(fams) == 21
         assert len(rows) == len(base) - sum(1 for x in base if x["family"] == st["drop_family"])
 
 

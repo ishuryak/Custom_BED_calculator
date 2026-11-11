@@ -54,7 +54,9 @@ OUT_DEFAULT = os.path.join(ROOT, "docs", "development", "2026_11_10_early_toxici
 STAN_FILE = os.path.join(HERE, "step5_model.stan")
 
 # Reference arms of the M4 sensitivity trials (the arm closest to conventional fractionation).
-REF_ARM = dict(s4.REF_ARM, IAEA_ACC="IAEA_ACC5", Pinto="Pinto_CF", Poddar="Poddar_5F")
+REF_ARM = dict(s4.REF_ARM, IAEA_ACC="IAEA_ACC5", Pinto="Pinto_CF", Poddar="Poddar_5F",
+               Sanchiz="Sanchiz_A", Dwivedi="Dwivedi_CF", ELAN="ELAN_SF")
+SENSITIVITY_FAMILIES = {"IAEA_ACC", "Pinto", "Poddar", "Sanchiz", "Dwivedi", "ELAN"}
 
 # C1: arm minus its family reference, by cumulative planned concurrent chemotherapy dose.
 CHEMO_CUMULATIVE = {
@@ -64,10 +66,18 @@ CHEMO_CUMULATIVE = {
     "Vienna_VCHART_MMC": +1,  # adds mitomycin C
     "Olmi_CFCT": +1,          # adds carboplatin/5-FU
     "Bartelink_MFD": -1,      # 10 mg/m2 on 15 days (150) against 6 mg/m2 on 35 days (210); daily dose is higher
+    "GhoshLaskar_CRT": +1,    # adds weekly cisplatin
+    "GuptaP_CBRT": -1,        # none against 3 x cisplatin 75 mg/m2
+    "Sanchiz_C": +1,          # adds 5-FU
 }
+# Arms whose planned therapy text differs from the reference arm's but whose cumulative planned
+# concurrent dose is the same (code 0).
+CHEMO_SAME_DOSE = {"GuptaP_CBRTCCT": "cisplatin 3 x 75 mg/m2 in both arms; only the days differ"}
 # Sensitivity coding: only a whole regimen added or removed counts.
-CHEMO_ONOFF = {"GORTEC9902_VACC": -1, "Vienna_VCHART_MMC": +1, "Olmi_CFCT": +1}
-CHEMO_FAMILIES = {"GORTEC9902", "RTOG0129", "Vienna", "ORO9301", "Bartelink2002"}
+CHEMO_ONOFF = {"GORTEC9902_VACC": -1, "Vienna_VCHART_MMC": +1, "Olmi_CFCT": +1,
+               "GhoshLaskar_CRT": +1, "GuptaP_CBRT": -1, "Sanchiz_C": +1}
+CHEMO_FAMILIES = {"GORTEC9902", "RTOG0129", "Vienna", "ORO9301", "Bartelink2002", "GhoshLaskar", "GuptaP",
+                  "Sanchiz"}
 
 GROUP_COLS = ("G2", "other")          # G1 is the reference scale group (M1)
 
@@ -90,11 +100,12 @@ UNITS = {
     "U08": ("candidate, five chemotherapy-differing families dropped, no gamma (C1)", dict(drop_chemo=True, use_gamma=0)),
     "U09": ("candidate, chemotherapy coded on/off only (C1)", dict(chemo="onoff")),
     "U10": ("candidate, W1 windows only (M2)", dict(w1_only=True)),
-    "U11": ("candidate, plus IAEA-ACC, Pinto, Poddar (M4)", dict(m4=True)),
+    "U11": ("candidate, plus the sensitivity trials (M4 and 2026-11-11 additions)", dict(m4=True)),
     "U14": ("candidate without the chemotherapy term (plan as written)", dict(use_gamma=0)),
 }
 # Leave-one-family-out influence of the primary candidate (U02 settings), one unit per family.
-LOFO_UNITS = {f"L_{f}": (f"candidate without family {f}", dict(drop_family=f)) for f in sorted(s4.REF_ARM)}
+LOFO_UNITS = {f"L_{f}": (f"candidate without family {f}", dict(drop_family=f))
+              for f in sorted(REF_ARM) if f not in SENSITIVITY_FAMILIES}
 REPORT_PARAMS = ["Lstar", "kappa", "ab", "r", "gamma[1]", "sigma_arm[1]", "m0", "tau0"]
 
 

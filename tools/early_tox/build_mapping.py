@@ -16,7 +16,8 @@ Analysis sets:
     primary      M1: G1 and G2 pooled, with a scale-family offset. M2: W1 and W2. M3: CAIR uses the
                  approximate EORTC III-IV count
     secondary    CAIR severe confluent (Dische score above 15)
-    sensitivity  M4: IAEA-ACC, Pinto 1991, Poddar 2017
+    sensitivity  M4: IAEA-ACC, Pinto 1991, Poddar 2017; added 2026-11-11: Sanchiz 1990, Dwivedi 2023,
+                 ELAN-RT (context C6)
     benchmark    HYPNO (plan R6), never fitted
 """
 import csv
@@ -32,6 +33,10 @@ FAMILY_RULES = {
     "Mani": ("G1", "W2"), "Sikdar": ("G2", "W2"), "Shivananjappa": ("G2", "W2"),
     "IAEA_ACC": ("G1", "none"), "Pinto": ("other", "W2"), "Poddar": ("G2", "W2"),
     "HYPNO": ("G2", "W2"),
+    # added 2026-11-11 (references obtained after step 5)
+    "DAHANCA67": ("G1", "W1"), "Tallari": ("G1", "W1"), "GuptaM": ("G1", "W1"), "GuptaP": ("G1", "W1"),
+    "GhoshLaskar": ("G1", "W2"), "Singh": ("G1", "W2"), "Grover": ("G2", "W2"),
+    "Sanchiz": ("other", "W2"), "Dwivedi": ("other", "W1"), "ELAN": ("G1", "W1"),
 }
 SECONDARY_CLASSES = {"severe_confluent_dische"}
 

@@ -6,7 +6,7 @@ Usage:
 Inputs (committed):
     data/early_tox/source/arm_curation.csv       one row per arm: role, context, therapy, schedule pattern
     data/early_tox/source/outcome_curation.csv   one row per arm outcome: expected denominator and events
-    docs/development/2026_11_10_early_toxicity/extraction/out_{A1,A2,B1,B2}.json
+    docs/development/2026_11_10_early_toxicity/extraction/out_{A,B,C,D,E}{1,2}.json
                                                  two independent extractions per batch of reports
 Outputs (data/early_tox/):
     arms.csv, outcomes.csv, arm_schedules.csv, arm_fractions.csv, evidence_families.csv
@@ -32,7 +32,13 @@ import sys
 from collections import defaultdict
 
 WEEKDAYS = {"W5": {0, 1, 2, 3, 4}, "W6": {0, 1, 2, 3, 4, 5}, "W7": set(range(7))}
-EXTRACTIONS = {"A": ("out_A1.json", "out_A2.json"), "B": ("out_B1.json", "out_B2.json")}
+EXTRACTIONS = {"A": ("out_A1.json", "out_A2.json"), "B": ("out_B1.json", "out_B2.json"),
+               "C": ("out_C1.json", "out_C2.json"), "D": ("out_D1.json", "out_D2.json"),
+               "E": ("out_E1.json", "out_E2.json")}
+# A count found in only one extraction is accepted only for a sensitivity-only arm, with
+# status "adjudicated_single" and a note saying how it was confirmed (added 2026-11-11 for the
+# ELAN-RT row hidden under a print banner).
+SINGLE_OK_STATUS = "adjudicated_single"
 
 
 def parse_variant(text):
@@ -101,8 +107,15 @@ def load_extractions(xdir):
     return ex
 
 
+def is_mucositis_endpoint(endpoint):
+    """Only mucositis rows can confirm a count (a pharyngeal or feeding-tube row with the same
+    numbers is a coincidence, found 2026-11-11 for ELAN-RT 11/91)."""
+    ep = (endpoint or "").lower()
+    return ep in ("max_grade_ge3_mucositis", "confluent_mucositis") or (ep.startswith("other:") and "mucos" in ep)
+
+
 def matches(rows, prefix, n, e):
-    return [r for r in rows if r["report_file"].startswith(prefix)
+    return [r for r in rows if r["report_file"].startswith(prefix) and is_mucositis_endpoint(r.get("endpoint"))
             and as_int(r.get("denominator")) == n and as_int(r.get("events")) == e]
 
 
@@ -161,8 +174,14 @@ def build(root):
             h1, h2 = matches(x1, o["report_prefix"], n, e), matches(x2, o["report_prefix"], n, e)
             if h1 or h2:
                 if not (h1 and h2):
-                    raise ValueError(f"{o['outcome_id']}: {e}/{n} found in only one extraction of batch {batch}")
-                hits = (batch, h1[0], h2[0])
+                    single_ok = (o["status"] == SINGLE_OK_STATUS and arm["role"] == "sensitivity"
+                                 and len(o["note"]) > 40)
+                    if not single_ok:
+                        raise ValueError(f"{o['outcome_id']}: {e}/{n} found in only one extraction of batch {batch}")
+                    r = (h1 or h2)[0]
+                    hits = (batch, r, None)
+                else:
+                    hits = (batch, h1[0], h2[0])
         if hits is None:
             raise ValueError(f"{o['outcome_id']}: {e}/{n} not found in any extraction of {o['report_prefix']}")
         batch, r1, r2 = hits
@@ -173,7 +192,9 @@ def build(root):
             denominator=n, denominator_type=r1.get("denominator_type", ""), events=e,
             percent_reported=o["percent"], count_derivation=r1.get("count_derivation", ""),
             status=o["status"], value_quote=r1.get("value_quote", ""), value_location=r1.get("value_location", ""),
-            report_file=r1["report_file"], extraction_agreement=f"batch {batch}: both extractions",
+            report_file=r1["report_file"],
+            extraction_agreement=(f"batch {batch}: both extractions" if r2 is not None
+                                  else f"batch {batch}: one extraction, adjudicated (see note)"),
             note=o["note"]))
 
     families = defaultdict(lambda: dict(roles=set(), reports=set(), arms=0))

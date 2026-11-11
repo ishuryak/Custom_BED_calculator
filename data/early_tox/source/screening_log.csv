@@ -35,3 +35,18 @@ Alam_MS_2016,Alam,2026-11-10,excluded,weekly snapshot counts only (no per-patien
 Daoud_J_2007,Daoud,2026-11-10,excluded,nasopharynx (context C4); grade 2-3 combined
 Van_den_Bogaert_W_1995,EORTC22811,2026-11-10,excluded,no acute grades reported
 Zackrisson_B_2011,ARTSCAN,2026-11-10,excluded,weekly prevalence in a figure only
+Mortensen_HR_2012,DAHANCA67,2026-11-11,included,"per-arm confluent mucositis counts by treatment received; DAHANCA 7 part used, DAHANCA 6 glottic (context C2) not used"
+Ghosh-Laskar_S_2016,GhoshLaskar,2026-11-11,included,RTOG grade 3-4 counts by arm
+Grover_2021,Grover,2026-11-11,included,CTCAE v4.03 grade 3 counts by arm (completers)
+Gupta_M_2015,GuptaM,2026-11-11,included,"confluent mucositis counts by arm, Table 5"
+Gupta_P_2020,GuptaP,2026-11-11,included,RTOG grade 3 counts by arm
+Tallari_RV_2017,Tallari,2026-11-11,included,RTOG grade 3 counts by arm (overlapping grade columns)
+Singh_S_2024,Singh,2026-11-11,included,RTOG grade III + IV counts by arm
+Sanchiz_F_1990,Sanchiz,2026-11-11,included_sensitivity,WHO grade 3 counts; about 11% nasopharynx and inconsistent tables
+Dwivedi_2023,Dwivedi,2026-11-11,included_sensitivity,"alternate allocation, not randomized"
+Ortholan_C_2026,ELAN,2026-11-11,included_sensitivity,"context C6 (frail elderly, split course); mucositis row recovered from under a print banner"
+Bentzen_SM_2001,CHART,2026-11-11,not_derivable,75% vs 44% confluent mucositis without per-arm denominators; only a field-length subgroup is derivable
+Poulsen_MG_1999,TROG9101,2026-11-11,not_derivable,90% vs 65% confluent mucositis of 148 and 155: not a unique integer (133 or 134; 100 or 101)
+Marcial_VA_1987,RTOG7913,2026-11-11,not_derivable,'severe' mucositis 13% vs 23% with no stated denominator (22/94 and 21/92 both fit)
+Miszczyk_L_2014,CHACHA,2026-11-11,excluded,"weekly median Dische scores only, no binary endpoint"
+Maciejewski_B_1990,Gliwice1990,2026-11-11,excluded,not randomized; dose and time bins across patients
