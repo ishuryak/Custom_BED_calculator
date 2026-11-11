@@ -34,6 +34,16 @@ constants:
     provenance: literature
     why: Largest fraction size among the benchmark regimens (HYHOPE 46.5 Gy in 15 fractions).
     sites: ["R/bed_models.R:49"]
+  fowler_acute_ab:
+    value: 10.0
+    provenance: literature
+    why: >
+      Fowler et al. 2003 acute-mucosa alpha/beta (Gy). Defined once in
+      tools/early_tox/evaluator.py (FOWLER_2003); step 4 uses it as the
+      recovery-simulation truth and step 5 reads it from the evaluator.
+    sites:
+      - "tools/early_tox/evaluator.py:@^    ab=10.0,$"
+      - "tools/early_tox/step4_identification.py:@^TRUTH = dict"
   fowler_zone:
     value: [59, 61]
     provenance: literature

@@ -34,3 +34,6 @@ __pycache__/
 # export_draws.py staging folders (review 2026-10-26)
 draws.staging/
 draws.previous/
+
+# CmdStan executable compiled from tools/early_tox/step5_model.stan
+tools/early_tox/step5_model

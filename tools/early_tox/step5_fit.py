@@ -74,7 +74,7 @@ GROUP_COLS = ("G2", "other")          # G1 is the reference scale group (M1)
 # Decision schedules (5 days a week, one fraction a day), each compared with 70 Gy / 35.
 DECISION = [(15, 3.5), (20, 2.75), (25, 2.4), (30, 2.2)]
 
-FOWLER = dict(ab=10.0, r=ev.fowler_rate())
+FOWLER = dict(ab=ev.FOWLER_2003["ab"], r=ev.fowler_rate())
 PRIOR = dict(Lstar_sd=1.0, ab_mu=math.log(10), ab_sd=0.354, r_mu=math.log(0.8), r_sd=0.5,
              gamma_sd=1.0, od_sd=0.5)
 

@@ -17,7 +17,12 @@ legacy evaluator (step 7) and is not reproduced by this module.
 """
 import math
 
-FOWLER_2003 = dict(ab=10.0, alpha=0.35, Tk=7.0, Tp=2.5)
+FOWLER_2003 = dict(
+    ab=10.0,
+    alpha=0.35,
+    Tk=7.0,
+    Tp=2.5,
+)
 
 
 def fowler_rate(alpha=FOWLER_2003["alpha"], Tp=FOWLER_2003["Tp"]):
