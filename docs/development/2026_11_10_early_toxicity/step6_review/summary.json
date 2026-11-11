@@ -5,7 +5,7 @@
  "tk": 7.0,
  "families": 22,
  "scope": "all primary families",
- "revision": "378d58f",
+ "revision": "84f5e5a",
  "tasks": {
   "new_trial": {
    "total_benchmark": -195.012,

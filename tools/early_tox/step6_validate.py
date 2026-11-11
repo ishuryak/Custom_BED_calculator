@@ -121,7 +121,59 @@ def group_delta(fit_draws, group, train_groups, rng):
 STEP6_SAMPLER = dict(s5.SAMPLER, seed=SEED)
 
 
-def fit_cached(model, name, rows, fams, settings, cache, rescore_only=False, accept_legacy=False):
+CACHE_MANIFEST = "cache_manifest.json"
+CACHE_ARRAYS = PARAMS + ["delta_all", "families", "groups", "gate", "gate_json", "identity"]
+
+
+def cache_manifest(cache):
+    path = os.path.join(cache, CACHE_MANIFEST)
+    if not os.path.exists(path):
+        return {}
+    m = json.load(open(path))
+    if not isinstance(m, dict):
+        raise RuntimeError(f"{path}: malformed cache manifest")
+    return m
+
+
+def record_cache(cache, name, path, identity):
+    """Bind a cache file's bytes to the generation manifest (review R6); written atomically."""
+    m = cache_manifest(cache)
+    m[name] = dict(sha256=s5.sha256_file(path), identity=identity)
+    tmp = os.path.join(cache, f"{CACHE_MANIFEST}.partial-{os.getpid()}")
+    with open(tmp, "w") as f:
+        json.dump(m, f, indent=1, sort_keys=True)
+    os.replace(tmp, os.path.join(cache, CACHE_MANIFEST))
+
+
+def cache_problem(out, fams):
+    """Validate a loaded cache's arrays (review R6): '' if valid."""
+    missing = [k for k in CACHE_ARRAYS if k not in out]
+    if missing:
+        return f"missing arrays {missing}"
+    S = len(out["kappa"])
+    if S < 1000:
+        return f"only {S} draws"
+    for k in PARAMS:
+        a = np.asarray(out[k], dtype=float)
+        if a.shape != (S,) or not np.all(np.isfinite(a)):
+            return f"{k} is not {S} finite values"
+    for k in ("ab", "r"):
+        if np.any(np.asarray(out[k]) <= 0):
+            return f"{k} has values <= 0"
+    for k in ("kappa", "tau0", "sigma_arm"):
+        if np.any(np.asarray(out[k]) < 0):
+            return f"{k} has negative values"
+    if np.asarray(out["delta_all"]).shape[0] != S or not np.all(np.isfinite(out["delta_all"])):
+        return "delta_all is not finite with one row per draw"
+    if list(out["families"].tolist()) != list(fams):
+        return "family list or order differs"
+    g = json.loads(str(out["gate_json"]))
+    if not isinstance(g.get("gate_pass"), bool):
+        return "gate_pass is not a boolean"
+    return ""
+
+
+def fit_cached(model, name, rows, fams, settings, cache, rescore_only=False, accept_legacy=False, register=False):
     """Posterior draws for one fit, reused only on an identical run identity (review F4). In
     rescore-only mode a missing cache is an error and nothing is sampled."""
     data = s5.stan_data(rows, fams, TK, settings)
@@ -142,6 +194,16 @@ def fit_cached(model, name, rows, fams, settings, cache, rescore_only=False, acc
             return out
         if str(out["identity"]) != identity:
             raise RuntimeError(f"{path}: run identity differs from the current inputs; refusing to reuse")
+        problem = cache_problem(out, fams)
+        if problem:
+            raise RuntimeError(f"{path}: invalid cache ({problem}); refusing to reuse")
+        entry = cache_manifest(cache).get(name)
+        if entry is None:
+            if not register:
+                raise RuntimeError(f"{path}: not in {CACHE_MANIFEST}; run once with --register-cache to adopt it")
+            record_cache(cache, name, path, identity)
+        elif entry.get("sha256") != s5.sha256_file(path) or entry.get("identity") != identity:
+            raise RuntimeError(f"{path}: bytes or identity differ from {CACHE_MANIFEST}; refusing to reuse")
         return out
     if rescore_only:
         raise RuntimeError(f"{path}: no cache; rescore-only mode does not sample")
@@ -161,9 +223,13 @@ def fit_cached(model, name, rows, fams, settings, cache, rescore_only=False, acc
     out["gate_json"] = np.array(json.dumps(gate, default=str))
     out["chain_archive"] = np.array(json.dumps(s5.archive_chains(fit, identity)))
     out["identity"] = np.array(identity)                     # written last into the same atomic file
+    problem = cache_problem(out, fams)
+    if problem:
+        raise RuntimeError(f"{name}: fit produced an invalid cache ({problem})")
     tmp = path + f".partial-{os.getpid()}.npz"
     np.savez_compressed(tmp, **out)
     os.replace(tmp, path)
+    record_cache(cache, name, path, identity)
     return out
 
 
@@ -298,6 +364,42 @@ def structural_repair(fc, prim, fams, allrows, gates, inner):
     return out
 
 
+REPORT_MANIFEST = "report_manifest.json"
+
+
+def publish_report(out_dir, tables, summary, structural=None):
+    """Write every report file into a staging folder, move them in, then write the report manifest
+    (file hashes) last, so an interrupted run never leaves a mixed generation that looks complete
+    (review R6). Readers trust a report only through report_manifest.json."""
+    stage = os.path.join(out_dir, f".report.partial-{os.getpid()}")
+    os.makedirs(stage, exist_ok=True)
+    if structural:
+        tables = dict(tables, **{"structural_repair.csv": structural})
+    for fn, rows in tables.items():
+        write(os.path.join(stage, fn), rows)
+    with open(os.path.join(stage, "summary.json"), "w") as fh:
+        json.dump(summary, fh, indent=1)
+    man = os.path.join(out_dir, REPORT_MANIFEST)     # an older manifest stops matching once any file changes
+    files = {}
+    for fn in sorted(os.listdir(stage)):
+        files[fn] = s5.sha256_file(os.path.join(stage, fn))
+        os.replace(os.path.join(stage, fn), os.path.join(out_dir, fn))
+    os.rmdir(stage)
+    tmp = man + f".partial-{os.getpid()}"
+    with open(tmp, "w") as fh:
+        json.dump(dict(revision=summary.get("revision"), files=files), fh, indent=1, sort_keys=True)
+    os.replace(tmp, man)
+
+
+def report_is_complete(out_dir):
+    man = os.path.join(out_dir, REPORT_MANIFEST)
+    if not os.path.exists(man):
+        return False
+    files = json.load(open(man)).get("files", {})
+    return bool(files) and all(os.path.exists(os.path.join(out_dir, fn)) and
+                               s5.sha256_file(os.path.join(out_dir, fn)) == h for fn, h in files.items())
+
+
 def numerical_rule(score_criterion_met, scope_complete, gates):
     """True only for the full family scope with every fit passing the complete-schema gate."""
     return bool(score_criterion_met and scope_complete and gates
@@ -311,13 +413,16 @@ def main(argv):
     ap.add_argument("--families", default="", help="comma list to restrict held-out families (smoke; never eligible)")
     ap.add_argument("--rescore-only", action="store_true", help="never sample; a missing cache is an error")
     ap.add_argument("--accept-legacy", action="store_true", help="read caches written before run identities (labelled)")
+    ap.add_argument("--register-cache", action="store_true",
+                    help="adopt existing identity-matched, validated caches into the cache manifest (once)")
     ap.add_argument("--structural", action="store_true",
                     help="also fit both models on all primary families at repair half-times 2 h, 4 h and complete")
     a = ap.parse_args(argv[1:])
     cache = os.path.join(a.out, "cache")
     os.makedirs(cache, exist_ok=True)
     model = None if a.rescore_only else s5.compile_model()
-    fc = lambda name, rows, fams_, st: fit_cached(model, name, rows, fams_, st, cache, a.rescore_only, a.accept_legacy)
+    fc = lambda name, rows, fams_, st: fit_cached(model, name, rows, fams_, st, cache, a.rescore_only, a.accept_legacy,
+                                                  a.register_cache)
     prim, fams = s5.load_rows()
     allrows, allfams = s5.load_rows(m4=True)
     held = [f for f in fams if not a.families or f in a.families.split(",")]
@@ -380,8 +485,7 @@ def main(argv):
                                           f"latent {c['latent_lor_median']:+.2f}" for c in cc)))
     structural = []
     if a.structural:
-        structural = structural_repair(fc, prim, fams, allrows, gates, a.inner)
-        write(os.path.join(a.out, "structural_repair.csv"), structural)
+        structural = structural_repair(fc, prim, fams, allrows, gates, a.inner)   # published with the report
     gates_ok = all(g["gate_pass"] for g in gates)
     gates_complete = all(g["scope"] == "complete schema gate" for g in gates)
     for task in summary["tasks"].values():
@@ -389,15 +493,8 @@ def main(argv):
     summary.update(external=ext, chemo_sensitivity=chemo_sens, gates_all_pass=gates_ok,
                    gates_complete_schema=gates_complete,
                    decision="undecided: Igor Shuryak decides after Phases A-D (Fowler stays the app default)")
-    write(os.path.join(a.out, "per_family.csv"), per_family)
-    write(os.path.join(a.out, "contrasts.csv"), contrasts)
-    write(os.path.join(a.out, "fit_gates.csv"), gates)
-    write(os.path.join(a.out, "external.csv"), ext)
-    write(os.path.join(a.out, "chemo_sensitivity.csv"), chemo_sens)
-    tmp = os.path.join(a.out, f"summary.json.partial-{os.getpid()}")
-    with open(tmp, "w") as fh:
-        json.dump(summary, fh, indent=1)
-    os.replace(tmp, os.path.join(a.out, "summary.json"))
+    publish_report(a.out, {"per_family.csv": per_family, "contrasts.csv": contrasts, "fit_gates.csv": gates,
+                           "external.csv": ext, "chemo_sensitivity.csv": chemo_sens}, summary, structural)
     print(json.dumps({k: summary[k] for k in ("tasks", "gates_all_pass", "gates_complete_schema", "scope")}, indent=1))
 
 

@@ -40,18 +40,53 @@ def sha256(path):
     return h.hexdigest()
 
 
+# The one scientific profile this release may export (review R4): the step 5 primary candidate.
+PRIMARY_PROFILE = dict(settings={"use_od": 1}, Tk=TK, halftime_h=HALFTIME_H, n_families=22, n_arms=51,
+                       totals={"arms": 51, "families": 22, "evaluable": 6042, "events": 2945})
+PACKAGE_SCHEMA = "early-fit-package-1"
+EVALUATOR_ID = "early-bed-fit-1: E = D + Q/ab - r*max(0, T_elapsed - Tk), exact hinge, repair half-time h on fraction times"
+
+
+def _manifest_problem(m):
+    spec = importlib.util.spec_from_file_location("step5_fit", os.path.join(ROOT, "tools", "early_tox", "step5_fit.py"))
+    s5 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(s5)
+    return s5.manifest_problem(m)
+
+
 def read_unit(unit):
+    """The primary unit's manifest, diagnostics and draws, after every check (review R4)."""
     man = json.load(open(os.path.join(unit, "manifest.json")))
-    if not man.get("gate_pass"):
+    problem = _manifest_problem(man)
+    if problem:
+        raise RuntimeError(f"{unit}: malformed manifest ({problem}); refusing to export")
+    if man["gate_pass"] is not True:
         raise RuntimeError(f"{unit}: gate did not pass; refusing to export")
-    if man.get("smoke"):
+    if man["smoke"] is not False:
         raise RuntimeError(f"{unit}: smoke run; refusing to export")
-    path = os.path.join(unit, "draws.csv.gz")
-    if sha256(path) != man["outputs"]["draws.csv.gz"]:
-        raise RuntimeError(f"{path}: changed since the run; refusing to export")
-    with gzip.open(path, "rt") as f:
+    for fn, digest in man["outputs"].items():
+        path = os.path.join(unit, fn)
+        if not os.path.exists(path) or sha256(path) != digest:
+            raise RuntimeError(f"{path}: changed since the run; refusing to export")
+    diag = json.load(open(os.path.join(unit, "diagnostics.json")))
+    if diag.get("identity") != man["identity"]:
+        raise RuntimeError(f"{unit}: diagnostics belong to another run; refusing to export")
+    if diag.get("gate_pass") is not True or diag.get("divergences") != 0 or not diag.get("rhat", 9) < 1.01 \
+            or not diag.get("ess_bulk", 0) > 400 or not diag.get("ess_tail", 0) > 400 or not diag.get("ebfmi_min", 0) >= 0.3:
+        raise RuntimeError(f"{unit}: diagnostics do not meet the gate; refusing to export")
+    for k, v in PRIMARY_PROFILE.items():
+        if diag.get(k) != v:
+            raise RuntimeError(f"{unit}: not the approved primary profile ({k} = {diag.get(k)!r}, expected {v!r}); "
+                               "refusing to export it under the primary description")
+    with gzip.open(os.path.join(unit, "draws.csv.gz"), "rt") as f:
         rows = list(csv.DictReader(f))
-    return man, rows
+    if len(rows) != 4000:
+        raise RuntimeError(f"{unit}: {len(rows)} draws, expected 4000")
+    for k, _ in COLUMNS:
+        v = np.array([float(r[k]) for r in rows])
+        if not np.all(np.isfinite(v)) or (k in ("ab", "r", "kappa") and np.any(v <= 0)):
+            raise RuntimeError(f"{unit}: posterior column {k} is not finite and positive")
+    return man, rows, diag
 
 
 def days_to_hours(days):
@@ -118,12 +153,32 @@ def trial_table():
     return rows
 
 
+def publish_package(stage, root=ROOT):
+    """Check the staged package against its own manifest, then move it in with the manifest last, so
+    an interrupted export never leaves draws and manifest from different generations (review R4)."""
+    man = json.load(open(os.path.join(stage, "early_fit_manifest.json")))
+    for fn, meta in man["files"].items():
+        if sha256(os.path.join(stage, fn)) != meta["sha256"]:
+            raise RuntimeError(f"staged {fn} does not match its manifest; nothing published")
+    dest = {"early_fit_draws.csv": os.path.join(root, "draws"), "early_fit_trials.csv": os.path.join(root, "draws"),
+            "early_fit_evaluator.json": os.path.join(root, "tests", "testthat", "fixtures")}
+    old = os.path.join(root, "draws", "early_fit_manifest.json")
+    if os.path.exists(old):
+        os.remove(old)                         # the app refuses the package until the new manifest is in place
+    for fn, d in dest.items():
+        os.replace(os.path.join(stage, fn), os.path.join(d, fn))
+    os.replace(os.path.join(stage, "early_fit_manifest.json"), old)
+    os.rmdir(stage)
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--unit", default=UNIT_DEFAULT)
     a = ap.parse_args(argv[1:])
-    man, rows = read_unit(a.unit)
-    out_csv = os.path.join(ROOT, "draws", "early_fit_draws.csv")
+    man, rows, diag = read_unit(a.unit)
+    stage = os.path.join(ROOT, "draws", f".early_fit.partial-{os.getpid()}")
+    os.makedirs(stage, exist_ok=True)
+    out_csv = os.path.join(stage, "early_fit_draws.csv")
     with open(out_csv, "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(["draw"] + [c for _, c in COLUMNS])
@@ -131,8 +186,9 @@ def main(argv):
             w.writerow([i] + [r[k] for k, _ in COLUMNS])
     vals = {c: np.array([float(r[k]) for r in rows]) for k, c in COLUMNS}
     med = {c: float(np.median(v)) for c, v in vals.items()}
-    diag = json.load(open(os.path.join(a.unit, "diagnostics.json")))
     manifest = dict(
+        schema=PACKAGE_SCHEMA, evaluator=EVALUATOR_ID,
+        row_order="draws in the order of the source unit's draws.csv.gz (4 chains x 1000), one joint row per draw",
         model_id=f"early-fit-{man['identity'][:12]}",
         label="Trial-count fit (research)",
         created_by="tools/early_tox/export_fit_for_app.py",
@@ -158,14 +214,14 @@ def main(argv):
                "docs/development/2026_11_11_early_toxicity_review_response.md",
         files={"early_fit_draws.csv": dict(sha256=sha256(out_csv), n_draws=len(rows))})
     trials = trial_table()
-    out_trials = os.path.join(ROOT, "draws", "early_fit_trials.csv")
+    out_trials = os.path.join(stage, "early_fit_trials.csv")
     with open(out_trials, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(trials[0]), lineterminator="\n")
         w.writeheader()
         w.writerows(trials)
     manifest["files"]["early_fit_trials.csv"] = dict(sha256=sha256(out_trials), n_rows=len(trials),
                                                      citations="PubMed esummary, verified 2026-11-11")
-    with open(os.path.join(ROOT, "draws", "early_fit_manifest.json"), "w") as f:
+    with open(os.path.join(stage, "early_fit_manifest.json"), "w") as f:
         json.dump(manifest, f, indent=1)
     # cross-language fixture
     cases = []
@@ -174,9 +230,9 @@ def main(argv):
         for ab, r in ((med["ab_e"], med["r_e"]), (10.0, 0.79217), (7.5, 2.4)):
             cases.append(dict(name=name, m=m, d=d, days=days, T=days[-1], ab=ab, r=r, calendar=calendar,
                               E=ev.early_bed(doses, times, ab=ab, r=r, Tk=TK, halftime_h=HALFTIME_H)))
-    fx = os.path.join(ROOT, "tests", "testthat", "fixtures", "early_fit_evaluator.json")
-    with open(fx, "w") as f:
+    with open(os.path.join(stage, "early_fit_evaluator.json"), "w") as f:
         json.dump(dict(Tk=TK, halftime_h=HALFTIME_H, cases=cases), f, indent=1)
+    publish_package(stage)
     print(f"{len(rows)} draws; medians ab {med['ab_e']:.3f}, r {med['r_e']:.4f}; model {manifest['model_id']}")
 
 

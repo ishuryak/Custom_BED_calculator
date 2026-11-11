@@ -32,6 +32,7 @@ import hashlib
 import importlib.util
 import json
 import math
+import re
 import shutil
 import subprocess
 import sys
@@ -326,7 +327,7 @@ def required_quantities(data):
     return req
 
 
-def gate_from_summary(s, data, divergences, ebfmi, treedepth_hits):
+def gate_from_summary(s, data, divergences, ebfmi, treedepth_hits, n_chains=4):
     """Exact-schema gate: every required quantity present with finite R-hat and ESS; fixed
     benchmark constants checked as constants; no divergences; E-BFMI >= 0.3 in every chain."""
     req = required_quantities(data)
@@ -338,25 +339,30 @@ def gate_from_summary(s, data, divergences, ebfmi, treedepth_hits):
     if data["fixed_E"]:
         for q, v in (("ab", data["ab_fix"]), ("r", data["r_fix"])):
             # CmdStan prints 6 significant figures, so compare relatively; a constant has no spread
+            mean = float(s.loc[q, "Mean"]) if q in s.index else float("nan")
             sd = float(s.loc[q, "StdDev"]) if q in s.index else float("nan")
-            fixed_ok &= (q in s.index and abs(float(s.loc[q, "Mean"]) - v) <= 1e-5 * abs(v)
-                         and (not np.isfinite(sd) or sd < 1e-6))
+            fixed_ok &= (q in s.index and np.isfinite(mean) and abs(mean - v) <= 1e-5 * abs(v)
+                         and np.isfinite(sd) and sd < 1e-6)      # a constant: finite, no spread (review R6)
     finite = vals.loc[[q for q in present if q not in nonfinite]]
     out = dict(divergences=int(divergences), missing=missing, nonfinite=nonfinite, fixed_constants_ok=bool(fixed_ok),
                rhat=float(finite["R_hat"].max()) if len(finite) else float("nan"),
                ess_bulk=float(finite["ESS_bulk"].min()) if len(finite) else float("nan"),
                ess_tail=float(finite["ESS_tail"].min()) if len(finite) else float("nan"),
                ebfmi_min=float(min(ebfmi)) if len(ebfmi) else float("nan"),
+               ebfmi_per_chain=[float(x) for x in ebfmi],
+               ebfmi_complete=bool(len(ebfmi) == n_chains and all(np.isfinite(x) for x in ebfmi)),
                treedepth_saturated=int(treedepth_hits), n_required=len(req))
     out["gate_pass"] = bool(not missing and not nonfinite and fixed_ok and out["divergences"] == 0
                             and out["rhat"] < 1.01 and out["ess_bulk"] > 400 and out["ess_tail"] > 400
-                            and np.isfinite(out["ebfmi_min"]) and out["ebfmi_min"] >= EBFMI_MIN)
+                            and out["ebfmi_complete"] and out["ebfmi_min"] >= EBFMI_MIN)
     return out
 
 
 def chain_energy_checks(fit, max_treedepth=10):
     mv = fit.method_variables()
-    energy, depth = mv["energy__"], mv["treedepth__"]                  # (draws, chains)
+    energy, depth = np.asarray(mv["energy__"]), np.asarray(mv["treedepth__"])     # (draws, chains)
+    if energy.ndim != 2 or energy.shape[1] != fit.chains:
+        raise RuntimeError(f"energy array has shape {energy.shape}, expected (draws, {fit.chains})")
     ebfmi = [float(np.sum(np.diff(energy[:, c]) ** 2) / len(energy[:, c]) / np.var(energy[:, c]))
              for c in range(energy.shape[1])]
     return ebfmi, int(np.sum(depth >= max_treedepth))
@@ -367,6 +373,27 @@ def archive_chains(fit, identity):
     os.makedirs(d, exist_ok=True)
     fit.save_csvfiles(d)
     return {x: sha256_file(os.path.join(d, x)) for x in sorted(os.listdir(d)) if x.endswith(".csv")}
+
+
+HEX64 = re.compile(r"^[0-9a-f]{64}$")
+MANIFEST_OUTPUTS = set(OUTPUT_FILES) | {"draws.csv.gz"}
+
+
+def manifest_problem(m):
+    """Schema of a unit manifest (review R6): '' if valid, else what is wrong."""
+    if not isinstance(m, dict):
+        return "not an object"
+    if not isinstance(m.get("identity"), str) or not HEX64.match(m["identity"]):
+        return "identity is not a sha256"
+    for k in ("gate_pass", "smoke"):
+        if not isinstance(m.get(k), bool):
+            return f"{k} is not a boolean"
+    out = m.get("outputs")
+    if not isinstance(out, dict) or set(out) != MANIFEST_OUTPUTS:
+        return f"outputs must list exactly {sorted(MANIFEST_OUTPUTS)}"
+    if not all(isinstance(v, str) and HEX64.match(v) for v in out.values()):
+        return "an output hash is not a sha256"
+    return ""
 
 
 def unit_state(udir, identity):
@@ -380,13 +407,16 @@ def unit_state(udir, identity):
         m = json.load(open(man))
     except (OSError, ValueError) as err:
         raise RuntimeError(f"{udir}: unreadable manifest ({err}); refusing to reuse")
+    problem = manifest_problem(m)
+    if problem:
+        raise RuntimeError(f"{udir}: malformed manifest ({problem}); refusing to reuse")
     if m.get("identity") != identity:
         raise RuntimeError(f"{udir}: run identity differs from the current inputs; refusing to reuse")
     for fn, digest in m.get("outputs", {}).items():
         path = os.path.join(udir, fn)
         if not os.path.exists(path) or sha256_file(path) != digest:
             raise RuntimeError(f"{udir}: output {fn} missing or changed since completion; refusing to reuse")
-    return "complete" if m.get("gate_pass") else "failed"
+    return "complete" if m["gate_pass"] is True else "failed"
 
 
 def run_unit(model, name, out_dir, smoke=False, od=False):

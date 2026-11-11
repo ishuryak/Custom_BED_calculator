@@ -168,3 +168,71 @@ def test_conditional_check_runs_on_fit_shaped_draws_with_a_scale_group_offset():
     d.update(delta_all=np.full((100, 1), 0.3), groups=np.array(["G2"]))
     c = s6.contrast_check(dict(fake_family(), group="G2"), d, 1, 10)
     assert len(c) == 2 and np.isfinite(c[0]["predicted_count_median"])
+
+
+# Review R6 (v4.6): cache bytes bound to a manifest, arrays validated, staged report publication.
+def _real_cache(tmp_path):
+    import shutil
+    rows, fams = s6.s5.load_rows()
+    tr, tf = s6.training_set(rows, fams, "Mani")
+    src = os.path.join(ROOT, "docs", "development", "2026_11_10_early_toxicity", "step6_review", "cache",
+                       "candidate__without_Mani.npz")
+    if not os.path.exists(src):
+        pytest.skip("review-generation cache not present locally")
+    shutil.copy(src, tmp_path / "candidate__without_Mani.npz")
+    return tr, tf
+
+
+def test_a_cache_must_be_registered_and_its_bytes_must_match(tmp_path):
+    tr, tf = _real_cache(tmp_path)
+    st = s6.MODELS["candidate"]
+    with pytest.raises(RuntimeError, match="not in cache_manifest.json"):
+        s6.fit_cached(None, "candidate__without_Mani", tr, tf, st, str(tmp_path), rescore_only=True)
+    out = s6.fit_cached(None, "candidate__without_Mani", tr, tf, st, str(tmp_path), rescore_only=True, register=True)
+    assert len(out["r"]) == 4000
+    s6.fit_cached(None, "candidate__without_Mani", tr, tf, st, str(tmp_path), rescore_only=True)   # reuse, no sampling
+    z = dict(np.load(tmp_path / "candidate__without_Mani.npz"))
+    z["r"] = z["r"].copy()
+    z["r"][0] = 150.0                                           # one finite draw changed, identity kept
+    np.savez_compressed(tmp_path / "candidate__without_Mani.npz", **z)
+    with pytest.raises(RuntimeError, match="bytes or identity differ"):
+        s6.fit_cached(None, "candidate__without_Mani", tr, tf, st, str(tmp_path), rescore_only=True)
+
+
+def test_cache_arrays_are_validated():
+    fams = ["A", "B"]
+    S = 1000
+    good = {k: np.full(S, 0.5) for k in s6.PARAMS}
+    good.update(ab=np.full(S, 10.0), r=np.full(S, 1.5), delta_all=np.zeros((S, 1)), families=np.array(fams),
+                groups=np.array(["G2"]), gate=np.zeros(5), gate_json=np.array('{"gate_pass": true}'),
+                identity=np.array("x"))
+    assert s6.cache_problem(good, fams) == ""
+    for k, v, msg in (("r", np.r_[np.full(S - 1, 1.5), np.nan], "not 1000 finite"),
+                      ("ab", np.r_[np.full(S - 1, 10.0), -1.0], "values <= 0"),
+                      ("tau0", np.full(S - 1, 0.1), "not 1000 finite"),
+                      ("gate_json", np.array('{"gate_pass": "true"}'), "not a boolean"),
+                      ("families", np.array(["B", "A"]), "order differs")):
+        assert msg in s6.cache_problem({**good, k: v}, fams), k
+    assert "missing arrays" in s6.cache_problem({k: v for k, v in good.items() if k != "identity"}, fams)
+
+
+def test_report_is_published_with_its_manifest_last(tmp_path):
+    s6.publish_report(str(tmp_path), {"per_family.csv": [dict(a=1)]}, dict(revision="r1"))
+    assert s6.report_is_complete(str(tmp_path))
+    (tmp_path / "per_family.csv").write_text("a\n2\n")
+    assert not s6.report_is_complete(str(tmp_path))            # a file changed after publication
+    s6.publish_report(str(tmp_path), {"per_family.csv": [dict(a=3)]}, dict(revision="r2"))
+    assert s6.report_is_complete(str(tmp_path)) and not list(tmp_path.glob(".report.partial-*"))
+    # interrupted after the files moved but before the new manifest: the old manifest no longer certifies
+    real = s6.json.dump
+    def fail_on_manifest(obj, fh, **k):
+        if "files" in obj:
+            raise OSError("interrupted")
+        return real(obj, fh, **k)
+    s6.json.dump = fail_on_manifest
+    try:
+        with pytest.raises(OSError):
+            s6.publish_report(str(tmp_path), {"per_family.csv": [dict(a=4)]}, dict(revision="r3"))
+    finally:
+        s6.json.dump = real
+    assert not s6.report_is_complete(str(tmp_path))

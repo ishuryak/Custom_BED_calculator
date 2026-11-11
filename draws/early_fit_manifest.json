@@ -1,4 +1,7 @@
 {
+ "schema": "early-fit-package-1",
+ "evaluator": "early-bed-fit-1: E = D + Q/ab - r*max(0, T_elapsed - Tk), exact hinge, repair half-time h on fraction times",
+ "row_order": "draws in the order of the source unit's draws.csv.gz (4 chains x 1000), one joint row per draw",
  "model_id": "early-fit-4747b297ac10",
  "label": "Trial-count fit (research)",
  "created_by": "tools/early_tox/export_fit_for_app.py",
@@ -6,7 +9,7 @@
  "source_identity": "4747b297ac104be786a513d801de053e2de026926f068edccbd3f3a5c90c7a73",
  "source_revision": "04a3082",
  "chain_archive": "/home/ishuryak/early_tox_chain_archive/4747b297ac104be7",
- "endpoint": "maximum grade >= 3 acute mucositis (or confluent), arm-level counts, 22 randomized trial families (51 arms, 6042 evaluable patients)",
+ "endpoint": "severe acute mucositis (maximum grade >= 3, or confluent), arm-level counts pooled across grading scales, observation windows and evaluable, as-treated or completer populations; 22 randomized trial families (51 arms, 6042 evaluable patients); 2 of 22 families met the adequate post-RT ascertainment rule",
  "model": "logit p = eta_trial + kappa * (E - E_ref) + gamma * chemo + arm effect; E = D + Q/ab - r * max(0, T_elapsed - Tk), Q with incomplete repair",
  "fixed": {
   "Tk_e_elapsed_days": 7.0,
@@ -28,6 +31,8 @@
   "divergences": 0,
   "ebfmi_min": 0.6771043173680077
  },
+ "margin_meaning": "+5 is a numerical margin on this model's BED scale; its clinical risk meaning is not established",
+ "chemotherapy_term": "one pooled coarse indicator (greater or added planned chemotherapy exposure); not a treatment-specific causal effect; not used by the calculator",
  "status": "research scenario; Fowler 2003 is the app default. Validation: better held-out log score across 22 trial families (+0.28 per family); HYPNO depends on its chemotherapy assumption; ELAN-RT (frail, split course) favored the Fowler-parameter benchmark. Record: docs/development/2026_11_11_early_toxicity_review_response.md",
  "files": {
   "early_fit_draws.csv": {

@@ -1,0 +1,12 @@
+{
+ "files": {
+  "chemo_sensitivity.csv": "029a3332777124c292093b06295c47f8f877e8cae045b1e13aaa5c50cf545f03",
+  "contrasts.csv": "d8d6c8c646f39dd8cb1965ae1caf18843d4246d9c6fdfac013f13084346533ab",
+  "external.csv": "880ae6758212a03b043b4dd2889a9b1e00bb0cb81165dc9660ff17312abfd553",
+  "fit_gates.csv": "6248389f73ef3b2a40d787520ca3dc5586bbf3ac60f664dc5a5a09e7fb2fbc90",
+  "per_family.csv": "60473bb26b187408248a451f543f4e0dad3c691b1622b1621f257998390fed52",
+  "structural_repair.csv": "44aaaefcc2262d2844e33d941c141786fecca82e46a497e64656bf29ab750eea",
+  "summary.json": "147b98a99cc5355159985c96a9f8a8bbb2eb2e3c9a776388097bf5e1ec93c5c3"
+ },
+ "revision": "84f5e5a"
+}

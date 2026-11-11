@@ -133,7 +133,7 @@ def test_overdispersion_switch_reaches_the_fit_and_finished_units_are_reused(mod
 
 
 # Run identity and gates (review F4, F5), without sampling.
-def _manifest_dir(tmp_path, identity, gate=True, files=("summary.csv",)):
+def _manifest_dir(tmp_path, identity, gate=True, files=tuple(sorted(s5.MANIFEST_OUTPUTS))):
     import json
     d = tmp_path / "U"
     d.mkdir()
@@ -141,19 +141,20 @@ def _manifest_dir(tmp_path, identity, gate=True, files=("summary.csv",)):
     for fn in files:
         (d / fn).write_text("ok")
         out[fn] = s5.sha256_file(str(d / fn))
-    (d / "manifest.json").write_text(json.dumps(dict(identity=identity, gate_pass=gate, outputs=out)))
+    (d / "manifest.json").write_text(json.dumps(dict(identity=identity, gate_pass=gate, smoke=False, outputs=out)))
     return d
 
 
 def test_unit_state_reuses_only_an_identical_complete_unit(tmp_path):
     assert s5.unit_state(str(tmp_path / "none"), "abc") == "absent"
-    d = _manifest_dir(tmp_path, "abc")
-    assert s5.unit_state(str(d), "abc") == "complete"
+    ida, idx = "a" * 64, "c" * 64
+    d = _manifest_dir(tmp_path, ida)
+    assert s5.unit_state(str(d), ida) == "complete"
     with pytest.raises(RuntimeError, match="identity differs"):
-        s5.unit_state(str(d), "xyz")
+        s5.unit_state(str(d), idx)
     (d / "summary.csv").write_text("changed")
     with pytest.raises(RuntimeError, match="missing or changed"):
-        s5.unit_state(str(d), "abc")
+        s5.unit_state(str(d), ida)
 
 
 def test_unit_state_refuses_legacy_malformed_and_reports_failed(tmp_path):
@@ -170,8 +171,12 @@ def test_unit_state_refuses_legacy_malformed_and_reports_failed(tmp_path):
     failed = tmp_path / "f"
     failed.mkdir()
     import json
-    (failed / "manifest.json").write_text(json.dumps(dict(identity="abc", gate_pass=False, outputs={})))
-    assert s5.unit_state(str(failed), "abc") == "failed"
+    outs = {}
+    for fn in sorted(s5.MANIFEST_OUTPUTS):
+        (failed / fn).write_text("x")
+        outs[fn] = s5.sha256_file(str(failed / fn))
+    (failed / "manifest.json").write_text(json.dumps(dict(identity="a" * 64, gate_pass=False, smoke=False, outputs=outs)))
+    assert s5.unit_state(str(failed), "a" * 64) == "failed"
 
 
 def test_run_identity_changes_with_each_defining_input(tmp_path, monkeypatch):
@@ -334,3 +339,48 @@ def test_sbc_bins_cover_101_discrete_ranks_and_divergent_reps_are_listed(tmp_pat
     res = sbc.summarize(str(tmp_path / "ranks.csv"), str(tmp_path))
     assert res["divergent_reps"] == [dict(rep=7, divergences=3)] and res["divergent_transitions"] == 3
     assert all(v["chisq"] == pytest.approx(0, abs=1e-9) for v in res["params"].values())
+
+
+# Review R6 (v4.6): every chain's E-BFMI, finite constants, strict manifest schema.
+def test_ebfmi_must_be_finite_in_every_chain_and_one_per_chain():
+    rows, fams = s5.load_rows()
+    cand = s5.stan_data(rows, fams, 7.0, dict(use_od=1))
+    s = _fake_summary(cand)
+    g = lambda e: s5.gate_from_summary(s, cand, 0, e, 0)["gate_pass"]
+    assert g([0.9] * 4)
+    for pos in range(4):
+        for bad in (float("nan"), float("inf"), -float("inf")):
+            e = [0.9] * 4
+            e[pos] = bad
+            assert not g(e), (pos, bad)
+    assert not g([0.9])                       # one value for a four-chain run
+    assert not g([0.9] * 5)
+
+
+def test_fixed_constant_needs_finite_mean_and_spread():
+    rows, fams = s5.load_rows()
+    bench = s5.stan_data(rows, fams, 7.0, dict(use_od=1, fixed_E=1))
+    s = _fake_summary(bench)
+    assert s5.gate_from_summary(s, bench, 0, [0.9] * 4, 0)["gate_pass"]
+    for col, val in (("StdDev", float("inf")), ("StdDev", float("nan")), ("StdDev", 0.01), ("Mean", float("nan"))):
+        t = s.copy()
+        t.loc["r", col] = val
+        assert not s5.gate_from_summary(t, bench, 0, [0.9] * 4, 0)["gate_pass"], (col, val)
+
+
+def test_manifest_schema_is_strict(tmp_path):
+    import json
+    good = dict(identity="a" * 64, gate_pass=True, smoke=False,
+                outputs={k: "b" * 64 for k in s5.MANIFEST_OUTPUTS})
+    assert s5.manifest_problem(good) == ""
+    for change, msg in ((dict(gate_pass="false"), "gate_pass is not a boolean"),
+                        (dict(outputs={}), "outputs must list exactly"),
+                        (dict(outputs={"summary.csv": "b" * 64}), "outputs must list exactly"),
+                        (dict(identity="abc"), "identity is not a sha256"),
+                        (dict(outputs={**good["outputs"], "summary.csv": "zz"}), "not a sha256")):
+        assert msg in s5.manifest_problem({**good, **change}), change
+    d = tmp_path / "U"
+    d.mkdir()
+    (d / "manifest.json").write_text(json.dumps({**good, "outputs": {}}))
+    with pytest.raises(RuntimeError, match="malformed manifest"):
+        s5.unit_state(str(d), "a" * 64)
