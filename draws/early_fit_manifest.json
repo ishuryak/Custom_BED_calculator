@@ -1,0 +1,38 @@
+{
+ "model_id": "early-fit-4747b297ac10",
+ "label": "Trial-count fit (research)",
+ "created_by": "tools/early_tox/export_fit_for_app.py",
+ "source_unit": "docs/development/2026_11_10_early_toxicity/step5_review/overdispersed/U02",
+ "source_identity": "4747b297ac104be786a513d801de053e2de026926f068edccbd3f3a5c90c7a73",
+ "source_revision": "04a3082",
+ "chain_archive": "/home/ishuryak/early_tox_chain_archive/4747b297ac104be7",
+ "endpoint": "maximum grade >= 3 acute mucositis (or confluent), arm-level counts, 22 randomized trial families (51 arms, 6042 evaluable patients)",
+ "model": "logit p = eta_trial + kappa * (E - E_ref) + gamma * chemo + arm effect; E = D + Q/ab - r * max(0, T_elapsed - Tk), Q with incomplete repair",
+ "fixed": {
+  "Tk_e_elapsed_days": 7.0,
+  "repair_halftime_h": 3.2,
+  "hinge": "exact",
+  "clock": "elapsed days"
+ },
+ "point_values": {
+  "ab_e": 12.8683,
+  "r_e": 1.5538,
+  "rule": "posterior medians"
+ },
+ "n_draws": 4000,
+ "gate": {
+  "passed": true,
+  "rhat": 1.00459,
+  "ess_bulk": 1274.13,
+  "ess_tail": 1873.27,
+  "divergences": 0,
+  "ebfmi_min": 0.6771043173680077
+ },
+ "status": "research scenario; Fowler 2003 is the app default. Validation: better held-out log score across 22 trial families (+0.28 per family); HYPNO depends on its chemotherapy assumption; ELAN-RT (frail, split course) favored the Fowler-parameter benchmark. Record: docs/development/2026_11_11_early_toxicity_review_response.md",
+ "files": {
+  "early_fit_draws.csv": {
+   "sha256": "a6fde4626c88a1872a84408d66e78ddd1460cdabb98734d06427ce186f07b4fd",
+   "n_draws": 4000
+  }
+ }
+}

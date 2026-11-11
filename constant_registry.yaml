@@ -53,7 +53,7 @@ constants:
     value: 0.5
     provenance: design
     why: Differences below this are "about the same" in words (plan workstream C, item 7). Tables keep full values.
-    sites: ["app.R:102"]
+    sites: ["app.R:@^VERDICT_TOL <- "]
   oar_near_fraction:
     value: 0.05
     provenance: design
@@ -68,7 +68,7 @@ constants:
     value: 1000
     provenance: design
     why: Draws used by the interactive uncertainty search (Monte Carlo standard error of a share at most 1.6 points); summaries use all draws.
-    sites: ["R/uncertainty.R:243"]
+    sites: ["R/uncertainty.R:@^SEARCH_DRAWS <- "]
   fenwick_boundary:
     value: [69.5, 32.2, 3.5, 50]
     provenance: literature

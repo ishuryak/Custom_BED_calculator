@@ -98,6 +98,7 @@ build_scenario <- function(p, ref, anchor, search, context, analysis = "candidat
                        c_over_alpha = if (is.finite(cal$c_over_alpha)) cal$c_over_alpha else NULL,
                        onset_anchor = if (is.finite(cal$onset_ref)) cal$onset_ref else NULL),
     search = search)
+  if (!is.null(early_block(p))) sc$early <- early_block(p)
   if (analysis == "agreement") {
     abv <- if (is.null(agreement$ab_values)) SCENARIO_AB_VALUES else agreement$ab_values
     sc$agreement <- list(
@@ -114,6 +115,35 @@ build_scenario <- function(p, ref, anchor, search, context, analysis = "candidat
   sc$code <- code
   sc$context <- context
   sc
+}
+
+# Research mode for early toxicity (version 4.6): the block that identifies the fitted model, or
+# NULL in Fowler mode (so Fowler-mode files and their IDs are exactly as before).
+early_block <- function(p) {
+  if (!early_is_relative(p)) return(NULL)
+  cal <- if (is.null(p$calendar_e)) default_calendar() else p$calendar_e
+  list(model = "fitted", model_id = p$early_model_id, ab_e = p$ab_e, r_e = p$r_e, Tk_e = p$Tk_e, h_e = p$h_e,
+       calendar = list(fx_per_week = cal$fx_per_week, start_weekday = cal$start_weekday,
+                       skip_days = as.list(cal$skip_days)),
+       formula = "E = D + Q/ab - r * max(0, T_elapsed - Tk), incomplete repair (half-time h_e hours), exact hinge",
+       meaning = "research scenario: trial-count fit of grade >= 3 acute mucositis; Fowler 2003 is the default")
+}
+
+# Apply a recorded early block to replayed parameters: only the installed fitted model with the same
+# identity and point values can reproduce it.
+apply_early_block <- function(p, eb, fit = load_early_fit()) {
+  if (is.null(eb)) return(p)
+  check_choice(eb$model, "early model", "fitted")
+  if (!isTRUE(fit$ok)) replay_fail("it used the fitted early-toxicity model, which is not available here: ", fit$reason, ".")
+  if (!identical(as.character(eb$model_id), fit$model_id))
+    replay_fail("it used fitted early-toxicity model ", eb$model_id, ", not this calculator's ", fit$model_id, ".")
+  for (k in c("ab_e", "r_e", "Tk_e", "h_e"))
+    if (!same_num(eb[[k]], fit$point[[k]])) replay_fail("its fitted early-toxicity value ", k, " differs from the installed model.")
+  cc <- eb$calendar
+  cal <- list(fx_per_week = check_num(cc$fx_per_week, "early calendar fx_per_week", 5, 6, TRUE),
+              start_weekday = check_num(cc$start_weekday, "early calendar start_weekday", 1, 6, TRUE),
+              skip_days = check_skip_days(unlist(cc$skip_days)))
+  fitted_early_params(p, fit, calendar = cal)
 }
 
 # The DD model's settings: calibrated (default) or fitted with its own values.
@@ -147,7 +177,7 @@ scenario_json <- function(sc, pretty = TRUE) {
 # interface context are excluded. SHA-256 of canonical UTF-8 JSON.
 SCIENTIFIC_FIELDS <- c("schema_version", "equation_version", "selection_version", "analysis",
                        "hinge", "clocks", "params", "dd", "comparison", "anchor", "search",
-                       "agreement", "scenario_set_version", "scenario_set")
+                       "agreement", "scenario_set_version", "scenario_set", "early")
 scenario_id <- function(sc) {
   x <- sc[intersect(SCIENTIFIC_FIELDS, names(sc))]
   js <- enc2utf8(as.character(scenario_json(canonicalize(x), pretty = FALSE)))
@@ -201,6 +231,7 @@ check_inputs <- function(sc) {
   p <- lapply(PARAM_NAMES, function(n) check_num(pr[[n]], n, lim[[n]][1], lim[[n]][2]))
   names(p) <- PARAM_NAMES
   p$clock_e <- sc$clocks$acute
+  p <- apply_early_block(p, sc$early)
   ddb <- sc$dd
   if (!is.null(ddb)) {
     mode <- check_choice(ddb$mode, "dd mode", c("calibrated", "fitted"))
@@ -482,7 +513,8 @@ uncertainty_scenario <- function(s, variant, tox_source, search = NULL, oar = NU
              limits = list(early = list(mode = s$early_mode, tol = s$tol_early),
                            late = list(mode = s$late_mode, tol = s$tol_late)),
              params_fixed_toxicity = if (identical(tox_source, "fixed"))
-               c(s$p[c("ab_e", "alpha_e", "lambda_e", "Tk_e", "ab_l")], list(ab_cord = organ_ab[["cord"]], ab_oar = organ_ab[["oar"]])) else NULL,
+               c(s$p[if (early_is_relative(s$p)) c("ab_e", "r_e", "Tk_e", "h_e", "ab_l") else c("ab_e", "alpha_e", "lambda_e", "Tk_e", "ab_l")],
+                 list(ab_cord = organ_ab[["cord"]], ab_oar = organ_ab[["oar"]])) else NULL,
              oar = if (is.null(oar)) list(applied = FALSE) else
                list(applied = TRUE, library = oar$library, percents = oar$percents,
                     ab = list(cord = organ_ab[["cord"]], oar = organ_ab[["oar"]]),
@@ -495,6 +527,7 @@ uncertainty_scenario <- function(s, variant, tox_source, search = NULL, oar = NU
                toxicity = list(source = tox_source, seed = TOXICITY_SEED, rng = TOXICITY_RNG, prior = toxicity_prior()),
                search_draws = SEARCH_DRAWS,
                wording = "shares of simulated parameter draws under the stated models and priors"))
+  if (!is.null(early_block(s$p))) sc$early <- early_block(s$p)
   if (!is.null(search)) {
     sc$search <- list(rule = search$rule, tox_share_min = search$tox_share / 100,
                       m_range = s$m_range, d_step = s$d_step, d_max = s$d_max,
@@ -549,7 +582,15 @@ validate_uncertainty_scenario <- function(sc, draws_dir = DRAWS_DIR) {
     replay_fail("the recorded toxicity prior differs from the one this calculator draws from.")
   if (!same_num(u$search_draws, SEARCH_DRAWS)) replay_fail("the recorded number of screen draws is not ", SEARCH_DRAWS, ".")
   pf <- NULL
-  if (source == "fixed") {
+  pe <- apply_early_block(list(), sc$early, if (is.null(sc$early)) NULL else load_early_fit(draws_dir))   # research mode
+  fitted_early <- early_is_relative(pe)
+  if (source == "fixed" && fitted_early) {
+    q <- sc$params_fixed_toxicity
+    if (!is.list(q)) replay_fail("fixed toxicity parameters are missing.")
+    for (k in c("ab_e", "r_e", "Tk_e", "h_e")) if (!same_num(q[[k]], pe[[k]])) replay_fail("fixed ", k, " differs from the fitted model.")
+    pf <- c(pe, list(ab_l = check_num(q$ab_l, "ab_l", 0.01, 1000), ab_cord = check_num(q$ab_cord, "ab_cord", 0.01, 100),
+                     ab_oar = check_num(q$ab_oar, "ab_oar", 0.01, 100)))
+  } else if (source == "fixed") {
     q <- sc$params_fixed_toxicity
     if (!is.list(q)) replay_fail("fixed toxicity parameters are missing.")
     pf <- list(ab_e = check_num(q$ab_e, "ab_e", 0.01, 1000), alpha_e = check_num(q$alpha_e, "alpha_e", 1e-6, 10),
@@ -603,7 +644,8 @@ validate_uncertainty_scenario <- function(sc, draws_dir = DRAWS_DIR) {
       replay_fail("the search grid (", n, " regimens) exceeds ", UNC_MAX_GRID_ROWS, ", the largest the app can request.")
   }
   tx <- if (source == "fixed") fixed_toxicity_draws(pf, nrow(di), c(cord = pf$ab_cord, oar = pf$ab_oar)) else
-    toxicity_draws(nrow(di), seed)
+    if (fitted_early) early_fit_toxicity_draws(nrow(di), load_early_fit(draws_dir), seed) else toxicity_draws(nrow(di), seed)
+  if (fitted_early) attr(tx, "calendar") <- pe$calendar_e
   oar_fun <- if (is.null(oar)) NULL else oar_draw_checker(load_constraints(), oar$percents, oar$library)
   list(reg = reg, ref = ref, threshold = threshold, limits = lim, di = di, dd = dd, tx = tx,
        oar_fun = oar_fun, search = search)

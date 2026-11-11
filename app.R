@@ -73,6 +73,9 @@ LIMITS <- list(
 # the app starts on scenario D18 and says why (review 4.1, 2026-11-09).
 REFIT_PROFILE <- refit_profile()
 STARTUP <- startup_profile(REFIT_PROFILE)
+# Research mode for early toxicity (version 4.6): the trial-count fit, loaded and hash-checked once.
+EARLY_FIT <- load_early_fit()
+EARLY_MODEL_CHOICES <- c("Fowler 2003 (default)" = "fowler", "Trial-count fit (research)" = "fitted")
 REFIT_OK <- isTRUE(REFIT_PROFILE$ok)
 PRESET_LABELS <- c(
   if (REFIT_OK) c("Trial-fit point scenario (default): medians of the Bayesian refit to randomized trials" = "refit"),
@@ -427,6 +430,10 @@ v4_home <- function() {
       actionButton("open_menu", "☰ Menu", class = "btn-outline-primary btn-sm",
                    title = "Check a regimen, see uncertainty, change settings, read the sources")),
     uiOutput("home_intro"),
+    div(class = "v4-early-model",
+      tags$span(class = "v4-early-model-label", "Early-toxicity model:"),
+      radioButtons("early_model", NULL, EARLY_MODEL_CHOICES, selected = "fowler", inline = TRUE),
+      uiOutput("early_model_note")),
     div(class = "v4-limits",
       tags$span(class = "v4-limits-label", "Change the limits (Gy of BED):"),
       numericInput("home_m_tumor", "Tumor: largest loss", V4_MARGINS$tumor, min = V4_MARGIN_RANGE[1],
@@ -517,7 +524,16 @@ ui <- page_sidebar(
       "  border-radius: 0.4rem; padding: 0.5rem 1rem 0; margin: -0.6rem 0 0.8rem; }",
       ".v4-limits .form-group { margin-bottom: 0.5rem; }",
       ".v4-limits-label { font-weight: 600; margin-bottom: 0.9rem; }",
-      ".v4-limits a { margin-bottom: 1rem; }")),
+      ".v4-limits a { margin-bottom: 1rem; }",
+      # Early-toxicity model switch (version 4.6): visible on the main page, Fowler selected by default.
+      ".v4-early-model { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1rem;",
+      "  border: 2px solid #1f6feb; border-radius: 0.5rem; padding: 0.5rem 0.9rem; margin: 0.6rem 0; }",
+      ".v4-early-model-label { font-weight: 700; }",
+      ".v4-early-model .form-group { margin-bottom: 0; }",
+      ".v4-early-model .radio-inline { padding: 0.3rem 0.8rem; border: 1px solid #1f6feb; border-radius: 1rem;",
+      "  margin-right: 0.4rem; cursor: pointer; }",
+      ".v4-early-model .radio-inline:has(input:checked) { background: #1f6feb; color: #fff; }",
+      ".v4-early-model .v4-research-banner { flex-basis: 100%; margin: 0.4rem 0 0; }")),
   sidebar = sidebar(id = "menu", title = "Menu", width = 290, open = "closed", v4_menu()),
   conditionalPanel("input.section && input.section !== 'home'", div(class = "bed-banner", uiOutput("banner"))),
   do.call(navset_hidden, c(list(id = "section", selected = "home", nav_panel_hidden("home", v4_home())), V45_PAGES))
@@ -594,7 +610,32 @@ server <- function(input, output, session) {
          dd_mode = choice_or("dd_mode", "calibrated"),
          alpha_dd = if (identical(input$dd_mode, "fitted")) checked("alpha_dd") else NULL,
          c_over_alpha_dd = if (identical(input$dd_mode, "fitted")) checked("c_over_alpha_dd") else NULL,
-         g_dd = if (identical(input$dd_mode, "fitted")) checked("g_dd") else NULL)
+         g_dd = if (identical(input$dd_mode, "fitted")) checked("g_dd") else NULL) |> with_early_model()
+  })
+
+  # Research mode replaces the mucosal values with the fitted model's point values (posterior
+  # medians) and passes the candidate calendar for its repair term. Fowler mode is untouched.
+  with_early_model <- function(p) {
+    if (!identical(input$early_model, "fitted")) return(p)
+    validate(need(isTRUE(EARLY_FIT$ok), paste0("The trial-count fit is not available: ", EARLY_FIT$reason, ".")))
+    cal <- tryCatch(candidate_calendar(calendar()), error = function(e) default_calendar())
+    fitted_early_params(p, EARLY_FIT, calendar = cal)
+  }
+
+  output$early_model_note <- renderUI({
+    if (!identical(input$early_model, "fitted")) return(NULL)
+    if (!isTRUE(EARLY_FIT$ok)) return(div(class = "alert alert-danger", "The trial-count fit is not available: ", EARLY_FIT$reason, "."))
+    pt <- EARLY_FIT$point
+    div(class = "alert alert-info v4-research-banner",
+      tags$strong("Research model in use for early toxicity. "),
+      sprintf(paste("Fitted to grade 3 or worse acute mucositis in 22 randomized trials (51 arms): mucosal α/β %.1f Gy,",
+                    "regrowth %.2f Gy of BED per day from day %g, %.1f-hour repair between fractions (posterior medians)."),
+              pt$ab_e, pt$r_e, pt$Tk_e, pt$h_e),
+      " It predicted held-out trials better on average than Fowler's parameters, but its advantage came mostly from",
+      " accelerated trials: for shorter hypofractionated courses the evidence is mixed (HYPNO depends on its",
+      " chemotherapy, ELAN-RT favored Fowler). The +5 limit is in this model's BED and corresponds to a smaller",
+      " increase in risk than Fowler's +5. Fowler 2003 remains the default.",
+      tags$span(class = "text-muted small", sprintf(" Model %s.", EARLY_FIT$model_id)))
   })
 
   # Overall time: from the calendar, or typed but not shorter than once-daily
@@ -916,6 +957,8 @@ server <- function(input, output, session) {
   # own comparison (suggest_regimens computes it).
   tox_args <- reactive({
     early_mode <- input$early_mode
+    validate(need(!(identical(input$early_model, "fitted") && identical(early_mode, "fowler")),
+                  "The Fowler 2003 zone (59-61 Gy₁₀) belongs to Fowler's parameters and is not used with the trial-count fit. Choose another early limit, or switch the early-toxicity model back to Fowler 2003 on the main page."))
     late_mode <- choice_or("late_mode", "reference")
     cap <- switch(early_mode,
       fowler = fowler_zone(isTRUE(input$chemo))[1],

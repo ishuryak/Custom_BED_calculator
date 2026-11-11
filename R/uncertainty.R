@@ -166,11 +166,68 @@ bed_dd_draws <- function(m, d, T, dr) {
 # Acute (Fowler-type) BED for every regimen and draw; T is inclusive and is
 # converted to the elapsed clock as in compute_all().
 bed_early_draws <- function(m, d, T, tx) {
+  if (!is.null(tx$r_e)) {                                   # research mode: fitted model, no hinge smoothing
+    cal <- if (is.null(attr(tx, "calendar"))) default_calendar() else attr(tx, "calendar")
+    S <- early_repair_S(m, T, cal, tx$h_e[1])
+    hinge <- pmax(0, acute_model_time(T, "elapsed") - tx$Tk_e[1])
+    return(matrix(m * d, length(m), nrow(tx)) + outer(S * d^2, 1 / tx$ab_e) - outer(hinge, tx$r_e))
+  }
   K <- bed_lq_mat(m, d, tx$ab_e)
   K - sweep(smooth_max0(outer(acute_model_time(T), tx$Tk_e, "-")), 2, tx$lambda_e / tx$alpha_e, "*")
 }
 
 bed_late_draws <- function(m, d, ab_l) bed_lq_mat(m, d, ab_l)
+
+# --- research mode: the trial-count fit of early toxicity (2026-11-11) --------------------------
+
+EARLY_FIT_MANIFEST <- "early_fit_manifest.json"
+EARLY_FIT_FILE <- "early_fit_draws.csv"
+
+# The fitted model's manifest, joint draws and point values, or ok = FALSE with a reason. The
+# draws file must match the sha256 in its manifest; anything else makes research mode unavailable.
+load_early_fit <- function(dir = DRAWS_DIR) {
+  fail <- function(why) list(ok = FALSE, reason = why)
+  mp <- file.path(dir, EARLY_FIT_MANIFEST); dp <- file.path(dir, EARLY_FIT_FILE)
+  if (!file.exists(mp) || !file.exists(dp)) return(fail("the fitted early-toxicity files are not installed"))
+  man <- tryCatch(jsonlite::fromJSON(mp, simplifyVector = FALSE), error = function(e) NULL)
+  if (is.null(man)) return(fail("the fitted early-toxicity manifest cannot be read"))
+  got <- digest::digest(readBin(dp, "raw", n = file.size(dp)), algo = "sha256", serialize = FALSE)
+  if (!identical(got, man$files[[EARLY_FIT_FILE]]$sha256))
+    return(fail("the fitted early-toxicity draws do not match their manifest"))
+  dr <- utils::read.csv(dp)
+  if (!all(c("ab_e", "r_e", "kappa") %in% names(dr)) || nrow(dr) != man$n_draws ||
+      any(!is.finite(as.matrix(dr[c("ab_e", "r_e", "kappa")]))) || any(dr$ab_e <= 0))
+    return(fail("the fitted early-toxicity draws are incomplete"))
+  list(ok = TRUE, manifest = man, draws = dr, model_id = man$model_id,
+       point = list(ab_e = man$point_values$ab_e, r_e = man$point_values$r_e,
+                    Tk_e = man$fixed$Tk_e_elapsed_days, h_e = man$fixed$repair_halftime_h))
+}
+
+# The early-toxicity parameters of research mode (point values) merged into a parameter list.
+fitted_early_params <- function(p, fit, calendar = default_calendar())
+  modifyList(p, c(fit$point, list(early_model = "fitted", early_model_id = fit$model_id, calendar_e = calendar)))
+
+# n toxicity draws for research mode: late and organ values from the stated priors (same seed as
+# Fowler mode), early values from the fitted joint posterior (all 4,000 in order when n = 4,000,
+# otherwise a seeded subsample). Each row keeps its own ab_e and r_e together.
+early_fit_toxicity_draws <- function(n, fit, seed = TOXICITY_SEED) {
+  base <- toxicity_draws(n, seed)
+  k <- nrow(fit$draws)
+  idx <- if (n == k) seq_len(k) else {
+    old <- if (exists(".Random.seed", envir = globalenv())) get(".Random.seed", envir = globalenv()) else NULL
+    on.exit(if (is.null(old)) rm(".Random.seed", envir = globalenv()) else assign(".Random.seed", old, envir = globalenv()))
+    RNGkind("Mersenne-Twister", "Inversion", "Rejection"); set.seed(seed + 1)
+    sample.int(k, n, replace = n > k)
+  }
+  base$ab_e <- fit$draws$ab_e[idx]
+  base$r_e <- fit$draws$r_e[idx]
+  base$Tk_e <- fit$point$Tk_e
+  base$h_e <- fit$point$h_e
+  base$alpha_e <- NA_real_; base$lambda_e <- NA_real_; base$Tp_e <- NA_real_
+  attr(base, "early_model") <- "fitted"
+  attr(base, "early_model_id") <- fit$model_id
+  base
+}
 
 # --- toxicity priors (assumption-based) -------------------------------------
 
@@ -220,6 +277,13 @@ toxicity_draws <- function(n, seed = TOXICITY_SEED, prior = toxicity_prior()) {
 # alpha/beta values (cord and brainstem, other organs) of the Organs at risk
 # tab, so a fixed draw gives the tab's own organ check.
 fixed_toxicity_draws <- function(p, n, organ_ab = c(cord = 2, oar = 3)) {
+  if (early_is_relative(p)) {
+    out <- data.frame(ab_e = rep(p$ab_e, n), r_e = p$r_e, Tk_e = p$Tk_e, h_e = p$h_e, ab_l = p$ab_l,
+                      ab_cord = organ_ab[["cord"]], ab_oar = organ_ab[["oar"]],
+                      alpha_e = NA_real_, lambda_e = NA_real_, Tp_e = NA_real_)
+    attr(out, "early_model") <- "fitted"
+    return(out)
+  }
   data.frame(ab_e = rep(p$ab_e, n), alpha_e = p$alpha_e, Tp_e = log(2) / p$lambda_e,
              Tk_e = p$Tk_e, ab_l = p$ab_l, ab_cord = organ_ab[["cord"]], ab_oar = organ_ab[["oar"]],
              lambda_e = p$lambda_e)
@@ -259,7 +323,8 @@ toxicity_ok_draws <- function(regs, ref, tx, limits, oar = NULL) {
     stop("unknown late limit: ", limits$late$mode))
   e <- bed_early_draws(regs$m, regs$d, regs$T, tx)
   l <- bed_late_draws(regs$m, regs$d, tx$ab_l)
-  ok_e <- e > 0 & sweep(e, 2, base_early + 1e-9, "<=")
+  relative <- !is.null(tx$r_e)                             # research mode: compared with the standard only
+  ok_e <- (if (relative) is.finite(e) else e > 0) & sweep(e, 2, base_early + 1e-9, "<=")
   ok_l <- sweep(l, 2, base_late + 1e-9, "<=")
   out <- ok_e & ok_l
   if (!is.null(oar)) out <- out & oar

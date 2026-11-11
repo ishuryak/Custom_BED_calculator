@@ -18,7 +18,7 @@ MAIN_SUPPORT_VARIANT <- "primary"
 # toggle) are excluded.
 MAIN_SCIENTIFIC_FIELDS <- c("schema_version", "main_version", "equation_version", "selection_version",
                             "analysis", "hinge", "clocks", "params", "dd", "anchor", "standard", "margins",
-                            "grid", "calendar", "rule", "support", "data_domain", "trial_arms")
+                            "grid", "calendar", "rule", "support", "data_domain", "trial_arms", "early")
 
 # Draws used for refit support: list(di, dd) from load_draws(), or NULL.
 main_support_block <- function(draws, margin = V4_MARGINS$tumor, threshold = V4_SUPPORT_MIN) {
@@ -59,6 +59,7 @@ main_scenario <- function(p, anchor, draws, data_domain = tumor_data_support(), 
     data_domain = list(file = data_domain$file, d_max = data_domain$d_max,
                        n_arms = data_domain$n_arms, n_studies = data_domain$n_studies),
     trial_arms = V4_TRIAL_ARMS)
+  if (!is.null(early_block(p))) sc$early <- early_block(p)
   now <- code_identity(code_root)
   if (is.null(code)) code <- now
   code$changed_since_load <- !identical(code$files, now$files)

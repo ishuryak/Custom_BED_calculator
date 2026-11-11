@@ -1,4 +1,4 @@
-# Custom BED calculator, version 4.5.0
+# Custom BED calculator, version 4.6.0
 
 **Use the calculator:** https://ishuryak.shinyapps.io/custom_bed_calculator_v4/ · **Source:** this branch (`v4`) of https://github.com/ishuryak/Custom_BED_calculator
 
@@ -63,6 +63,15 @@ run_app.bat                     # or: Rscript tools/launch.R
 ```
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
+
+## Changes in version 4.6.0 (early-toxicity research switch, 2026-11-11; not deployed)
+
+- **Main page switch:** "Early-toxicity model: Fowler 2003 (default) | Trial-count fit (research)". Research mode applies the fitted model everywhere (main list, Check a regimen, custom search, Uncertainty with the 4,000 joint draws, downloads). It shows a banner that names the model and its evidence. Fowler mode reproduces 4.5.0 exactly (69 doses in 18 rows).
+- **Model files:** `draws/early_fit_draws.csv` and `draws/early_fit_manifest.json`, exported by `tools/early_tox/export_fit_for_app.py` from the gated step 5 primary unit. They are checked by SHA-256 at startup, and the mode is unavailable on a mismatch.
+- **Evaluator:** the same formula as the fitting code, with incomplete repair on the actual treatment days and an exact hinge. It is checked against the Python evaluator (`tests/testthat/fixtures/early_fit_evaluator.json`). Research mode does not require positive early BED, since only differences from the standard are used (review F9: 13% of draws give E <= 0 for 70/35).
+- **Exports and replay:** research-mode exports carry an `early` block (model ID, point values, calendar), which is part of the analysis ID. Replay refuses another model. Fowler-mode exports and IDs are unchanged.
+- **Limits:** the Fowler zone limit is refused in research mode.
+- **Records and tests:** `docs/development/2026_11_11_early_toxicity_review_response.md` and `docs/FIXES.md`. Tests: `tests/testthat/test_v46_early_research.R`, `test_v46_app_switch.R`, `tests/python/test_early_tox_export.py`.
 
 ## Changes in version 4.5.0 (independent review of 4.4.0, 2026-11-09; deployed 2026-11-09 at `faf6817`)
 

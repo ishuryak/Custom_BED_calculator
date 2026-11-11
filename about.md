@@ -72,6 +72,16 @@ $$BED_{early} = n d \left(1 + \frac{d}{(\alpha/\beta)_e}\right) - \frac{\lambda_
 
 Here $T_e$ is the overall time in **elapsed days** (last treatment day minus first), which is the calendar count minus 1. Fowler's parameters and tolerance zone were derived on that clock [5, 9]: 70 Gy in 35 fractions over 7 weeks counts as 46 days and gives 53.1 Gy₁₀, as in his Table 1. The calculator converts once, inside the calculation.
 
+### Research option: the trial-count fit of early toxicity (version 4.6)
+
+The main page has a switch, **Early-toxicity model**, set to **Fowler 2003 (default)**. Choosing **Trial-count fit (research)** replaces the early-toxicity model everywhere in the calculator: main list, Check a regimen, the custom search, Uncertainty and every download.
+
+- **What it is.** A model fitted to grade 3 or worse acute mucositis counts (or confluent mucositis) in the arms of 22 randomized trials of altered fractionation in head and neck cancer, 51 arms with 6,042 evaluable patients. It compares each trial's arms with that trial's own control arm, with a term for differences in planned concurrent chemotherapy.
+- **Formula.** Early BED is $E = D + Q/(\alpha/\beta)_e - r\,\max(0, T_e - T_{k,e})$. Here $T_e$ is elapsed days, and $Q$ includes incomplete repair between fractions (half-time 3.2 hours) on the actual treatment days. The point values are the posterior medians: $(\alpha/\beta)_e$ = 12.9 Gy and $r$ = 1.55 Gy of BED per day from day 7. Under Uncertainty, the 4,000 joint posterior draws are used, each with its own α/β and $r$.
+- **How it differs from Fowler.** The regrowth rate is about twice Fowler's (0.79 Gy of BED per day), so shortening a course raises early BED more. With the default +5 limit, the main list keeps only 26 to 30 fractions. The +5 limit is in this model's own BED and corresponds to a smaller increase in risk than Fowler's +5.
+- **What the evidence shows.** Leaving out one trial at a time, the fitted model predicted the left-out trial better than Fowler's parameters on average: in 18 of 22 trials, by about 0.28 log-score units per trial. Most of that advantage came from accelerated trials, and for shorter hypofractionated courses the evidence is mixed. In HYPNO (55 Gy in 20 fractions against 66 Gy in 33), the comparison depends on how the trial's 4 vs 5 weekly cisplatin courses are treated. ELAN-RT, in frail older patients with a split course, favored Fowler's parameters. Few trials scored mucositis after the end of radiotherapy, when it often peaks.
+- **What it is not.** It is not a validated replacement for Fowler, and it gives no patient risk. It does not use the Fowler zone (that zone belongs to Fowler's parameters and is refused with this model), and it does not require early BED to be positive, because only differences from the standard are interpreted.
+
 ### Late toxicity BED
 
 Late-responding tissues are assumed not to repopulate during treatment, so $\alpha$ does not enter:
@@ -226,6 +236,10 @@ Every preset keeps the background growth $g$ entered on Model settings, and ever
 - The tumor data cover 1.15–2.55 Gy per fraction. Tumor BEDs at larger fractions are extrapolations. The main list (Caution column), Check a regimen, Custom search and Uncertainty tables flag them.
 
 ### Release history
+
+#### Version 4.6
+
+- An early-toxicity model switch on the main page: Fowler 2003 (default) or the trial-count fit (research option, described above). Fowler mode is unchanged.
 
 #### Version 4.5
 

@@ -146,7 +146,9 @@ data.
    (record `2026_11_11_early_toxicity_review_response.md`). Same scores with complete gates and
    identities. HYPNO's ranking depends on its 4 vs 5 cisplatin courses, and hypofractionation
    evidence is mixed.
-   **Next: Igor decides D2 (research scenario in the app or Fowler only). Phase E only then.**
+   D2 decided 2026-11-11 (Igor): keep Fowler as default, add a visible switch to the fitted model
+   (posterior medians, +5 margin). Phase E built as version 4.6.0 (local, not deployed).
+   **Next: visual walkthrough, then deployment only with Igor's approval.**
 2. **Step 1** (about 2 hours): write the structured target definition. No code change.
 3. **Step 2** (3–5 days, Igor Shuryak spot-checks): build `data/early_tox/` (reports, schedules,
    fractions, labels, arms, outcomes, evidence families). Every value comes from a downloaded full

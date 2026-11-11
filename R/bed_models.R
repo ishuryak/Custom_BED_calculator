@@ -8,7 +8,7 @@
 # All max(0, x) terms use the same smooth version as the v1 website,
 # log(1 + exp(3x)) / 3, so v1 and v2 agree at the v1 defaults.
 
-APP_VERSION <- "4.5.0"
+APP_VERSION <- "4.6.0"
 EQUATION_VERSION <- "3.0"  # 2.2 + optional fitted DD model (own alpha, rate, onset constant)
 # Selection rules (filtering, validity, ranking), versioned apart from the
 # equations. 2.5: one validity rule for search, sensitivity and agreement.
@@ -163,6 +163,48 @@ bed_early <- function(m, d, T, ab_e, alpha_e, lambda_e, Tk_e) {
   bed_lq(m, d, ab_e) - lambda_e * smooth_max0(T - Tk_e) / alpha_e
 }
 
+# --- Research mode (2026-11-11): the trial-count fit of early toxicity -------------------------
+# docs/development/2026_11_11_early_toxicity_review_response.md. Same formula as the fitting code
+# (tools/early_tox/evaluator.py; checked by tests/testthat/fixtures/early_fit_evaluator.json):
+#   E = D + Q / ab - r * max(0, T_elapsed - Tk)      exact hinge, elapsed clock,
+#   Q = d^2 * S, S = sum_i sum_j exp(-mu |t_i - t_j|), mu = ln 2 / h (incomplete repair between
+#   fractions h hours apart; h = NULL means complete repair, S = m), t from the treatment days.
+# The fitted model is relative (each trial's arms against its own control), so the app compares a
+# regimen with the standard and never requires E > 0 (review F9).
+EARLY_MODEL_IDS <- c("fowler", "fitted")
+
+repair_sum <- function(days, h) {
+  n <- length(days)
+  if (is.null(h) || n < 2) return(n)
+  t <- 24 * (days - days[1])
+  dt <- abs(outer(t, t, "-"))
+  sum(exp(-log(2) / h * dt))
+}
+
+# Treatment days of m once-daily fractions ending on day T: the given calendar, else the default
+# calendar, else (an overall time typed longer than either allows) the given calendar's days.
+fit_treatment_days <- function(m, T, cal) {
+  for (cc in list(cal, default_calendar())) {
+    dd <- treatment_days(m, cc$fx_per_week, cc$start_weekday, cc$skip_days)
+    if (dd[m] == T) return(dd)
+  }
+  treatment_days(m, cal$fx_per_week, cal$start_weekday, cal$skip_days)
+}
+
+early_repair_S <- function(m, T, cal, h) {
+  key <- paste(m, T)
+  u <- !duplicated(key)
+  S_u <- mapply(function(mm, TT) repair_sum(fit_treatment_days(mm, TT, cal), h), m[u], T[u])
+  unname(S_u[match(key, key[u])])
+}
+
+bed_early_fit <- function(m, d, T, ab, r, Tk, h, cal = default_calendar()) {
+  S <- early_repair_S(m, T, cal, h)
+  m * d + S * d^2 / ab - r * pmax(0, acute_model_time(T, "elapsed") - Tk)
+}
+
+early_is_relative <- function(p) identical(p$early_model, "fitted")
+
 # Late toxicity BED: LQ only, no repopulation. alpha does not enter.
 bed_late <- function(m, d, ab_l) bed_lq(m, d, ab_l)
 
@@ -174,7 +216,9 @@ compute_all <- function(m, d, T, p, anchor) {
   g <- if (is.null(p$g)) 0 else p$g
   clock_e <- if (is.null(p$clock_e)) "elapsed" else p$clock_e
   cal <- dd_setup(p, anchor)
-  early <- bed_early(m, d, acute_model_time(T, clock_e), p$ab_e, p$alpha_e, p$lambda_e, p$Tk_e)
+  early <- if (early_is_relative(p))
+    bed_early_fit(m, d, T, p$ab_e, p$r_e, p$Tk_e, p$h_e, if (is.null(p$calendar_e)) default_calendar() else p$calendar_e)
+  else bed_early(m, d, acute_model_time(T, clock_e), p$ab_e, p$alpha_e, p$lambda_e, p$Tk_e)
   late <- bed_late(m, d, p$ab_l)
   data.frame(
     m = m, d = d, T = T, total_dose = m * d,
@@ -260,7 +304,8 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
   if (!dd_usable && needs_dd) return(blocked("negative_reference_dd"))
   if (!di_usable && needs_di) return(blocked("negative_reference_di"))
   if (!di_usable && !dd_usable) return(blocked("negative_reference_both"))
-  if (!fenwick && is.null(early_cap) && !(is.finite(r0$bed_early) && r0$bed_early > 0))
+  relative <- early_is_relative(p)       # research mode: no positivity requirement (review F9)
+  if (!fenwick && is.null(early_cap) && !(is.finite(r0$bed_early) && (relative || r0$bed_early > 0)))
     return(blocked("negative_reference_early"))
   if (is.null(late_cap) && !(is.finite(r0$bed_late) && r0$bed_late > 0))
     return(blocked("negative_reference_late"))
@@ -298,7 +343,7 @@ suggest_regimens <- function(p, ref, anchor = default_anchor(), m_range = 5:34,
     a$early_ok <- if (fenwick) {
       lim <- fenwick_limit(T)
       !is.na(lim) & fenwick_cell_kill(m, d) <= lim + eps
-    } else a$bed_early > 0 & a$bed_early <= cap_early + eps
+    } else is.finite(a$bed_early) & (relative | a$bed_early > 0) & a$bed_early <= cap_early + eps
     a$late_ok <- a$bed_late <= cap_late + eps
     a$oar_ok <- if (is.null(oar_check)) rep(TRUE, length(m)) else oar_check(m, d)
     # Ranking score: evaluable only when the endpoints it needs are evaluable.

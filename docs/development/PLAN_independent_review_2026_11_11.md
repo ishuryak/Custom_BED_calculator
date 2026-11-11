@@ -146,3 +146,6 @@ review is planned.
 Phases A–D are done. The record is `2026_11_11_early_toxicity_review_response.md`. Phase E waits
 for decision D2.
 
+Phase E (2026-11-11): Igor chose a visible main-page switch, with Fowler as the default, posterior
+medians and the +5 margin. Built as version 4.6.0 (see `docs/FIXES.md`). Not deployed.
+

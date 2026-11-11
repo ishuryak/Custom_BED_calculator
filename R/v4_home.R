@@ -247,7 +247,7 @@ v4_failed_conditions <- function(m, d, p, anchor, r0, margins = V4_MARGINS) {
   c(if (!(meets(e$di) || meets(e$dd)))
       sprintf("tumor BED not within %g Gy of the standard under either model: %s; %s", margins$tumor,
               v4_endpoint_words(e$di, "DI"), v4_endpoint_words(e$dd, "DD")),
-    if (!(is.finite(x$bed_early) && x$bed_early > 0)) "early BED not positive"
+    if (!(is.finite(x$bed_early) && (early_is_relative(p) || x$bed_early > 0))) "early BED not positive"
     else if (x$bed_early > r0$bed_early + margins$early + 1e-9)
       sprintf("early BED more than %g Gy above the standard", margins$early),
     if (x$bed_late > r0$bed_late + margins$late + 1e-9)

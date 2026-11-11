@@ -489,3 +489,17 @@ Several R tests were red on 917825b because the new helper did not exist yet. Th
 
 **Verification.** 2026-11-11: `python3 -m pytest -q tests/python` passes. Full runs on `04a3082` (step 6 records `378d58f`, which differs only in the applicability script): 42 of 42 overdispersed step 5 fits and every step 6 fit pass the complete-schema gate; a rescore-only run sampled nothing. `stale_constant_audit.py --strict`: 0 errors. Plan: `docs/development/PLAN_independent_review_2026_11_11.md`. Record: `docs/development/2026_11_11_early_toxicity_review_response.md`.
 
+### 2026-11-11: version 4.6.0, early-toxicity research switch (Phase E; local, not deployed)
+
+**Changes published numbers:** no for the default. With the switch on Fowler 2003 (the default), the app reproduces 4.5.0 exactly (69 doses in 18 rows; all earlier tests pass). Research mode is a new, opt-in output. With the +5 limit it lists 9 doses in 26-30 fractions.
+
+| Change | What was wrong or missing (proof) | Test (red by mutation) | What it moves |
+|---|---|---|---|
+| Fitted early model in R (`bed_early_fit`, `compute_all` dispatch) | The app had only Fowler's evaluator (complete repair, smooth hinge) | `tests/testthat/test_v46_early_research.R` (agreement with the Python evaluator on 18 fixture cases; red with repair ignored or a smooth hinge) | Research mode only |
+| No positivity filter in research mode (search and draws) | 526 of 4,000 draws give E <= 0 for 70/35, so the legacy filter would give 87% support for 70/35 against itself (review F9) | `::test_that("same regimen gives a zero difference and full support ...")`, `::("research mode drops the positivity requirement ...")` | Research mode only |
+| Model files with SHA-256 check (`draws/early_fit_*`, `load_early_fit`) | A changed draws file must not be used silently | `::("the fitted model loads ... refuses a changed draws file")`; `tests/python/test_early_tox_export.py` | None |
+| Main-page switch, banner, Fowler-zone refusal (`app.R`) | User request (Igor Shuryak, 2026-11-11) | `tests/testthat/test_v46_app_switch.R` (red with the switch ignored or the zone allowed) | Research mode only |
+| Export `early` block, replay check (`R/export.R`, `R/v4_export.R`) | A research-mode file must not replay under Fowler | `test_v46_app_switch.R::("a research-mode main export records the model and replays exactly ...")` | Fowler files and IDs unchanged |
+
+**Verification.** 2026-11-11: `Rscript tools/run_tests.R` gave 6,561 expectations, 0 failed, 0 errors (before the commit, so marked a numerical check). `python3 -m pytest -q tests/python`: 300 passed. `stale_constant_audit.py --strict`: 0 errors. The UI render shows the switch above the limits with Fowler selected. A visual browser walkthrough is still to do before any deployment, and deployment needs Igor's approval.
+

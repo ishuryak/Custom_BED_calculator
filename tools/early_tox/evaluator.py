@@ -48,8 +48,11 @@ def repair_q(doses, times_h, halftime_h=None):
     return q
 
 
+HOURS_PER_DAY = 24.0
+
+
 def elapsed_days(times_h):
-    return (times_h[-1] - times_h[0]) / 24.0
+    return (times_h[-1] - times_h[0]) / HOURS_PER_DAY
 
 
 def early_bed(doses, times_h, ab=FOWLER_2003["ab"], r=None, Tk=FOWLER_2003["Tk"], halftime_h=None):
