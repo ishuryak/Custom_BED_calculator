@@ -16,8 +16,10 @@ Each predictive density averages over posterior draws and, within each draw, ove
 Carlo draws of the trial baseline and arm effects (seeded). The score per family is the log
 predictive density; the paired difference d_j = candidate - benchmark is summarized with a Bayesian
 bootstrap of family weights (Dirichlet(1,...,1), seeds 20261113 and 20261114, 20,000 replicates).
-Promotion convention (plan step 6): the lower 95% bound of the weighted mean d must be above 0 in
-both seeds, and the leave-one-family influence must not change the sign.
+Score criterion (plan step 6): the lower 95% bound of the weighted mean d is above 0 in both seeds and
+no single family reverses the sign. numerical_rule_pass also requires the full family scope and every
+fit passing the complete-schema gate (review F4/F5). It is not a promotion decision: `decision`
+stays with Igor Shuryak.
 
 External checks, from fits on all 22 primary families: HYPNO (benchmark, R6) and the sensitivity
 trials (IAEA-ACC, Pinto, Poddar, Sanchiz, Dwivedi, ELAN-RT), conditional contrast task.
@@ -75,17 +77,34 @@ def family_data(fam, rows_all):
                 group=rows[0]["scale_group"])
 
 
+def arm_probabilities(draws, fd, eta, arm):
+    """p (S, inner, I). An arm's chemotherapy may be a probability mixture fd['chemo_mix'][i] =
+    [(weight, code), ...], mixed on the probability scale before the binomial (review F1)."""
+    dE = fd["dD"][None, :] + fd["dQ"][None, :] / draws["ab"][:, None] - draws["r"][:, None] * fd["dTe"][None, :]
+    base = eta[:, :, None] + (draws["kappa"][:, None] * dE)[:, None, :] + arm
+    mix = fd.get("chemo_mix") or [[(1.0, c)] for c in fd["chemo"]]
+    p = np.zeros_like(base)
+    for i, comps in enumerate(mix):
+        if abs(sum(w for w, _ in comps) - 1) > 1e-9:
+            raise ValueError("mixture weights must sum to 1")
+        for w, c in comps:
+            p[:, :, i] += w / (1 + np.exp(-(base[:, :, i] + draws["gamma"][:, None] * c)))
+    return p
+
+
+def latent_draws(draws, fd, inner, rng):
+    S, I = len(draws["kappa"]), len(fd["y"])
+    eta = (draws["m0"] + draws["delta"])[:, None] + draws["tau0"][:, None] * rng.standard_normal((S, inner))
+    arm = draws["sigma_arm"][:, None, None] * rng.standard_normal((S, inner, I))
+    return eta, arm
+
+
 def predictive(draws, fd, inner, rng):
     """(log p(all arms), log p(reference arm)) by Monte Carlo over draws x inner baselines."""
-    S = len(draws["kappa"])
-    I = len(fd["y"])
-    dE = fd["dD"][None, :] + fd["dQ"][None, :] / draws["ab"][:, None] - draws["r"][:, None] * fd["dTe"][None, :]
-    base = draws["m0"] + draws["delta"]                                    # (S,)
-    eta = base[:, None] + draws["tau0"][:, None] * rng.standard_normal((S, inner))       # (S, inner)
-    arm = draws["sigma_arm"][:, None, None] * rng.standard_normal((S, inner, I))
-    lin = eta[:, :, None] + (draws["kappa"][:, None] * dE + draws["gamma"][:, None] * fd["chemo"][None, :])[:, None, :] + arm
-    ll = binom_logpmf(fd["y"][None, None, :], fd["N"][None, None, :], 1 / (1 + np.exp(-lin)))   # (S, inner, I)
-    tot = S * inner
+    eta, arm = latent_draws(draws, fd, inner, rng)
+    p = arm_probabilities(draws, fd, eta, arm)
+    ll = binom_logpmf(fd["y"][None, None, :], fd["N"][None, None, :], p)   # (S, inner, I)
+    tot = ll.shape[0] * ll.shape[1]
     return float(logsumexp(ll.sum(axis=2)) - math.log(tot)), float(logsumexp(ll[:, :, fd["ref"]]) - math.log(tot))
 
 
@@ -99,29 +118,52 @@ def group_delta(fit_draws, group, train_groups, rng):
     return rng.standard_normal(S)
 
 
-def fit_cached(model, name, rows, fams, settings, cache):
+STEP6_SAMPLER = dict(s5.SAMPLER, seed=SEED)
+
+
+def fit_cached(model, name, rows, fams, settings, cache, rescore_only=False, accept_legacy=False):
+    """Posterior draws for one fit, reused only on an identical run identity (review F4). In
+    rescore-only mode a missing cache is an error and nothing is sampled."""
+    data = s5.stan_data(rows, fams, TK, settings)
+    identity = s5.run_identity(data, settings, STEP6_SAMPLER, extra=dict(step6=name, families=fams))
     path = os.path.join(cache, f"{name}.npz")
     if os.path.exists(path):
-        z = np.load(path, allow_pickle=False)
-        return {k: z[k] for k in z.files}
-    data = s5.stan_data(rows, fams, TK, settings)
+        try:
+            z = np.load(path, allow_pickle=False)
+            out = {k: z[k] for k in z.files}
+        except Exception as err:                                        # truncated or corrupt file
+            raise RuntimeError(f"{path}: unreadable cache ({err}); refusing to reuse")
+        if "identity" not in out:
+            if not accept_legacy:
+                raise RuntimeError(f"{path}: cache has no run identity (legacy); refusing to reuse")
+            if sorted(out["families"].tolist()) != sorted(fams):
+                raise RuntimeError(f"{path}: legacy cache family set differs")
+            out["gate_json"] = np.array(json.dumps(dict(gate_pass=bool(out["gate"][0]), scope="legacy narrow gate")))
+            return out
+        if str(out["identity"]) != identity:
+            raise RuntimeError(f"{path}: run identity differs from the current inputs; refusing to reuse")
+        return out
+    if rescore_only:
+        raise RuntimeError(f"{path}: no cache; rescore-only mode does not sample")
     s5.wait_for_memory()
-    fit = model.sample(data=data, chains=4, parallel_chains=1, iter_warmup=1000, iter_sampling=1000,
-                       adapt_delta=0.95, seed=SEED, show_progress=False, show_console=False)
-    s = fit.summary()
-    keep = [n for n in s.index if n.split("[")[0] in ("m0", "tau0", "Lstar", "ab", "r", "gamma", "sigma_arm", "delta", "eta")]
-    sub = s.loc[keep]
-    gate = (int(np.sum(fit.divergences)) == 0 and float(sub["R_hat"].max()) < 1.01
-            and float(sub["ESS_bulk"].min()) > 400 and float(sub["ESS_tail"].min()) > 400)
-    out = {p: np.asarray(fit.stan_variable(p)).reshape(len(fit.stan_variable("kappa")), -1)[:, 0]
-           if p in ("gamma", "sigma_arm") else np.asarray(fit.stan_variable(p)) for p in PARAMS}
-    out["delta_all"] = np.asarray(fit.stan_variable("delta")).reshape(len(out["kappa"]), -1)
+    fit = model.sample(data=data, show_progress=False, show_console=False, **STEP6_SAMPLER)
+    summ = fit.summary(percentiles=(5, 50, 95))
+    ebfmi, depth = s5.chain_energy_checks(fit)
+    gate = s5.gate_from_summary(summ, data, np.sum(fit.divergences), ebfmi, depth)
+    gate["scope"] = "complete schema gate"
+    S = len(fit.stan_variable("kappa"))
+    out = {p: np.asarray(fit.stan_variable(p)).reshape(S, -1)[:, 0] if p in ("gamma", "sigma_arm")
+           else np.asarray(fit.stan_variable(p)) for p in PARAMS}
+    out["delta_all"] = np.asarray(fit.stan_variable("delta")).reshape(S, -1)
     out["families"] = np.array(fams)
     out["groups"] = np.array([g for g in s5.GROUP_COLS if any(x["scale_group"] == g for x in rows)])
-    out["gate"] = np.array([gate, int(np.sum(fit.divergences)), float(sub["R_hat"].max()),
-                            float(sub["ESS_bulk"].min()), float(sub["ESS_tail"].min())])
-    np.savez_compressed(path + ".tmp.npz", **out)
-    os.replace(path + ".tmp.npz", path)
+    out["gate"] = np.array([gate["gate_pass"], gate["divergences"], gate["rhat"], gate["ess_bulk"], gate["ess_tail"]])
+    out["gate_json"] = np.array(json.dumps(gate, default=str))
+    out["chain_archive"] = np.array(json.dumps(s5.archive_chains(fit, identity)))
+    out["identity"] = np.array(identity)                     # written last into the same atomic file
+    tmp = path + f".partial-{os.getpid()}.npz"
+    np.savez_compressed(tmp, **out)
+    os.replace(tmp, path)
     return out
 
 
@@ -141,61 +183,139 @@ def bayes_boot(dvals, seed, n=N_BOOT):
                 p_positive=float(np.mean(m > 0)))
 
 
+def cc_lor(y1, n1, y0, n0):
+    """Continuity-corrected sample log odds ratio, the statistic compared on both scales."""
+    return np.log((y1 + 0.5) / (n1 - y1 + 0.5)) - np.log((y0 + 0.5) / (n0 - y0 + 0.5))
+
+
+def weighted_quantiles(x, w, qs):
+    o = np.argsort(x)
+    cw = np.cumsum(w[o])
+    cw /= cw[-1]
+    return [float(x[o][min(np.searchsorted(cw, q), len(x) - 1)]) for q in qs]
+
+
 def contrast_check(fd, draws_fit, seed, inner):
-    """Observed against predicted log odds ratio of each non-reference arm, given the reference arm."""
+    """Conditional predictive check of each non-reference arm GIVEN the observed reference count
+    (review F2). Baselines and arm effects are weighted by the reference-arm likelihood; the other
+    arms' counts are simulated with their own denominators; the same continuity-corrected sample
+    log OR is computed on replicates and data (observed scale). The latent log OR, also weighted, is
+    reported separately. ESS of the weights is recorded."""
     rng = np.random.default_rng(seed)
-    S = len(draws_fit["kappa"])
-    dE = fd["dD"][None, :] + fd["dQ"][None, :] / draws_fit["ab"][:, None] - draws_fit["r"][:, None] * fd["dTe"][None, :]
-    lor = draws_fit["kappa"][:, None] * dE + draws_fit["gamma"][:, None] * fd["chemo"][None, :]
-    # predictive spread for a new arm pair adds two arm effects
-    lor_pred = lor + draws_fit["sigma_arm"][:, None] * math.sqrt(2) * rng.standard_normal(lor.shape)
+    eta, arm = latent_draws(draws_fit, fd, inner, rng)
+    p = arm_probabilities(draws_fit, fd, eta, arm)                         # (S, inner, I)
     y, N, r = fd["y"], fd["N"], fd["ref"]
+    lw = binom_logpmf(y[r], N[r], p[:, :, r]).ravel()
+    w = np.exp(lw - lw.max())
+    ess = float(w.sum() ** 2 / np.sum(w ** 2))
     out = []
     for i, x in enumerate(fd["rows"]):
         if i == r:
             continue
-        obs = math.log((y[i] + 0.5) / (N[i] - y[i] + 0.5)) - math.log((y[r] + 0.5) / (N[r] - y[r] + 0.5))
-        q = np.percentile(lor_pred[:, i], [5, 50, 95])
-        out.append(dict(arm_id=x["arm_id"], observed_lor=round(obs, 4), predicted_lor_median=round(float(q[1]), 4),
-                        predicted_lor_5=round(float(q[0]), 4), predicted_lor_95=round(float(q[2]), 4),
-                        inside_90=bool(q[0] <= obs <= q[2]), pit=round(float(np.mean(lor_pred[:, i] <= obs)), 4)))
+        yrep = rng.binomial(N[i], p[:, :, i]).ravel()
+        stat_rep = cc_lor(yrep, N[i], y[r], N[r])
+        obs = float(cc_lor(y[i], N[i], y[r], N[r]))
+        latent = (np.log(p[:, :, i] / (1 - p[:, :, i])) - np.log(p[:, :, r] / (1 - p[:, :, r]))).ravel()
+        q = weighted_quantiles(stat_rep, w, [0.05, 0.5, 0.95])
+        qc = weighted_quantiles(yrep.astype(float), w, [0.05, 0.5, 0.95])
+        ql = weighted_quantiles(latent, w, [0.05, 0.5, 0.95])
+        below = float(np.sum(w[stat_rep < obs]) / w.sum())
+        equal = float(np.sum(w[stat_rep == obs]) / w.sum())
+        out.append(dict(arm_id=x["arm_id"], observed_lor=round(obs, 4),
+                        predicted_obs_lor_5=round(q[0], 4), predicted_obs_lor_median=round(q[1], 4),
+                        predicted_obs_lor_95=round(q[2], 4), inside_90=bool(q[0] <= obs <= q[2]),
+                        width_90=round(q[2] - q[0], 4), mid_pit=round(below + 0.5 * equal, 4),
+                        observed_count=int(y[i]), predicted_count_5=qc[0], predicted_count_median=qc[1],
+                        predicted_count_95=qc[2],
+                        latent_lor_5=round(ql[0], 4), latent_lor_median=round(ql[1], 4), latent_lor_95=round(ql[2], 4),
+                        target="observed-scale sample log OR given the observed reference count",
+                        reference_arm=fd["rows"][r]["arm_id"], seed=seed, weight_ess=round(ess, 1)))
     return out
+
+
+def gate_row(model, held_out, dr):
+    g = json.loads(str(dr["gate_json"]))
+    return dict(model=model, held_out=held_out, gate_pass=bool(g["gate_pass"]), scope=g.get("scope", ""),
+                divergences=g.get("divergences", ""), rhat=g.get("rhat", ""), ess_bulk=g.get("ess_bulk", ""),
+                ess_tail=g.get("ess_tail", ""), ebfmi_min=g.get("ebfmi_min", ""),
+                missing=len(g.get("missing", [])), nonfinite=len(g.get("nonfinite", [])),
+                identity=str(dr["identity"]) if "identity" in dr else "legacy (none)")
+
+
+def with_chemo(fd, arm_id, code=None, mix=None):
+    """A copy of a family's data with one arm's chemotherapy code or probability mixture replaced."""
+    f = dict(fd)
+    i = [x["arm_id"] for x in fd["rows"]].index(arm_id)
+    if mix is not None:
+        f["chemo_mix"] = [[(1.0, c)] for c in fd["chemo"]]
+        f["chemo_mix"][i] = list(mix)
+    else:
+        ch = fd["chemo"].copy()
+        ch[i] = code
+        f["chemo"] = ch
+    return f
+
+
+def hypno_scenarios(fd):
+    out = {}
+    for name, spec in s5.EXTERNAL_CHEMO_SCENARIOS["HYPNO_HFX"].items():
+        if isinstance(spec, tuple):
+            _, share, code = spec
+            out[name] = with_chemo(fd, "HYPNO_HFX", mix=[(share, code), (1 - share, 0.0)])
+        else:
+            out[name] = with_chemo(fd, "HYPNO_HFX", code=spec)
+    return out
+
+
+def numerical_rule(score_criterion_met, scope_complete, gates):
+    """True only for the full family scope with every fit passing the complete-schema gate."""
+    return bool(score_criterion_met and scope_complete and gates
+                and all(g["gate_pass"] and g["scope"] == "complete schema gate" for g in gates))
 
 
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=OUT_DEFAULT)
     ap.add_argument("--inner", type=int, default=100)
-    ap.add_argument("--families", default="", help="comma list to restrict held-out families (smoke)")
+    ap.add_argument("--families", default="", help="comma list to restrict held-out families (smoke; never eligible)")
+    ap.add_argument("--rescore-only", action="store_true", help="never sample; a missing cache is an error")
+    ap.add_argument("--accept-legacy", action="store_true", help="read caches written before run identities (labelled)")
     a = ap.parse_args(argv[1:])
     cache = os.path.join(a.out, "cache")
     os.makedirs(cache, exist_ok=True)
-    model = s5.compile_model()
+    model = None if a.rescore_only else s5.compile_model()
+    fc = lambda name, rows, fams_, st: fit_cached(model, name, rows, fams_, st, cache, a.rescore_only, a.accept_legacy)
     prim, fams = s5.load_rows()
     allrows, allfams = s5.load_rows(m4=True)
     held = [f for f in fams if not a.families or f in a.families.split(",")]
     t0 = time.time()
-    per_family, contrasts, gates = [], [], []
+    per_family, contrasts, gates, chemo_sens = [], [], [], []
     for k, f in enumerate(held):
         rows, tfams = training_set(prim, fams, f)
         fd = family_data(f, prim)
         rec = dict(family=f, n_arms=len(fd["y"]), group=fd["group"])
         for m, st in MODELS.items():
-            dr = fit_cached(model, f"{m}__without_{f}", rows, tfams, st, cache)
+            dr = fc(f"{m}__without_{f}", rows, tfams, st)
             assert f not in set(dr["families"].tolist()), f"leak: {f} in its own training fit"
-            gates.append(dict(model=m, held_out=f, gate_pass=bool(dr["gate"][0]), divergences=int(dr["gate"][1]),
-                              rhat=round(float(dr["gate"][2]), 4), ess_bulk=int(dr["gate"][3]), ess_tail=int(dr["gate"][4])))
+            gates.append(gate_row(m, f, dr))
             new, cond = score_family(fd, dr, a.inner, SEED + 1000 * k)      # common random numbers
             rec[f"{m}_new_trial"] = round(new, 4)
             rec[f"{m}_conditional"] = round(cond, 4)
             contrasts += [dict(model=m, family=f, **c) for c in contrast_check(fd, dr, SEED + k, a.inner)]
+            for arm_id, code in s5.CHEMO_SENSITIVITY.items():                # decision D5 (held-out fold only)
+                if any(x["arm_id"] == arm_id for x in fd["rows"]):
+                    _, c2 = score_family(with_chemo(fd, arm_id, code=code), dr, a.inner, SEED + 1000 * k)
+                    chemo_sens.append(dict(model=m, family=f, arm_id=arm_id, code=code, conditional=round(c2, 4),
+                                           conditional_at_0=round(cond, 4)))
         rec["d_new_trial"] = round(rec["candidate_new_trial"] - rec["benchmark_new_trial"], 4)
         rec["d_conditional"] = round(rec["candidate_conditional"] - rec["benchmark_conditional"], 4)
         per_family.append(rec)
         print(f"held out {f} ({k + 1}/{len(held)}, {time.time() - t0:.0f} s): d_new {rec['d_new_trial']:+.3f}, "
               f"d_cond {rec['d_conditional']:+.3f}", flush=True)
 
+    scope_complete = len(per_family) == len(fams) and not a.families
     summary = dict(seed=SEED, inner=a.inner, n_boot=N_BOOT, tk=TK, families=len(per_family),
+                   scope="all primary families" if scope_complete else f"SUBSET {held} (smoke; never eligible)",
                    revision=os.popen(f"git -C {ROOT} rev-parse --short HEAD").read().strip(), tasks={})
     for task in ("new_trial", "conditional"):
         d = [r[f"d_{task}"] for r in per_family]
@@ -208,33 +328,40 @@ def main(argv):
             sum_d=round(float(np.sum(d)), 3), families_candidate_better=int(np.sum(np.array(d) > 0)),
             bootstrap=boots, leave_one_family_mean=infl,
             influence_sign_changes=int(sum((v > 0) != (np.mean(d) > 0) for v in infl.values())),
-            promote=bool(all(b["lo"] > 0 for b in boots.values())
-                         and all((v > 0) for v in infl.values())))
+            score_criterion_met=bool(all(b["lo"] > 0 for b in boots.values()) and all(v > 0 for v in infl.values())))
 
-    # external checks from fits on all primary families
+    # external checks from fits on all primary families; HYPNO under declared chemotherapy scenarios
     ext = []
     for m, st in MODELS.items():
-        dr = fit_cached(model, f"{m}__all_primary", prim, fams, st, cache)
-        gates.append(dict(model=m, held_out="none (all primary)", gate_pass=bool(dr["gate"][0]),
-                          divergences=int(dr["gate"][1]), rhat=round(float(dr["gate"][2]), 4),
-                          ess_bulk=int(dr["gate"][3]), ess_tail=int(dr["gate"][4])))
+        dr = fc(f"{m}__all_primary", prim, fams, st)
+        gates.append(gate_row(m, "none (all primary)", dr))
         hy = external_family("HYPNO")
-        targets = [("HYPNO", hy)] + [(f, family_data(f, allrows)) for f in sorted(s5.SENSITIVITY_FAMILIES)]
+        targets = [(f"HYPNO [{n}]", fdx) for n, fdx in hypno_scenarios(hy).items()]
+        targets += [(f, family_data(f, allrows)) for f in sorted(s5.SENSITIVITY_FAMILIES)]
         for j, (f, fd) in enumerate(targets):
-            new, cond = score_family(fd, dr, a.inner, SEED + 5000 + j)
+            new, cond = score_family(fd, dr, 300 if f.startswith("HYPNO") else a.inner, SEED + 5000 + j)
             cc = contrast_check(fd, dr, SEED + 7000 + j, a.inner)
             ext.append(dict(model=m, family=f, conditional=round(cond, 4), new_trial=round(new, 4),
-                            arms=";".join(f"{c['arm_id']} obs {c['observed_lor']:+.2f} pred {c['predicted_lor_median']:+.2f} "
-                                          f"[{c['predicted_lor_5']:+.2f},{c['predicted_lor_95']:+.2f}]" for c in cc)))
-    summary["external"] = ext
-    summary["gates_all_pass"] = all(g["gate_pass"] for g in gates)
+                            arms=";".join(f"{c['arm_id']} obs {c['observed_lor']:+.2f} pred(obs) {c['predicted_obs_lor_median']:+.2f} "
+                                          f"[{c['predicted_obs_lor_5']:+.2f},{c['predicted_obs_lor_95']:+.2f}] "
+                                          f"latent {c['latent_lor_median']:+.2f}" for c in cc)))
+    gates_ok = all(g["gate_pass"] for g in gates)
+    gates_complete = all(g["scope"] == "complete schema gate" for g in gates)
+    for task in summary["tasks"].values():
+        task["numerical_rule_pass"] = numerical_rule(task["score_criterion_met"], scope_complete, gates)
+    summary.update(external=ext, chemo_sensitivity=chemo_sens, gates_all_pass=gates_ok,
+                   gates_complete_schema=gates_complete,
+                   decision="undecided: Igor Shuryak decides after Phases A-D (Fowler stays the app default)")
     write(os.path.join(a.out, "per_family.csv"), per_family)
     write(os.path.join(a.out, "contrasts.csv"), contrasts)
     write(os.path.join(a.out, "fit_gates.csv"), gates)
     write(os.path.join(a.out, "external.csv"), ext)
-    with open(os.path.join(a.out, "summary.json"), "w") as fh:
+    write(os.path.join(a.out, "chemo_sensitivity.csv"), chemo_sens)
+    tmp = os.path.join(a.out, f"summary.json.partial-{os.getpid()}")
+    with open(tmp, "w") as fh:
         json.dump(summary, fh, indent=1)
-    print(json.dumps({k: summary[k] for k in ("tasks", "gates_all_pass")}, indent=1))
+    os.replace(tmp, os.path.join(a.out, "summary.json"))
+    print(json.dumps({k: summary[k] for k in ("tasks", "gates_all_pass", "gates_complete_schema", "scope")}, indent=1))
 
 
 def external_family(fam):

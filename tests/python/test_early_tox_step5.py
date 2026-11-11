@@ -88,6 +88,7 @@ def model():
     return s5.compile_model()
 
 
+@pytest.mark.sampling
 def test_stan_model_recovers_known_parameters_from_large_noise_free_counts(model):
     # Expected counts at 200 times the real arm sizes, from known values: kappa 0.1, gamma 1.0,
     # alpha/beta 10, Fowler r. The fit must land near them, so a sign or scale error fails.
@@ -107,8 +108,10 @@ def test_stan_model_recovers_known_parameters_from_large_noise_free_counts(model
     assert med["ab"] == pytest.approx(10.0, rel=0.3)
 
 
-def test_overdispersion_switch_reaches_the_fit_and_finished_units_are_skipped(model, tmp_path, monkeypatch):
+@pytest.mark.sampling
+def test_overdispersion_switch_reaches_the_fit_and_finished_units_are_reused(model, tmp_path, monkeypatch):
     monkeypatch.setattr(s5, "wait_for_memory", lambda: 99.0)
+    monkeypatch.setattr(s5, "ARCHIVE_ROOT", str(tmp_path / "archive"))
     import json
     for od, out in ((True, tmp_path / "od"), (False, tmp_path / "bin")):
         s5.run_unit(model, "U02", str(out), smoke=True, od=od)
@@ -116,9 +119,112 @@ def test_overdispersion_switch_reaches_the_fit_and_finished_units_are_skipped(mo
         summ = (out / "U02" / "summary.csv").read_text()
         assert diag["settings"].get("use_od", 0) == int(od)
         assert ("sigma_arm[1]" in summ) == od
-    stamp = os.path.getmtime(tmp_path / "od" / "U02" / "diagnostics.json")
+        man = json.loads((out / "U02" / "manifest.json").read_text())
+        assert man["identity"] == diag["identity"] and len(man["chain_csv_sha256"]) == 4
+        assert not list(out.glob("U02.partial-*"))
+    # positive control: an unchanged rerun does not sample
+    monkeypatch.setattr(model, "sample", lambda **k: (_ for _ in ()).throw(AssertionError("sampled")))
     s5.run_unit(model, "U02", str(tmp_path / "od"), smoke=True, od=True)
-    assert os.path.getmtime(tmp_path / "od" / "U02" / "diagnostics.json") == stamp
+    # negative control: a changed output is refused, not silently reused
+    p = tmp_path / "od" / "U02" / "summary.csv"
+    p.write_text(p.read_text() + "x")
+    with pytest.raises(RuntimeError, match="missing or changed"):
+        s5.run_unit(model, "U02", str(tmp_path / "od"), smoke=True, od=True)
+
+
+# Run identity and gates (review F4, F5), without sampling.
+def _manifest_dir(tmp_path, identity, gate=True, files=("summary.csv",)):
+    import json
+    d = tmp_path / "U"
+    d.mkdir()
+    out = {}
+    for fn in files:
+        (d / fn).write_text("ok")
+        out[fn] = s5.sha256_file(str(d / fn))
+    (d / "manifest.json").write_text(json.dumps(dict(identity=identity, gate_pass=gate, outputs=out)))
+    return d
+
+
+def test_unit_state_reuses_only_an_identical_complete_unit(tmp_path):
+    assert s5.unit_state(str(tmp_path / "none"), "abc") == "absent"
+    d = _manifest_dir(tmp_path, "abc")
+    assert s5.unit_state(str(d), "abc") == "complete"
+    with pytest.raises(RuntimeError, match="identity differs"):
+        s5.unit_state(str(d), "xyz")
+    (d / "summary.csv").write_text("changed")
+    with pytest.raises(RuntimeError, match="missing or changed"):
+        s5.unit_state(str(d), "abc")
+
+
+def test_unit_state_refuses_legacy_malformed_and_reports_failed(tmp_path):
+    legacy = tmp_path / "legacy"
+    legacy.mkdir()
+    (legacy / "diagnostics.json").write_text("{}")
+    with pytest.raises(RuntimeError, match="without a manifest"):
+        s5.unit_state(str(legacy), "abc")
+    bad = tmp_path / "bad"
+    bad.mkdir()
+    (bad / "manifest.json").write_text("{not json")
+    with pytest.raises(RuntimeError, match="unreadable manifest"):
+        s5.unit_state(str(bad), "abc")
+    failed = tmp_path / "f"
+    failed.mkdir()
+    import json
+    (failed / "manifest.json").write_text(json.dumps(dict(identity="abc", gate_pass=False, outputs={})))
+    assert s5.unit_state(str(failed), "abc") == "failed"
+
+
+def test_run_identity_changes_with_each_defining_input(tmp_path, monkeypatch):
+    rows, fams = s5.load_rows()
+    base_settings = dict(use_od=1)
+    d0 = s5.stan_data(rows, fams, 7.0, base_settings)
+    i0 = s5.run_identity(d0, base_settings, s5.SAMPLER)
+    assert s5.run_identity(s5.stan_data(rows, fams, 7.0, base_settings), base_settings, s5.SAMPLER) == i0
+    changed = [
+        s5.run_identity(dict(d0, y=[d0["y"][0] + 1] + d0["y"][1:]), base_settings, s5.SAMPLER),   # one outcome
+        s5.run_identity(s5.stan_data(rows, fams, 7.0, dict(base_settings, halftime_h=2.0)),
+                        dict(base_settings, halftime_h=2.0), s5.SAMPLER),                         # repair
+        s5.run_identity(s5.stan_data(rows, fams, 7.0, dict(base_settings, ab_sd=0.7)),
+                        dict(base_settings, ab_sd=0.7), s5.SAMPLER),                              # prior
+        s5.run_identity(d0, base_settings, dict(s5.SAMPLER, adapt_delta=0.9)),                    # sampler
+        s5.run_identity(*(lambda r, f: (s5.stan_data(r, f, 7.0, base_settings), base_settings, s5.SAMPLER))(
+            *s5.load_rows(drop_family="Vienna"))),                                                # family list
+    ]
+    stan = tmp_path / "m.stan"
+    stan.write_text(open(s5.STAN_FILE).read() + "\n// changed\n")
+    monkeypatch.setattr(s5, "STAN_FILE", str(stan))
+    changed.append(s5.run_identity(d0, base_settings, s5.SAMPLER))                                # Stan source
+    assert len(set(changed)) == len(changed) and i0 not in changed
+
+
+def _fake_summary(data, rhat=1.001, ess=1000.0, drop=(), nan=(), bench_ab=None):
+    import pandas as pd
+    req = s5.required_quantities(data)
+    idx = [q for q in req if q not in drop]
+    extra = ["ab", "r"] if data["fixed_E"] else []
+    df = pd.DataFrame(dict(Mean=0.5, StdDev=0.1, R_hat=rhat, ESS_bulk=ess, ESS_tail=ess), index=idx + extra)
+    for q in nan:
+        df.loc[q, "R_hat"] = float("nan")
+    if data["fixed_E"]:
+        df.loc["ab", ["Mean", "StdDev", "R_hat", "ESS_bulk", "ESS_tail"]] = [bench_ab or data["ab_fix"], 0, float("nan"), float("nan"), float("nan")]
+        df.loc["r", ["Mean", "StdDev", "R_hat", "ESS_bulk", "ESS_tail"]] = [data["r_fix"], 0, float("nan"), float("nan"), float("nan")]
+    return df
+
+
+def test_gate_requires_every_quantity_finite_and_checks_constants():
+    rows, fams = s5.load_rows()
+    cand = s5.stan_data(rows, fams, 7.0, dict(use_od=1))
+    bench = s5.stan_data(rows, fams, 7.0, dict(use_od=1, fixed_E=1))
+    ok = lambda d, **k: s5.gate_from_summary(_fake_summary(d, **k), d, 0, [0.9] * 4, 0)["gate_pass"]
+    assert ok(cand) and ok(bench)
+    assert not ok(cand, nan=("Lstar",))                    # NaN diagnostic on a required quantity
+    assert not ok(cand, drop=("zarm[3]",))                 # an arm effect missing from the summary
+    assert not ok(cand, rhat=1.02)
+    assert not ok(bench, bench_ab=11.0)                    # fixed benchmark constant moved
+    s = _fake_summary(cand)
+    assert not s5.gate_from_summary(s, cand, 1, [0.9] * 4, 0)["gate_pass"]        # a divergence
+    assert not s5.gate_from_summary(s, cand, 0, [0.9, 0.2, 0.9, 0.9], 0)["gate_pass"]   # low E-BFMI
+    assert "zarm[51]" in s5.required_quantities(cand) and "dE_dec[1]" not in s5.required_quantities(bench)
 
 
 def test_leave_one_family_out_removes_exactly_that_family():
@@ -207,3 +313,20 @@ def test_reported_totals_come_from_the_loaded_rows():
     assert s5.analysis_totals(rows) == dict(arms=51, families=22, evaluable=6042, events=2945)
     with pytest.raises(ValueError, match="counted twice"):
         s5.analysis_totals(rows + rows[:1])
+
+
+def test_sbc_bins_cover_101_discrete_ranks_and_divergent_reps_are_listed(tmp_path):
+    sbc = load("step5_sbc")
+    p = sbc.bin_probabilities()
+    assert p.sum() == pytest.approx(1) and p[0] == pytest.approx(11 / 101) and p[1] == pytest.approx(10 / 101)
+    covered = sorted(r for lo, hi in sbc.RANK_BINS for r in range(lo, hi + 1))
+    assert covered == list(range(101))
+    import csv as _csv
+    with open(tmp_path / "ranks.csv", "w", newline="") as f:
+        w = _csv.writer(f)
+        w.writerow(["rep", "divergences"] + sbc.PARAMS)
+        for k in range(101):
+            w.writerow([k, 3 if k == 7 else 0] + [k] * len(sbc.PARAMS))       # perfectly uniform ranks
+    res = sbc.summarize(str(tmp_path / "ranks.csv"), str(tmp_path))
+    assert res["divergent_reps"] == [dict(rep=7, divergences=3)] and res["divergent_transitions"] == 3
+    assert all(v["chisq"] == pytest.approx(0, abs=1e-9) for v in res["params"].values())

@@ -13,8 +13,11 @@ Decisions applied (Igor Shuryak, 2026-11-11, "C1-C3 as recommended, go"):
         only if the binomial U02 posterior predictive check fails (chi-square p < 0.05)
 Model and priors (D3, M1-M4): see tools/early_tox/step5_model.stan and the step 5 record.
 
-Each unit (one fit) is written to OUT/<unit>/ as soon as it finishes and skipped on rerun if its
-diagnostics.json exists (plan rule 12). One chain runs at a time, one thread, and the script waits
+Each unit (one fit) is written to OUT/<unit>.partial-<pid>/ and published to OUT/<unit>/ by an
+atomic rename after its manifest.json (run identity, output hashes, gate, raw-chain archive) is
+written. A rerun reuses a unit only when its identity and output hashes match, and refuses a
+mismatch, a missing or unreadable manifest, or changed outputs (review F4). Raw CmdStan chains
+are archived under $EARLY_TOX_ARCHIVE (default ~/early_tox_chain_archive), outside the repository. One chain runs at a time, one thread, and the script waits
 while Windows free memory is below 3.5 GB.
 """
 import os
@@ -25,9 +28,11 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
 import argparse
 import csv
 import gzip
+import hashlib
 import importlib.util
 import json
 import math
+import shutil
 import subprocess
 import sys
 import time
@@ -114,6 +119,7 @@ PRIOR = dict(Lstar_sd=1.0, ab_mu=math.log(10), ab_sd=0.354, r_mu=math.log(0.8), 
              gamma_sd=1.0, od_sd=0.5)
 
 # name: (description, settings)
+COMPLETE_REPAIR = "complete"
 UNITS = {
     "U01": ("benchmark: Fowler exposure fixed, Tk 7", dict(fixed_E=1)),
     "U02": ("candidate, Tk 7 (primary)", dict()),
@@ -129,6 +135,12 @@ UNITS = {
     "U14": ("candidate without the chemotherapy term (plan as written)", dict(use_gamma=0)),
     "U15": ("candidate, adequate peak ascertainment only (decision D3)", dict(adequate_only=True)),
     "U16": ("benchmark, adequate peak ascertainment only (decision D3)", dict(adequate_only=True, fixed_E=1)),
+    "U17": ("candidate, repair half-time 2 h (F8)", dict(halftime_h=2.0)),
+    "U18": ("candidate, repair half-time 4 h (F8)", dict(halftime_h=4.0)),
+    "U19": ("candidate, complete repair (F8)", dict(halftime_h=COMPLETE_REPAIR)),
+    "U20": ("benchmark, repair half-time 2 h (F8)", dict(halftime_h=2.0, fixed_E=1)),
+    "U21": ("benchmark, repair half-time 4 h (F8)", dict(halftime_h=4.0, fixed_E=1)),
+    "U22": ("benchmark, complete repair (F8)", dict(halftime_h=COMPLETE_REPAIR, fixed_E=1)),
 }
 # Leave-one-family-out influence of the primary candidate (U02 settings), one unit per family.
 LOFO_UNITS = {f"L_{f}": (f"candidate without family {f}", dict(drop_family=f))
@@ -185,13 +197,29 @@ def analysis_totals(rows):
                 evaluable=sum(r["N"] for r in rows), events=sum(r["y"] for r in rows))
 
 
-def schedule_terms(doses, times, Tk):
+def halftime_of(settings):
+    """Repair half-time in hours from the settings: 3.2 by default, None for complete repair."""
+    h = settings.get("halftime_h", s4.HALFTIME_H)
+    return None if h == COMPLETE_REPAIR else float(h)
+
+
+def schedule_terms(doses, times, Tk, halftime_h=s4.HALFTIME_H):
     T = ev.elapsed_days(times)
-    return sum(doses), ev.repair_q(doses, times, s4.HALFTIME_H), max(0.0, T - Tk)
+    return sum(doses), ev.repair_q(doses, times, halftime_h), max(0.0, T - Tk)
+
+
+def arm_terms(row, Tk, halftime_h=s4.HALFTIME_H):
+    """Patient-weighted D, Q and T_eff = max(0, T - Tk) over an arm's schedule variants."""
+    tot = sum(w for _, w in row["variants"])
+    acc = np.zeros(3)
+    for (doses, times), w in row["variants"]:
+        acc += w * np.array(schedule_terms(doses, times, Tk, halftime_h))
+    return tuple(acc / tot)
 
 
 def stan_data(rows, fams, Tk, settings):
-    terms = np.array([s4.arm_terms(x, Tk)[:3] for x in rows])            # D, Q, Te
+    h = halftime_of(settings)
+    terms = np.array([arm_terms(x, Tk, h) for x in rows])            # D, Q, Te
     ref = {f: next(i for i, x in enumerate(rows) if x["arm_id"] == REF_ARM[f]) for f in fams}
     d = np.array([terms[i] - terms[ref[x["family"]]] for i, x in enumerate(rows)])
     coding = CHEMO_ONOFF if settings.get("chemo") == "onoff" else CHEMO_CUMULATIVE
@@ -200,8 +228,8 @@ def stan_data(rows, fams, Tk, settings):
            for f in fams]
     used = [k for k in range(len(GROUP_COLS)) if any(row[k] for row in grp)]
     grp = [[row[k] for k in used] for row in grp]
-    ref70 = schedule_terms(*ev.regular_schedule(35, 2.0), Tk)
-    dec = np.array([np.subtract(schedule_terms(*ev.regular_schedule(n, dd), Tk), ref70) for n, dd in DECISION])
+    ref70 = schedule_terms(*ev.regular_schedule(35, 2.0), Tk, h)
+    dec = np.array([np.subtract(schedule_terms(*ev.regular_schedule(n, dd), Tk, h), ref70) for n, dd in DECISION])
     pr = dict(PRIOR, **{k: v for k, v in settings.items() if k in PRIOR})
     return dict(
         I=len(rows), J=len(fams), fam=[fams.index(x["family"]) + 1 for x in rows],
@@ -243,42 +271,154 @@ def compile_model():
     return CmdStanModel(stan_file=STAN_FILE)
 
 
-def diagnostics(fit, names):
-    s = fit.summary(percentiles=(5, 50, 95))
-    rows = [n for n in s.index if n in names or n.split("[")[0] in ("dE_dec", "lor_dec", "eta", "delta")]
-    s = s.loc[rows]
-    div = int(np.sum(fit.divergences))
-    worst = dict(rhat=float(s["R_hat"].max()), ess_bulk=float(s["ESS_bulk"].min()), ess_tail=float(s["ESS_tail"].min()))
-    gate = div == 0 and worst["rhat"] < 1.01 and worst["ess_bulk"] > 400 and worst["ess_tail"] > 400
-    return s, dict(divergences=div, **worst, gate_pass=bool(gate))
+SAMPLER = dict(chains=4, parallel_chains=1, threads_per_chain=1, iter_warmup=1000, iter_sampling=1000,
+               adapt_delta=0.95, seed=SEED)
+SMOKE_SAMPLER = dict(SAMPLER, iter_warmup=200, iter_sampling=200)
+EBFMI_MIN = 0.3
+ARCHIVE_ROOT = os.environ.get("EARLY_TOX_ARCHIVE", os.path.expanduser("~/early_tox_chain_archive"))
+OUTPUT_FILES = ("summary.csv", "ppc_arms.csv", "diagnostics.json")
+
+
+def _normalize(x):
+    if isinstance(x, float):
+        return float(f"{x:.12g}")
+    if isinstance(x, dict):
+        return {k: _normalize(v) for k, v in sorted(x.items())}
+    if isinstance(x, (list, tuple)):
+        return [_normalize(v) for v in x]
+    if isinstance(x, np.ndarray):
+        return _normalize(x.tolist())
+    if isinstance(x, (np.floating, np.integer)):
+        return _normalize(x.item())
+    return x
+
+
+def sha256_file(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def run_identity(data, settings, sampler, extra=None):
+    """One hash over everything that defines a fit (review F4): data in order, settings (repair, Tk,
+    priors), Stan source, sampler configuration and tool versions."""
+    import cmdstanpy
+    payload = dict(data=_normalize(data), settings=_normalize(settings), sampler=_normalize(sampler),
+                   stan_sha256=sha256_file(STAN_FILE), cmdstan=os.path.basename(cmdstan_path()),
+                   cmdstanpy=cmdstanpy.__version__, numpy=np.__version__, extra=_normalize(extra))
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+
+
+def required_quantities(data):
+    """Every sampled or decision quantity whose diagnostics the gate must see (review F5)."""
+    J, I, G, K = data["J"], data["I"], data["G"], data["K"]
+    req = ["m0", "tau0", "Lstar", "kappa"] + [f"z[{j}]" for j in range(1, J + 1)]
+    req += [f"eta[{j}]" for j in range(1, J + 1)] + [f"delta[{g}]" for g in range(1, G + 1)]
+    req += [f"lor_dec[{k}]" for k in range(1, K + 1)]
+    if not data["fixed_E"]:
+        req += ["log_ab[1]", "log_r[1]", "ab", "r"] + [f"dE_dec[{k}]" for k in range(1, K + 1)]
+    if data["use_gamma"]:
+        req += ["gamma[1]"]
+    if data["use_od"]:
+        req += ["sigma_arm[1]"] + [f"zarm[{i}]" for i in range(1, I + 1)]
+    return req
+
+
+def gate_from_summary(s, data, divergences, ebfmi, treedepth_hits):
+    """Exact-schema gate: every required quantity present with finite R-hat and ESS; fixed
+    benchmark constants checked as constants; no divergences; E-BFMI >= 0.3 in every chain."""
+    req = required_quantities(data)
+    missing = [q for q in req if q not in s.index]
+    present = [q for q in req if q in s.index]
+    vals = s.loc[present, ["R_hat", "ESS_bulk", "ESS_tail"]].astype(float)
+    nonfinite = [q for q in present if not np.isfinite(vals.loc[q]).all()]
+    fixed_ok = True
+    if data["fixed_E"]:
+        for q, v in (("ab", data["ab_fix"]), ("r", data["r_fix"])):
+            fixed_ok &= q in s.index and abs(float(s.loc[q, "Mean"]) - v) < 1e-9 and float(s.loc[q, "StdDev"]) < 1e-9
+    finite = vals.loc[[q for q in present if q not in nonfinite]]
+    out = dict(divergences=int(divergences), missing=missing, nonfinite=nonfinite, fixed_constants_ok=bool(fixed_ok),
+               rhat=float(finite["R_hat"].max()) if len(finite) else float("nan"),
+               ess_bulk=float(finite["ESS_bulk"].min()) if len(finite) else float("nan"),
+               ess_tail=float(finite["ESS_tail"].min()) if len(finite) else float("nan"),
+               ebfmi_min=float(min(ebfmi)) if len(ebfmi) else float("nan"),
+               treedepth_saturated=int(treedepth_hits), n_required=len(req))
+    out["gate_pass"] = bool(not missing and not nonfinite and fixed_ok and out["divergences"] == 0
+                            and out["rhat"] < 1.01 and out["ess_bulk"] > 400 and out["ess_tail"] > 400
+                            and np.isfinite(out["ebfmi_min"]) and out["ebfmi_min"] >= EBFMI_MIN)
+    return out
+
+
+def chain_energy_checks(fit, max_treedepth=10):
+    mv = fit.method_variables()
+    energy, depth = mv["energy__"], mv["treedepth__"]                  # (draws, chains)
+    ebfmi = [float(np.sum(np.diff(energy[:, c]) ** 2) / len(energy[:, c]) / np.var(energy[:, c]))
+             for c in range(energy.shape[1])]
+    return ebfmi, int(np.sum(depth >= max_treedepth))
+
+
+def archive_chains(fit, identity):
+    d = os.path.join(ARCHIVE_ROOT, identity[:16])
+    os.makedirs(d, exist_ok=True)
+    fit.save_csvfiles(d)
+    return {x: sha256_file(os.path.join(d, x)) for x in sorted(os.listdir(d)) if x.endswith(".csv")}
+
+
+def unit_state(udir, identity):
+    """'complete' (reusable), 'failed' (same identity, gate failed), 'absent', or raise on mismatch."""
+    man = os.path.join(udir, "manifest.json")
+    if not os.path.exists(udir):
+        return "absent"
+    if not os.path.exists(man):
+        raise RuntimeError(f"{udir}: outputs without a manifest (legacy or interrupted); refusing to reuse")
+    try:
+        m = json.load(open(man))
+    except (OSError, ValueError) as err:
+        raise RuntimeError(f"{udir}: unreadable manifest ({err}); refusing to reuse")
+    if m.get("identity") != identity:
+        raise RuntimeError(f"{udir}: run identity differs from the current inputs; refusing to reuse")
+    for fn, digest in m.get("outputs", {}).items():
+        path = os.path.join(udir, fn)
+        if not os.path.exists(path) or sha256_file(path) != digest:
+            raise RuntimeError(f"{udir}: output {fn} missing or changed since completion; refusing to reuse")
+    return "complete" if m.get("gate_pass") else "failed"
 
 
 def run_unit(model, name, out_dir, smoke=False, od=False):
     desc, settings = {**UNITS, **LOFO_UNITS}[name]
     settings = dict(settings, use_od=1) if od else settings
     udir = os.path.join(out_dir, name)
-    if os.path.exists(os.path.join(udir, "diagnostics.json")):
-        print(f"{name}: done, skipped", flush=True)
-        return
-    os.makedirs(udir, exist_ok=True)
     rows, fams = load_rows(settings.get("w1_only", False), settings.get("m4", False), settings.get("drop_chemo", False),
                            settings.get("drop_family"), settings.get("adequate_only", False))
     Tk = settings.get("Tk", 7.0)
     data = stan_data(rows, fams, Tk, settings)
+    sampler = SMOKE_SAMPLER if smoke else SAMPLER
+    identity = run_identity(data, settings, sampler, extra=dict(unit=name, families=fams))
+    state = unit_state(udir, identity)
+    if state != "absent":
+        print(f"{name}: {state} with identical identity, not rerun", flush=True)
+        return
+    tmp = f"{udir}.partial-{os.getpid()}"
+    if os.path.exists(tmp):
+        shutil.rmtree(tmp)
+    os.makedirs(tmp)
     free = wait_for_memory()
     t0 = time.time()
-    fit = model.sample(data=data, chains=4, parallel_chains=1, threads_per_chain=1,
-                       iter_warmup=200 if smoke else 1000, iter_sampling=200 if smoke else 1000,
-                       adapt_delta=0.95, seed=SEED, show_progress=False, show_console=False)
+    fit = model.sample(data=data, show_progress=False, show_console=False, **sampler)
     secs = time.time() - t0
-    s, diag = diagnostics(fit, set(REPORT_PARAMS))
-    s.to_csv(os.path.join(udir, "summary.csv"), float_format="%.5g")
+    s = fit.summary(percentiles=(5, 50, 95))
+    ebfmi, depth_hits = chain_energy_checks(fit)
+    diag = gate_from_summary(s, data, np.sum(fit.divergences), ebfmi, depth_hits)
+    keep_rows = [n for n in s.index if n in REPORT_PARAMS or n.split("[")[0] in ("dE_dec", "lor_dec", "eta", "delta")]
+    s.loc[keep_rows].to_csv(os.path.join(tmp, "summary.csv"), float_format="%.5g")
     dr = fit.draws_pd()
     keep = [c for c in dr.columns if c in REPORT_PARAMS or c.split("[")[0] in ("dE_dec", "lor_dec", "T_obs", "T_rep")]
-    with gzip.open(os.path.join(udir, "draws.csv.gz"), "wt") as f:
+    with gzip.open(os.path.join(tmp, "draws.csv.gz"), "wt") as f:
         dr[keep].to_csv(f, index=False, float_format="%.6g")
     yrep = fit.stan_variable("y_rep")
-    with open(os.path.join(udir, "ppc_arms.csv"), "w", newline="") as f:
+    with open(os.path.join(tmp, "ppc_arms.csv"), "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(["arm_id", "family", "N", "y", "chemo", "yrep_median", "yrep_5", "yrep_95", "p_upper", "p_lower"])
         for i, x in enumerate(rows):
@@ -290,18 +430,28 @@ def run_unit(model, name, out_dir, smoke=False, od=False):
     ll = fit.stan_variable("log_lik")
     lppd = float(np.sum(np.log(np.mean(np.exp(ll), axis=0))))
     p_waic = float(np.sum(np.var(ll, axis=0, ddof=1)))
-    diag.update(unit=name, description=desc, settings=settings, Tk=Tk, n_arms=len(rows), n_families=len(fams),
-                families=fams, smoke=smoke, seconds=round(secs, 1), windows_free_gb_at_start=round(free, 1),
+    diag.update(unit=name, description=desc, settings=settings, Tk=Tk, halftime_h=halftime_of(settings),
+                n_arms=len(rows), n_families=len(fams), families=fams, totals=analysis_totals(rows), smoke=smoke,
+                sampler=sampler, seconds=round(secs, 1), windows_free_gb_at_start=round(free, 1),
                 ppc_chisq_p=round(float(np.mean(T_rep >= T_obs)), 4),
                 waic=round(-2 * (lppd - p_waic), 3), p_waic=round(p_waic, 3),
                 decision_schedules=[f"{n} x {d} Gy" for n, d in DECISION],
-                cmdstan=os.path.basename(cmdstan_path()),
+                cmdstan=os.path.basename(cmdstan_path()), identity=identity,
                 revision=subprocess.run(["git", "-C", ROOT, "rev-parse", "--short", "HEAD"],
                                         capture_output=True, text=True).stdout.strip())
-    with open(os.path.join(udir, "diagnostics.json"), "w") as f:
+    with open(os.path.join(tmp, "diagnostics.json"), "w") as f:
         json.dump(diag, f, indent=1, default=str)
+    chains = archive_chains(fit, identity)
+    manifest = dict(identity=identity, unit=name, gate_pass=diag["gate_pass"], smoke=smoke,
+                    outputs={fn: sha256_file(os.path.join(tmp, fn)) for fn in OUTPUT_FILES + ("draws.csv.gz",)},
+                    chain_archive=os.path.join(ARCHIVE_ROOT, identity[:16]), chain_csv_sha256=chains)
+    with open(os.path.join(tmp, "manifest.json.tmp"), "w") as f:
+        json.dump(manifest, f, indent=1)
+    os.replace(os.path.join(tmp, "manifest.json.tmp"), os.path.join(tmp, "manifest.json"))   # manifest last
+    os.replace(tmp, udir)                                                                    # then publish
     print(f"{name}: {desc}: {secs:.0f} s, divergences {diag['divergences']}, Rhat {diag['rhat']:.4f}, "
-          f"ESS {diag['ess_bulk']:.0f}/{diag['ess_tail']:.0f}, PPC p {diag['ppc_chisq_p']}, "
+          f"ESS {diag['ess_bulk']:.0f}/{diag['ess_tail']:.0f}, E-BFMI {diag['ebfmi_min']:.2f}, "
+          f"missing {len(diag['missing'])}, PPC p {diag['ppc_chisq_p']}, "
           f"gate {'PASS' if diag['gate_pass'] else 'FAIL'}", flush=True)
 
 

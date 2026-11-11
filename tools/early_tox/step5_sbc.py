@@ -53,15 +53,27 @@ def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--reps", type=int, default=500)
     ap.add_argument("--out", default=OUT_DEFAULT)
+    ap.add_argument("--summarize-only", action="store_true", help="recompute summary.json from ranks.csv; no sampling")
     a = ap.parse_args(argv[1:])
     os.makedirs(a.out, exist_ok=True)
     path = os.path.join(a.out, "ranks.csv")
+    if a.summarize_only:
+        return summarize(path, a.out)
     done = set()
     if os.path.exists(path):
         with open(path, newline="") as f:
             done = {int(r["rep"]) for r in csv.DictReader(f)}
     rows, fams = s5.load_rows()
     base = s5.stan_data(rows, fams, 7.0, dict(use_od=1))
+    sampler = dict(chains=2, parallel_chains=1, iter_warmup=500, iter_sampling=500, adapt_delta=0.95)
+    identity = s5.run_identity(base, dict(use_od=1, sbc=True), sampler, extra=dict(seed=SEED, reps=a.reps))
+    man = os.path.join(a.out, "manifest.json")
+    if done:
+        if not os.path.exists(man) or json.load(open(man)).get("identity") != identity:
+            raise RuntimeError(f"{path}: existing ranks were made with another (or unrecorded) identity; refusing to append")
+    else:
+        with open(man, "w") as f:
+            json.dump(dict(identity=identity, seed=SEED, reps=a.reps, sampler=sampler), f, indent=1)
     model = s5.compile_model()
     s5.wait_for_memory()
     t0 = time.time()
@@ -90,24 +102,44 @@ def main(argv):
     summarize(path, a.out)
 
 
+RANK_BINS = [(0, 10)] + [(10 * b + 1, 10 * b + 10) for b in range(1, 10)]     # 101 ranks: 11, then 10 each
+
+
+def bin_probabilities():
+    """Exact discrete-rank bin probabilities for ranks 0..100 (review F5): 11/101, then 10/101."""
+    return np.array([(hi - lo + 1) / 101 for lo, hi in RANK_BINS])
+
+
 def summarize(path, out):
-    """Chi-square uniformity test of ranks in 10 bins per parameter (ranks 0-100)."""
+    """Chi-square test of ranks against the exact discrete bin probabilities, per parameter, and the
+    list of replicates with divergences. 'No detected rank departure' is the strongest statement."""
     from scipy.stats import chi2
     with open(path, newline="") as f:
         R = list(csv.DictReader(f))
-    res = dict(reps=len(R), seed=SEED, reps_with_divergences=sum(int(r["divergences"]) > 0 for r in R), params={})
+    probs = bin_probabilities()
+    div = [dict(rep=int(r["rep"]), divergences=int(r["divergences"])) for r in R if int(r["divergences"]) > 0]
+    res = dict(reps=len(R), seed=SEED, reps_with_divergences=len(div),
+               divergent_transitions=sum(d["divergences"] for d in div), divergent_reps=div,
+               bin_probabilities=[round(float(p), 6) for p in probs], params={},
+               statement="no detected rank departure at the 5% level" )
     for p in PARAMS:
         x = np.array([int(r[p]) for r in R])
-        counts = np.histogram(x, bins=np.linspace(0, 101, 11))[0]
-        e = len(x) / 10
+        counts = np.array([np.sum((x >= lo) & (x <= hi)) for lo, hi in RANK_BINS])
+        e = len(x) * probs
         stat = float(np.sum((counts - e) ** 2 / e))
         res["params"][p] = dict(bin_counts=counts.tolist(), chisq=round(stat, 2), p=round(float(chi2.sf(stat, 9)), 4),
                                 mean_rank=round(float(x.mean()), 1))
-    with open(os.path.join(out, "summary.json"), "w") as f:
+        if res["params"][p]["p"] < 0.05:
+            res["statement"] = "rank departure detected for at least one parameter"
+    tmp = os.path.join(out, f"summary.json.partial-{os.getpid()}")
+    with open(tmp, "w") as f:
         json.dump(res, f, indent=1)
+    os.replace(tmp, os.path.join(out, "summary.json"))
     for p, v in res["params"].items():
         print(f"{p:10s} chisq {v['chisq']:6.2f} p {v['p']:.3f} mean rank {v['mean_rank']} bins {v['bin_counts']}")
-    print(f"replicates with divergences: {res['reps_with_divergences']} / {res['reps']}")
+    print(f"replicates with divergences: {res['reps_with_divergences']} / {res['reps']} "
+          f"({res['divergent_transitions']} transitions); {res['statement']}")
+    return res
 
 
 if __name__ == "__main__":

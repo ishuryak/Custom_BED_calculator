@@ -81,3 +81,71 @@ def test_hypno_benchmark_uses_its_randomized_control():
     hfx = ids.index("HYPNO_HFX")
     assert fd["dD"][hfx] == pytest.approx(-11.0) and fd["chemo"][hfx] == 0
     assert "HYPNO" not in s6.s5.REF_ARM                      # temporary reference removed again
+
+
+# Conditional predictive check (review F2)
+def test_conditional_prediction_responds_to_the_reference_count():
+    d, fd = fake_draws(S=400), fake_family()
+    d["tau0"] = np.full(400, 1.5)
+    lo = s6.contrast_check(dict(fd, y=np.array([2, 18, 25])), d, 1, 50)
+    hi = s6.contrast_check(dict(fd, y=np.array([40, 18, 25])), d, 1, 50)
+    # the other arm's predicted count moves only through the conditioned baseline
+    assert hi[0]["predicted_count_median"] > lo[0]["predicted_count_median"] + 5
+
+
+def test_uninformative_reference_gives_the_unconditional_prediction():
+    d, fd = fake_draws(S=300), fake_family()
+    d["tau0"] = np.full(300, 1.0)
+    none = dict(fd, y=np.array([0, 18, 25]), N=np.array([0, 50, 50]))
+    c = s6.contrast_check(none, d, 3, 20)
+    assert c[0]["weight_ess"] == pytest.approx(300 * 20)            # all weights equal
+
+
+def test_conditional_check_handles_zero_and_all_events_and_shares_the_reference():
+    d, fd = fake_draws(S=200), fake_family()
+    c = s6.contrast_check(dict(fd, y=np.array([0, 50, 0])), d, 4, 20)
+    assert all(np.isfinite([x["observed_lor"], x["predicted_obs_lor_5"], x["predicted_obs_lor_95"]]).all() for x in c)
+    assert len({x["weight_ess"] for x in c}) == 1 and len(c) == 2      # two arms, one shared reference
+
+
+def test_probability_mixture_matches_a_pure_code_and_rejects_bad_weights():
+    d, fd = fake_draws(S=100), fake_family()
+    a = s6.predictive(d, s6.with_chemo(fd, "B", code=-1.0), 10, np.random.default_rng(5))
+    b = s6.predictive(d, s6.with_chemo(fd, "B", mix=[(1.0, -1.0)]), 10, np.random.default_rng(5))
+    assert a == pytest.approx(b)
+    with pytest.raises(ValueError, match="sum to 1"):
+        s6.predictive(d, s6.with_chemo(fd, "B", mix=[(0.5, -1.0)]), 10, np.random.default_rng(5))
+
+
+def test_hypno_is_scored_under_three_declared_chemotherapy_scenarios():
+    sc = s6.hypno_scenarios(s6.external_family("HYPNO"))
+    assert set(sc) == {"code_0", "code_minus1", "mixture_75pct"}
+    hfx = [x["arm_id"] for x in sc["code_0"]["rows"]].index("HYPNO_HFX")
+    assert sc["code_minus1"]["chemo"][hfx] == -1 and sc["mixture_75pct"]["chemo_mix"][hfx] == [(0.75, -1.0), (0.25, 0.0)]
+
+
+# Cache identity and eligibility (review F4)
+def test_cache_without_identity_or_with_another_identity_is_refused(tmp_path):
+    rows, fams = s6.s5.load_rows()
+    tr, tf = s6.training_set(rows, fams, "Mani")
+    np.savez(tmp_path / "x__legacy.npz", families=np.array(tf), gate=np.array([1, 0, 1.0, 900, 900]))
+    with pytest.raises(RuntimeError, match="no run identity"):
+        s6.fit_cached(None, "x__legacy", tr, tf, s6.MODELS["candidate"], str(tmp_path))
+    np.savez(tmp_path / "x__other.npz", families=np.array(tf), identity=np.array("not-this-one"))
+    with pytest.raises(RuntimeError, match="identity differs"):
+        s6.fit_cached(None, "x__other", tr, tf, s6.MODELS["candidate"], str(tmp_path))
+    (tmp_path / "x__broken.npz").write_bytes(b"PK\x03\x04 truncated")
+    with pytest.raises(RuntimeError, match="unreadable cache"):
+        s6.fit_cached(None, "x__broken", tr, tf, s6.MODELS["candidate"], str(tmp_path))
+    with pytest.raises(RuntimeError, match="rescore-only mode does not sample"):
+        s6.fit_cached(None, "x__missing", tr, tf, s6.MODELS["candidate"], str(tmp_path), rescore_only=True)
+
+
+def test_subsets_failed_gates_and_legacy_gates_are_never_eligible():
+    good = [dict(gate_pass=True, scope="complete schema gate")] * 3
+    assert s6.numerical_rule(True, True, good)
+    assert not s6.numerical_rule(True, False, good)                                  # subset run
+    assert not s6.numerical_rule(True, True, good + [dict(gate_pass=False, scope="complete schema gate")])
+    assert not s6.numerical_rule(True, True, good + [dict(gate_pass=True, scope="legacy narrow gate")])
+    assert not s6.numerical_rule(False, True, good)
+    assert not s6.numerical_rule(True, True, [])

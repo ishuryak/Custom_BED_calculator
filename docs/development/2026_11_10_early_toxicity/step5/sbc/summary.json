@@ -2,6 +2,89 @@
  "reps": 500,
  "seed": 20261112,
  "reps_with_divergences": 17,
+ "divergent_transitions": 29,
+ "divergent_reps": [
+  {
+   "rep": 43,
+   "divergences": 1
+  },
+  {
+   "rep": 53,
+   "divergences": 2
+  },
+  {
+   "rep": 62,
+   "divergences": 1
+  },
+  {
+   "rep": 76,
+   "divergences": 1
+  },
+  {
+   "rep": 160,
+   "divergences": 6
+  },
+  {
+   "rep": 182,
+   "divergences": 2
+  },
+  {
+   "rep": 185,
+   "divergences": 1
+  },
+  {
+   "rep": 202,
+   "divergences": 1
+  },
+  {
+   "rep": 216,
+   "divergences": 3
+  },
+  {
+   "rep": 229,
+   "divergences": 1
+  },
+  {
+   "rep": 231,
+   "divergences": 1
+  },
+  {
+   "rep": 244,
+   "divergences": 1
+  },
+  {
+   "rep": 249,
+   "divergences": 2
+  },
+  {
+   "rep": 252,
+   "divergences": 1
+  },
+  {
+   "rep": 328,
+   "divergences": 2
+  },
+  {
+   "rep": 457,
+   "divergences": 1
+  },
+  {
+   "rep": 465,
+   "divergences": 2
+  }
+ ],
+ "bin_probabilities": [
+  0.108911,
+  0.09901,
+  0.09901,
+  0.09901,
+  0.09901,
+  0.09901,
+  0.09901,
+  0.09901,
+  0.09901,
+  0.09901
+ ],
  "params": {
   "Lstar": {
    "bin_counts": [
@@ -16,8 +99,8 @@
     39,
     51
    ],
-   "chisq": 15.6,
-   "p": 0.0757,
+   "chisq": 15.0,
+   "p": 0.091,
    "mean_rank": 48.7
   },
   "ab": {
@@ -33,8 +116,8 @@
     54,
     52
    ],
-   "chisq": 16.2,
-   "p": 0.0628,
+   "chisq": 16.01,
+   "p": 0.0667,
    "mean_rank": 51.1
   },
   "r": {
@@ -50,8 +133,8 @@
     64,
     48
    ],
-   "chisq": 7.36,
-   "p": 0.5997,
+   "chisq": 9.19,
+   "p": 0.4195,
    "mean_rank": 52.4
   },
   "gamma": {
@@ -67,8 +150,8 @@
     51,
     42
    ],
-   "chisq": 7.88,
-   "p": 0.5463,
+   "chisq": 6.35,
+   "p": 0.7047,
    "mean_rank": 48.4
   },
   "sigma_arm": {
@@ -84,8 +167,8 @@
     57,
     56
    ],
-   "chisq": 11.16,
-   "p": 0.2649,
+   "chisq": 9.88,
+   "p": 0.3604,
    "mean_rank": 50.9
   },
   "m0": {
@@ -101,8 +184,8 @@
     52,
     59
    ],
-   "chisq": 10.0,
-   "p": 0.3505,
+   "chisq": 8.27,
+   "p": 0.5075,
    "mean_rank": 50.0
   },
   "tau0": {
@@ -118,9 +201,10 @@
     43,
     47
    ],
-   "chisq": 9.56,
-   "p": 0.3873,
+   "chisq": 6.9,
+   "p": 0.6478,
    "mean_rank": 48.1
   }
- }
+ },
+ "statement": "no detected rank departure at the 5% level"
 }
