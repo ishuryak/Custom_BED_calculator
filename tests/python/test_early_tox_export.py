@@ -102,3 +102,30 @@ def test_a_staged_package_that_does_not_match_its_manifest_publishes_nothing(tmp
         x.publish_package(str(stage), root=str(root))
     assert (root / "draws" / "early_fit_manifest.json").read_text() == "previous"
     assert not (root / "draws" / "early_fit_draws.csv").exists()
+
+
+# Review R2 (v4.6): the trial table keeps every schedule variant, weight and qualification.
+def test_trial_table_keeps_every_variant_weight_and_qualification():
+    import csv
+    rows = [{k: str(v) for k, v in r.items()} for r in x.trial_table()]
+    assert rows == list(csv.DictReader(open(os.path.join(ROOT, "draws", "early_fit_trials.csv"))))   # committed = rebuilt
+    arms = {a["arm_label"] + "|" + a["trial_id"]: a for a in csv.DictReader(open(os.path.join(ROOT, "data", "early_tox", "arms.csv")))}
+    for r in rows:                                           # source-to-export: all variants and weights
+        a = arms[r["arm"] + "|" + r["trial"]]
+        weights = [v.split(":")[1] for v in a["schedule_variants"].split()]
+        assert int(r["schedule_variants"]) == len(weights)
+        if len(weights) > 1:
+            assert all(f"weight {float(w):g}:" in r["schedule"] for w in weights), r["arm"]
+    get = lambda trial, arm: next(r for r in rows if r["trial"].startswith(trial) and r["arm"].startswith(arm))
+    cair = get("CAIR", "CAIR 7 days")
+    assert "weight 23: 35 fractions, 70 Gy, 35 days" in cair["schedule"] and "weight 27: 40 fractions, 72 Gy, 40 days" in cair["schedule"]
+    assert sum(1 for r in rows if r["trial"].startswith("CAIR") and r["arm"].startswith("CAIR 7 days")) == 1   # one count
+    dah = get("DAHANCA", "6 fractions")
+    assert "as treated" in dah["analysis_population"] and "largest gap after RT 8 weeks" in dah["assessment"]
+    eo = get("EORTC 22851", "Accelerated")
+    assert eo["endpoint_timepoint"].startswith("during treatment") and "course 2" in eo["schedule_notes"]
+    assert "4 courses planned" in get("HYPNO", "HFX")["concurrent_therapy"]
+    assert "5 courses planned" in get("HYPNO", "NFX")["concurrent_therapy"]
+    assert "assumed equal" in get("Tandon", "SMART")["concurrent_therapy"]
+    assert "6 courses planned" in get("Grover", "SIB")["concurrent_therapy"]
+    assert "third after RT" in get("ORO", "Conventional RT +")["therapy_note"]

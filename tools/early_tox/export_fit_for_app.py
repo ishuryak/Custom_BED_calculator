@@ -113,41 +113,77 @@ def fixture_cases():
 ROLE_LABEL = {"primary": "fitted", "sensitivity": "sensitivity check only", "benchmark": "external benchmark (never fitted)"}
 
 
-def assessment_text(last):
+def assessment_text(last, gap="", note=""):
     if last == "":
-        return "follow-up after RT not stated"
-    if last == "resolution":
-        return "followed until reactions settled"
-    if float(last) == 0:
-        return "scored during RT only"
-    return f"last scored {float(last):g} weeks after RT"
+        head = "follow-up after RT not stated"
+    elif last == "resolution":
+        head = "followed until reactions settled"
+    elif float(last) == 0:
+        head = "scored during RT only"
+    else:
+        head = f"last scored {float(last):g} week{'' if float(last) == 1 else 's'} after RT"
+    if gap not in ("", None) and last not in ("", "0"):
+        g = float(gap)
+        head += f"; largest gap after RT {g:g} week{'' if g == 1 else 's'}"
+    return f"{head} ({note})" if note else head
 
 
 def trial_table():
     """One row per arm of every trial in the early-toxicity evidence (fitted, sensitivity, benchmark),
-    with its verified citation (data/early_tox/source/report_citations.csv, PubMed esummary)."""
+    with its verified citation (data/early_tox/source/report_citations.csv, PubMed esummary). Every
+    modelled schedule variant and weight, the schedule notes, the assessment schedule and population,
+    and the structured planned therapy are kept (review R2); a pooled count is never split by variant."""
     spec = importlib.util.spec_from_file_location("app_table", os.path.join(ROOT, "tools", "early_tox", "applicability_table.py"))
     app = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(app)
     feats = {r["arm_id"]: r for r in app.build("/nonexistent")}
-    cit = {r["family_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "data", "early_tox", "source", "report_citations.csv")))}
+    src = os.path.join(ROOT, "data", "early_tox", "source")
+    cit = {r["family_id"]: r for r in csv.DictReader(open(os.path.join(src, "report_citations.csv")))}
+    asc = {r["family_id"]: r for r in csv.DictReader(open(os.path.join(src, "ascertainment.csv")))}
+    pt = {r["arm_id"]: r for r in csv.DictReader(open(os.path.join(src, "planned_therapy.csv")))}
     arms = {r["arm_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "data", "early_tox", "arms.csv")))}
     outs = {r["outcome_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "data", "early_tox", "outcomes.csv")))}
+    fr = {}
+    for r in csv.DictReader(open(os.path.join(ROOT, "data", "early_tox", "arm_fractions.csv"))):
+        fr.setdefault(r["schedule_id"], []).append((int(r["fraction"]), float(r["dose_gy"]), float(r["time_h"])))
     rows = []
     for m in csv.DictReader(open(os.path.join(ROOT, "data", "early_tox", "endpoint_mapping.csv"))):
         if m["analysis_set"] not in ROLE_LABEL:
             continue
         f, a, o, c = feats[m["arm_id"]], arms[m["arm_id"]], outs[m["outcome_id"]], cit[m["family_id"]]
+        variants = []
+        for v in a["schedule_variants"].split():
+            sid, w = v.split(":")
+            x = sorted(fr[sid])
+            vf = app.schedule_features([d for _, d, _ in x], [t for _, _, t in x])
+            variants.append((float(w), vf))
+        sched = "; ".join(
+            (f"weight {w:g}: " if len(variants) > 1 else "") +
+            f"{vf['n_fractions']} fractions, {vf['total_dose_gy']:g} Gy, {int(vf['elapsed_days']) + 1} days"
+            + (f", {vf['max_fractions_per_day']} a day" if vf["max_fractions_per_day"] > 1 else "")
+            for w, vf in variants)
+        t = pt.get(m["arm_id"])
+        therapy = a["planned_systemic_therapy"]
+        if t:
+            courses = f", {t['planned_courses']} courses planned" if t["planned_courses"] else ""
+            share = (f", intended for about {float(t['proportion_intended']):.0%} of patients"
+                     if t["proportion_intended"] not in ("", "1", "0") else "")
+            status = {"known": "", "assumed_equal": " (assumed equal to the control arm: planned courses not stated)"}[t["status"]]
+            therapy = f"{t['agents']}{courses}{share}{status}"
+        ac = asc.get(m["family_id"], {})
         rows.append(dict(
             role=ROLE_LABEL[m["analysis_set"]], trial=a["trial_id"],
             reference=f"{c['first_author']} et al., {c['journal']} {c['year']}", pmid=c["pmid"], doi=c["doi"],
             arm=a["arm_label"], control_arm=int(f["reference_arm"]),
-            schedule=f"{f['n_fractions']} fractions, {float(f['total_dose_gy']):g} Gy, {int(float(f['elapsed_days'])) + 1} days",
+            schedule=sched, schedule_variants=len(variants), schedule_notes=a["pattern_notes"],
             dose_per_fraction_gy=f["mean_dose_per_fraction"], fractions_per_day=f["max_fractions_per_day"],
-            schedule_class=f["schedule_class"], concurrent_therapy=a["planned_systemic_therapy"],
-            endpoint=o["endpoint_as_written"], grading_group=m["scale_group"],
-            events=o["events"], patients=o["denominator"],
-            assessment=assessment_text(m["last_assessment_weeks_after_rt"])))
+            schedule_class=f["schedule_class"], concurrent_therapy=therapy,
+            therapy_note=(t or {}).get("basis", ""),
+            endpoint=o["endpoint_as_written"], endpoint_timepoint=ac.get("endpoint_timepoint", ""),
+            grading_group=m["scale_group"], events=o["events"], patients=o["denominator"],
+            analysis_population=ac.get("analysis_population", ""),
+            assessment=assessment_text(m["last_assessment_weeks_after_rt"], m["max_post_rt_gap_weeks"],
+                                       ac.get("schedule_note", ""))))
     order = {"fitted": 0, "sensitivity check only": 1, "external benchmark (never fitted)": 2}
     rows.sort(key=lambda r: (order[r["role"]], r["trial"], -r["control_arm"], r["arm"]))
     return rows

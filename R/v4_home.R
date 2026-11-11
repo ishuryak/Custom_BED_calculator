@@ -612,7 +612,8 @@ early_fit_trials_dialog <- function(fit, dir = DRAWS_DIR) {
                            "%d arms of %d randomized trials, %s evaluable patients. Each trial is compared with its own",
                            "control arm (marked). Sensitivity trials were used only in a check, and HYPNO only as an",
                            "external benchmark. Counts are patients with grade 3 or worse (or confluent) acute",
-                           "mucositis. References were checked against PubMed."),
+                           "mucositis; a trial whose arms changed schedule during accrual is modeled with every schedule and its",
+                           "weight, and the count is for the whole arm. References were checked against PubMed."),
                      nrow(fitted), length(unique(fitted$trial)), format(sum(as.integer(fitted$patients)), big.mark = ",")))
   section <- function(role, heading) {
     x <- t[t$role == role, , drop = FALSE]
@@ -623,13 +624,17 @@ early_fit_trials_dialog <- function(fit, dir = DRAWS_DIR) {
                                                   target = "_blank", rel = "noopener", class = "small", r$reference)),
               tags$td(r$arm, if (r$control_arm == "1") tags$span(class = "badge bg-secondary ms-1", "control")),
               tags$td(r$schedule, tags$br(), tags$span(class = "small text-muted",
-                       sprintf("%s Gy per fraction, %s a day; %s", r$dose_per_fraction_gy, r$fractions_per_day, r$schedule_class))),
-              tags$td(r$concurrent_therapy), tags$td(r$endpoint),
-              tags$td(sprintf("%s / %s", r$events, r$patients)), tags$td(class = "small", r$assessment))
+                       sprintf("%s; %s", r$schedule_class, r$schedule_notes))),
+              tags$td(r$concurrent_therapy, if (nzchar(r$therapy_note)) tagList(tags$br(), tags$span(class = "small text-muted", r$therapy_note))),
+              tags$td(r$endpoint, if (nzchar(r$endpoint_timepoint)) tagList(tags$br(), tags$span(class = "small text-muted", r$endpoint_timepoint))),
+              tags$td(sprintf("%s / %s", r$events, r$patients), if (nzchar(r$analysis_population)) tagList(tags$br(),
+                       tags$span(class = "small text-muted", r$analysis_population))),
+              tags$td(class = "small", r$assessment))
     })
     tagList(h5(heading), div(style = "overflow-x:auto;", tags$table(class = "table table-sm table-striped small",
-      tags$thead(tags$tr(lapply(c("Trial and reference", "Arm", "Schedule", "Concurrent therapy", "Endpoint as reported",
-                                  "Events / patients", "Assessment"), tags$th))),
+      tags$thead(tags$tr(lapply(c("Trial and reference", "Arm", "Schedule as modeled (all variants and weights)",
+                                  "Planned concurrent therapy", "Endpoint as reported (time point)",
+                                  "Events / patients (population)", "Assessment"), tags$th))),
       tags$tbody(rows))))
   }
   list(ok = TRUE, t = t,

@@ -5,7 +5,7 @@ GORTEC9902_VACC,none,0,0,0,known,RT alone
 RTOG0129_SFX,cisplatin 100 mg/m2 3-weekly,3,300,1,known,x 3
 RTOG0129_AFXC,cisplatin 100 mg/m2 3-weekly,2,200,1,known,x 2
 Vienna_VCHART_MMC,mitomycin C 20 mg/m2,1,20,1,known,day 5
-Olmi_CFCT,carboplatin + 5-FU every 28 days,2,600 (carboplatin),1,known,carboplatin 75 mg/m2 days 1-4 every 28 days over 7 weeks
+Olmi_CFCT,carboplatin + 5-FU every 28 days,3 (2 during RT),600 (carboplatin),1,known,"3 cycles planned at weeks 1, 5 and 9: 2 concurrent with RT, the third after RT if RT was completed without breaks (Olmi 2003); coded as an added regimen"
 Bartelink_CF,cisplatin 6 mg/m2 daily,35,210,1,known,before each of 35 fractions
 Bartelink_MFD,cisplatin 10 mg/m2 daily,15,150,1,known,15 treatment days; higher daily dose
 Tandon_SIB,cisplatin 40 mg/m2 weekly,,,1,assumed_equal,planned courses not stated; >=5 cycles delivered in 83% vs 73% (p. 4)
@@ -16,8 +16,8 @@ Shivananjappa_HSIB,cisplatin 100 mg/m2 3-weekly if fit,,,,assumed_equal,number o
 Shivananjappa_CONV,cisplatin 100 mg/m2 3-weekly if fit,,,,assumed_equal,as HSIB
 Mani_SIB,cisplatin 35 mg/m2 weekly,,,1,assumed_equal,same RT duration in both arms
 Mani_SEQ,cisplatin 35 mg/m2 weekly,,,1,assumed_equal,same RT duration in both arms
-DAHANCA7_5F,nimorazole,30,,1,known,"with the first 30 fractions, both arms"
-DAHANCA7_6F,nimorazole,30,,1,known,"with the first 30 fractions, both arms"
+DAHANCA7_5F,nimorazole 1200 mg/m2 orally with the first 30 fractions,,,1,known,"with the first 30 fractions, both arms"
+DAHANCA7_6F,nimorazole 1200 mg/m2 orally with the first 30 fractions,,,1,known,"with the first 30 fractions, both arms"
 GhoshLaskar_CRT,cisplatin 30 mg/m2 weekly,,,1,known,added regimen; reference arm has none
 Grover_SEQ,cisplatin 40 mg/m2 weekly,6,240,1,known,6 cycles in both arms
 Grover_SIB,cisplatin 40 mg/m2 weekly,6,240,1,known,6 cycles in both arms
