@@ -138,14 +138,20 @@ def main(argv):
         created_by="tools/early_tox/export_fit_for_app.py",
         source_unit=os.path.relpath(a.unit, ROOT), source_identity=man["identity"],
         source_revision=diag.get("revision"), chain_archive=man.get("chain_archive"),
-        endpoint="maximum grade >= 3 acute mucositis (or confluent), arm-level counts, 22 randomized trial families "
-                 f"({diag['totals']['arms']} arms, {diag['totals']['evaluable']} evaluable patients)",
+        endpoint="severe acute mucositis (maximum grade >= 3, or confluent), arm-level counts pooled across grading "
+                 "scales, observation windows and evaluable, as-treated or completer populations; "
+                 f"{diag['n_families']} randomized trial families ({diag['totals']['arms']} arms, "
+                 f"{diag['totals']['evaluable']} evaluable patients); 2 of 22 families met the adequate post-RT "
+                 "ascertainment rule",
         model="logit p = eta_trial + kappa * (E - E_ref) + gamma * chemo + arm effect; "
               "E = D + Q/ab - r * max(0, T_elapsed - Tk), Q with incomplete repair",
         fixed=dict(Tk_e_elapsed_days=TK, repair_halftime_h=HALFTIME_H, hinge="exact", clock="elapsed days"),
         point_values=dict(ab_e=round(med["ab_e"], 4), r_e=round(med["r_e"], 4), rule="posterior medians"),
         n_draws=len(rows), gate=dict(passed=True, rhat=diag["rhat"], ess_bulk=diag["ess_bulk"], ess_tail=diag["ess_tail"],
                                      divergences=diag["divergences"], ebfmi_min=diag["ebfmi_min"]),
+        margin_meaning="+5 is a numerical margin on this model's BED scale; its clinical risk meaning is not established",
+        chemotherapy_term="one pooled coarse indicator (greater or added planned chemotherapy exposure); not a "
+                          "treatment-specific causal effect; not used by the calculator",
         status="research scenario; Fowler 2003 is the app default. Validation: better held-out log score across "
                "22 trial families (+0.28 per family); HYPNO depends on its chemotherapy assumption; ELAN-RT (frail, "
                "split course) favored the Fowler-parameter benchmark. Record: "

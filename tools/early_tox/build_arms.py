@@ -117,8 +117,28 @@ def is_mucositis_endpoint(endpoint):
     return ep in ("max_grade_ge3_mucositis", "confluent_mucositis") or (ep.startswith("other:") and "mucos" in ep)
 
 
-GRADE2_ONLY = re.compile(r"grade\s*(2|ii)\b(?!\s*[-–+]\s*(3|4|iii|iv))|>=\s*2|ge2|grade_2", re.I)
-CONFLUENT_CLASSES = ("confluent", "diffuse")
+# Accepted endpoint pairings (review R7, 2026-11-11): a curated outcome class is confirmed only by
+# its standard extraction code, or by a source-specific adjudicated equivalence recorded in
+# data/early_tox/source/endpoint_equivalence.csv. Nothing is inferred from the word "mucositis".
+STANDARD_ENDPOINTS = {
+    "grade_3_4_mucositis": "max_grade_ge3_mucositis", "grade_3_mucositis": "max_grade_ge3_mucositis",
+    "grade_3_plus_mucositis": "max_grade_ge3_mucositis", "grade_3_4_mucositis_from_dische": "max_grade_ge3_mucositis",
+    "diffuse_mucositis_top_grade": "max_grade_ge3_mucositis", "grade_3_mucositis_end_of_rt": "max_grade_ge3_mucositis",
+    "confluent_mucositis": "confluent_mucositis", "confluent_mucositis_own_scale": "confluent_mucositis",
+    "severe_confluent_dische": "confluent_mucositis", "diffuse_mucositis": "confluent_mucositis",
+}
+EQUIVALENCES = set()
+
+
+def load_equivalences(src):
+    out = set()
+    path = os.path.join(src, "endpoint_equivalence.csv")
+    if os.path.exists(path):
+        for r in read_csv(path):
+            if not r["basis"].strip():
+                raise ValueError(f"{r['report_prefix']}: endpoint equivalence without a basis")
+            out.add((r["report_prefix"], r["extraction_endpoint"], r["outcome_class"]))
+    return out
 
 
 def row_problem(r, o, n, e):
@@ -128,16 +148,12 @@ def row_problem(r, o, n, e):
     if as_int(r.get("denominator")) != n or as_int(r.get("events")) != e:
         return f"holds {r.get('events')}/{r.get('denominator')}, not {e}/{n}"
     ep = (r.get("endpoint") or "")
+    cls = o["endpoint_class"]
+    if STANDARD_ENDPOINTS.get(cls) == ep or (o["report_prefix"], ep, cls) in EQUIVALENCES:
+        return ""
     if not is_mucositis_endpoint(ep):
         return f"endpoint {ep!r} is not mucositis"
-    if GRADE2_ONLY.search(ep):
-        return f"endpoint {ep!r} is a grade 2 threshold"
-    if any(c in o["endpoint_class"] for c in CONFLUENT_CLASSES):
-        if not (ep in ("confluent_mucositis", "max_grade_ge3_mucositis") or ep.lower().startswith("other:")):
-            return f"endpoint {ep!r} does not fit class {o['endpoint_class']}"
-    elif ep == "confluent_mucositis" and "dische" not in o["endpoint_class"]:
-        return f"endpoint {ep!r} does not fit class {o['endpoint_class']}"
-    return ""
+    return f"endpoint {ep!r} is not an accepted equivalent of class {cls} (no standard pairing or recorded equivalence)"
 
 
 def build(root):
@@ -146,6 +162,8 @@ def build(root):
     arms_in = read_csv(os.path.join(src, "arm_curation.csv"))
     outs_in = read_csv(os.path.join(src, "outcome_curation.csv"))
     ex = load_extractions(xdir)
+    EQUIVALENCES.clear()
+    EQUIVALENCES.update(load_equivalences(src))
 
     arms, schedules, fractions, seen = [], [], [], set()
     by_arm = {}

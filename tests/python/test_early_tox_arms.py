@@ -82,12 +82,14 @@ def test_a_count_found_in_neither_extraction_is_refused(tmp_path):
         load_builder().build(str(tmp_path))
 
 
-def test_a_count_found_in_only_one_extraction_is_refused(tmp_path):
-    # Horiot 1992: only extraction A1 recorded a functional mucosal G3-G4 row (64/158).
+def test_a_count_found_only_in_an_unaccepted_endpoint_row_is_refused(tmp_path):
+    # Horiot 1992: only extraction A2 recorded a functional (patient-reported) mucosal G3-G4 row (64/158);
+    # it is not an accepted equivalent of the objective grade 3-4 class (review R7). The one-extraction
+    # refusal itself is tested with ELAN-RT (test_adjudicated_single_extraction_is_refused_for_a_candidate_arm).
     src = copy_sources(tmp_path)
     add_rows(src, "X_EO,EORTC22791,EORTC 22791,Horiot_JC_1992,CF,candidate,C1,x,none,x,W5 35d[2.0],x",
              "O900,X_EO,Horiot_JC_1992,grade_3_4_mucositis,158,64,,usable,x", "O900,A,,31,x")
-    with pytest.raises(ValueError, match="O900: 64/158 found in only one extraction"):
+    with pytest.raises(ValueError, match="O900: extraction A2#31 endpoint .*not an accepted equivalent"):
         load_builder().build(str(tmp_path))
 
 
@@ -137,16 +139,36 @@ def test_one_extraction_row_cannot_confirm_two_outcomes(tmp_path):
         load_builder().build(str(tmp_path))
 
 
-def test_grade_2_and_wrong_report_rows_are_refused():
+def test_only_standard_pairings_or_recorded_equivalences_confirm_a_count():
+    # Review R7: grade 1, grade 2, any grade, grade 4 alone and pharyngeal rows never confirm a severe
+    # count; a confluent class is not confirmed by a grade >= 3 code (or the reverse) without a record.
     b = load_builder()
+    b.EQUIVALENCES.clear()
+    b.EQUIVALENCES.update(b.load_equivalences(os.path.join(ROOT, "data", "early_tox", "source")))
     o = dict(outcome_id="X", report_prefix="Gupta_P_2020", endpoint_class="grade_3_mucositis")
     row = dict(report_file="Gupta_P_2020_x.pdf", denominator=30, events=8, endpoint="max_grade_ge3_mucositis")
     assert b.row_problem(row, o, 30, 8) == ""
-    assert "grade 2" in b.row_problem(dict(row, endpoint="other:mucositis grade 2"), o, 30, 8)
-    assert "grade 2" in b.row_problem(dict(row, endpoint="other:mucositis grade >=2"), o, 30, 8)
-    assert b.row_problem(dict(row, endpoint="other:mucositis grade 3-4"), o, 30, 8) == ""
-    assert "is from" in b.row_problem(dict(row, report_file="Tallari_RV_2017_x.pdf"), o, 30, 8)
+    for bad in ("other:grade 1 mucositis", "other:mucositis grade 2", "other:mucositis any grade",
+                "other:mucositis grade 4", "other:grade 3-4 mucositis", "confluent_mucositis"):
+        assert "not an accepted equivalent" in b.row_problem(dict(row, endpoint=bad), o, 30, 8), bad
     assert "not mucositis" in b.row_problem(dict(row, endpoint="other:pharyngeal grade 3"), o, 30, 8)
+    assert "is from" in b.row_problem(dict(row, report_file="Tallari_RV_2017_x.pdf"), o, 30, 8)
+    oc = dict(outcome_id="Y", report_prefix="Gupta_M_2015", endpoint_class="confluent_mucositis")
+    assert b.row_problem(dict(row, report_file="Gupta_M_2015_x.pdf", endpoint="confluent_mucositis"), oc, 30, 8) == ""
+    assert "not an accepted equivalent" in b.row_problem(dict(row, report_file="Gupta_M_2015_x.pdf"), oc, 30, 8)
+    # a recorded equivalence holds for its own report only
+    ep = "other:grade>=3 mucositis at treatment completion (CTCAE v4)"
+    op = dict(outcome_id="Z", report_prefix="Poddar_J_2017", endpoint_class="grade_3_mucositis_end_of_rt")
+    assert b.row_problem(dict(row, report_file="Poddar_J_2017_x.pdf", endpoint=ep), op, 30, 8) == ""
+    assert "not an accepted equivalent" in b.row_problem(dict(row, endpoint=ep), dict(op, report_prefix="Gupta_P_2020"), 30, 8)
+
+
+def test_an_equivalence_without_a_basis_is_refused(tmp_path):
+    src = copy_sources(tmp_path)
+    with open(src / "endpoint_equivalence.csv", "a") as f:
+        f.write("Gupta_P_2020,other:grade 1 mucositis,grade_3_mucositis, ,2026-11-11\n")
+    with pytest.raises(ValueError, match="endpoint equivalence without a basis"):
+        load_builder().build(str(tmp_path))
 
 
 def test_duplicate_outcome_ids_and_map_rows_are_refused(tmp_path):

@@ -633,13 +633,14 @@ server <- function(input, output, session) {
     pt <- EARLY_FIT$point
     div(class = "alert alert-info v4-research-banner",
       tags$strong("Research model in use for early toxicity. "),
-      sprintf(paste("Fitted to grade 3 or worse acute mucositis in 22 randomized trials (51 arms): mucosal α/β %.1f Gy,",
-                    "regrowth %.2f Gy of BED per day from day %g, %.1f-hour repair between fractions (posterior medians)."),
+      sprintf(paste("Fitted to severe (grade 3 or worse, or confluent) acute mucositis counts in 22 randomized trials (51 arms):",
+                    "mucosal α/β %.1f Gy, fitted time-loss rate %.2f Gy of BED per day from day %g (fixed for this scenario),",
+                    "%.1f-hour repair between fractions according to their time intervals (posterior medians)."),
               pt$ab_e, pt$r_e, pt$Tk_e, pt$h_e),
       " It predicted held-out trials better on average than Fowler's parameters, but its advantage came mostly from",
       " accelerated trials: for shorter hypofractionated courses the evidence is mixed (HYPNO depends on its",
-      " chemotherapy, ELAN-RT favored Fowler). The +5 limit is in this model's BED and corresponds to a smaller",
-      " increase in risk than Fowler's +5. Fowler 2003 remains the default.",
+      " chemotherapy, ELAN-RT favored Fowler). The +5 limit is a numerical margin on this model's BED scale; its",
+      " clinical risk meaning is not established. Fowler 2003 remains the default.",
       tags$span(class = "text-muted small", sprintf(" Model %s.", EARLY_FIT$model_id)))
   })
 

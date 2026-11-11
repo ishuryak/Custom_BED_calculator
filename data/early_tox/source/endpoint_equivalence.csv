@@ -1,0 +1,3 @@
+report_prefix,extraction_endpoint,outcome_class,basis,adjudicated_on
+Bartelink_H_2002,other:diffuse mucositis (physician-scored objective mucosal reaction),diffuse_mucositis,"The report's top objective mucosal category is diffuse mucositis; curated as the severe (confluent-type) endpoint in step 2 and confirmed in both extractions",2026-11-11
+Poddar_J_2017,other:grade>=3 mucositis at treatment completion (CTCAE v4),grade_3_mucositis_end_of_rt,"Table 4 reports CTCAE v4 grade 3 (grade 4 = 0) at treatment completion; the curated class names that time point (sensitivity trial only)",2026-11-11
