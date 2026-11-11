@@ -25,6 +25,8 @@ main <- function(args) {
   source(file.path(root, "tools", "env.R"))
   rel_lib <- bed_library()
   stopifnot(dir.exists(file.path(rel_lib, "shiny")))
+  # The version the page must show, read from the code rather than written here (it went stale at 4.6).
+  app_version <- sub('.*"(.*)".*', "\\1", grep("^APP_VERSION <- ", readLines(file.path(root, "R", "bed_models.R")), value = TRUE))
   live <- "--live" %in% args
   base <- if (live) sub("/$", "", args[which(args == "--live") + 1]) else NULL
   out <- file.path(root, "docs", "development", "2026_10_28_v4", "walkthrough",
@@ -92,6 +94,28 @@ main <- function(args) {
   check("Details adds the model column and Notes", isTRUE(js("$('#home_table').text().includes('Tumor condition holds in') && $('#home_table').text().includes('Notes')")))
   js("$('#home_details').prop('checked', false).trigger('change')"); idle(2)
   check("caution above the table", isTRUE(js("$('.v4-caution').offset().top < $('#home_table').offset().top")))
+  # Version 4.6: the early-toxicity switch (Fowler 2003 default, trial-count fit as research option).
+  check("early model starts on Fowler 2003", isTRUE(js("$('input[name=early_model]:checked').val() === 'fowler'")))
+  js("$('input[name=early_model][value=fitted]').prop('checked', true).trigger('change')"); idle(3)
+  nf <- js("$('#home_table table.dataTable tbody tr').length")
+  check("research model: 5 rows (26 to 30 fractions)", identical(as.integer(nf), 5L), paste("rows:", nf))
+  check("research note names the model and the margin's limits",
+        isTRUE(js("$('#early_model_note').text().includes('Research model in use') && $('#early_model_note').text().includes('clinical risk meaning is not established')")))
+  shot("01b_main_research_model")
+  js("$('#go_report').click()"); idle(2)
+  check("banner names the trial-count fit on Check a regimen", isTRUE(js("$('#banner').text().includes('Early toxicity: trial-count fit')")))
+  js("$('#go_settings').click()"); idle(2)
+  js("$('a[data-value=\"Model settings\"]').click()"); idle(1)
+  js("$('.accordion-button').filter((i, b) => b.innerText.includes('Early toxicity (acute mucosa)') && b.classList.contains('collapsed')).click()"); idle(2)
+  check("Model settings: fitted values shown read-only", isTRUE(js("$('#early_fit_values').text().includes('cannot be edited here')")),
+        substr(js("$('#early_fit_values').text()") %||% "", 1, 80))
+  check("Model settings: Fowler fields hidden", isTRUE(js("$('#ab_e').length === 1 && $('#ab_e').is(':hidden')")))
+  shot("01c_settings_research_model")
+  js("$('#go_home').click()"); idle(2)
+  js("$('input[name=early_model][value=fowler]').prop('checked', true).trigger('change')"); idle(3)
+  nb <- js("$('#home_table table.dataTable tbody tr').length")
+  check("switching back to Fowler restores 18 rows", identical(as.integer(nb), 18L), paste("rows:", nb))
+  check("research note gone with Fowler", isTRUE(js("$('#early_model_note').text().trim() === ''")))
   check("menu starts closed", isTRUE(js("$('.bslib-sidebar-layout').hasClass('sidebar-collapsed')")))
   check("no banner on the main page", isTRUE(js("$('.bed-banner').is(':hidden')")))
   check("no output errors on the main page", !nzchar(visible_errors() %||% ""), visible_errors() %||% "")
@@ -155,7 +179,8 @@ main <- function(args) {
   check("All BED values and Compare sections render", isTRUE(js("$('#results table').length === 1 && $('#compare_table table').length === 1")))
   js("$('#go_settings').click()"); idle(2)
   js("$('a[data-value=\"Model and sources\"]').click()"); idle(2)
-  check("Model and sources tab shows the version", isTRUE(js("$('#about').text().includes('Version 4.5.0')")))
+  check("Model and sources tab shows the version", isTRUE(js(sprintf("$('#about').text().includes('Version %s')", app_version))),
+        app_version)
   check("About includes the fitted-model summary", isTRUE(js("$('#about').text().includes('Differences between randomized arms')")))
   js("$('#how_fitted_settings').click()"); idle(1.5)
   check("'How was the tumor model fitted?' opens", isTRUE(js("$('.modal-title').text().includes('How the tumor model was fitted')")))

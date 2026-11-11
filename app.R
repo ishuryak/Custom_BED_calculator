@@ -1403,7 +1403,7 @@ server <- function(input, output, session) {
         tags$strong("Evaluating "), regimen_text(r), tags$strong(" against "), regimen_text(rf),
         sprintf(" · tumor threshold %+g Gy · %s · tumor values: %s", checked("min_gain"), dd,
                 PROFILE_NAMES[[active_profile()]]),
-        tags$div(class = "v4-banner-early", early_model_text(p), ". ",
+        tags$div(class = "v4-banner-early", paste0(early_model_text(p), ". "),
                  actionLink("banner_early", "Change the early-toxicity model on the main page")), extrap)
   })
 

@@ -119,6 +119,8 @@ test_that("the shared banner and Model settings name the active early model and 
     b <- as.character(output$banner$html)
     expect_match(b, sprintf("trial-count fit (research model %s; mucosal α/β %.2f Gy", FIT6$model_id, FIT6$point$ab_e), fixed = TRUE)
     expect_false(grepl("Fowler 2003 values", b, fixed = TRUE))
+    expect_match(b, "posterior medians)\\.")
+    expect_false(grepl("medians)\\s+\\.", b))                                  # no stray space before the period
     v <- as.character(output$early_fit_values$html)
     expect_match(v, sprintf("Mucosal α/β: %.4f Gy", FIT6$point$ab_e), fixed = TRUE)
     expect_match(v, "cannot be edited here", fixed = TRUE)
