@@ -306,3 +306,32 @@ Every numeric model input and default search setting the app ships, with its ori
 | Candidate search: minimum change +1 Gy, 7 days saved, dose step 0.05 Gy, highest dose 5 Gy, criterion "DI or DD", ranking "larger change" | chosen (screening settings) | this calculator |
 | Agreement: allowed change −3 Gy (BED, each scenario's α/β), 1 day saved, comparison HYPNO 55 Gy/20 | chosen (PI decision 2026-10-19) | `docs/development/2026_10_19_review_and_plan.md` |
 | Sensitivity: tumor α/β 7, 10 and 15 Gy for each preset | chosen | this calculator |
+
+## H. Candidate trials for the early-toxicity refit (searched 2026-11-11)
+
+Found by a PubMed search for randomized HNSCC fractionation trials with per-arm acute mucositis,
+not already in `data/early_tox/`. Every PMID and DOI was checked against the PubMed record on
+2026-11-11. None has been extracted yet: each must go through the step 2 double extraction before
+it enters a fit. Local copies are in `Custom_BED_calculator_v2/References/` (git-ignored).
+
+**Downloaded 2026-11-11 (open access, publisher PDF):**
+- Grover A, et al. 2021. SIB-IMRT 66 Gy/30 vs sequential IMRT 70 Gy/35, weekly cisplatin both arms, 55 vs 55. Radiat Oncol J. PMID 33794570, DOI 10.3857/roj.2020.01018, PMC8024186. CC BY-NC. `Grover_2021_SIB_vs_SEQ_IMRT_RCT.pdf`
+- Gupta M, et al. 2015. 66 Gy/33 at 6 vs 5 fractions a week, RT alone, 55 vs 54. South Asian J Cancer. PMID 26942141, DOI 10.4103/2278-330X.173168, PMC4756485. CC BY-NC-SA. `Gupta_M_2015_6_vs_5_fractions_per_week_RCT.pdf`
+- Dwivedi A, et al. 2023. 64 Gy/25 vs 70 Gy/35 with cisplatin, oropharynx, alternate allocation (not randomized). Asian Pac J Cancer Prev. PMID 38156840, DOI 10.31557/APJCP.2023.24.12.4077, PMC10909098. CC BY-NC. `Dwivedi_2023_hypofx_chemoRT_oropharynx.pdf`
+
+**Not downloadable by script (paywalled, or open access behind a bot check); requested from Igor:**
+
+| Priority | Paper | PMID | DOI | Why it matters |
+|---|---|---|---|---|
+| 1 | Poulsen MG 1999, TROG 91.01 acute toxicity, Australas Radiol | 10901965 | 10.1046/j.1440-1673.1999.00718.x | 59.4 Gy/33 in 24 days vs 70/35 in 49 days, RT alone both arms: time effect without a chemotherapy difference |
+| 2 | Bentzen SM 2001, CHART early morbidity, Radiother Oncol | 11439207 | 10.1016/s0167-8140(01)00358-9 | Per-arm counts for CHART (918 patients), missing from Dische 1997 |
+| 3 | Mortensen HR 2012, DAHANCA 6&7 morbidity, Radiother Oncol | 22398313 | 10.1016/j.radonc.2012.01.002 | Per-arm counts for DAHANCA 6&7 (1,468), missing from Overgaard 2003 |
+| 4 | Ortholan C 2026, ELAN-RT, Lancet Healthy Longev | 41713468 | 10.1016/j.lanhl.2025.100812 | 55 Gy/20 split course vs 70/35, RT alone: modern hypofractionation |
+| 5 | Ghosh-Laskar S 2016, Tata 3-arm, Head Neck | 25224814 | 10.1002/hed.23865 | 6 vs 5 fractions a week, RT alone |
+| 6 | Singh S 2024, Natl J Maxillofac Surg (open access, PMC11737566) | 39830463 | 10.4103/njms.njms_4_24 | 6 vs 5 fractions a week, cisplatin both arms |
+| 7 | Miszczyk L 2014, CHA-CHA, Br J Radiol (open access, PMC4453153) | 25027170 | 10.1259/bjr.20140212 | Split-course accelerated hyperfractionation, 7 days a week |
+| 8 | Tallari RV 2017, J Cancer Res Ther | 28643738 | 10.4103/0973-1482.199785 | 1.1 Gy twice daily vs 2 Gy daily, similar time, same chemotherapy: α/β |
+| 9 | Gupta P 2020, J Cancer Res Ther | 32719254 | 10.4103/jcrt.JCRT_475_18 | Concomitant boost vs standard, same cisplatin |
+| 10 | Marcial VA 1987, RTOG 79-13, Int J Radiat Oncol Biol Phys | 3542916 | 10.1016/0360-3016(87)90258-6 | Hyperfractionation: α/β |
+| 11 | Sanchíz F 1990, Int J Radiat Oncol Biol Phys | 2262356 | 10.1016/0360-3016(90)90342-h | Hyperfractionation, 859 patients: α/β |
+| 12 | Maciejewski B 1990, Int J Radiat Oncol Biol Phys (non-randomized) | 2298613 | 10.1016/0360-3016(90)90273-m | 498 patients, several schedules: time effect |
