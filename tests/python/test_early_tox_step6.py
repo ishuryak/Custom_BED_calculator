@@ -149,3 +149,13 @@ def test_subsets_failed_gates_and_legacy_gates_are_never_eligible():
     assert not s6.numerical_rule(True, True, good + [dict(gate_pass=True, scope="legacy narrow gate")])
     assert not s6.numerical_rule(False, True, good)
     assert not s6.numerical_rule(True, True, [])
+
+
+def test_repair_half_time_reaches_the_external_contrasts():
+    # HYPNO arms are once daily: repair changes dQ only slightly; a BID family changes clearly.
+    rows, _ = s6.s5.load_rows()
+    a = s6.family_data("RTOG9003", rows)
+    b = s6.family_data("RTOG9003", rows, dict(halftime_h=s6.s5.COMPLETE_REPAIR))
+    c = s6.family_data("RTOG9003", rows, dict(halftime_h=2.0))
+    assert not np.allclose(a["dQ"], b["dQ"]) and not np.allclose(a["dQ"], c["dQ"])
+    assert np.allclose(a["dD"], b["dD"]) and np.allclose(a["dTe"], b["dTe"])

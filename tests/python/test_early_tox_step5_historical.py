@@ -65,3 +65,14 @@ def test_tk_is_chosen_without_the_held_out_source(monkeypatch):
     srcs = [s for s, _, _ in h.folds(recs)]
     assert len(seen) == len(srcs)
     assert all(s not in used for s, used in zip(srcs, seen))
+
+
+def test_matched_repair_variants_differ_only_in_repair():
+    recs = h.load_records("primary")
+    s5pt = (12.0, 1.5)
+    bid = next(i for i, x in enumerate(recs) if len(set(int(t // 24) for t in x["times"])) < len(x["times"]))
+    one = next(i for i, x in enumerate(recs) if len(set(int(t // 24) for t in x["times"])) == len(x["times"]))
+    f0, f3 = h.exposure(recs, "fowler"), h.exposure(recs, "fowler_h3.2")
+    c3, c0 = h.exposure(recs, "step5", step5=s5pt), h.exposure(recs, "step5_complete", step5=s5pt)
+    assert f3[bid] > f0[bid] and c3[bid] > c0[bid]          # incomplete repair raises BID exposure
+    assert f3[one] == pytest.approx(f0[one], abs=0.2)       # once daily: 24 h apart, about 0.1 Gy10

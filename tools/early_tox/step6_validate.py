@@ -66,10 +66,10 @@ def binom_logpmf(y, n, p):
     return gammaln(n + 1) - gammaln(y + 1) - gammaln(n - y + 1) + y * np.log(p) + (n - y) * np.log1p(-p)
 
 
-def family_data(fam, rows_all):
-    """Contrast terms of one family's arms against its own reference arm."""
+def family_data(fam, rows_all, settings=None):
+    """Contrast terms of one family's arms against its own reference arm (repair as in settings)."""
     rows = [x for x in rows_all if x["family"] == fam]
-    d = s5.stan_data(rows, [fam], TK, {})
+    d = s5.stan_data(rows, [fam], TK, {k: v for k, v in (settings or {}).items() if k == "halftime_h"})
     ref = [i for i, x in enumerate(rows) if x["arm_id"] == s5.REF_ARM[fam]]
     assert len(ref) == 1
     return dict(rows=rows, ref=ref[0], y=np.array(d["y"]), N=np.array(d["N"]), dD=np.array(d["dD"]),
@@ -267,6 +267,35 @@ def hypno_scenarios(fd):
     return out
 
 
+STRUCTURAL_HALFTIMES = (2.0, 4.0, s5.COMPLETE_REPAIR)
+
+
+def structural_repair(fc, prim, fams, allrows, gates, inner):
+    """Review F8 / plan D2: both models refitted on all primary families at other repair half-times;
+    parameters, decision odds ratios and external checks per variant (no held-out refits)."""
+    out = []
+    for h in (s5.s4.HALFTIME_H,) + STRUCTURAL_HALFTIMES:
+        for m, st in MODELS.items():
+            stx = dict(st, halftime_h=h) if h != s5.s4.HALFTIME_H else st
+            name = f"{m}__all_primary" + ("" if h == s5.s4.HALFTIME_H else f"__h{h}")
+            dr = fc(name, prim, fams, stx)
+            if h != s5.s4.HALFTIME_H:
+                gates.append(gate_row(m, f"none (all primary, h={h})", dr))
+            hh = s5.halftime_of(stx)
+            ref70 = s5.schedule_terms(*s5.ev.regular_schedule(35, 2.0), TK, hh)
+            row = dict(model=m, halftime_h=h, r_median=round(float(np.median(dr["r"])), 3),
+                       ab_median=round(float(np.median(dr["ab"])), 2), kappa_median=round(float(np.median(dr["kappa"])), 4))
+            for n, dd in s5.DECISION:
+                t = np.subtract(s5.schedule_terms(*s5.ev.regular_schedule(n, dd), TK, hh), ref70)
+                lor = dr["kappa"] * (t[0] + t[1] / dr["ab"] - dr["r"] * t[2])
+                row[f"OR_{n}x{dd}"] = round(float(np.exp(np.median(lor))), 3)
+            for j, (f, fd) in enumerate([(f"HYPNO [{k}]", v) for k, v in hypno_scenarios(external_family("HYPNO", stx)).items()]
+                                        + [("ELAN", family_data("ELAN", allrows, stx))]):
+                row[f"cond_{f}"] = round(score_family(fd, dr, 300, SEED + 9000 + j)[1], 4)
+            out.append(row)
+    return out
+
+
 def numerical_rule(score_criterion_met, scope_complete, gates):
     """True only for the full family scope with every fit passing the complete-schema gate."""
     return bool(score_criterion_met and scope_complete and gates
@@ -280,6 +309,8 @@ def main(argv):
     ap.add_argument("--families", default="", help="comma list to restrict held-out families (smoke; never eligible)")
     ap.add_argument("--rescore-only", action="store_true", help="never sample; a missing cache is an error")
     ap.add_argument("--accept-legacy", action="store_true", help="read caches written before run identities (labelled)")
+    ap.add_argument("--structural", action="store_true",
+                    help="also fit both models on all primary families at repair half-times 2 h, 4 h and complete")
     a = ap.parse_args(argv[1:])
     cache = os.path.join(a.out, "cache")
     os.makedirs(cache, exist_ok=True)
@@ -345,6 +376,10 @@ def main(argv):
                             arms=";".join(f"{c['arm_id']} obs {c['observed_lor']:+.2f} pred(obs) {c['predicted_obs_lor_median']:+.2f} "
                                           f"[{c['predicted_obs_lor_5']:+.2f},{c['predicted_obs_lor_95']:+.2f}] "
                                           f"latent {c['latent_lor_median']:+.2f}" for c in cc)))
+    structural = []
+    if a.structural:
+        structural = structural_repair(fc, prim, fams, allrows, gates, a.inner)
+        write(os.path.join(a.out, "structural_repair.csv"), structural)
     gates_ok = all(g["gate_pass"] for g in gates)
     gates_complete = all(g["scope"] == "complete schema gate" for g in gates)
     for task in summary["tasks"].values():
@@ -364,13 +399,13 @@ def main(argv):
     print(json.dumps({k: summary[k] for k in ("tasks", "gates_all_pass", "gates_complete_schema", "scope")}, indent=1))
 
 
-def external_family(fam):
+def external_family(fam, settings=None):
     """HYPNO is the R6 benchmark: never fitted; its reference arm is the 66 Gy / 33 control."""
     rows = [x for x in s5_benchmark_rows() if x["family"] == fam]
     old = s5.REF_ARM.get(fam)
     s5.REF_ARM[fam] = "HYPNO_NFX"
     try:
-        return family_data(fam, rows)
+        return family_data(fam, rows, settings)
     finally:
         if old is None:
             del s5.REF_ARM[fam]

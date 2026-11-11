@@ -17,7 +17,10 @@ Exposures:
     step5        step 5 primary candidate at its posterior medians (ab, r from
                  step5/overdispersed/U02), 3.2 h repair, Tk 7: a consistency check, not a validation
     null         intercept only
-Not used to predict patient risk.
+    fowler_h3.2  Fowler's parameters with 3.2 h repair     } matched-repair comparisons (review F8):
+    step5_complete  step 5 point with complete repair      } compare like with like
+A descriptive compatibility check, not an independent validation: Fowler 2003 was tuned on largely
+the same historical schedules. Not used to predict patient risk.
 """
 import argparse
 import csv
@@ -71,12 +74,18 @@ def step5_point(step5_dir=STEP5_DEFAULT):
 
 
 def exposure(recs, model, Tk=7.0, step5=None):
+    """Exposure per record. Matched-repair variants (review F8): fowler_h3.2 is Fowler's parameters
+    with 3.2 h repair; step5_complete is the step 5 point with complete repair."""
     if model == "null":
         return np.zeros(len(recs))
     if model in ("fowler", "boundary"):
         return np.array([ev.early_bed(x["doses"], x["times"], ab=ev.FOWLER_2003["ab"], Tk=Tk) for x in recs])
+    if model == "fowler_h3.2":
+        return np.array([ev.early_bed(x["doses"], x["times"], ab=ev.FOWLER_2003["ab"], Tk=7.0, halftime_h=3.2)
+                         for x in recs])
     ab, r = step5
-    return np.array([ev.early_bed(x["doses"], x["times"], ab=ab, r=r, Tk=7.0, halftime_h=3.2) for x in recs])
+    h = None if model == "step5_complete" else 3.2
+    return np.array([ev.early_bed(x["doses"], x["times"], ab=ab, r=r, Tk=7.0, halftime_h=h) for x in recs])
 
 
 def fit(E, y, slope=True):
@@ -146,7 +155,7 @@ def main(argv):
         y = np.array([x["y"] for x in recs])
         r = dict(records=len(recs), events=int(y.sum()), sources=len(folds(recs)), models={})
         ls = {}
-        for m in ("null", "fowler", "boundary", "step5"):
+        for m in ("null", "fowler", "boundary", "step5", "fowler_h3.2", "step5_complete"):
             ls[m], tks = loso(recs, m, s5pt)
             Tk_full = 7.0
             if m == "boundary":
@@ -160,7 +169,7 @@ def main(argv):
                 in_sample_auc=round(auc(E, y), 3) if m != "null" else None,
                 Tk_full_data=Tk_full if m == "boundary" else None,
                 Tk_folds_range=[min(tks), max(tks)] if tks else None)
-        for m in ("fowler", "boundary", "step5"):
+        for m in ("fowler", "boundary", "step5", "fowler_h3.2", "step5_complete"):
             d = ls[m] - ls["fowler"] if m != "fowler" else ls[m] - ls["null"]
             per_src = {}
             for i, x in enumerate(recs):
@@ -169,6 +178,9 @@ def main(argv):
             r["models"][m][f"difference_vs_{ref}"] = round(float(d.sum()), 3)
             r["models"][m][f"sources_better_vs_{ref}"] = int(sum(v > 1e-9 for v in per_src.values()))
             r["models"][m][f"sources_worse_vs_{ref}"] = int(sum(v < -1e-9 for v in per_src.values()))
+        r["matched_repair"] = {
+            "3.2 h repair (step5 vs fowler_h3.2)": round(float((ls["step5"] - ls["fowler_h3.2"]).sum()), 3),
+            "complete repair (step5_complete vs fowler)": round(float((ls["step5_complete"] - ls["fowler"]).sum()), 3)}
         res["selections"][sel] = r
         with open(os.path.join(a.out, f"records_{sel}.csv"), "w", newline="") as f:
             w = csv.writer(f, lineterminator="\n")
