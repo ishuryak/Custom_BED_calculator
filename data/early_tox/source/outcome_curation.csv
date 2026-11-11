@@ -1,0 +1,46 @@
+outcome_id,arm_id,report_prefix,endpoint_class,denominator,events,percent,status,note
+O001,GORTEC9902_CRT,Bourhis_J_2012,grade_3_4_mucositis,262,180,,usable,RTOG grade 3-4 acute mucosal toxicity
+O002,GORTEC9902_ACCCT,Bourhis_J_2012,grade_3_4_mucositis,271,205,,usable,
+O003,GORTEC9902_VACC,Bourhis_J_2012,grade_3_4_mucositis,268,226,,usable,
+O004,RTOG9003_SF,Fu_KK_2000,grade_3_4_mucositis,268,67,,usable,"RTOG worst acute mucous membrane grade 3+4, within 90 days of start"
+O005,RTOG9003_HFX,Fu_KK_2000,grade_3_4_mucositis,263,110,,usable,
+O006,RTOG9003_AFXS,Fu_KK_2000,grade_3_4_mucositis,274,112,,usable,
+O007,RTOG9003_AFXC,Fu_KK_2000,grade_3_4_mucositis,268,123,,usable,
+O008,RTOG0129_SFX,Nguyen_Tan_PF_2014,grade_3_4_mucositis,361,141,,usable,"NCI CTC v2 mucositis/stomatitis grade 3-5, within 90 days of start of RT"
+O009,RTOG0129_AFXC,Nguyen_Tan_PF_2014,grade_3_4_mucositis,360,119,,usable,
+O010,EORTC22791_CF,Horiot_JC_1992,diffuse_mucositis_top_grade,158,78,,usable,"EORTC objective mucosal scale tops at grade 3 = diffuse mucositis; scored during treatment"
+O011,EORTC22791_HF,Horiot_JC_1992,diffuse_mucositis_top_grade,162,108,,usable,
+O012,EORTC22851_CF,Horiot_JC_1997,grade_3_4_mucositis,245,123,,usable,objective mucosal reaction grade 3-4 (physician scored)
+O013,EORTC22851_AF,Horiot_JC_1997,grade_3_4_mucositis,240,160,,usable,
+O014,PMH_CF,Cummings_B_2007,grade_3_4_mucositis,154,70,,usable,RTOG/EORTC acute mucosa grade 3 or 4
+O015,PMH_HF,Cummings_B_2007,grade_3_4_mucositis,156,97,,usable,
+O016,Ghoshal_CB,Ghoshal_S_2008,grade_3_4_mucositis,143,51,,usable,RTOG/EORTC mucous membrane grade 3+4; acute window not stated
+O017,Ghoshal_CF,Ghoshal_S_2008,grade_3_4_mucositis,142,27,,usable,"Table 4 gives 27 (19%); the Discussion says 23/142. Table used, conflict flagged"
+O018,CAIR1_CAIR,Skladowski_K_2000,grade_3_4_mucositis_from_dische,50,48,,usable,"peak acute mucosal reaction approximated to EORTC grade III-IV from the modified Dische score; first 2 months"
+O019,CAIR1_CF,Skladowski_K_2000,grade_3_4_mucositis_from_dische,49,35,,usable,
+O020,CAIR1_CAIR,Skladowski_K_2000,severe_confluent_dische,50,31,,usable,"severe confluent mucositis, maximum Dische score above 15 (different threshold from O018)"
+O021,CAIR1_CF,Skladowski_K_2000,severe_confluent_dische,49,13,,usable,
+O022,Vienna_CF,Dobrowsky_W_1996,confluent_mucositis,33,12,,usable,"confluent extensive mucosal reaction (grade 3), scale not stated; interim report"
+O023,Vienna_VCHART,Dobrowsky_W_1996,confluent_mucositis,29,25,,usable,
+O024,Vienna_VCHART_MMC,Dobrowsky_W_1996,confluent_mucositis,28,22,,usable,
+O025,Olmi_CF,Olmi_P_2003,grade_3_4_mucositis,54,8,14.7,usable,RTOG acute mucosa grade 3 + 4 (Table 7); the text's 44% for arm C is grade 3 alone
+O026,Olmi_SCAHF,Olmi_P_2003,grade_3_4_mucositis,52,21,40.3,usable,
+O027,Olmi_CFCT,Olmi_P_2003,grade_3_4_mucositis,50,24,44,usable,
+O028,Bartelink_CF,Bartelink_H_2002,diffuse_mucositis,24,8,,usable,"physician-scored objective diffuse mucositis, EORTC/RTOG scale; assessment window not stated"
+O029,Bartelink_MFD,Bartelink_H_2002,diffuse_mucositis,25,6,,usable,
+O030,Tandon_SIB,Tandon_S_2018,grade_3_mucositis,30,11,36.7,usable,CTCAE v4.0
+O031,Tandon_SMART,Tandon_S_2018,grade_3_mucositis,30,16,53.3,usable,
+O032,Sikdar_SEQ,Sikdar_D_2026,grade_3_4_mucositis,33,5,15.2,usable,CTCAE v4.0
+O033,Sikdar_SIB,Sikdar_D_2026,grade_3_4_mucositis,33,7,21.2,usable,report's SIB mucositis row sums to 32 of 33
+O034,Shivananjappa_HSIB,Shivananjappa_R_2023,grade_3_mucositis,25,8,32,usable,CTCAE v4.0; no grade 4 acute toxicity
+O035,Shivananjappa_CONV,Shivananjappa_R_2023,grade_3_mucositis,25,7,28,usable,
+O036,Mani_SIB,Mani_N_2022,grade_3_mucositis,17,2,,usable,RTOG acute mucosa grade 3
+O037,Mani_SEQ,Mani_N_2022,grade_3_mucositis,17,1,,usable,
+O038,IAEA_ACC6,Overgaard_J_2010,confluent_mucositis,441,45,,usable,scale not stated; ascertainment suspect (see arm notes)
+O039,IAEA_ACC5,Overgaard_J_2010,confluent_mucositis,439,22,,usable,
+O040,Pinto_CF,Pinto_LH_1991,confluent_mucositis_own_scale,48,17,,usable,"paper's own 4-point scale; integers printed in Fig. 7; may not be the maximum per patient"
+O041,Pinto_HF,Pinto_LH_1991,confluent_mucositis_own_scale,50,24,,usable,
+O042,Poddar_6F,Poddar_J_2017,grade_3_mucositis_end_of_rt,25,19,76,usable,"CTCAE v4.0 grade at treatment completion, patients who completed treatment"
+O043,Poddar_5F,Poddar_J_2017,grade_3_mucositis_end_of_rt,25,16,64,usable,
+O044,HYPNO_HFX,Bentzen_2026,grade_3_plus_mucositis,373,190,50.9,usable,"CTCAE v4.0 maximum grade 3+; benchmark only"
+O045,HYPNO_NFX,Bentzen_2026,grade_3_plus_mucositis,380,208,54.7,usable,

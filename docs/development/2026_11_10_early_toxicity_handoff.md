@@ -126,8 +126,10 @@ data.
 
 ## 7. Next session
 
-1. ~~Ask D1–D6 (one round).~~ Done. **Start at step 2**, using section 7 of the step 1 record as
-   the starting index.
+1. ~~Ask D1–D6 (one round).~~ Done. ~~Step 2~~ built 2026-11-10 (record
+   `2026_11_10_early_toxicity_step2_data.md`): 45 arm outcomes from 36 reports, each in two
+   independent extractions. Open: Igor spot-check, historical-label crosswalk (before step 6),
+   EORTC 22851 course-2 pattern. **Next: step 3 (endpoint mapping, Igor approves).**
 2. **Step 1** (about 2 hours): write the structured target definition. No code change.
 3. **Step 2** (3–5 days, Igor Shuryak spot-checks): build `data/early_tox/` (reports, schedules,
    fractions, labels, arms, outcomes, evidence families). Every value comes from a downloaded full

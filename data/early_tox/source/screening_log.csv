@@ -1,0 +1,37 @@
+report_prefix,family_id,screened_on,decision,reason
+Bourhis_J_2012,GORTEC9902,2026-11-10,included,"counts by arm, RTOG grade 3-4"
+Fu_KK_2000,RTOG9003,2026-11-10,included,counts by arm in table
+Nguyen_Tan_PF_2014,RTOG0129,2026-11-10,included,counts by arm; chemotherapy cycles differ by arm (strategy)
+Horiot_JC_1992,EORTC22791,2026-11-10,included,counts by arm
+Bernier_J_1998,EORTC22791,2026-11-10,duplicate,same trial and patients as Horiot 1992; percentages only
+Horiot_JC_1997,EORTC22851,2026-11-10,included,counts by arm
+Cummings_B_2007,PMH_HF,2026-11-10,included,counts by arm
+Ghoshal_S_2008,Ghoshal,2026-11-10,included,counts by arm; internal conflict on the conventional arm (27 in table vs 23 in text)
+Skladowski_K_2000,CAIR1,2026-11-10,included,counts by arm (first full report of CAIR)
+Skladowski_K_2006,CAIR1,2026-11-10,duplicate,"same patients as Skladowski 2000; 94% vs 53% with no stated denominator (94% fits 47/50 and 48/51)"
+Maciejewski_B_1996,CAIR1,2026-11-10,duplicate,first 44 CAIR patients (2.0 Gy era); used only for the era counts
+Skladowski_K_2013,CAIR2,2026-11-10,not_derivable,"86% vs 89% with no stated denominator for acute toxicity; about 25% missing scoring noted"
+Dobrowsky_W_1996,Vienna,2026-11-10,included,counts by arm (interim report)
+Dobrowsky_W_1998,Vienna,2026-11-10,duplicate,same trial; no counts
+Dobrowsky_W_2000,Vienna,2026-11-10,duplicate,same trial; accelerated arms pooled (90% in text vs 95% in abstract)
+Olmi_P_2003,ORO9301,2026-11-10,included,counts by arm (Table 7)
+Bartelink_H_2002,Bartelink2002,2026-11-10,included,counts by arm; both arms with daily cisplatin
+Tandon_S_2018,Tandon,2026-11-10,included,counts by arm
+Sikdar_D_2026,Sikdar,2026-11-10,included,counts by arm
+Shivananjappa_R_2023,Shivananjappa,2026-11-10,included,counts by arm; reported 45% break rate impossible with 25 patients (flag)
+Mani_N_2022,Mani,2026-11-10,included,counts by arm; no contrast in the prescription schedule
+Overgaard_J_2010,IAEA_ACC,2026-11-10,included_sensitivity,counts by arm; ascertainment suspect
+Pinto_LH_1991,Pinto,2026-11-10,included_sensitivity,counts in a figure; own scale
+Poddar_J_2017,Poddar,2026-11-10,included_sensitivity,grade at end of treatment only; stage I-II
+Bentzen_2026,HYPNO,2026-11-10,benchmark,external benchmark (plan R6)
+Overgaard_J_2003,DAHANCA67,2026-11-10,not_derivable,53% vs 33% with no per-arm denominator for this analysis
+Hliniak_A_2002,Hliniak,2026-11-10,not_derivable,70% vs 56% with no per-arm denominator; many early-glottic small-field patients
+Dische_S_1997,CHART,2026-11-10,not_derivable,73% vs 43%; percentage not convertible to a unique count
+Saunders_MI_2010,CHART,2026-11-10,excluded,no acute toxicity data
+Poulsen_MG_2001,TROG9101,2026-11-10,not_derivable,94% vs 71% are cumulative probabilities
+Jackson_SM_1997,Jackson,2026-11-10,excluded,grade 3-4 skin or mucosa combined
+Cox_JD_1990,RTOG8313,2026-11-10,excluded,grade 3+ acute toxicity of any organ
+Alam_MS_2016,Alam,2026-11-10,excluded,weekly snapshot counts only (no per-patient maximum)
+Daoud_J_2007,Daoud,2026-11-10,excluded,nasopharynx (context C4); grade 2-3 combined
+Van_den_Bogaert_W_1995,EORTC22811,2026-11-10,excluded,no acute grades reported
+Zackrisson_B_2011,ARTSCAN,2026-11-10,excluded,weekly prevalence in a figure only
