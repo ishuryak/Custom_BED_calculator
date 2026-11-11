@@ -97,7 +97,7 @@ UNITS = {
     "U05": ("candidate, L* ~ HalfNormal(0.5)", dict(Lstar_sd=0.5)),
     "U06": ("candidate, L* ~ HalfNormal(2)", dict(Lstar_sd=2.0)),
     "U07": ("candidate, alpha/beta prior sd doubled (0.708)", dict(ab_sd=0.708)),
-    "U08": ("candidate, five chemotherapy-differing families dropped, no gamma (C1)", dict(drop_chemo=True, use_gamma=0)),
+    "U08": ("candidate, chemotherapy-differing families dropped, no gamma (C1)", dict(drop_chemo=True, use_gamma=0)),
     "U09": ("candidate, chemotherapy coded on/off only (C1)", dict(chemo="onoff")),
     "U10": ("candidate, W1 windows only (M2)", dict(w1_only=True)),
     "U11": ("candidate, plus the sensitivity trials (M4 and 2026-11-11 additions)", dict(m4=True)),

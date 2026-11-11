@@ -61,10 +61,12 @@ def load_records(selection="primary"):
     return recs
 
 
-def step5_point():
+STEP5_DEFAULT = os.path.join(ROOT, "docs", "development", "2026_11_10_early_toxicity", "step5")
+
+
+def step5_point(step5_dir=STEP5_DEFAULT):
     import pandas as pd
-    s = pd.read_csv(os.path.join(ROOT, "docs", "development", "2026_11_10_early_toxicity", "step5",
-                                 "overdispersed", "U02", "summary.csv"), index_col=0)
+    s = pd.read_csv(os.path.join(step5_dir, "overdispersed", "U02", "summary.csv"), index_col=0)
     return float(s.loc["ab", "50%"]), float(s.loc["r", "50%"])
 
 
@@ -134,10 +136,11 @@ def auc(score, y):
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=OUT_DEFAULT)
+    ap.add_argument("--step5-dir", default=STEP5_DEFAULT, help="step 5 output folder holding overdispersed/U02")
     a = ap.parse_args(argv[1:])
     os.makedirs(a.out, exist_ok=True)
-    s5pt = step5_point()
-    res = dict(step5_point=dict(ab=s5pt[0], r=s5pt[1]), tk_grid=[TK_GRID[0], TK_GRID[-1]], selections={})
+    s5pt = step5_point(a.step5_dir)
+    res = dict(step5_dir=os.path.relpath(a.step5_dir, ROOT), step5_point=dict(ab=s5pt[0], r=s5pt[1]), tk_grid=[TK_GRID[0], TK_GRID[-1]], selections={})
     for sel in ("primary", "sensitivity"):
         recs = load_records(sel)
         y = np.array([x["y"] for x in recs])
