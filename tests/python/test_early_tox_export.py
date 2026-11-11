@@ -42,3 +42,16 @@ def test_failed_smoke_or_changed_units_are_refused(tmp_path):
         f.write(b"x")
     with pytest.raises(RuntimeError, match="changed since the run"):
         x.read_unit(u)
+
+
+def test_trial_table_is_hashed_cited_and_one_control_arm_per_trial():
+    import csv
+    m = json.load(open(os.path.join(ROOT, "draws", "early_fit_manifest.json")))
+    p = os.path.join(ROOT, "draws", "early_fit_trials.csv")
+    assert hashlib.sha256(open(p, "rb").read()).hexdigest() == m["files"]["early_fit_trials.csv"]["sha256"]
+    rows = list(csv.DictReader(open(p)))
+    fitted = [r for r in rows if r["role"] == "fitted"]
+    assert len({r["trial"] for r in fitted}) == 22 and sum(int(r["patients"]) for r in fitted) == 6042
+    assert all(r["pmid"].isdigit() for r in rows)
+    trials = {r["trial"] for r in rows}
+    assert sum(int(r["control_arm"]) for r in rows) == len(trials)

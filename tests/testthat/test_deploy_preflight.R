@@ -51,8 +51,9 @@ test_that(".Rhistory, .Renviron and the suite marker are neither tracked nor dep
 })
 
 test_that("the bundle check refuses a missing draws manifest and local-only files", {
-  need <- c("app.R", "about.md", "refit_in_brief.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
-            file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
+  need <- c("app.R", "about.md", "refit_in_brief.md", "early_fit_in_brief.md", SERVED_ASSETS,
+            file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+            top_files(app_abs, "data"), top_files(app_abs, "draws"))
   expect_true(check_bundle(need, app_abs))
   expect_error(check_bundle(setdiff(need, "draws/draws_manifest.json"), app_abs), "missing from the bundle")
   expect_error(check_bundle(c(need, "external_proofs.yaml"), app_abs), "Local-only files")
@@ -62,8 +63,9 @@ test_that("the bundle check refuses a missing draws manifest and local-only file
 
 # Review S6 (2026-10-25): an untracked file could reach the bundle, so the deployed code was not the recorded revision.
 test_that("the bundle check refuses files that are not tracked by git", {
-  need <- c("app.R", "about.md", "refit_in_brief.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
-            file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
+  need <- c("app.R", "about.md", "refit_in_brief.md", "early_fit_in_brief.md", SERVED_ASSETS,
+            file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+            top_files(app_abs, "data"), top_files(app_abs, "draws"))
   expect_true(check_bundle(need, app_abs, tracked = need))
   expect_error(check_bundle(c(need, "R/scratch.R"), app_abs, tracked = need), "not committed to git.*R/scratch.R")
   expect_true(check_bundle(c(need, "deployed_revision.txt"), app_abs, tracked = need))  # written by deploy.R itself
@@ -73,8 +75,9 @@ test_that("the bundle check refuses files that are not tracked by git", {
 # Review 6.4 (2026-11-09): a synthetic bundle without both refit explainer copies was accepted, and the
 # deploy tools library was put on the library path before it existed.
 test_that("the bundle check requires each linked document, present and not empty", {
-  need <- c("app.R", "about.md", "refit_in_brief.md", SERVED_ASSETS, file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
-            file.path("data", list.files(file.path(app_abs, "data"))), file.path("draws", list.files(file.path(app_abs, "draws"))))
+  need <- c("app.R", "about.md", "refit_in_brief.md", "early_fit_in_brief.md", SERVED_ASSETS,
+            file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+            top_files(app_abs, "data"), top_files(app_abs, "draws"))
   expect_true(check_bundle(need, app_abs))
   for (a in SERVED_ASSETS) expect_error(check_bundle(setdiff(need, a), app_abs), paste0("missing from the bundle.*", a))
   expect_error(check_bundle(setdiff(need, SERVED_ASSETS), app_abs), "missing from the bundle")
@@ -104,3 +107,17 @@ test_that("the deploy tools library is created before it is put on the library p
   expect_true(any(grepl("ensure_deploy_tools(deploy_lib)", s, fixed = TRUE)))
   expect_false(any(grepl("^\\.libPaths\\(c\\(.libPaths\\(\\)\\[1\\], deploy_lib", s)))
 })
+
+# 4.6.0: a bundle lists files, never folder names; the research data folder must not be required,
+# and the early-toxicity summary the main page links to must be bundled.
+test_that("the bundle check requires files only, and the early-toxicity summary", {
+  need <- c("app.R", "about.md", "refit_in_brief.md", "early_fit_in_brief.md", SERVED_ASSETS,
+            file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+            top_files(app_abs, "data"), top_files(app_abs, "draws"))
+  expect_true(dir.exists(file.path(app_abs, "data", "early_tox")))
+  expect_false("data/early_tox" %in% need)
+  expect_true(check_bundle(need, app_abs))
+  expect_error(check_bundle(setdiff(need, "early_fit_in_brief.md"), app_abs), "missing from the bundle.*early_fit_in_brief.md")
+  expect_error(check_bundle(setdiff(need, "draws/early_fit_trials.csv"), app_abs), "missing from the bundle")
+})
+

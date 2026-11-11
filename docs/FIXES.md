@@ -503,3 +503,13 @@ Several R tests were red on 917825b because the new helper did not exist yet. Th
 
 **Verification.** 2026-11-11: `Rscript tools/run_tests.R` gave 6,561 expectations, 0 failed, 0 errors (before the commit, so marked a numerical check). `python3 -m pytest -q tests/python`: 300 passed. `stale_constant_audit.py --strict`: 0 errors. The UI render shows the switch above the limits with Fowler selected. A visual browser walkthrough is still to do before any deployment, and deployment needs Igor's approval.
 
+### 2026-11-11, 4.6.0 addition: where to read how each model was fitted and on which trials (local, not deployed)
+
+**Changes published numbers:** no.
+
+| Change | What was missing (proof) | Test (red by mutation) | What it moves |
+|---|---|---|---|
+| Main page: "How was the early-toxicity model fitted?" and "Trials used for the early-toxicity fit" links in the early-toxicity box; "Trials the tumor model was fitted to" visible beside "How was the tumor model fitted?" | The early model had no explanation or trial list in the app, and the tumor trial list was only reachable after ticking Details (Igor Shuryak, 2026-11-11) | `tests/testthat/test_v46_app_switch.R` link and trial-list tests (red with each link removed or the hash check skipped) | Display only |
+| `early_fit_in_brief.md`, `draws/early_fit_trials.csv` (citations from PubMed esummary, `data/early_tox/source/report_citations.csv`), hash in the fitted-model manifest | As above | `tests/python/test_early_tox_export.py::test_trial_table_is_hashed_cited_and_one_control_arm_per_trial` | Display only |
+| Deploy bundle check requires files, not folder names (`top_files`) | The new `data/early_tox/` folder would have made `check_bundle` refuse every real bundle, which lists files only | `tests/testthat/test_deploy_preflight.R::"the bundle check requires files only, and the early-toxicity summary"` (4 failures with the old listing) | Deployment check only |
+

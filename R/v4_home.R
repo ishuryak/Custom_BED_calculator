@@ -586,3 +586,56 @@ v4_fit_trials_table <- function(t) {
           "Read from figure: the rate was read from the trial's published curve at the time point shown."))))
 }
 V4_TRANSFER_SCOPE <- v4_transfer_scope()
+
+# --- Early-toxicity research option (version 4.6): the trials of the fit and how it was made ---
+
+EARLY_FIT_TRIALS_FILE <- "early_fit_trials.csv"
+
+# The trial table of the fitted early-toxicity model, checked against its manifest (SHA-256).
+early_fit_trials <- function(fit, dir = DRAWS_DIR) {
+  if (!isTRUE(fit$ok)) stop(fit$reason, call. = FALSE)
+  path <- file.path(dir, EARLY_FIT_TRIALS_FILE)
+  if (!file.exists(path)) stop("the trial list of the fitted model is not installed", call. = FALSE)
+  got <- digest::digest(readBin(path, "raw", n = file.size(path)), algo = "sha256", serialize = FALSE)
+  if (!identical(got, fit$manifest$files[[EARLY_FIT_TRIALS_FILE]]$sha256))
+    stop("the trial list does not match the fitted model's manifest", call. = FALSE)
+  utils::read.csv(path, colClasses = "character", encoding = "UTF-8")
+}
+
+early_fit_trials_dialog <- function(fit, dir = DRAWS_DIR) {
+  t <- tryCatch(early_fit_trials(fit, dir), error = function(e) e)
+  if (inherits(t, "error"))
+    return(list(ok = FALSE, title = "Trials used for the early-toxicity fit (list unavailable)",
+                body = div(class = "alert alert-warning", "The list is unavailable: ", conditionMessage(t), ".")))
+  fitted <- t[t$role == "fitted", ]
+  intro <- p(sprintf(paste("The trial-count fit of early toxicity (a research option; Fowler 2003 is the default) used",
+                           "%d arms of %d randomized trials, %s evaluable patients. Each trial is compared with its own",
+                           "control arm (marked). Sensitivity trials were used only in a check, and HYPNO only as an",
+                           "external benchmark. Counts are patients with grade 3 or worse (or confluent) acute",
+                           "mucositis. References were checked against PubMed."),
+                     nrow(fitted), length(unique(fitted$trial)), format(sum(as.integer(fitted$patients)), big.mark = ",")))
+  section <- function(role, heading) {
+    x <- t[t$role == role, , drop = FALSE]
+    if (nrow(x) == 0) return(NULL)
+    rows <- lapply(seq_len(nrow(x)), function(i) {
+      r <- x[i, ]
+      tags$tr(tags$td(r$trial, tags$br(), tags$a(href = sprintf("https://pubmed.ncbi.nlm.nih.gov/%s/", r$pmid),
+                                                  target = "_blank", rel = "noopener", class = "small", r$reference)),
+              tags$td(r$arm, if (r$control_arm == "1") tags$span(class = "badge bg-secondary ms-1", "control")),
+              tags$td(r$schedule, tags$br(), tags$span(class = "small text-muted",
+                       sprintf("%s Gy per fraction, %s a day; %s", r$dose_per_fraction_gy, r$fractions_per_day, r$schedule_class))),
+              tags$td(r$concurrent_therapy), tags$td(r$endpoint),
+              tags$td(sprintf("%s / %s", r$events, r$patients)), tags$td(class = "small", r$assessment))
+    })
+    tagList(h5(heading), div(style = "overflow-x:auto;", tags$table(class = "table table-sm table-striped small",
+      tags$thead(tags$tr(lapply(c("Trial and reference", "Arm", "Schedule", "Concurrent therapy", "Endpoint as reported",
+                                  "Events / patients", "Assessment"), tags$th))),
+      tags$tbody(rows))))
+  }
+  list(ok = TRUE, t = t,
+       title = sprintf("Trials used for the early-toxicity fit (%d trials, %d arms)", length(unique(fitted$trial)), nrow(fitted)),
+       body = tagList(intro, section("fitted", "Trials the model was fitted to"),
+                      section("sensitivity check only", "Sensitivity checks only (not in the main fit)"),
+                      section("external benchmark (never fitted)", "External benchmark (never fitted)")))
+}
+

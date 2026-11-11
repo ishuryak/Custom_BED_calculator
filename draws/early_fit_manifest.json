@@ -33,6 +33,11 @@
   "early_fit_draws.csv": {
    "sha256": "a6fde4626c88a1872a84408d66e78ddd1460cdabb98734d06427ce186f07b4fd",
    "n_draws": 4000
+  },
+  "early_fit_trials.csv": {
+   "sha256": "e5666e361b6a6d38fce38d4d3cee6c87686a2983def134393ba10a0ee7a1e568",
+   "n_rows": 66,
+   "citations": "PubMed esummary, verified 2026-11-11"
   }
  }
 }

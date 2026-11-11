@@ -73,3 +73,45 @@ test_that("a research-mode main export records the model and replays exactly; an
     expect_false(identical(main_id(scf), main_id(sc)))
   })
 })
+
+test_that("the main page offers visible links to how each model was fitted and to its trials", {
+  e <- new.env(); withr::with_dir(app_abs, sys.source("app.R", envir = e))
+  html <- as.character(htmltools::renderTags(e$ui)$html)
+  for (id in c("early_how", "early_trials")) expect_match(html, sprintf("id=\"%s\"", id), fixed = TRUE)
+  expect_match(html, "How was the early-toxicity model fitted?", fixed = TRUE)
+  expect_match(html, "Trials used for the early-toxicity fit", fixed = TRUE)
+  shiny::testServer(app_dir, {
+    do.call(session$setInputs, v46_inputs)
+    hs <- as.character(output$home_settings$html)
+    expect_match(hs, "id=\"how_fitted_home\"", fixed = TRUE)                  # tumor method, visible
+    expect_match(hs, "id=\"tumor_trials_link\"", fixed = TRUE)                # tumor trials, visible without Details
+    expect_silent(session$setInputs(early_how = 1))
+    expect_silent(session$setInputs(early_trials = 1))
+    expect_silent(session$setInputs(tumor_trials_link = 1))
+  })
+})
+
+test_that("the early-toxicity trial list is complete, cited and hash-checked; the summary agrees with it", {
+  withr::with_dir(app_abs, {
+    t <- early_fit_trials(FIT6)
+    fitted <- t[t$role == "fitted", ]
+    expect_equal(length(unique(fitted$trial)), 22)
+    expect_equal(nrow(fitted), 51)
+    expect_equal(sum(as.integer(fitted$patients)), 6042)
+    expect_true(all(grepl("^[0-9]{6,8}$", t$pmid)))
+    expect_equal(sum(t$control_arm == "1"), length(unique(t$trial)))       # one control arm per trial
+    dlg <- early_fit_trials_dialog(FIT6)
+    expect_true(dlg$ok)
+    expect_match(dlg$title, "22 trials, 51 arms", fixed = TRUE)
+    brief <- paste(readLines("early_fit_in_brief.md", encoding = "UTF-8"), collapse = " ")
+    expect_match(brief, "22 randomized trials", fixed = TRUE)
+    expect_match(brief, "51 arms and 6,042 evaluable patients", fixed = TRUE)
+    expect_false(grepl("$", brief, fixed = TRUE))                            # no unrendered LaTeX in the modal
+    tmp <- tempfile(); dir.create(tmp)
+    file.copy(file.path("draws", c(EARLY_FIT_MANIFEST, EARLY_FIT_FILE, EARLY_FIT_TRIALS_FILE)), tmp)
+    cat("x\n", file = file.path(tmp, EARLY_FIT_TRIALS_FILE), append = TRUE)
+    bad <- early_fit_trials_dialog(FIT6, tmp)
+    expect_false(bad$ok)
+    expect_match(as.character(bad$body), "does not match", fixed = TRUE)
+  })
+})

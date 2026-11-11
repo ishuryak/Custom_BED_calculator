@@ -75,6 +75,49 @@ def fixture_cases():
             for n_, m, d, pw, st, sk in spec]
 
 
+ROLE_LABEL = {"primary": "fitted", "sensitivity": "sensitivity check only", "benchmark": "external benchmark (never fitted)"}
+
+
+def assessment_text(last):
+    if last == "":
+        return "follow-up after RT not stated"
+    if last == "resolution":
+        return "followed until reactions settled"
+    if float(last) == 0:
+        return "scored during RT only"
+    return f"last scored {float(last):g} weeks after RT"
+
+
+def trial_table():
+    """One row per arm of every trial in the early-toxicity evidence (fitted, sensitivity, benchmark),
+    with its verified citation (data/early_tox/source/report_citations.csv, PubMed esummary)."""
+    spec = importlib.util.spec_from_file_location("app_table", os.path.join(ROOT, "tools", "early_tox", "applicability_table.py"))
+    app = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(app)
+    feats = {r["arm_id"]: r for r in app.build("/nonexistent")}
+    cit = {r["family_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "data", "early_tox", "source", "report_citations.csv")))}
+    arms = {r["arm_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "data", "early_tox", "arms.csv")))}
+    outs = {r["outcome_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "data", "early_tox", "outcomes.csv")))}
+    rows = []
+    for m in csv.DictReader(open(os.path.join(ROOT, "data", "early_tox", "endpoint_mapping.csv"))):
+        if m["analysis_set"] not in ROLE_LABEL:
+            continue
+        f, a, o, c = feats[m["arm_id"]], arms[m["arm_id"]], outs[m["outcome_id"]], cit[m["family_id"]]
+        rows.append(dict(
+            role=ROLE_LABEL[m["analysis_set"]], trial=a["trial_id"],
+            reference=f"{c['first_author']} et al., {c['journal']} {c['year']}", pmid=c["pmid"], doi=c["doi"],
+            arm=a["arm_label"], control_arm=int(f["reference_arm"]),
+            schedule=f"{f['n_fractions']} fractions, {float(f['total_dose_gy']):g} Gy, {int(float(f['elapsed_days'])) + 1} days",
+            dose_per_fraction_gy=f["mean_dose_per_fraction"], fractions_per_day=f["max_fractions_per_day"],
+            schedule_class=f["schedule_class"], concurrent_therapy=a["planned_systemic_therapy"],
+            endpoint=o["endpoint_as_written"], grading_group=m["scale_group"],
+            events=o["events"], patients=o["denominator"],
+            assessment=assessment_text(m["last_assessment_weeks_after_rt"])))
+    order = {"fitted": 0, "sensitivity check only": 1, "external benchmark (never fitted)": 2}
+    rows.sort(key=lambda r: (order[r["role"]], r["trial"], -r["control_arm"], r["arm"]))
+    return rows
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--unit", default=UNIT_DEFAULT)
@@ -108,6 +151,14 @@ def main(argv):
                "split course) favored the Fowler-parameter benchmark. Record: "
                "docs/development/2026_11_11_early_toxicity_review_response.md",
         files={"early_fit_draws.csv": dict(sha256=sha256(out_csv), n_draws=len(rows))})
+    trials = trial_table()
+    out_trials = os.path.join(ROOT, "draws", "early_fit_trials.csv")
+    with open(out_trials, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(trials[0]), lineterminator="\n")
+        w.writeheader()
+        w.writerows(trials)
+    manifest["files"]["early_fit_trials.csv"] = dict(sha256=sha256(out_trials), n_rows=len(trials),
+                                                     citations="PubMed esummary, verified 2026-11-11")
     with open(os.path.join(ROOT, "draws", "early_fit_manifest.json"), "w") as f:
         json.dump(manifest, f, indent=1)
     # cross-language fixture

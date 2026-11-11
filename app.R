@@ -95,6 +95,7 @@ REFIT_EXPLAINER_DOCX <- "refit_explainer.docx"
 # The short clinician text on how the tumor model was fitted (review 3, 2026-11-09), opened from
 # the main page, the Uncertainty page and Settings and sources.
 REFIT_BRIEF <- markdown::mark(file = "refit_in_brief.md")
+EARLY_BRIEF <- markdown::mark(file = "early_fit_in_brief.md")
 how_fitted_link <- function(id) actionLink(id, "How was the tumor model fitted?", class = "v4-how-fitted")
 # The values a complete profile sets (all six tumor fields).
 profile_values <- function(name) switch(name, refit = REFIT_PROFILE$values, d18 = d18_profile(), NULL)
@@ -433,6 +434,9 @@ v4_home <- function() {
     div(class = "v4-early-model",
       tags$span(class = "v4-early-model-label", "Early-toxicity model:"),
       radioButtons("early_model", NULL, EARLY_MODEL_CHOICES, selected = "fowler", inline = TRUE),
+      div(class = "v4-early-links",
+        actionLink("early_how", "How was the early-toxicity model fitted?"), " · ",
+        actionLink("early_trials", "Trials used for the early-toxicity fit")),
       uiOutput("early_model_note")),
     div(class = "v4-limits",
       tags$span(class = "v4-limits-label", "Change the limits (Gy of BED):"),
@@ -529,6 +533,7 @@ ui <- page_sidebar(
       ".v4-early-model { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1rem;",
       "  border: 2px solid #1f6feb; border-radius: 0.5rem; padding: 0.5rem 0.9rem; margin: 0.6rem 0; }",
       ".v4-early-model-label { font-weight: 700; }",
+      ".v4-early-links { font-size: 0.9rem; }",
       ".v4-early-model .form-group { margin-bottom: 0; }",
       ".v4-early-model .radio-inline { padding: 0.3rem 0.8rem; border: 1px solid #1f6feb; border-radius: 1rem;",
       "  margin-right: 0.4rem; cursor: pointer; }",
@@ -1607,7 +1612,8 @@ server <- function(input, output, session) {
           "The trial-fit point values could not be read (%s), so the calculator started with scenario D18."), STARTUP$why)),
         if (same) tags$span(sprintf("Model settings: defaults. Tumor values: %s.", what)) else
           tags$span(tags$strong("Model settings changed."), sprintf("Tumor values: %s.", what)),
-        actionLink("open_settings", "View or change the settings"), " · ", how_fitted_link("how_fitted_home"))
+        actionLink("open_settings", "View or change the settings"), " · ", how_fitted_link("how_fitted_home"),
+        " · ", actionLink("tumor_trials_link", "Trials the tumor model was fitted to"))
   })
 
   output$home_msg <- renderUI({
@@ -1765,11 +1771,24 @@ server <- function(input, output, session) {
   })
 
   # The trials of the Bayesian refit, in a dialog opened from Details (version 4.4.0).
-  observeEvent(input$home_trials, {
+  show_tumor_trials <- function() {
     # A failed reference check shows "list unavailable", never a wrong citation (review 2.3).
     dlg <- v4_fit_trials_dialog(REFIT_EXPLAINER_HTML)
     showModal(modalDialog(title = dlg$title, size = "xl", easyClose = TRUE, footer = modalButton("Close"), dlg$body))
-  })
+  }
+  observeEvent(input$home_trials, show_tumor_trials())
+  observeEvent(input$tumor_trials_link, show_tumor_trials())
+  # Early-toxicity research option: how it was fitted, and its trials (version 4.6).
+  observeEvent(input$early_how, showModal(modalDialog(
+    title = "How the early-toxicity model was fitted", size = "l", easyClose = TRUE, footer = modalButton("Close"),
+    HTML(sub("<h3>[^<]*</h3>", "", EARLY_BRIEF)),
+    tags$p(actionLink("early_trials_from_how", "See the trials used for the fit."))))) 
+  show_early_trials <- function() {
+    dlg <- early_fit_trials_dialog(EARLY_FIT)
+    showModal(modalDialog(title = dlg$title, size = "xl", easyClose = TRUE, footer = modalButton("Close"), dlg$body))
+  }
+  observeEvent(input$early_trials, show_early_trials())
+  observeEvent(input$early_trials_from_how, show_early_trials())
   for (id in c("how_fitted_home", "how_fitted_unc", "how_fitted_settings")) local({
     id <- id
     observeEvent(input[[id]], showModal(modalDialog(
