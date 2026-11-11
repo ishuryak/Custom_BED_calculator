@@ -132,7 +132,9 @@ data.
    EORTC 22851 course-2 pattern. Step 3 PROPOSAL written
    (`2026_11_10_early_toxicity_step3_mapping_proposal.md`, decisions M1-M4 and a spot-check list),
    not applied. Step 4 groundwork: `tools/early_tox/evaluator.py` with plan tests 6-8.
-   **Next: Igor answers M1-M4 and spot-checks, then step 3 is applied and step 4 runs.**
+   M1-M4 approved and APPLIED; step 4 RUN (record `2026_11_10_early_toxicity_step4_identification.md`):
+   slope and time effect identified, alpha/beta weakly informed, Tk not identified up to 16 days.
+   **Next: Igor answers C1-C3, spot-checks the step 2 counts, and agrees to start step 5 (first refit).**
 2. **Step 1** (about 2 hours): write the structured target definition. No code change.
 3. **Step 2** (3–5 days, Igor Shuryak spot-checks): build `data/early_tox/` (reports, schedules,
    fractions, labels, arms, outcomes, evidence families). Every value comes from a downloaded full

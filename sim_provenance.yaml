@@ -203,3 +203,120 @@ parameters:
       date: "2026-10-21"
       range: [0, 1]
       assumption_ack: true
+  # Early-toxicity plan step 4 (2026-11-10): recovery simulations on the real trial design
+  # (tools/early_tox/step4_identification.py, seed 20261110) and the step 5 priors (decision D3).
+  - id: et_rec_ab
+    description: "Recovery-simulation truth: mucosal alpha/beta, the Fowler 2003 reference value"
+    units: "Gy"
+    source: user_supplied
+    value: 10
+    user_supplied:
+      provided_by: "analyst choice (Claude): Fowler 2003 reference value used as simulation truth"
+      date: "2026-11-10"
+      range: [10, 10]
+      assumption_ack: true
+  - id: et_rec_r
+    description: "Recovery-simulation truth: repopulation rate r = ln 2 / (alpha Tp) with Fowler 2003 alpha 0.35/Gy and Tp 2.5 d"
+    units: "BED Gy10 per day"
+    source: user_supplied
+    value: 0.79217
+    user_supplied:
+      provided_by: "analyst choice (Claude): Fowler 2003 values used as simulation truth"
+      date: "2026-11-10"
+      range: [0.79217, 0.79217]
+      assumption_ack: true
+  - id: et_rec_Tk
+    description: "Recovery-simulation truth and fixed scenario value: onset of mucosal repopulation, elapsed days (Fowler 2003)"
+    units: "day"
+    source: user_supplied
+    value: 7
+    user_supplied:
+      provided_by: "analyst choice (Claude): Fowler 2003 reference value"
+      date: "2026-11-10"
+      range: [7, 7]
+      assumption_ack: true
+  - id: et_rec_kappa
+    description: "Recovery-simulation truth: log-odds slope per BED unit (L* = 1 per 10 BED units); expected posterior SDs also computed at L* = 0.5 and 2"
+    units: "logit per Gy10"
+    source: user_supplied
+    value: 0.1
+    user_supplied:
+      provided_by: "analyst choice (Claude), central value of the D3 slope prior scale"
+      date: "2026-11-10"
+      range: [0.05, 0.2]
+      assumption_ack: true
+  - id: et_rec_eta
+    description: "Recovery-simulation truth: trial baselines = logit of each primary family's observed reference-arm rate (clipped to 0.03-0.97), from data/early_tox/outcomes.csv"
+    units: "logit"
+    source: user_supplied
+    value: 0
+    user_supplied:
+      provided_by: "analyst choice (Claude): observed reference-arm rates used as plausible baselines; one value per family"
+      date: "2026-11-10"
+      range: [-3.5, 3.5]
+      assumption_ack: true
+  - id: et_prior_Lstar
+    description: "Step 5 prior (D3): L* = 10 kappa, half-normal scale 1 (sensitivities 0.5 and 2)"
+    units: "logit per 10 Gy10"
+    source: user_supplied
+    value: 1
+    distribution:
+      family: normal
+      params: {mean: 0, sd: 1}
+    user_supplied:
+      provided_by: "independent review proposal, adopted as decision D3 by Igor Shuryak"
+      date: "2026-11-10"
+      range: [0, 3]
+      assumption_ack: true
+  - id: et_prior_ab
+    description: "Step 5 prior (D3, D6): mucosal alpha/beta lognormal(log 10, 0.354); Denham 1995 interval 5.8-17.9 Gy as reported by Kaanders 1999 is consistent"
+    units: "Gy"
+    source: user_supplied
+    value: 10
+    distribution:
+      family: lognormal
+      params: {meanlog: 2.302585, sdlog: 0.354}
+    user_supplied:
+      provided_by: "independent review proposal, adopted as decisions D3 and D6 by Igor Shuryak"
+      date: "2026-11-10"
+      range: [5, 20]
+      assumption_ack: true
+  - id: et_prior_r
+    description: "Step 5 prior (D3): repopulation rate lognormal(log 0.8, 0.5)"
+    units: "BED Gy10 per day"
+    source: user_supplied
+    value: 0.8
+    distribution:
+      family: lognormal
+      params: {meanlog: -0.223144, sdlog: 0.5}
+    user_supplied:
+      provided_by: "independent review proposal, adopted as decision D3 by Igor Shuryak"
+      date: "2026-11-10"
+      range: [0.3, 2.1]
+      assumption_ack: true
+  - id: et_prior_m0
+    description: "Step 5 prior (D3): mean of trial reference-arm log odds, normal(0, 2.5)"
+    units: "logit"
+    source: user_supplied
+    value: 0
+    distribution:
+      family: normal
+      params: {mean: 0, sd: 2.5}
+    user_supplied:
+      provided_by: "independent review proposal, adopted as decision D3 by Igor Shuryak"
+      date: "2026-11-10"
+      range: [-5, 5]
+      assumption_ack: true
+  - id: et_prior_tau0
+    description: "Step 5 prior (D3): between-trial SD of reference-arm log odds, half-normal(1)"
+    units: "logit"
+    source: user_supplied
+    value: 1
+    distribution:
+      family: normal
+      params: {mean: 0, sd: 1}
+    user_supplied:
+      provided_by: "independent review proposal, adopted as decision D3 by Igor Shuryak"
+      date: "2026-11-10"
+      range: [0, 3]
+      assumption_ack: true

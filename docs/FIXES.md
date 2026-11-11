@@ -437,3 +437,13 @@ Several R tests were red on 917825b because the new helper did not exist yet. Th
 | One repair-aware evaluator for explicit fraction schedules (plan R8) | The exploratory fitter used repair with a 3.2 h half-time while `exploratory_after_audit/implic.py` used complete repair, so fit and prediction disagreed (plan R8). | `tests/python/test_early_tox_evaluator.py`: an inclusive clock gave 1 failure (`::test_fowler_no_repair_fixtures_from_the_step2_arm_schedules`); an undoubled repair cross-term gave 2; dropping the onset hinge gave 1 (`::test_onset_cancels_from_a_contrast_only_when_both_courses_pass_it`); half-time used as a rate gave 2; no ordering check gave 1. | Nothing in the app. Fixtures: 53.10544, 55.86597, 55.43495 (from the step 2 arm schedules), 84.12426 and +0.28402 Gy10. |
 
 **Verification.** 2026-11-10: `python3 -m pytest -q tests/python` gave 239 passed (232 before).
+
+### 2026-11-10, fourth part: early-toxicity steps 3 (mapping) and 4 (identification) (local, not pushed, not deployed)
+
+**Changes published numbers:** no. Nothing in the app reads `data/early_tox/` or the step 4 outputs.
+
+| Change | What was wrong (proof) | Test (red by mutation) | What it moves |
+|---|---|---|---|
+| Endpoint mapping M1-M4 (`tools/early_tox/build_mapping.py`, `data/early_tox/endpoint_mapping.csv`) and identification run (`tools/early_tox/step4_identification.py`, outputs in `docs/development/2026_11_10_early_toxicity/step4/`) | The plan forbids fitting before identification is checked: randomized contrasts were claimed to identify Tk in plan version 1, which is false when both arms pass onset (plan R3). Confirmed here: changing Tk from 0 to 16 days changes no primary contrast (largest change 1e-10). | `tests/python/test_early_tox_step3_step4.py`: Tandon window changed, CAIR severe confluent in the primary, onset hinge removed, likelihood sign flipped, alpha/beta division removed; each gave 1 failure. | Nothing in the app. Recorded: slope and time effect identified, alpha/beta weakly informed, Tk not identified up to 16 days. |
+
+**Verification.** 2026-11-10: `python3 -m pytest -q tests/python` gave 245 passed (239 before). Step 4 run on `e2de68e`, seed 20261110, 200 replicates, all converged. `sim_provenance.py validate sim_provenance.yaml`: registry OK. Record: `docs/development/2026_11_10_early_toxicity_step4_identification.md`.

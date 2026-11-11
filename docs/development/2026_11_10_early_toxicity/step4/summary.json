@@ -1,0 +1,123 @@
+{
+ "seed": 20261110,
+ "reps": 200,
+ "truth": {
+  "ab": 10.0,
+  "r": 0.7921682063542231,
+  "Tk": 7.0,
+  "kappa": 0.1
+ },
+ "halftime_h": 3.2,
+ "n_primary_arms": 35,
+ "n_families": 15,
+ "jacobian": {
+  "n_contrasts": 20,
+  "design_rank": 3,
+  "design_condition_number": 2.2071392378380503,
+  "dE_dlogab_range": [
+   -6.720945866405259,
+   2.195918091842941
+  ],
+  "dE_dlogr_range": [
+   -0.23104906059501218,
+   23.567004178275397
+  ],
+  "dE_dTk_max_abs": 1.0658141036401503e-10,
+  "corr_dD_dQ": 0.13429600968496455,
+  "corr_dD_dT": 0.775242519305577,
+  "corr_dQ_dT": 0.17016049625434862
+ },
+ "recovery": {
+  "converged": 1.0,
+  "hessian_pd": 1.0,
+  "coverage_kappa": 0.96,
+  "coverage_ab": 0.975,
+  "coverage_r": 0.955,
+  "ab_hat_q05_q50_q95": [
+   7.479,
+   9.935,
+   12.729
+  ],
+  "r_hat_q05_q50_q95": [
+   0.6522,
+   0.7877,
+   0.9552
+  ],
+  "kappa_hat_q05_q50_q95": [
+   0.0862,
+   0.101,
+   0.1128
+  ]
+ },
+ "fisher": [
+  {
+   "Lstar": 0.5,
+   "parameter": "log_kappa",
+   "expected_posterior_sd": 0.1756,
+   "prior_sd": NaN,
+   "ratio_to_prior": ""
+  },
+  {
+   "Lstar": 0.5,
+   "parameter": "log_ab",
+   "expected_posterior_sd": 0.3074,
+   "prior_sd": 0.354,
+   "ratio_to_prior": 0.868
+  },
+  {
+   "Lstar": 0.5,
+   "parameter": "log_r",
+   "expected_posterior_sd": 0.198,
+   "prior_sd": 0.5,
+   "ratio_to_prior": 0.396
+  },
+  {
+   "Lstar": 1.0,
+   "parameter": "log_kappa",
+   "expected_posterior_sd": 0.0929,
+   "prior_sd": NaN,
+   "ratio_to_prior": ""
+  },
+  {
+   "Lstar": 1.0,
+   "parameter": "log_ab",
+   "expected_posterior_sd": 0.2437,
+   "prior_sd": 0.354,
+   "ratio_to_prior": 0.689
+  },
+  {
+   "Lstar": 1.0,
+   "parameter": "log_r",
+   "expected_posterior_sd": 0.1099,
+   "prior_sd": 0.5,
+   "ratio_to_prior": 0.22
+  },
+  {
+   "Lstar": 2.0,
+   "parameter": "log_kappa",
+   "expected_posterior_sd": 0.0542,
+   "prior_sd": NaN,
+   "ratio_to_prior": ""
+  },
+  {
+   "Lstar": 2.0,
+   "parameter": "log_ab",
+   "expected_posterior_sd": 0.1908,
+   "prior_sd": 0.354,
+   "ratio_to_prior": 0.539
+  },
+  {
+   "Lstar": 2.0,
+   "parameter": "log_r",
+   "expected_posterior_sd": 0.0643,
+   "prior_sd": 0.5,
+   "ratio_to_prior": 0.129
+  }
+ ],
+ "seconds": 621.5,
+ "versions": {
+  "python": "3.12.3",
+  "numpy": "2.4.3",
+  "scipy": "1.17.1"
+ }
+}
