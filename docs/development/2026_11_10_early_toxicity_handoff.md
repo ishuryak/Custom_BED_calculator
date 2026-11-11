@@ -138,7 +138,11 @@ data.
    done by Claude at Igor's request, all 5 pass, Ghoshal resolved to 27/142). Step 5 RUN (record
    `2026_11_10_early_toxicity_step5_fit.md`): overdispersed model primary (C3), r about 1.5 BED/day
    (twice Fowler), alpha/beta prior-driven, chemotherapy OR about 1.7; historical labels favor
-   Fowler (not independent). **Next: step 6 (crosswalk first, then leave-family-out validation).**
+   Fowler (not independent). 2026-11-11 later: 10 trials added from Igor's 12 new PDFs; step 6 RUN
+   (record `2026_11_11_early_toxicity_step6_validation.md`): candidate passes the numerical
+   promotion rule on held-out trials (+0.28 per family, 95% 0.10-0.55) but HYPNO and ELAN-RT (the
+   hypofractionation trials) favor Fowler. Recommendation: do not promote; Fowler stays default.
+   **Next: Igor decides (keep Fowler / research scenario / promote); then step 7.**
 2. **Step 1** (about 2 hours): write the structured target definition. No code change.
 3. **Step 2** (3–5 days, Igor Shuryak spot-checks): build `data/early_tox/` (reports, schedules,
    fractions, labels, arms, outcomes, evidence families). Every value comes from a downloaded full

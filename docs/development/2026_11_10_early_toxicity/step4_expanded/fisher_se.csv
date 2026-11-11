@@ -1,0 +1,10 @@
+Lstar,parameter,expected_posterior_sd,prior_sd,ratio_to_prior
+0.5,log_kappa,0.1745,nan,
+0.5,log_ab,0.3045,0.354,0.86
+0.5,log_r,0.1936,0.5,0.387
+1.0,log_kappa,0.0924,nan,
+1.0,log_ab,0.2386,0.354,0.674
+1.0,log_r,0.1064,0.5,0.213
+2.0,log_kappa,0.0535,nan,
+2.0,log_ab,0.183,0.354,0.517
+2.0,log_r,0.0613,0.5,0.123

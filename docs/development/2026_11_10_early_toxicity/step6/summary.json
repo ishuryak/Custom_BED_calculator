@@ -1,0 +1,203 @@
+{
+ "seed": 20261113,
+ "inner": 100,
+ "n_boot": 20000,
+ "tk": 7.0,
+ "families": 22,
+ "revision": "e80aa12",
+ "tasks": {
+  "new_trial": {
+   "total_benchmark": -195.012,
+   "total_candidate": -188.767,
+   "sum_d": 6.245,
+   "families_candidate_better": 18,
+   "bootstrap": {
+    "20261113": {
+     "mean": 0.28385909090909095,
+     "lo": 0.10935775063568932,
+     "hi": 0.5538924092341139,
+     "p_positive": 0.9999
+    },
+    "20261114": {
+     "mean": 0.28385909090909095,
+     "lo": 0.10995943820912694,
+     "hi": 0.5485221759765818,
+     "p_positive": 0.9998
+    }
+   },
+   "leave_one_family_mean": {
+    "Bartelink2002": 0.2754,
+    "CAIR1": 0.2885,
+    "DAHANCA67": 0.2846,
+    "EORTC22791": 0.3077,
+    "EORTC22851": 0.3076,
+    "GORTEC9902": 0.2656,
+    "GhoshLaskar": 0.2851,
+    "Ghoshal": 0.2916,
+    "Grover": 0.3093,
+    "GuptaM": 0.2904,
+    "GuptaP": 0.2835,
+    "Mani": 0.2939,
+    "ORO9301": 0.2935,
+    "PMH_HF": 0.3116,
+    "RTOG0129": 0.2924,
+    "RTOG9003": 0.2431,
+    "Shivananjappa": 0.2928,
+    "Sikdar": 0.2917,
+    "Singh": 0.2891,
+    "Tallari": 0.2853,
+    "Tandon": 0.2745,
+    "Vienna": 0.1878
+   },
+   "influence_sign_changes": 0,
+   "promote": true
+  },
+  "conditional": {
+   "total_benchmark": -107.516,
+   "total_candidate": -101.386,
+   "sum_d": 6.13,
+   "families_candidate_better": 18,
+   "bootstrap": {
+    "20261113": {
+     "mean": 0.2786590909090909,
+     "lo": 0.10295802634841934,
+     "hi": 0.550073195977928,
+     "p_positive": 0.9997
+    },
+    "20261114": {
+     "mean": 0.2786590909090909,
+     "lo": 0.1030446297417543,
+     "hi": 0.5430442031816749,
+     "p_positive": 0.99985
+    }
+   },
+   "leave_one_family_mean": {
+    "Bartelink2002": 0.2721,
+    "CAIR1": 0.2727,
+    "DAHANCA67": 0.279,
+    "EORTC22791": 0.3028,
+    "EORTC22851": 0.3017,
+    "GORTEC9902": 0.2526,
+    "GhoshLaskar": 0.2826,
+    "Ghoshal": 0.2881,
+    "Grover": 0.2998,
+    "GuptaM": 0.2861,
+    "GuptaP": 0.2811,
+    "Mani": 0.2894,
+    "ORO9301": 0.2883,
+    "PMH_HF": 0.307,
+    "RTOG0129": 0.2886,
+    "RTOG9003": 0.2394,
+    "Shivananjappa": 0.2905,
+    "Sikdar": 0.291,
+    "Singh": 0.2844,
+    "Tallari": 0.2815,
+    "Tandon": 0.2688,
+    "Vienna": 0.183
+   },
+   "influence_sign_changes": 0,
+   "promote": true
+  }
+ },
+ "external": [
+  {
+   "model": "benchmark",
+   "family": "HYPNO",
+   "conditional": -4.6849,
+   "new_trial": -10.6074,
+   "arms": "HYPNO_HFX obs -0.15 pred +0.02 [-0.73,+0.80]"
+  },
+  {
+   "model": "benchmark",
+   "family": "Dwivedi",
+   "conditional": -2.68,
+   "new_trial": -5.8617,
+   "arms": "Dwivedi_HF obs +0.96 pred +0.56 [-0.22,+1.37]"
+  },
+  {
+   "model": "benchmark",
+   "family": "ELAN",
+   "conditional": -2.7087,
+   "new_trial": -6.7762,
+   "arms": "ELAN_HSC obs -0.54 pred -0.63 [-1.47,+0.17]"
+  },
+  {
+   "model": "benchmark",
+   "family": "IAEA_ACC",
+   "conditional": -4.0015,
+   "new_trial": -11.2664,
+   "arms": "IAEA_ACC6 obs +0.76 pred +0.41 [-0.36,+1.19]"
+  },
+  {
+   "model": "benchmark",
+   "family": "Pinto",
+   "conditional": -3.1484,
+   "new_trial": -6.786,
+   "arms": "Pinto_HF obs +0.51 pred +0.13 [-0.66,+0.92]"
+  },
+  {
+   "model": "benchmark",
+   "family": "Poddar",
+   "conditional": -2.3889,
+   "new_trial": -5.9532,
+   "arms": "Poddar_6F obs +0.55 pred +0.41 [-0.37,+1.20]"
+  },
+  {
+   "model": "benchmark",
+   "family": "Sanchiz",
+   "conditional": -7.8439,
+   "new_trial": -13.3217,
+   "arms": "Sanchiz_B obs -0.26 pred +0.36 [-0.37,+1.16];Sanchiz_C obs +0.75 pred +0.52 [-0.35,+1.35]"
+  },
+  {
+   "model": "candidate",
+   "family": "HYPNO",
+   "conditional": -5.36,
+   "new_trial": -11.4163,
+   "arms": "HYPNO_HFX obs -0.15 pred +0.42 [-0.21,+1.07]"
+  },
+  {
+   "model": "candidate",
+   "family": "Dwivedi",
+   "conditional": -2.5493,
+   "new_trial": -5.7027,
+   "arms": "Dwivedi_HF obs +0.96 pred +0.83 [+0.22,+1.49]"
+  },
+  {
+   "model": "candidate",
+   "family": "ELAN",
+   "conditional": -3.1299,
+   "new_trial": -7.1599,
+   "arms": "ELAN_HSC obs -0.54 pred -0.16 [-0.85,+0.48]"
+  },
+  {
+   "model": "candidate",
+   "family": "IAEA_ACC",
+   "conditional": -3.8033,
+   "new_trial": -11.1441,
+   "arms": "IAEA_ACC6 obs +0.76 pred +0.50 [-0.09,+1.12]"
+  },
+  {
+   "model": "candidate",
+   "family": "Pinto",
+   "conditional": -3.0743,
+   "new_trial": -6.6966,
+   "arms": "Pinto_HF obs +0.51 pred +0.15 [-0.47,+0.75]"
+  },
+  {
+   "model": "candidate",
+   "family": "Poddar",
+   "conditional": -2.2493,
+   "new_trial": -5.9777,
+   "arms": "Poddar_6F obs +0.55 pred +0.50 [-0.09,+1.13]"
+  },
+  {
+   "model": "candidate",
+   "family": "Sanchiz",
+   "conditional": -6.8662,
+   "new_trial": -12.3133,
+   "arms": "Sanchiz_B obs -0.26 pred +0.10 [-0.50,+0.74];Sanchiz_C obs +0.75 pred +0.56 [-0.12,+1.25]"
+  }
+ ],
+ "gates_all_pass": true
+}

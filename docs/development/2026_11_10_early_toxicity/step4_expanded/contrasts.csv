@@ -1,0 +1,52 @@
+outcome_id,arm_id,family,is_reference,N,D_gy,Q_gy2,elapsed_days,E_fowler_rep3p2,dE_vs_reference,chemo_planned
+O001,GORTEC9902_CRT,GORTEC9902,1,262,70.0,141.2426,46.0,53.2297,0.0,"carboplatin 70 mg/m2/day + 5-FU 600 mg/m2/day, days 1-4, 22-25, 43-46"
+O002,GORTEC9902_ACCCT,GORTEC9902,0,271,70.0,135.2294,39.3333,57.9095,4.6798,"carboplatin 70 mg/m2/day + 5-FU 600 mg/m2/day, days 1-5 and 29-33"
+O003,GORTEC9902_VACC,GORTEC9902,0,268,64.8,141.2007,23.3333,65.9813,12.7516,none
+O004,RTOG9003_SF,RTOG9003,1,268,70.0,141.2426,46.0,53.2297,0.0,none
+O005,RTOG9003_HFX,RTOG9003,0,263,81.6,127.178,45.25,64.0174,10.7877,none
+O006,RTOG9003_AFXS,RTOG9003,0,274,67.2,139.3626,42.25,53.2123,-0.0174,none
+O007,RTOG9003_AFXC,RTOG9003,0,268,72.0,144.0236,39.25,60.8549,7.6252,none
+O008,RTOG0129_SFX,RTOG0129,1,361,70.0,141.2426,46.0,53.2297,0.0,cisplatin 100 mg/m2 every 3 weeks x 3
+O009,RTOG0129_AFXC,RTOG0129,0,360,72.0,144.0236,39.25,60.8549,7.6252,cisplatin 100 mg/m2 every 3 weeks x 2
+O010,EORTC22791_CF,EORTC22791,1,158,70.0,141.2426,46.0,53.2297,0.0,none
+O011,EORTC22791_HF,EORTC22791,0,162,80.5,126.0918,46.2083,62.0496,8.8199,none
+O012,EORTC22851_CF,EORTC22851,1,245,70.0,141.2426,46.0,53.2297,0.0,none
+O013,EORTC22851_AF,EORTC22851,0,240,72.0,197.8654,31.3333,72.5104,19.2807,none
+O014,PMH_CF,PMH_HF,1,154,51.0,131.2043,25.0,49.8614,0.0,none
+O015,PMH_HF,PMH_HF,0,156,58.0,109.2451,25.25,54.4674,4.606,none
+O016,Ghoshal_CB,Ghoshal,0,143,67.5,139.2678,32.25,61.4245,11.4194,none
+O017,Ghoshal_CF,Ghoshal,1,142,66.0,133.1537,44.0,50.0051,0.0,none
+O018,CAIR1_CAIR,CAIR1,0,50,71.08,135.8369,36.7,61.1363,10.532,none
+O019,CAIR1_CF,CAIR1,1,49,71.1429,135.247,50.0,50.6043,0.0,none
+O022,Vienna_CF,Vienna,1,33,70.0,141.2426,46.0,53.2297,0.0,none
+O023,Vienna_VCHART,Vienna,0,29,55.3,119.8739,16.25,59.9598,6.7301,none
+O024,Vienna_VCHART_MMC,Vienna,0,28,55.3,119.8739,16.25,59.9598,6.7301,mitomycin C 20 mg/m2 on day 5
+O025,Olmi_CF,ORO9301,1,54,70.0,141.2426,46.0,53.2297,0.0,none
+O026,Olmi_SCAHF,ORO9301,0,52,67.2,139.3626,42.25,53.2123,-0.0174,none
+O027,Olmi_CFCT,ORO9301,0,50,70.0,141.2426,46.0,53.2297,0.0,"carboplatin 75 mg/m2 days 1-4 + 5-FU 1000 mg/m2/day 96 h, every 28 days"
+O028,Bartelink_CF,Bartelink2002,1,24,70.0,141.2426,46.0,53.2297,0.0,cisplatin 6 mg/m2 daily before each fraction
+O029,Bartelink_MFD,Bartelink2002,0,25,72.0,208.452,46.2917,61.7196,8.4899,cisplatin 10 mg/m2 daily
+O030,Tandon_SIB,Tandon,1,30,70.0,141.2426,46.0,53.2297,0.0,weekly cisplatin 40 mg/m2
+O031,Tandon_SMART,Tandon,0,30,60.0,145.2781,32.0,54.7236,1.4939,weekly cisplatin 40 mg/m2
+O032,Sikdar_SEQ,Sikdar,1,33,70.0,141.2426,46.0,53.2297,0.0,weekly cisplatin 40 mg/m2
+O033,Sikdar_SIB,Sikdar,0,33,66.0,146.4887,39.0,55.2995,2.0698,weekly cisplatin 40 mg/m2
+O034,Shivananjappa_HSIB,Shivananjappa,0,25,66.0,146.4887,39.0,55.2995,2.0698,cisplatin 100 mg/m2 3-weekly if fit
+O035,Shivananjappa_CONV,Shivananjappa,1,25,70.0,141.2426,46.0,53.2297,0.0,cisplatin 100 mg/m2 3-weekly if fit
+O036,Mani_SIB,Mani,0,17,70.0,141.2426,46.0,53.2297,0.0,weekly cisplatin 35 mg/m2
+O037,Mani_SEQ,Mani,1,17,70.0,141.2426,46.0,53.2297,0.0,weekly cisplatin 35 mg/m2
+O046,DAHANCA7_5F,DAHANCA67,1,383,66.0,133.1537,44.0,50.0051,0.0,nimorazole 1200 mg/m2 orally with the first 30 fractions (both arms)
+O047,DAHANCA7_6F,DAHANCA67,0,398,66.0,133.1996,37.0,55.5549,5.5498,nimorazole 1200 mg/m2 orally with the first 30 fractions (both arms)
+O048,GhoshLaskar_RT,GhoshLaskar,1,57,70.0,141.2426,46.0,53.2297,0.0,none
+O049,GhoshLaskar_CRT,GhoshLaskar,0,65,70.0,141.2426,46.0,53.2297,0.0,cisplatin 30 mg/m2 weekly concurrent
+O050,GhoshLaskar_ACC,GhoshLaskar,0,64,70.0,141.2885,39.0,58.7795,5.5498,none
+O051,Grover_SEQ,Grover,1,51,70.0,141.2426,46.0,53.2297,0.0,cisplatin 40 mg/m2 weekly concurrent (both arms)
+O052,Grover_SIB,Grover,0,50,66.0,146.4887,39.0,55.2995,2.0698,cisplatin 40 mg/m2 weekly concurrent (both arms)
+O053,GuptaM_5F,GuptaM,1,54,66.0,133.1537,44.0,50.0051,0.0,none
+O054,GuptaM_6F,GuptaM,0,55,66.0,133.1996,37.0,55.5549,5.5498,none
+O055,GuptaP_CFCCT,GuptaP,1,30,64.0,129.1093,43.0,48.3929,0.0,"cisplatin 75 mg/m2 on days 1, 22 and 42"
+O056,GuptaP_CBRT,GuptaP,0,30,63.0,133.2059,32.25,56.3183,7.9255,none
+O057,GuptaP_CBRTCCT,GuptaP,0,30,63.0,133.2059,32.25,56.3183,7.9255,"cisplatin 75 mg/m2 on days 1, 17 and 34"
+O058,Tallari_CF,Tallari,1,48,70.0,141.2426,46.0,53.2297,0.0,induction paclitaxel/cisplatin then concurrent cisplatin (both arms)
+O059,Tallari_HF,Tallari,0,47,70.4,100.5456,43.25,51.7385,-1.4912,induction paclitaxel/cisplatin then concurrent cisplatin (both arms)
+O060,Singh_5F,Singh,1,40,70.0,141.2426,46.0,53.2297,0.0,"cisplatin 100 mg/m2 on days 1, 22 and 43 (both arms)"
+O061,Singh_6F,Singh,0,41,70.0,141.2885,39.0,58.7795,5.5498,"cisplatin 100 mg/m2 on days 1, 22 and 43 (both arms)"

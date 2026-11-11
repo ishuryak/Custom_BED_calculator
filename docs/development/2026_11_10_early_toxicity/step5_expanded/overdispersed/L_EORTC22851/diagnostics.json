@@ -1,0 +1,53 @@
+{
+ "divergences": 0,
+ "rhat": 1.00537,
+ "ess_bulk": 1069.47,
+ "ess_tail": 1647.81,
+ "gate_pass": true,
+ "unit": "L_EORTC22851",
+ "description": "candidate without family EORTC22851",
+ "settings": {
+  "drop_family": "EORTC22851",
+  "use_od": 1
+ },
+ "Tk": 7.0,
+ "n_arms": 49,
+ "n_families": 21,
+ "families": [
+  "Bartelink2002",
+  "CAIR1",
+  "DAHANCA67",
+  "EORTC22791",
+  "GORTEC9902",
+  "GhoshLaskar",
+  "Ghoshal",
+  "Grover",
+  "GuptaM",
+  "GuptaP",
+  "Mani",
+  "ORO9301",
+  "PMH_HF",
+  "RTOG0129",
+  "RTOG9003",
+  "Shivananjappa",
+  "Sikdar",
+  "Singh",
+  "Tallari",
+  "Tandon",
+  "Vienna"
+ ],
+ "smoke": false,
+ "seconds": 4.9,
+ "windows_free_gb_at_start": 5.1,
+ "ppc_chisq_p": 0.5493,
+ "waic": 293.729,
+ "p_waic": 20.356,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "revision": "439d466"
+}

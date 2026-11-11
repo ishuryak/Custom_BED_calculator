@@ -1,0 +1,53 @@
+{
+ "divergences": 0,
+ "rhat": 1.01246,
+ "ess_bulk": 615.426,
+ "ess_tail": 1285.81,
+ "gate_pass": false,
+ "unit": "U07",
+ "description": "candidate, alpha/beta prior sd doubled (0.708)",
+ "settings": {
+  "ab_sd": 0.708
+ },
+ "Tk": 7.0,
+ "n_arms": 51,
+ "n_families": 22,
+ "families": [
+  "Bartelink2002",
+  "CAIR1",
+  "DAHANCA67",
+  "EORTC22791",
+  "EORTC22851",
+  "GORTEC9902",
+  "GhoshLaskar",
+  "Ghoshal",
+  "Grover",
+  "GuptaM",
+  "GuptaP",
+  "Mani",
+  "ORO9301",
+  "PMH_HF",
+  "RTOG0129",
+  "RTOG9003",
+  "Shivananjappa",
+  "Sikdar",
+  "Singh",
+  "Tallari",
+  "Tandon",
+  "Vienna"
+ ],
+ "smoke": false,
+ "seconds": 3.2,
+ "windows_free_gb_at_start": 6.0,
+ "ppc_chisq_p": 0.016,
+ "waic": 352.834,
+ "p_waic": 31.634,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "revision": "439d466"
+}

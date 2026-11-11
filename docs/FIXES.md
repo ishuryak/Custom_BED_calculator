@@ -458,3 +458,17 @@ Several R tests were red on 917825b because the new helper did not exist yet. Th
 | Fowler acute alpha/beta registered (`constant_registry.yaml::fowler_acute_ab`); `evaluator.py` FOWLER_2003 split one key per line, same values | The value 10.0 sat unregistered in two files, so a change in one would not be caught. | `stale_constant_audit.py --strict` gave 1 error with the evaluator value changed to 11.0, 0 with it restored. | Nothing. |
 
 **Verification.** 2026-11-11, revision `f47cd4d` for all fits: `python3 -m pytest -q tests/python` gave 259 passed (245 before). All 27 primary fits pass the sampler gate (no divergences, R-hat < 1.01, ESS > 400). SBC with 500 replicates: uniform ranks for all 7 parameters (smallest p = 0.063). `stale_constant_audit.py --project . --project-root . --strict`: 0 errors. `sim_provenance.py validate`: registry OK. Record: `docs/development/2026_11_10_early_toxicity_step5_fit.md`.
+
+### 2026-11-11, later: early-toxicity data expanded (10 trials) and step 6 validation (not deployed)
+
+**Changes published numbers:** no. The app does not read these outputs. Fowler 2003 stays the default.
+
+| Change | What was wrong (proof) | Test (red by mutation) | What it moves |
+|---|---|---|---|
+| Builder accepts a count only from mucositis rows (`build_arms.is_mucositis_endpoint`) | ELAN-RT's pharyngeal grade 3 count 11/91 in extraction E1 equals the mucositis count, and was accepted as "both extractions". | `test_early_tox_arms.py::test_only_mucositis_rows_confirm_a_count` and `::test_every_count_is_in_both_independent_extractions` (4 failures with the filter removed) | Nothing for the 45 earlier outcomes (byte-identical); O068 now cites the mucositis row |
+| One-extraction counts allowed only for sensitivity arms with status `adjudicated_single` | ELAN-RT's mucositis row is hidden by a print banner; one extractor recovered it | `::test_adjudicated_single_extraction_is_refused_for_a_candidate_arm` (red without the role check) | ELAN-RT enters as sensitivity only |
+| 10 trials added (7 primary, 3 sensitivity) from 12 new references, double extraction C-E | Step 5 rested on 15 trials; the time effect relied mainly on two arms with chemotherapy differences | Updated expectations in `test_early_tox_step3_step4.py` and `test_early_tox_step5.py`; new chemotherapy codes red when mutated | Research results: r 1.55 (1.07-2.45), previously 1.51 |
+| Step 6 validation (`tools/early_tox/step6_validate.py`) | The plan requires held-out validation before any default change | `tests/python/test_early_tox_step6.py`, 7 tests, each red by a targeted mutation | Research results: the candidate passes the numerical rule on held-out trials but HYPNO and ELAN-RT favor Fowler; recommendation is not to promote |
+
+**Verification.** 2026-11-11: `python3 -m pytest -q tests/python` gave 268 passed (261 before step 6). Step 5 expanded on `439d466`: 34 of 34 primary fits pass the gate, SBC uniform (smallest p = 0.28). Step 6 on `e80aa12`: 46 of 46 fits pass the gate; rescoring with new seeds reproduced the totals to within 0.1. `stale_constant_audit.py --strict`: 0 errors. Record: `docs/development/2026_11_11_early_toxicity_step6_validation.md`.
+

@@ -1,0 +1,53 @@
+{
+ "divergences": 0,
+ "rhat": 1.00419,
+ "ess_bulk": 1056.71,
+ "ess_tail": 1763.59,
+ "gate_pass": true,
+ "unit": "L_Tandon",
+ "description": "candidate without family Tandon",
+ "settings": {
+  "drop_family": "Tandon",
+  "use_od": 1
+ },
+ "Tk": 7.0,
+ "n_arms": 49,
+ "n_families": 21,
+ "families": [
+  "Bartelink2002",
+  "CAIR1",
+  "DAHANCA67",
+  "EORTC22791",
+  "EORTC22851",
+  "GORTEC9902",
+  "GhoshLaskar",
+  "Ghoshal",
+  "Grover",
+  "GuptaM",
+  "GuptaP",
+  "Mani",
+  "ORO9301",
+  "PMH_HF",
+  "RTOG0129",
+  "RTOG9003",
+  "Shivananjappa",
+  "Sikdar",
+  "Singh",
+  "Tallari",
+  "Vienna"
+ ],
+ "smoke": false,
+ "seconds": 5.1,
+ "windows_free_gb_at_start": 6.2,
+ "ppc_chisq_p": 0.5363,
+ "waic": 299.472,
+ "p_waic": 21.086,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "revision": "439d466"
+}
