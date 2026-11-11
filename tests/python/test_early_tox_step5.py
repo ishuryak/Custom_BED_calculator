@@ -154,5 +154,5 @@ def test_an_arm_entering_the_analysis_twice_is_refused(monkeypatch):
             rows = rows + [dict(r, outcome_id="O055") for r in rows if r["outcome_id"] == "O055"]
         return rows
     monkeypatch.setattr(s5, "read", doubled)
-    with pytest.raises(ValueError, match="GuptaP_CFCCT"):
+    with pytest.raises(ValueError, match=r"entered twice: \[.GuptaP_CFCCT.\]"):
         s5.load_rows()
