@@ -93,7 +93,7 @@ prescription schedule.
 | Every denominator explicit | Pass. Each outcome has its denominator and its type |
 | No unresolved duplicate evidence among arms | Pass. The builder refuses screened duplicates (`test_early_tox_arms.py`) |
 | No evidence family crosses a validation split | **Open for the historical labels.** The Pardo-Montero records (K, F and H references) are not yet mapped to trials, so a label from, say, CHART cannot yet be held out with CHART's family. This is needed before step 6, not before steps 3-4, because the two likelihoods are fitted separately (plan R5) |
-| Igor spot-check | **Pending.** Suggested sample: Ghoshal (table against text conflict), CAIR 2000 (two thresholds), Olmi Table 7, RTOG 9003 table and one IMRT trial |
+| Igor spot-check | **Pass, 2026-11-11, done by Claude against the PDFs at Igor's request** (step 5 record, section 1). All 5 items match. Ghoshal: 27/142 confirmed (table grades sum to 142 and 27/142 = 19%), the Discussion's 23/142 is a typographical error |
 
 ## 6. Tests
 

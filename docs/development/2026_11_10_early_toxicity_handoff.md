@@ -134,7 +134,11 @@ data.
    not applied. Step 4 groundwork: `tools/early_tox/evaluator.py` with plan tests 6-8.
    M1-M4 approved and APPLIED; step 4 RUN (record `2026_11_10_early_toxicity_step4_identification.md`):
    slope and time effect identified, alpha/beta weakly informed, Tk not identified up to 16 days.
-   **Next: Igor answers C1-C3, spot-checks the step 2 counts, and agrees to start step 5 (first refit).**
+   ~~Igor answers C1-C3 and agrees to step 5~~ Done 2026-11-11 (C1-C3 as recommended; spot-check
+   done by Claude at Igor's request, all 5 pass, Ghoshal resolved to 27/142). Step 5 RUN (record
+   `2026_11_10_early_toxicity_step5_fit.md`): overdispersed model primary (C3), r about 1.5 BED/day
+   (twice Fowler), alpha/beta prior-driven, chemotherapy OR about 1.7; historical labels favor
+   Fowler (not independent). **Next: step 6 (crosswalk first, then leave-family-out validation).**
 2. **Step 1** (about 2 hours): write the structured target definition. No code change.
 3. **Step 2** (3–5 days, Igor Shuryak spot-checks): build `data/early_tox/` (reports, schedules,
    fractions, labels, arms, outcomes, evidence families). Every value comes from a downloaded full

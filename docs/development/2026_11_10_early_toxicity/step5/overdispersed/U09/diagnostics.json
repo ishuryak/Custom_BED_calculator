@@ -1,0 +1,47 @@
+{
+ "divergences": 0,
+ "rhat": 1.00556,
+ "ess_bulk": 1050.78,
+ "ess_tail": 1553.81,
+ "gate_pass": true,
+ "unit": "U09",
+ "description": "candidate, chemotherapy coded on/off only (C1)",
+ "settings": {
+  "chemo": "onoff",
+  "use_od": 1
+ },
+ "Tk": 7.0,
+ "n_arms": 35,
+ "n_families": 15,
+ "families": [
+  "Bartelink2002",
+  "CAIR1",
+  "EORTC22791",
+  "EORTC22851",
+  "GORTEC9902",
+  "Ghoshal",
+  "Mani",
+  "ORO9301",
+  "PMH_HF",
+  "RTOG0129",
+  "RTOG9003",
+  "Shivananjappa",
+  "Sikdar",
+  "Tandon",
+  "Vienna"
+ ],
+ "smoke": false,
+ "seconds": 4.3,
+ "windows_free_gb_at_start": 8.0,
+ "ppc_chisq_p": 0.5032,
+ "waic": 218.173,
+ "p_waic": 16.442,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "revision": "f47cd4d"
+}

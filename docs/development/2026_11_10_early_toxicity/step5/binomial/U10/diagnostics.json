@@ -1,0 +1,40 @@
+{
+ "divergences": 0,
+ "rhat": 1.00606,
+ "ess_bulk": 1074.87,
+ "ess_tail": 1559.28,
+ "gate_pass": true,
+ "unit": "U10",
+ "description": "candidate, W1 windows only (M2)",
+ "settings": {
+  "w1_only": true
+ },
+ "Tk": 7.0,
+ "n_arms": 23,
+ "n_families": 9,
+ "families": [
+  "CAIR1",
+  "EORTC22851",
+  "GORTEC9902",
+  "ORO9301",
+  "PMH_HF",
+  "RTOG0129",
+  "RTOG9003",
+  "Tandon",
+  "Vienna"
+ ],
+ "smoke": false,
+ "seconds": 2.5,
+ "windows_free_gb_at_start": 8.4,
+ "ppc_chisq_p": 0.0005,
+ "waic": 202.323,
+ "p_waic": 23.545,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "revision": "f47cd4d"
+}

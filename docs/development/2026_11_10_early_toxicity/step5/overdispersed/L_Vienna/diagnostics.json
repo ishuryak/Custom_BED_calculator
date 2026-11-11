@@ -1,0 +1,46 @@
+{
+ "divergences": 0,
+ "rhat": 1.00316,
+ "ess_bulk": 1203.91,
+ "ess_tail": 1889.05,
+ "gate_pass": true,
+ "unit": "L_Vienna",
+ "description": "candidate without family Vienna",
+ "settings": {
+  "drop_family": "Vienna",
+  "use_od": 1
+ },
+ "Tk": 7.0,
+ "n_arms": 32,
+ "n_families": 14,
+ "families": [
+  "Bartelink2002",
+  "CAIR1",
+  "EORTC22791",
+  "EORTC22851",
+  "GORTEC9902",
+  "Ghoshal",
+  "Mani",
+  "ORO9301",
+  "PMH_HF",
+  "RTOG0129",
+  "RTOG9003",
+  "Shivananjappa",
+  "Sikdar",
+  "Tandon"
+ ],
+ "smoke": false,
+ "seconds": 4.2,
+ "windows_free_gb_at_start": 7.3,
+ "ppc_chisq_p": 0.495,
+ "waic": 203.759,
+ "p_waic": 15.517,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "revision": "f47cd4d"
+}

@@ -1,0 +1,45 @@
+{
+ "divergences": 0,
+ "rhat": 1.00363,
+ "ess_bulk": 807.881,
+ "ess_tail": 1281.26,
+ "gate_pass": true,
+ "unit": "L_Sikdar",
+ "description": "candidate without family Sikdar",
+ "settings": {
+  "drop_family": "Sikdar"
+ },
+ "Tk": 7.0,
+ "n_arms": 33,
+ "n_families": 14,
+ "families": [
+  "Bartelink2002",
+  "CAIR1",
+  "EORTC22791",
+  "EORTC22851",
+  "GORTEC9902",
+  "Ghoshal",
+  "Mani",
+  "ORO9301",
+  "PMH_HF",
+  "RTOG0129",
+  "RTOG9003",
+  "Shivananjappa",
+  "Tandon",
+  "Vienna"
+ ],
+ "smoke": false,
+ "seconds": 2.7,
+ "windows_free_gb_at_start": 7.5,
+ "ppc_chisq_p": 0.0032,
+ "waic": 255.956,
+ "p_waic": 27.108,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "revision": "f47cd4d"
+}

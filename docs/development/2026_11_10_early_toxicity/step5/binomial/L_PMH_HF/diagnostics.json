@@ -1,0 +1,45 @@
+{
+ "divergences": 0,
+ "rhat": 1.0032,
+ "ess_bulk": 782.205,
+ "ess_tail": 1124.66,
+ "gate_pass": true,
+ "unit": "L_PMH_HF",
+ "description": "candidate without family PMH_HF",
+ "settings": {
+  "drop_family": "PMH_HF"
+ },
+ "Tk": 7.0,
+ "n_arms": 33,
+ "n_families": 14,
+ "families": [
+  "Bartelink2002",
+  "CAIR1",
+  "EORTC22791",
+  "EORTC22851",
+  "GORTEC9902",
+  "Ghoshal",
+  "Mani",
+  "ORO9301",
+  "RTOG0129",
+  "RTOG9003",
+  "Shivananjappa",
+  "Sikdar",
+  "Tandon",
+  "Vienna"
+ ],
+ "smoke": false,
+ "seconds": 2.9,
+ "windows_free_gb_at_start": 7.0,
+ "ppc_chisq_p": 0.0075,
+ "waic": 241.858,
+ "p_waic": 23.671,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "revision": "f47cd4d"
+}

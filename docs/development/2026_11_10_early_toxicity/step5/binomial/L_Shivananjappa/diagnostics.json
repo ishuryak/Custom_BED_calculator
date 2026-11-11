@@ -1,0 +1,45 @@
+{
+ "divergences": 0,
+ "rhat": 1.00683,
+ "ess_bulk": 860.041,
+ "ess_tail": 1295.52,
+ "gate_pass": true,
+ "unit": "L_Shivananjappa",
+ "description": "candidate without family Shivananjappa",
+ "settings": {
+  "drop_family": "Shivananjappa"
+ },
+ "Tk": 7.0,
+ "n_arms": 33,
+ "n_families": 14,
+ "families": [
+  "Bartelink2002",
+  "CAIR1",
+  "EORTC22791",
+  "EORTC22851",
+  "GORTEC9902",
+  "Ghoshal",
+  "Mani",
+  "ORO9301",
+  "PMH_HF",
+  "RTOG0129",
+  "RTOG9003",
+  "Sikdar",
+  "Tandon",
+  "Vienna"
+ ],
+ "smoke": false,
+ "seconds": 3.0,
+ "windows_free_gb_at_start": 7.3,
+ "ppc_chisq_p": 0.0018,
+ "waic": 255.38,
+ "p_waic": 26.89,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "revision": "f47cd4d"
+}
