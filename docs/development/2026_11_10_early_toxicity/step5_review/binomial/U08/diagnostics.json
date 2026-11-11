@@ -1,0 +1,70 @@
+{
+ "divergences": 0,
+ "missing": [],
+ "nonfinite": [],
+ "fixed_constants_ok": true,
+ "rhat": 1.00376,
+ "ess_bulk": 871.066,
+ "ess_tail": 1170.89,
+ "ebfmi_min": 0.7264249132940411,
+ "treedepth_saturated": 0,
+ "n_required": 47,
+ "gate_pass": true,
+ "unit": "U08",
+ "description": "candidate, chemotherapy-differing families dropped, no gamma (C1)",
+ "settings": {
+  "drop_chemo": true,
+  "use_gamma": 0
+ },
+ "Tk": 7.0,
+ "halftime_h": 3.2,
+ "n_arms": 32,
+ "n_families": 15,
+ "families": [
+  "CAIR1",
+  "DAHANCA67",
+  "EORTC22791",
+  "EORTC22851",
+  "Ghoshal",
+  "Grover",
+  "GuptaM",
+  "Mani",
+  "PMH_HF",
+  "RTOG9003",
+  "Shivananjappa",
+  "Sikdar",
+  "Singh",
+  "Tallari",
+  "Tandon"
+ ],
+ "totals": {
+  "arms": 32,
+  "families": 15,
+  "evaluable": 3949,
+  "events": 1860
+ },
+ "smoke": false,
+ "sampler": {
+  "chains": 4,
+  "parallel_chains": 1,
+  "threads_per_chain": 1,
+  "iter_warmup": 1000,
+  "iter_sampling": 1000,
+  "adapt_delta": 0.95,
+  "seed": 20261111
+ },
+ "seconds": 2.3,
+ "windows_free_gb_at_start": 9.4,
+ "ppc_chisq_p": 0.0168,
+ "waic": 233.146,
+ "p_waic": 23.42,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "identity": "f0b22fa9194c0d10cec41ef93e49180b4c51cf0880ba10fbae89a329c5c17e30",
+ "revision": "378d58f"
+}

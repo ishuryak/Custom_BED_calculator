@@ -1,0 +1,58 @@
+{
+ "divergences": 0,
+ "missing": [],
+ "nonfinite": [],
+ "fixed_constants_ok": true,
+ "rhat": 1.0036,
+ "ess_bulk": 1427.24,
+ "ess_tail": 932.757,
+ "ebfmi_min": 0.919104417728457,
+ "treedepth_saturated": 0,
+ "n_required": 19,
+ "gate_pass": true,
+ "unit": "U16",
+ "description": "benchmark, adequate peak ascertainment only (decision D3)",
+ "settings": {
+  "adequate_only": true,
+  "fixed_E": 1,
+  "use_od": 1
+ },
+ "Tk": 7.0,
+ "halftime_h": 3.2,
+ "n_arms": 5,
+ "n_families": 2,
+ "families": [
+  "CAIR1",
+  "ORO9301"
+ ],
+ "totals": {
+  "arms": 5,
+  "families": 2,
+  "evaluable": 255,
+  "events": 136
+ },
+ "smoke": false,
+ "sampler": {
+  "chains": 4,
+  "parallel_chains": 1,
+  "threads_per_chain": 1,
+  "iter_warmup": 1000,
+  "iter_sampling": 1000,
+  "adapt_delta": 0.95,
+  "seed": 20261111
+ },
+ "seconds": 1.3,
+ "windows_free_gb_at_start": 9.4,
+ "ppc_chisq_p": 0.4377,
+ "waic": 29.855,
+ "p_waic": 3.339,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "identity": "cb088c5984e076f4b937d5afecc512c1d2003b55526a21e41df0a5e1922ddf36",
+ "revision": "04a3082"
+}

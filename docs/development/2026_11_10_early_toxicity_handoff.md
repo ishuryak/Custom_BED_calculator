@@ -142,7 +142,11 @@ data.
    (record `2026_11_11_early_toxicity_step6_validation.md`): candidate passes the numerical
    promotion rule on held-out trials (+0.28 per family, 95% 0.10-0.55) but HYPNO and ELAN-RT (the
    hypofractionation trials) favor Fowler. Recommendation: do not promote; Fowler stays default.
-   **Next: Igor decides (keep Fowler / research scenario / promote); then step 7.**
+   2026-11-11 later: independent review F1-F9 checked (all confirmed) and Phases A-D applied
+   (record `2026_11_11_early_toxicity_review_response.md`). Same scores with complete gates and
+   identities. HYPNO's ranking depends on its 4 vs 5 cisplatin courses, and hypofractionation
+   evidence is mixed.
+   **Next: Igor decides D2 (research scenario in the app or Fowler only). Phase E only then.**
 2. **Step 1** (about 2 hours): write the structured target definition. No code change.
 3. **Step 2** (3–5 days, Igor Shuryak spot-checks): build `data/early_tox/` (reports, schedules,
    fractions, labels, arms, outcomes, evidence families). Every value comes from a downloaded full

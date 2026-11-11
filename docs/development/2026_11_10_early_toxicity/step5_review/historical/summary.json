@@ -1,0 +1,179 @@
+{
+ "step5_dir": "docs/development/2026_11_10_early_toxicity/step5_review",
+ "step5_point": {
+  "ab": 12.868,
+  "r": 1.5538
+ },
+ "tk_grid": [
+  0,
+  35
+ ],
+ "selections": {
+  "primary": {
+   "records": 103,
+   "events": 13,
+   "sources": 61,
+   "models": {
+    "null": {
+     "loso_log_score": -40.182,
+     "full_data_a": -1.908,
+     "full_data_b_per_10": null,
+     "exposure_at_p50": null,
+     "in_sample_auc": null,
+     "Tk_full_data": null,
+     "Tk_folds_range": null
+    },
+    "fowler": {
+     "loso_log_score": -25.899,
+     "full_data_a": -1.631,
+     "full_data_b_per_10": 3.384,
+     "exposure_at_p50": 64.82,
+     "in_sample_auc": 0.907,
+     "Tk_full_data": null,
+     "Tk_folds_range": null,
+     "difference_vs_null": 14.282,
+     "sources_better_vs_null": 49,
+     "sources_worse_vs_null": 12
+    },
+    "boundary": {
+     "loso_log_score": -26.027,
+     "full_data_a": -0.574,
+     "full_data_b_per_10": 3.418,
+     "exposure_at_p50": 61.68,
+     "in_sample_auc": 0.907,
+     "Tk_full_data": 3.0,
+     "Tk_folds_range": [
+      2.0,
+      11.0
+     ],
+     "difference_vs_fowler": -0.128,
+     "sources_better_vs_fowler": 51,
+     "sources_worse_vs_fowler": 10
+    },
+    "step5": {
+     "loso_log_score": -30.286,
+     "full_data_a": 0.212,
+     "full_data_b_per_10": 1.089,
+     "exposure_at_p50": 58.06,
+     "in_sample_auc": 0.882,
+     "Tk_full_data": null,
+     "Tk_folds_range": null,
+     "difference_vs_fowler": -4.387,
+     "sources_better_vs_fowler": 22,
+     "sources_worse_vs_fowler": 39
+    },
+    "fowler_h3.2": {
+     "loso_log_score": -27.544,
+     "full_data_a": -2.531,
+     "full_data_b_per_10": 2.409,
+     "exposure_at_p50": 70.5,
+     "in_sample_auc": 0.897,
+     "Tk_full_data": null,
+     "Tk_folds_range": null,
+     "difference_vs_fowler": -1.644,
+     "sources_better_vs_fowler": 25,
+     "sources_worse_vs_fowler": 36
+    },
+    "step5_complete": {
+     "loso_log_score": -29.283,
+     "full_data_a": 0.89,
+     "full_data_b_per_10": 1.27,
+     "exposure_at_p50": 52.99,
+     "in_sample_auc": 0.886,
+     "Tk_full_data": null,
+     "Tk_folds_range": null,
+     "difference_vs_fowler": -3.383,
+     "sources_better_vs_fowler": 24,
+     "sources_worse_vs_fowler": 37
+    }
+   },
+   "matched_repair": {
+    "3.2 h repair (step5 vs fowler_h3.2)": -2.743,
+    "complete repair (step5_complete vs fowler)": -3.383
+   }
+  },
+  "sensitivity": {
+   "records": 107,
+   "events": 15,
+   "sources": 63,
+   "models": {
+    "null": {
+     "loso_log_score": -44.48,
+     "full_data_a": -1.792,
+     "full_data_b_per_10": null,
+     "exposure_at_p50": null,
+     "in_sample_auc": null,
+     "Tk_full_data": null,
+     "Tk_folds_range": null
+    },
+    "fowler": {
+     "loso_log_score": -28.44,
+     "full_data_a": -1.568,
+     "full_data_b_per_10": 3.505,
+     "exposure_at_p50": 64.47,
+     "in_sample_auc": 0.91,
+     "Tk_full_data": null,
+     "Tk_folds_range": null,
+     "difference_vs_null": 16.039,
+     "sources_better_vs_null": 49,
+     "sources_worse_vs_null": 14
+    },
+    "boundary": {
+     "loso_log_score": -28.553,
+     "full_data_a": -0.472,
+     "full_data_b_per_10": 3.537,
+     "exposure_at_p50": 61.33,
+     "in_sample_auc": 0.91,
+     "Tk_full_data": 3.0,
+     "Tk_folds_range": [
+      3.0,
+      11.0
+     ],
+     "difference_vs_fowler": -0.113,
+     "sources_better_vs_fowler": 51,
+     "sources_worse_vs_fowler": 12
+    },
+    "step5": {
+     "loso_log_score": -32.922,
+     "full_data_a": 0.393,
+     "full_data_b_per_10": 1.142,
+     "exposure_at_p50": 56.56,
+     "in_sample_auc": 0.884,
+     "Tk_full_data": null,
+     "Tk_folds_range": null,
+     "difference_vs_fowler": -4.482,
+     "sources_better_vs_fowler": 23,
+     "sources_worse_vs_fowler": 40
+    },
+    "fowler_h3.2": {
+     "loso_log_score": -31.705,
+     "full_data_a": -2.372,
+     "full_data_b_per_10": 2.304,
+     "exposure_at_p50": 70.29,
+     "in_sample_auc": 0.881,
+     "Tk_full_data": null,
+     "Tk_folds_range": null,
+     "difference_vs_fowler": -3.265,
+     "sources_better_vs_fowler": 18,
+     "sources_worse_vs_fowler": 45
+    },
+    "step5_complete": {
+     "loso_log_score": -31.312,
+     "full_data_a": 1.127,
+     "full_data_b_per_10": 1.357,
+     "exposure_at_p50": 51.69,
+     "in_sample_auc": 0.889,
+     "Tk_full_data": null,
+     "Tk_folds_range": null,
+     "difference_vs_fowler": -2.872,
+     "sources_better_vs_fowler": 27,
+     "sources_worse_vs_fowler": 36
+    }
+   },
+   "matched_repair": {
+    "3.2 h repair (step5 vs fowler_h3.2)": -1.217,
+    "complete repair (step5_complete vs fowler)": -2.872
+   }
+  }
+ }
+}

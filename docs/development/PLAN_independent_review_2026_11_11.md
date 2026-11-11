@@ -140,3 +140,9 @@ every commit.
 
 When Phases A–D pass, stop. Reopen only for a failed criterion or new evidence. No further general
 review is planned.
+
+## 5. Status (2026-11-11)
+
+Phases A–D are done. The record is `2026_11_11_early_toxicity_review_response.md`. Phase E waits
+for decision D2.
+

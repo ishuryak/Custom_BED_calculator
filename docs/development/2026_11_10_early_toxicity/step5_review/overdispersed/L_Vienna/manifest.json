@@ -1,0 +1,19 @@
+{
+ "identity": "0e91117af0a4234298952f9d73dd228d479c78029743f48351741fcbb8245510",
+ "unit": "L_Vienna",
+ "gate_pass": true,
+ "smoke": false,
+ "outputs": {
+  "summary.csv": "a0e0b6be0195b7442c90b670c4fb67b95191181fbad3957757d8c045bcf68cda",
+  "ppc_arms.csv": "f8099d907a67471e59434c58d74fea8c059e81d7e7571f486bb6876c5bbaf940",
+  "diagnostics.json": "3c0f39d8089edca027e5abcc02b9f7d6f355ea6577f053a6ff9115535d46cc03",
+  "draws.csv.gz": "b898f9a9c321599a7b44376f35a19d8565ce31c3a37e97bbbeabb077ce720e34"
+ },
+ "chain_archive": "/home/ishuryak/early_tox_chain_archive/0e91117af0a42342",
+ "chain_csv_sha256": {
+  "step5_model-20261111125759_1.csv": "1d478928b72d2cd631853971581190f7a801ae0f8b2fb723bf517fdb2eab26ff",
+  "step5_model-20261111125759_2.csv": "fa8cd14f4366d7518314ee3fbb261937888e0d3d8849eb789f60cab9c80ccff2",
+  "step5_model-20261111125759_3.csv": "61dcb93b532b21054b3b9ed5a048f8f294cbc41793c0afde5b4355f719cf2aa3",
+  "step5_model-20261111125759_4.csv": "feea3a44b0222751fe07fd93ed86fcb2fe8b709a9e6f1edf5b112197e1aa4ecc"
+ }
+}

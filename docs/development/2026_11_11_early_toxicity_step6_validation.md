@@ -1,5 +1,15 @@
 # Early-toxicity plan: expanded data (10 trials added) and step 6 validation
 
+
+> **Correction, 2026-11-11 (independent review).** Several statements in this record are superseded.
+> See `2026_11_11_early_toxicity_review_response.md`, section 4:
+> - The evaluable totals are 4,599 (15 families) and 6,042 (22 families), not 4,500 and 6,256.
+> - HYPNO's ranking depends on its planned 4 vs 5 cisplatin courses.
+> - The conditional coverage figures were computed without conditioning on the reference arm.
+> - The benchmark is a Fowler-parameter statistical model, not the app's Fowler limit.
+>
+> The numbers below are kept as the record of what was run.
+
 Written 2026-11-11. These are research results only: the app is unchanged, and Fowler 2003 stays the
 default. Nothing is deployed. The decision in section 5 is Igor Shuryak's.
 

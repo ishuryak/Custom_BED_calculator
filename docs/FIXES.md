@@ -472,3 +472,20 @@ Several R tests were red on 917825b because the new helper did not exist yet. Th
 
 **Verification.** 2026-11-11: `python3 -m pytest -q tests/python` gave 268 passed (261 before step 6). Step 5 expanded on `439d466`: 34 of 34 primary fits pass the gate, SBC uniform (smallest p = 0.28). Step 6 on `e80aa12`: 46 of 46 fits pass the gate; rescoring with new seeds reproduced the totals to within 0.1. `stale_constant_audit.py --strict`: 0 errors. Record: `docs/development/2026_11_11_early_toxicity_step6_validation.md`.
 
+### 2026-11-11, review response: early-toxicity steps 1-6, Phases A-D (not deployed)
+
+**Changes published numbers:** no. The app is unchanged. No data count changed. The step 5 and step 6 scores reproduce exactly. Earlier records misstated totals (6,256 and 4,500; correct: 6,042 and 4,599), the HYPNO conclusion and the conditional coverage. They are corrected in `docs/development/2026_11_11_early_toxicity_review_response.md`, section 4.
+
+| Change | What was wrong (proof) | Test (red by mutation) | What it moves |
+|---|---|---|---|
+| Extraction identity (F7) | O055 changed from 8/30 to 15/30 was accepted as "both extractions" via another arm's row | `test_early_tox_arms.py::test_a_count_moved_to_another_arms_value_is_refused` and 4 more | Nothing (outcomes byte-identical plus an `extraction_rows` column) |
+| Ascertainment, population, totals (F6) | EORTC 22851 counts are during-treatment, DAHANCA's first post-RT visit is at 8-9 weeks, and the totals were typed by hand | `test_early_tox_step3_step4.py::test_ascertainment_rule_fixtures` and 2 more; `test_early_tox_step5.py::test_reported_totals_come_from_the_loaded_rows` | New U15/U16 (2 families, uninformative). U10 relabeled |
+| Planned therapy (F1) | HYPNO planned 4 vs 5 courses but was coded 0; coding it -1 reverses its ranking (-0.686 to +0.595) | `test_early_tox_step5.py::test_planned_therapy_differences_are_coded_or_declared_as_scenarios` and 3 more | External HYPNO conclusion only |
+| Run identity, atomic publication, rescore-only, eligibility (F4) | A crafted cache and a bare diagnostics.json were accepted, and promote ignored the gates | `test_early_tox_step5.py::test_unit_state_*`, `::test_run_identity_changes_with_each_defining_input`; `test_early_tox_step6.py::test_cache_without_identity_*`, `::test_subsets_failed_gates_*` | Nothing (same draws) |
+| Exact-schema gate, chain archive, SBC bins (F5) | NaN diagnostics and an omitted zarm passed; the SBC bins assumed 10 equal bins over 101 ranks | `test_early_tox_step5.py::test_gate_requires_every_quantity_finite_and_checks_constants`, `::test_sbc_bins_cover_101_discrete_ranks_and_divergent_reps_are_listed` | SBC smallest p 0.28 to 0.148 (expanded), still no detected departure |
+| Conditional predictive check (F2) | Changing HYPNO's reference count from 208 to 1 left the "conditional" interval unchanged | `test_early_tox_step6.py::test_conditional_prediction_responds_to_the_reference_count` and 3 more | Coverage 23/29 (both) to 23/29 benchmark, 25/29 candidate |
+| Repair sensitivity (F8) | Repair was fixed at 3.2 h, and the historical comparison mixed repair assumptions | `test_early_tox_step6.py::test_repair_half_time_reaches_the_external_contrasts`; `test_early_tox_step5_historical.py::test_matched_repair_variants_differ_only_in_repair` | Nothing material (r 1.51-1.57 across 2 h, 4 h, complete) |
+| Applicability table (F3) | The narrative overstated the split between acceleration and hypofractionation | `test_early_tox_applicability.py::test_schedule_classes_of_known_arms` | Documentation |
+
+**Verification.** 2026-11-11: `python3 -m pytest -q tests/python` passes. Full runs on `04a3082` (step 6 records `378d58f`, which differs only in the applicability script): 42 of 42 overdispersed step 5 fits and every step 6 fit pass the complete-schema gate; a rescore-only run sampled nothing. `stale_constant_audit.py --strict`: 0 errors. Plan: `docs/development/PLAN_independent_review_2026_11_11.md`. Record: `docs/development/2026_11_11_early_toxicity_review_response.md`.
+

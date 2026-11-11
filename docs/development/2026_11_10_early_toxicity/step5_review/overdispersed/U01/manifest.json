@@ -1,0 +1,19 @@
+{
+ "identity": "02b4a9575128929811495404af68491d4fd135c7b7aec9ca7d5521e7ba9103a5",
+ "unit": "U01",
+ "gate_pass": true,
+ "smoke": false,
+ "outputs": {
+  "summary.csv": "788e2d1c47ae1f04b55121b284e48431a1000c1ac5c73c412c88dcfcf9599e6f",
+  "ppc_arms.csv": "3a4a7dff3d1084c5cf5cf54cd8bbf46059bd8169fc57d526d2f8beed2fce4286",
+  "diagnostics.json": "966e20a5f771712665a6532d1e511a140b0d509e606d12c2b7802a1fb8ab46f8",
+  "draws.csv.gz": "0318ee5160022ead7ee36385fdee4dbd3f8db62886c1d7a4314219a4cffb4628"
+ },
+ "chain_archive": "/home/ishuryak/early_tox_chain_archive/02b4a95751289298",
+ "chain_csv_sha256": {
+  "step5_model-20261111125152_1.csv": "39de5a4764300028ebdf0c9d262293f02253db1adf180a9ccd5d92d41f1ad328",
+  "step5_model-20261111125152_2.csv": "79c946f6d35fd7013abb3b0dcd9b4338a028b0f77cbb841f0e32810d9e78360c",
+  "step5_model-20261111125152_3.csv": "8998be03d78ef1f8a1fbed3934473ebba9d97257c6df983d84b7980d05f4a56d",
+  "step5_model-20261111125152_4.csv": "34c2b92ba8f9a62dca789b42620e818104c83396b45dc457f126854784b5f39c"
+ }
+}

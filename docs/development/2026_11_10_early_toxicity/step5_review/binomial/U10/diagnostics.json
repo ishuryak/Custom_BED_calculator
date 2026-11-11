@@ -1,0 +1,67 @@
+{
+ "divergences": 0,
+ "missing": [],
+ "nonfinite": [],
+ "fixed_constants_ok": true,
+ "rhat": 1.00411,
+ "ess_bulk": 728.176,
+ "ess_tail": 1191.69,
+ "ebfmi_min": 0.7622554525422826,
+ "treedepth_saturated": 0,
+ "n_required": 44,
+ "gate_pass": true,
+ "unit": "U10",
+ "description": "candidate, nominal W1 windows only (M2; stated window, not visit schedule)",
+ "settings": {
+  "w1_only": true
+ },
+ "Tk": 7.0,
+ "halftime_h": 3.2,
+ "n_arms": 32,
+ "n_families": 13,
+ "families": [
+  "CAIR1",
+  "DAHANCA67",
+  "EORTC22851",
+  "GORTEC9902",
+  "GuptaM",
+  "GuptaP",
+  "ORO9301",
+  "PMH_HF",
+  "RTOG0129",
+  "RTOG9003",
+  "Tallari",
+  "Tandon",
+  "Vienna"
+ ],
+ "totals": {
+  "arms": 32,
+  "families": 13,
+  "evaluable": 4870,
+  "events": 2494
+ },
+ "smoke": false,
+ "sampler": {
+  "chains": 4,
+  "parallel_chains": 1,
+  "threads_per_chain": 1,
+  "iter_warmup": 1000,
+  "iter_sampling": 1000,
+  "adapt_delta": 0.95,
+  "seed": 20261111
+ },
+ "seconds": 2.6,
+ "windows_free_gb_at_start": 9.0,
+ "ppc_chisq_p": 0.0,
+ "waic": 259.666,
+ "p_waic": 28.386,
+ "decision_schedules": [
+  "15 x 3.5 Gy",
+  "20 x 2.75 Gy",
+  "25 x 2.4 Gy",
+  "30 x 2.2 Gy"
+ ],
+ "cmdstan": "cmdstan-2.40.0",
+ "identity": "6d72e3068f66c5131f143a66e05d9f3ff46ad7c3fea5c2ab07bd63df059b21e8",
+ "revision": "378d58f"
+}

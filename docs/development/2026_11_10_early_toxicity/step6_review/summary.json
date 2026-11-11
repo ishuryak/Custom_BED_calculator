@@ -1,0 +1,254 @@
+{
+ "seed": 20261113,
+ "inner": 100,
+ "n_boot": 20000,
+ "tk": 7.0,
+ "families": 22,
+ "scope": "all primary families",
+ "revision": "378d58f",
+ "tasks": {
+  "new_trial": {
+   "total_benchmark": -195.012,
+   "total_candidate": -188.767,
+   "sum_d": 6.245,
+   "families_candidate_better": 18,
+   "bootstrap": {
+    "20261113": {
+     "mean": 0.28385909090909095,
+     "lo": 0.10935775063568932,
+     "hi": 0.5538924092341139,
+     "p_positive": 0.9999
+    },
+    "20261114": {
+     "mean": 0.28385909090909095,
+     "lo": 0.10995943820912694,
+     "hi": 0.5485221759765818,
+     "p_positive": 0.9998
+    }
+   },
+   "leave_one_family_mean": {
+    "Bartelink2002": 0.2754,
+    "CAIR1": 0.2885,
+    "DAHANCA67": 0.2846,
+    "EORTC22791": 0.3077,
+    "EORTC22851": 0.3076,
+    "GORTEC9902": 0.2656,
+    "GhoshLaskar": 0.2851,
+    "Ghoshal": 0.2916,
+    "Grover": 0.3093,
+    "GuptaM": 0.2904,
+    "GuptaP": 0.2835,
+    "Mani": 0.2939,
+    "ORO9301": 0.2935,
+    "PMH_HF": 0.3116,
+    "RTOG0129": 0.2924,
+    "RTOG9003": 0.2431,
+    "Shivananjappa": 0.2928,
+    "Sikdar": 0.2917,
+    "Singh": 0.2891,
+    "Tallari": 0.2853,
+    "Tandon": 0.2745,
+    "Vienna": 0.1878
+   },
+   "influence_sign_changes": 0,
+   "score_criterion_met": true,
+   "numerical_rule_pass": true
+  },
+  "conditional": {
+   "total_benchmark": -107.516,
+   "total_candidate": -101.386,
+   "sum_d": 6.13,
+   "families_candidate_better": 18,
+   "bootstrap": {
+    "20261113": {
+     "mean": 0.2786590909090909,
+     "lo": 0.10295802634841934,
+     "hi": 0.550073195977928,
+     "p_positive": 0.9997
+    },
+    "20261114": {
+     "mean": 0.2786590909090909,
+     "lo": 0.1030446297417543,
+     "hi": 0.5430442031816749,
+     "p_positive": 0.99985
+    }
+   },
+   "leave_one_family_mean": {
+    "Bartelink2002": 0.2721,
+    "CAIR1": 0.2727,
+    "DAHANCA67": 0.279,
+    "EORTC22791": 0.3028,
+    "EORTC22851": 0.3017,
+    "GORTEC9902": 0.2526,
+    "GhoshLaskar": 0.2826,
+    "Ghoshal": 0.2881,
+    "Grover": 0.2998,
+    "GuptaM": 0.2861,
+    "GuptaP": 0.2811,
+    "Mani": 0.2894,
+    "ORO9301": 0.2883,
+    "PMH_HF": 0.307,
+    "RTOG0129": 0.2886,
+    "RTOG9003": 0.2394,
+    "Shivananjappa": 0.2905,
+    "Sikdar": 0.291,
+    "Singh": 0.2844,
+    "Tallari": 0.2815,
+    "Tandon": 0.2688,
+    "Vienna": 0.183
+   },
+   "influence_sign_changes": 0,
+   "score_criterion_met": true,
+   "numerical_rule_pass": true
+  }
+ },
+ "external": [
+  {
+   "model": "benchmark",
+   "family": "HYPNO [code_0]",
+   "conditional": -4.6724,
+   "new_trial": -10.5944,
+   "arms": "HYPNO_HFX obs -0.15 pred(obs) -0.09 [-0.90,+0.68] latent -0.07"
+  },
+  {
+   "model": "benchmark",
+   "family": "HYPNO [code_minus1]",
+   "conditional": -5.1786,
+   "new_trial": -11.0994,
+   "arms": "HYPNO_HFX obs -0.15 pred(obs) -0.61 [-1.48,+0.22] latent -0.59"
+  },
+  {
+   "model": "benchmark",
+   "family": "HYPNO [mixture_75pct]",
+   "conditional": -4.9257,
+   "new_trial": -10.8494,
+   "arms": "HYPNO_HFX obs -0.15 pred(obs) -0.47 [-1.32,+0.33] latent -0.47"
+  },
+  {
+   "model": "benchmark",
+   "family": "Dwivedi",
+   "conditional": -2.6786,
+   "new_trial": -5.8428,
+   "arms": "Dwivedi_HF obs +0.96 pred(obs) +0.69 [-0.52,+1.79] latent +0.64"
+  },
+  {
+   "model": "benchmark",
+   "family": "ELAN",
+   "conditional": -2.7078,
+   "new_trial": -6.7814,
+   "arms": "ELAN_HSC obs -0.54 pred(obs) -0.44 [-1.56,+0.50] latent -0.53"
+  },
+  {
+   "model": "benchmark",
+   "family": "IAEA_ACC",
+   "conditional": -4.018,
+   "new_trial": -11.2597,
+   "arms": "IAEA_ACC6 obs +0.76 pred(obs) +0.78 [-0.10,+1.72] latent +0.69"
+  },
+  {
+   "model": "benchmark",
+   "family": "Pinto",
+   "conditional": -3.1471,
+   "new_trial": -6.7884,
+   "arms": "Pinto_HF obs +0.51 pred(obs) +0.11 [-0.89,+1.15] latent +0.14"
+  },
+  {
+   "model": "benchmark",
+   "family": "Poddar",
+   "conditional": -2.3918,
+   "new_trial": -5.9538,
+   "arms": "Poddar_6F obs +0.55 pred(obs) +0.17 [-1.10,+1.31] latent +0.29"
+  },
+  {
+   "model": "benchmark",
+   "family": "Sanchiz",
+   "conditional": -7.8993,
+   "new_trial": -13.3639,
+   "arms": "Sanchiz_B obs -0.26 pred(obs) +0.59 [-0.36,+1.51] latent +0.51;Sanchiz_C obs +0.75 pred(obs) +0.72 [-0.33,+1.70] latent +0.66"
+  },
+  {
+   "model": "candidate",
+   "family": "HYPNO [code_0]",
+   "conditional": -5.3581,
+   "new_trial": -11.4118,
+   "arms": "HYPNO_HFX obs -0.15 pred(obs) +0.33 [-0.36,+0.98] latent +0.35"
+  },
+  {
+   "model": "candidate",
+   "family": "HYPNO [code_minus1]",
+   "conditional": -4.5838,
+   "new_trial": -10.6462,
+   "arms": "HYPNO_HFX obs -0.15 pred(obs) -0.22 [-0.96,+0.47] latent -0.21"
+  },
+  {
+   "model": "candidate",
+   "family": "HYPNO [mixture_75pct]",
+   "conditional": -4.55,
+   "new_trial": -10.6062,
+   "arms": "HYPNO_HFX obs -0.15 pred(obs) -0.09 [-0.78,+0.58] latent -0.07"
+  },
+  {
+   "model": "candidate",
+   "family": "Dwivedi",
+   "conditional": -2.546,
+   "new_trial": -5.6792,
+   "arms": "Dwivedi_HF obs +0.96 pred(obs) +0.96 [-0.23,+2.03] latent +0.88"
+  },
+  {
+   "model": "candidate",
+   "family": "ELAN",
+   "conditional": -3.1267,
+   "new_trial": -7.1633,
+   "arms": "ELAN_HSC obs -0.54 pred(obs) -0.04 [-1.02,+0.80] latent -0.09"
+  },
+  {
+   "model": "candidate",
+   "family": "IAEA_ACC",
+   "conditional": -3.8011,
+   "new_trial": -11.0856,
+   "arms": "IAEA_ACC6 obs +0.76 pred(obs) +0.76 [-0.00,+1.52] latent +0.67"
+  },
+  {
+   "model": "candidate",
+   "family": "Pinto",
+   "conditional": -3.0756,
+   "new_trial": -6.6983,
+   "arms": "Pinto_HF obs +0.51 pred(obs) +0.11 [-0.76,+0.99] latent +0.15"
+  },
+  {
+   "model": "candidate",
+   "family": "Poddar",
+   "conditional": -2.2569,
+   "new_trial": -5.9938,
+   "arms": "Poddar_6F obs +0.55 pred(obs) +0.17 [-0.78,+1.31] latent +0.43"
+  },
+  {
+   "model": "candidate",
+   "family": "Sanchiz",
+   "conditional": -6.8516,
+   "new_trial": -12.2949,
+   "arms": "Sanchiz_B obs -0.26 pred(obs) +0.24 [-0.70,+1.05] latent +0.18;Sanchiz_C obs +0.75 pred(obs) +0.72 [-0.16,+1.52] latent +0.65"
+  }
+ ],
+ "chemo_sensitivity": [
+  {
+   "model": "benchmark",
+   "family": "Tandon",
+   "arm_id": "Tandon_SMART",
+   "code": -1,
+   "conditional": -4.0165,
+   "conditional_at_0": -3.018
+  },
+  {
+   "model": "candidate",
+   "family": "Tandon",
+   "arm_id": "Tandon_SMART",
+   "code": -1,
+   "conditional": -3.2462,
+   "conditional_at_0": -2.5319
+  }
+ ],
+ "gates_all_pass": true,
+ "gates_complete_schema": true,
+ "decision": "undecided: Igor Shuryak decides after Phases A-D (Fowler stays the app default)"
+}
