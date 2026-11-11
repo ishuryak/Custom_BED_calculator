@@ -156,3 +156,9 @@ def test_an_arm_entering_the_analysis_twice_is_refused(monkeypatch):
     monkeypatch.setattr(s5, "read", doubled)
     with pytest.raises(ValueError, match=r"entered twice: \[.GuptaP_CFCCT.\]"):
         s5.load_rows()
+
+
+def test_adequate_ascertainment_unit_loads_only_the_strict_set():
+    rows, fams = s5.load_rows(adequate_only=True)
+    assert fams == ["CAIR1", "ORO9301"] and len(rows) == 5
+    assert s5.UNITS["U15"][1] == dict(adequate_only=True)

@@ -96,3 +96,33 @@ def test_map_fit_recovers_the_truth_from_noise_free_counts(design):
     assert math.exp(res.x[k]) == pytest.approx(0.1, rel=0.15)
     assert math.exp(res.x[k + 2]) == pytest.approx(s4.ev.fowler_rate(), rel=0.15)
     assert math.exp(res.x[k + 1]) == pytest.approx(10.0, rel=0.35)
+
+
+# Adequate peak ascertainment (review F6, decision D3, 2026-11-11)
+def test_ascertainment_rule_fixtures():
+    ok = mp.adequate_ascertainment
+    assert ok("8", "2")                     # CAIR: every 2 weeks for 2 months
+    assert ok("resolution", "1")            # ORO 93-01: weekly until reactions settled
+    assert not ok("9", "8")                 # DAHANCA: long nominal window, 8-week gap after RT
+    assert not ok("6", "6")                 # EORTC 22851: completion, then 6 weeks
+    assert not ok("4", "4")                 # RTOG 9003, Ghoshal: first post-RT visit at 4 weeks
+    assert not ok("2", "2")                 # Sikdar: ends 2 weeks after RT
+    assert not ok("", "")                   # schedule not stated
+    assert not ok("resolution", "4")        # Vienna: every 2-4 weeks
+
+
+def test_adequate_set_and_recorded_time_points():
+    rows = {r["outcome_id"]: r for r in mp.build(ROOT)}
+    assert {r["family_id"] for r in rows.values() if r["in_adequate_sensitivity"]} == {"CAIR1", "ORO9301"}
+    assert rows["O013"]["endpoint_timepoint"].startswith("during treatment")      # EORTC 22851 AF 160/240
+    assert "as treated" in rows["O046"]["analysis_population"]                   # DAHANCA 7
+
+
+def test_a_family_without_an_ascertainment_row_is_refused(tmp_path):
+    import shutil
+    for sub in ("data/early_tox",):
+        shutil.copytree(os.path.join(ROOT, sub), tmp_path / sub)
+    p = tmp_path / "data/early_tox/source/ascertainment.csv"
+    p.write_text("\n".join(l for l in p.read_text().splitlines() if not l.startswith("Tandon,")) + "\n")
+    with pytest.raises(ValueError, match="family Tandon has no ascertainment row"):
+        mp.build(str(tmp_path))

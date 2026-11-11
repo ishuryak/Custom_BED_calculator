@@ -1,69 +1,69 @@
-outcome_id,arm_id,family_id,endpoint_class,scale_group,window,analysis_set,in_primary,in_w1_sensitivity
-O001,GORTEC9902_CRT,GORTEC9902,grade_3_4_mucositis,G1,W1,primary,1,1
-O002,GORTEC9902_ACCCT,GORTEC9902,grade_3_4_mucositis,G1,W1,primary,1,1
-O003,GORTEC9902_VACC,GORTEC9902,grade_3_4_mucositis,G1,W1,primary,1,1
-O004,RTOG9003_SF,RTOG9003,grade_3_4_mucositis,G1,W1,primary,1,1
-O005,RTOG9003_HFX,RTOG9003,grade_3_4_mucositis,G1,W1,primary,1,1
-O006,RTOG9003_AFXS,RTOG9003,grade_3_4_mucositis,G1,W1,primary,1,1
-O007,RTOG9003_AFXC,RTOG9003,grade_3_4_mucositis,G1,W1,primary,1,1
-O008,RTOG0129_SFX,RTOG0129,grade_3_4_mucositis,G1,W1,primary,1,1
-O009,RTOG0129_AFXC,RTOG0129,grade_3_4_mucositis,G1,W1,primary,1,1
-O010,EORTC22791_CF,EORTC22791,diffuse_mucositis_top_grade,G1,W2,primary,1,0
-O011,EORTC22791_HF,EORTC22791,diffuse_mucositis_top_grade,G1,W2,primary,1,0
-O012,EORTC22851_CF,EORTC22851,grade_3_4_mucositis,G1,W1,primary,1,1
-O013,EORTC22851_AF,EORTC22851,grade_3_4_mucositis,G1,W1,primary,1,1
-O014,PMH_CF,PMH_HF,grade_3_4_mucositis,G1,W1,primary,1,1
-O015,PMH_HF,PMH_HF,grade_3_4_mucositis,G1,W1,primary,1,1
-O016,Ghoshal_CB,Ghoshal,grade_3_4_mucositis,G1,W2,primary,1,0
-O017,Ghoshal_CF,Ghoshal,grade_3_4_mucositis,G1,W2,primary,1,0
-O018,CAIR1_CAIR,CAIR1,grade_3_4_mucositis_from_dische,G1,W1,primary,1,1
-O019,CAIR1_CF,CAIR1,grade_3_4_mucositis_from_dische,G1,W1,primary,1,1
-O020,CAIR1_CAIR,CAIR1,severe_confluent_dische,G1,W1,secondary,0,0
-O021,CAIR1_CF,CAIR1,severe_confluent_dische,G1,W1,secondary,0,0
-O022,Vienna_CF,Vienna,confluent_mucositis,G1,W1,primary,1,1
-O023,Vienna_VCHART,Vienna,confluent_mucositis,G1,W1,primary,1,1
-O024,Vienna_VCHART_MMC,Vienna,confluent_mucositis,G1,W1,primary,1,1
-O025,Olmi_CF,ORO9301,grade_3_4_mucositis,G1,W1,primary,1,1
-O026,Olmi_SCAHF,ORO9301,grade_3_4_mucositis,G1,W1,primary,1,1
-O027,Olmi_CFCT,ORO9301,grade_3_4_mucositis,G1,W1,primary,1,1
-O028,Bartelink_CF,Bartelink2002,diffuse_mucositis,G1,W2,primary,1,0
-O029,Bartelink_MFD,Bartelink2002,diffuse_mucositis,G1,W2,primary,1,0
-O030,Tandon_SIB,Tandon,grade_3_mucositis,G2,W1,primary,1,1
-O031,Tandon_SMART,Tandon,grade_3_mucositis,G2,W1,primary,1,1
-O032,Sikdar_SEQ,Sikdar,grade_3_4_mucositis,G2,W2,primary,1,0
-O033,Sikdar_SIB,Sikdar,grade_3_4_mucositis,G2,W2,primary,1,0
-O034,Shivananjappa_HSIB,Shivananjappa,grade_3_mucositis,G2,W2,primary,1,0
-O035,Shivananjappa_CONV,Shivananjappa,grade_3_mucositis,G2,W2,primary,1,0
-O036,Mani_SIB,Mani,grade_3_mucositis,G1,W2,primary,1,0
-O037,Mani_SEQ,Mani,grade_3_mucositis,G1,W2,primary,1,0
-O038,IAEA_ACC6,IAEA_ACC,confluent_mucositis,G1,none,sensitivity,0,0
-O039,IAEA_ACC5,IAEA_ACC,confluent_mucositis,G1,none,sensitivity,0,0
-O040,Pinto_CF,Pinto,confluent_mucositis_own_scale,other,W2,sensitivity,0,0
-O041,Pinto_HF,Pinto,confluent_mucositis_own_scale,other,W2,sensitivity,0,0
-O042,Poddar_6F,Poddar,grade_3_mucositis_end_of_rt,G2,W2,sensitivity,0,0
-O043,Poddar_5F,Poddar,grade_3_mucositis_end_of_rt,G2,W2,sensitivity,0,0
-O044,HYPNO_HFX,HYPNO,grade_3_plus_mucositis,G2,W2,benchmark,0,0
-O045,HYPNO_NFX,HYPNO,grade_3_plus_mucositis,G2,W2,benchmark,0,0
-O046,DAHANCA7_5F,DAHANCA67,confluent_mucositis,G1,W1,primary,1,1
-O047,DAHANCA7_6F,DAHANCA67,confluent_mucositis,G1,W1,primary,1,1
-O048,GhoshLaskar_RT,GhoshLaskar,grade_3_4_mucositis,G1,W2,primary,1,0
-O049,GhoshLaskar_CRT,GhoshLaskar,grade_3_4_mucositis,G1,W2,primary,1,0
-O050,GhoshLaskar_ACC,GhoshLaskar,grade_3_4_mucositis,G1,W2,primary,1,0
-O051,Grover_SEQ,Grover,grade_3_mucositis,G2,W2,primary,1,0
-O052,Grover_SIB,Grover,grade_3_mucositis,G2,W2,primary,1,0
-O053,GuptaM_5F,GuptaM,confluent_mucositis,G1,W1,primary,1,1
-O054,GuptaM_6F,GuptaM,confluent_mucositis,G1,W1,primary,1,1
-O055,GuptaP_CFCCT,GuptaP,grade_3_mucositis,G1,W1,primary,1,1
-O056,GuptaP_CBRT,GuptaP,grade_3_mucositis,G1,W1,primary,1,1
-O057,GuptaP_CBRTCCT,GuptaP,grade_3_mucositis,G1,W1,primary,1,1
-O058,Tallari_CF,Tallari,grade_3_mucositis,G1,W1,primary,1,1
-O059,Tallari_HF,Tallari,grade_3_mucositis,G1,W1,primary,1,1
-O060,Singh_5F,Singh,grade_3_4_mucositis,G1,W2,primary,1,0
-O061,Singh_6F,Singh,grade_3_4_mucositis,G1,W2,primary,1,0
-O062,Sanchiz_A,Sanchiz,grade_3_mucositis,other,W2,sensitivity,0,0
-O063,Sanchiz_B,Sanchiz,grade_3_mucositis,other,W2,sensitivity,0,0
-O064,Sanchiz_C,Sanchiz,grade_3_mucositis,other,W2,sensitivity,0,0
-O065,Dwivedi_CF,Dwivedi,grade_3_plus_mucositis,other,W1,sensitivity,0,0
-O066,Dwivedi_HF,Dwivedi,grade_3_plus_mucositis,other,W1,sensitivity,0,0
-O067,ELAN_SF,ELAN,grade_3_plus_mucositis,G1,W1,sensitivity,0,0
-O068,ELAN_HSC,ELAN,grade_3_plus_mucositis,G1,W1,sensitivity,0,0
+outcome_id,arm_id,family_id,endpoint_class,scale_group,window,analysis_set,in_primary,in_w1_sensitivity,last_assessment_weeks_after_rt,max_post_rt_gap_weeks,adequate_ascertainment,in_adequate_sensitivity,endpoint_timepoint,analysis_population
+O001,GORTEC9902_CRT,GORTEC9902,grade_3_4_mucositis,G1,W1,primary,1,1,,,0,0,maximum over the acute period (to 3 months after RT),evaluated for acute toxicity
+O002,GORTEC9902_ACCCT,GORTEC9902,grade_3_4_mucositis,G1,W1,primary,1,1,,,0,0,maximum over the acute period (to 3 months after RT),evaluated for acute toxicity
+O003,GORTEC9902_VACC,GORTEC9902,grade_3_4_mucositis,G1,W1,primary,1,1,,,0,0,maximum over the acute period (to 3 months after RT),evaluated for acute toxicity
+O004,RTOG9003_SF,RTOG9003,grade_3_4_mucositis,G1,W1,primary,1,1,4,4,0,0,maximum within 90 days of start,"analyzable patients (1,073 of 1,113)"
+O005,RTOG9003_HFX,RTOG9003,grade_3_4_mucositis,G1,W1,primary,1,1,4,4,0,0,maximum within 90 days of start,"analyzable patients (1,073 of 1,113)"
+O006,RTOG9003_AFXS,RTOG9003,grade_3_4_mucositis,G1,W1,primary,1,1,4,4,0,0,maximum within 90 days of start,"analyzable patients (1,073 of 1,113)"
+O007,RTOG9003_AFXC,RTOG9003,grade_3_4_mucositis,G1,W1,primary,1,1,4,4,0,0,maximum within 90 days of start,"analyzable patients (1,073 of 1,113)"
+O008,RTOG0129_SFX,RTOG0129,grade_3_4_mucositis,G1,W1,primary,1,1,,,0,0,maximum within 90 days of start,analyzable eligible patients
+O009,RTOG0129_AFXC,RTOG0129,grade_3_4_mucositis,G1,W1,primary,1,1,,,0,0,maximum within 90 days of start,analyzable eligible patients
+O010,EORTC22791_CF,EORTC22791,diffuse_mucositis_top_grade,G1,W2,primary,1,0,0,,0,0,during treatment,evaluated for acute toxicity
+O011,EORTC22791_HF,EORTC22791,diffuse_mucositis_top_grade,G1,W2,primary,1,0,0,,0,0,during treatment,evaluated for acute toxicity
+O012,EORTC22851_CF,EORTC22851,grade_3_4_mucositis,G1,W1,primary,1,1,6,6,0,0,during treatment (Table 4 'OMR during treatment'); the 6-week counts 84/245 and 168/240 are not used and not combined,evaluated for acute toxicity
+O013,EORTC22851_AF,EORTC22851,grade_3_4_mucositis,G1,W1,primary,1,1,6,6,0,0,during treatment (Table 4 'OMR during treatment'); the 6-week counts 84/245 and 168/240 are not used and not combined,evaluated for acute toxicity
+O014,PMH_CF,PMH_HF,grade_3_4_mucositis,G1,W1,primary,1,1,12,4,0,0,maximum during treatment and follow-up,evaluated for acute toxicity
+O015,PMH_HF,PMH_HF,grade_3_4_mucositis,G1,W1,primary,1,1,12,4,0,0,maximum during treatment and follow-up,evaluated for acute toxicity
+O016,Ghoshal_CB,Ghoshal,grade_3_4_mucositis,G1,W2,primary,1,0,4,4,0,0,maximum as reported (window not stated),treated
+O017,Ghoshal_CF,Ghoshal,grade_3_4_mucositis,G1,W2,primary,1,0,4,4,0,0,maximum as reported (window not stated),treated
+O018,CAIR1_CAIR,CAIR1,grade_3_4_mucositis_from_dische,G1,W1,primary,1,1,8,2,1,1,peak acute reaction during RT and the first 2 months,evaluated for acute toxicity
+O019,CAIR1_CF,CAIR1,grade_3_4_mucositis_from_dische,G1,W1,primary,1,1,8,2,1,1,peak acute reaction during RT and the first 2 months,evaluated for acute toxicity
+O020,CAIR1_CAIR,CAIR1,severe_confluent_dische,G1,W1,secondary,0,0,8,2,1,0,peak acute reaction during RT and the first 2 months,evaluated for acute toxicity
+O021,CAIR1_CF,CAIR1,severe_confluent_dische,G1,W1,secondary,0,0,8,2,1,0,peak acute reaction during RT and the first 2 months,evaluated for acute toxicity
+O022,Vienna_CF,Vienna,confluent_mucositis,G1,W1,primary,1,1,resolution,4,0,0,maximum until normalization,treated and analysed
+O023,Vienna_VCHART,Vienna,confluent_mucositis,G1,W1,primary,1,1,resolution,4,0,0,maximum until normalization,treated and analysed
+O024,Vienna_VCHART_MMC,Vienna,confluent_mucositis,G1,W1,primary,1,1,resolution,4,0,0,maximum until normalization,treated and analysed
+O025,Olmi_CF,ORO9301,grade_3_4_mucositis,G1,W1,primary,1,1,resolution,1,1,1,maximum within 90 days of start,evaluated for acute toxicity
+O026,Olmi_SCAHF,ORO9301,grade_3_4_mucositis,G1,W1,primary,1,1,resolution,1,1,1,maximum within 90 days of start,evaluated for acute toxicity
+O027,Olmi_CFCT,ORO9301,grade_3_4_mucositis,G1,W1,primary,1,1,resolution,1,1,1,maximum within 90 days of start,evaluated for acute toxicity
+O028,Bartelink_CF,Bartelink2002,diffuse_mucositis,G1,W2,primary,1,0,,,0,0,not stated,eligible randomized patients analysed
+O029,Bartelink_MFD,Bartelink2002,diffuse_mucositis,G1,W2,primary,1,0,,,0,0,not stated,eligible randomized patients analysed
+O030,Tandon_SIB,Tandon,grade_3_mucositis,G2,W1,primary,1,1,12,12,0,0,maximum during RT and at 12 weeks,randomized
+O031,Tandon_SMART,Tandon,grade_3_mucositis,G2,W1,primary,1,1,12,12,0,0,maximum during RT and at 12 weeks,randomized
+O032,Sikdar_SEQ,Sikdar,grade_3_4_mucositis,G2,W2,primary,1,0,2,2,0,0,during treatment and 2 weeks after,evaluated for acute toxicity
+O033,Sikdar_SIB,Sikdar,grade_3_4_mucositis,G2,W2,primary,1,0,2,2,0,0,during treatment and 2 weeks after,evaluated for acute toxicity
+O034,Shivananjappa_HSIB,Shivananjappa,grade_3_mucositis,G2,W2,primary,1,0,0,,0,0,during treatment,randomized
+O035,Shivananjappa_CONV,Shivananjappa,grade_3_mucositis,G2,W2,primary,1,0,0,,0,0,during treatment,randomized
+O036,Mani_SIB,Mani,grade_3_mucositis,G1,W2,primary,1,0,0,,0,0,during treatment,analysed
+O037,Mani_SEQ,Mani,grade_3_mucositis,G1,W2,primary,1,0,0,,0,0,during treatment,analysed
+O038,IAEA_ACC6,IAEA_ACC,confluent_mucositis,G1,none,sensitivity,0,0,,,0,0,not stated,patients with data recorded
+O039,IAEA_ACC5,IAEA_ACC,confluent_mucositis,G1,none,sensitivity,0,0,,,0,0,not stated,patients with data recorded
+O040,Pinto_CF,Pinto,confluent_mucositis_own_scale,other,W2,sensitivity,0,0,0,,0,0,end of RT,evaluable
+O041,Pinto_HF,Pinto,confluent_mucositis_own_scale,other,W2,sensitivity,0,0,0,,0,0,end of RT,evaluable
+O042,Poddar_6F,Poddar,grade_3_mucositis_end_of_rt,G2,W2,sensitivity,0,0,4,4,0,0,at completion and at 1 month,available for analysis
+O043,Poddar_5F,Poddar,grade_3_mucositis_end_of_rt,G2,W2,sensitivity,0,0,4,4,0,0,at completion and at 1 month,available for analysis
+O044,HYPNO_HFX,HYPNO,grade_3_plus_mucositis,G2,W2,benchmark,0,0,,,0,0,maximum (CTCAE v4),randomized and treated
+O045,HYPNO_NFX,HYPNO,grade_3_plus_mucositis,G2,W2,benchmark,0,0,,,0,0,maximum (CTCAE v4),randomized and treated
+O046,DAHANCA7_5F,DAHANCA67,confluent_mucositis,G1,W1,primary,1,1,9,8,0,0,maximum recorded within 6 months of start,"as treated (grouped by treatment received), DAHANCA 7 part"
+O047,DAHANCA7_6F,DAHANCA67,confluent_mucositis,G1,W1,primary,1,1,9,8,0,0,maximum recorded within 6 months of start,"as treated (grouped by treatment received), DAHANCA 7 part"
+O048,GhoshLaskar_RT,GhoshLaskar,grade_3_4_mucositis,G1,W2,primary,1,0,0,,0,0,during RT,evaluated (186 of 199)
+O049,GhoshLaskar_CRT,GhoshLaskar,grade_3_4_mucositis,G1,W2,primary,1,0,0,,0,0,during RT,evaluated (186 of 199)
+O050,GhoshLaskar_ACC,GhoshLaskar,grade_3_4_mucositis,G1,W2,primary,1,0,0,,0,0,during RT,evaluated (186 of 199)
+O051,Grover_SEQ,Grover,grade_3_mucositis,G2,W2,primary,1,0,0,,0,0,during chemoradiotherapy,completers (101 of 110 randomized)
+O052,Grover_SIB,Grover,grade_3_mucositis,G2,W2,primary,1,0,0,,0,0,during chemoradiotherapy,completers (101 of 110 randomized)
+O053,GuptaM_5F,GuptaM,confluent_mucositis,G1,W1,primary,1,1,6,6,0,0,maximum within 90 days of start,evaluated
+O054,GuptaM_6F,GuptaM,confluent_mucositis,G1,W1,primary,1,1,6,6,0,0,maximum within 90 days of start,evaluated
+O055,GuptaP_CFCCT,GuptaP,grade_3_mucositis,G1,W1,primary,1,1,,,0,0,maximum to day 90,randomized
+O056,GuptaP_CBRT,GuptaP,grade_3_mucositis,G1,W1,primary,1,1,,,0,0,maximum to day 90,randomized
+O057,GuptaP_CBRTCCT,GuptaP,grade_3_mucositis,G1,W1,primary,1,1,,,0,0,maximum to day 90,randomized
+O058,Tallari_CF,Tallari,grade_3_mucositis,G1,W1,primary,1,1,,,0,0,maximum within 90 days of start,completers
+O059,Tallari_HF,Tallari,grade_3_mucositis,G1,W1,primary,1,1,,,0,0,maximum within 90 days of start,completers
+O060,Singh_5F,Singh,grade_3_4_mucositis,G1,W2,primary,1,0,6,4,0,0,maximum to end of RT and post-RT visits,completers
+O061,Singh_6F,Singh,grade_3_4_mucositis,G1,W2,primary,1,0,6,4,0,0,maximum to end of RT and post-RT visits,completers
+O062,Sanchiz_A,Sanchiz,grade_3_mucositis,other,W2,sensitivity,0,0,,,0,0,not stated,evaluated
+O063,Sanchiz_B,Sanchiz,grade_3_mucositis,other,W2,sensitivity,0,0,,,0,0,not stated,evaluated
+O064,Sanchiz_C,Sanchiz,grade_3_mucositis,other,W2,sensitivity,0,0,,,0,0,not stated,evaluated
+O065,Dwivedi_CF,Dwivedi,grade_3_plus_mucositis,other,W1,sensitivity,0,0,4,4,0,0,maximum to 3 months after RT,completers (34 of 44 and 49)
+O066,Dwivedi_HF,Dwivedi,grade_3_plus_mucositis,other,W1,sensitivity,0,0,4,4,0,0,maximum to 3 months after RT,completers (34 of 44 and 49)
+O067,ELAN_SF,ELAN,grade_3_plus_mucositis,G1,W1,sensitivity,0,0,12,12,0,0,maximum over RT and 3 months after,safety population
+O068,ELAN_HSC,ELAN,grade_3_plus_mucositis,G1,W1,sensitivity,0,0,12,12,0,0,maximum over RT and 3 months after,safety population

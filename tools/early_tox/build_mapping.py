@@ -8,10 +8,11 @@ Scale groups:
         top grade, Dische-based confluent)
     G2  CTCAE v4: grade 3 = "Severe pain; interfering with oral intake" (checked against the NCI
         CTCAE v4.03 quick reference on 2026-11-10)
-Windows:
+Windows (NOMINAL: the stated acute window, not the actual visit schedule; review F6):
     W1  stated and reaching at least 4 weeks after RT (or 90 days from the start of a 7-week
         course), or follow-up to healing
     W2  not stated, or ending during or within 2 weeks of the end of RT
+Adequate ascertainment (decision D3): see adequate_ascertainment(); the in_adequate_sensitivity set
 Analysis sets:
     primary      M1: G1 and G2 pooled, with a scale-family offset. M2: W1 and W2. M3: CAIR uses the
                  approximate EORTC III-IV count
@@ -40,6 +41,20 @@ FAMILY_RULES = {
 }
 SECONDARY_CLASSES = {"severe_confluent_dische"}
 
+# Adequate peak ascertainment (decision D3, Igor Shuryak 2026-11-11): assessment reaching at least
+# 4 weeks after the end of RT ("resolution" = followed until the reaction settled) AND no post-RT
+# gap longer than 3 weeks. A schedule that is not stated fails. Source:
+# data/early_tox/source/ascertainment.csv (one row per family).
+MIN_WEEKS_AFTER_RT = 4
+MAX_GAP_WEEKS = 3
+
+
+def adequate_ascertainment(last, gap):
+    if last == "" or gap == "":
+        return False
+    reaches = last == "resolution" or float(last) >= MIN_WEEKS_AFTER_RT
+    return reaches and float(gap) <= MAX_GAP_WEEKS
+
 
 def analysis_set(o):
     if o["role"] == "benchmark":
@@ -54,8 +69,14 @@ def analysis_set(o):
 def build(root):
     with open(os.path.join(root, "data", "early_tox", "outcomes.csv"), newline="") as f:
         outcomes = list(csv.DictReader(f))
+    with open(os.path.join(root, "data", "early_tox", "source", "ascertainment.csv"), newline="") as f:
+        asc = {r["family_id"]: r for r in csv.DictReader(f)}
     rows = []
     for o in outcomes:
+        if o["family_id"] not in asc:
+            raise ValueError(f"{o['outcome_id']}: family {o['family_id']} has no ascertainment row")
+        a = asc[o["family_id"]]
+        adequate = adequate_ascertainment(a["last_assessment_weeks_after_rt"], a["max_post_rt_gap_weeks"])
         if o["family_id"] not in FAMILY_RULES:
             raise ValueError(f"{o['outcome_id']}: family {o['family_id']} has no mapping rule")
         group, window = FAMILY_RULES[o["family_id"]]
@@ -64,7 +85,13 @@ def build(root):
                          endpoint_class=o["endpoint_class"], scale_group=group, window=window,
                          analysis_set=aset,
                          in_primary=int(aset == "primary"),
-                         in_w1_sensitivity=int(aset == "primary" and window == "W1")))
+                         in_w1_sensitivity=int(aset == "primary" and window == "W1"),
+                         last_assessment_weeks_after_rt=a["last_assessment_weeks_after_rt"],
+                         max_post_rt_gap_weeks=a["max_post_rt_gap_weeks"],
+                         adequate_ascertainment=int(adequate),
+                         in_adequate_sensitivity=int(aset == "primary" and adequate),
+                         endpoint_timepoint=a["endpoint_timepoint"],
+                         analysis_population=a["analysis_population"]))
     return rows
 
 

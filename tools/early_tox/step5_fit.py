@@ -99,9 +99,11 @@ UNITS = {
     "U07": ("candidate, alpha/beta prior sd doubled (0.708)", dict(ab_sd=0.708)),
     "U08": ("candidate, chemotherapy-differing families dropped, no gamma (C1)", dict(drop_chemo=True, use_gamma=0)),
     "U09": ("candidate, chemotherapy coded on/off only (C1)", dict(chemo="onoff")),
-    "U10": ("candidate, W1 windows only (M2)", dict(w1_only=True)),
+    "U10": ("candidate, nominal W1 windows only (M2; stated window, not visit schedule)", dict(w1_only=True)),
     "U11": ("candidate, plus the sensitivity trials (M4 and 2026-11-11 additions)", dict(m4=True)),
     "U14": ("candidate without the chemotherapy term (plan as written)", dict(use_gamma=0)),
+    "U15": ("candidate, adequate peak ascertainment only (decision D3)", dict(adequate_only=True)),
+    "U16": ("benchmark, adequate peak ascertainment only (decision D3)", dict(adequate_only=True, fixed_E=1)),
 }
 # Leave-one-family-out influence of the primary candidate (U02 settings), one unit per family.
 LOFO_UNITS = {f"L_{f}": (f"candidate without family {f}", dict(drop_family=f))
@@ -114,7 +116,7 @@ def read(name):
         return list(csv.DictReader(f))
 
 
-def load_rows(w1_only=False, m4=False, drop_chemo=False, drop_family=None):
+def load_rows(w1_only=False, m4=False, drop_chemo=False, drop_family=None, adequate_only=False):
     """Arm rows for one analysis set, with D, Q (3.2 h repair) and elapsed-time terms per arm."""
     fr = {}
     for r in read("arm_fractions.csv"):
@@ -128,6 +130,8 @@ def load_rows(w1_only=False, m4=False, drop_chemo=False, drop_family=None):
         if not keep or (w1_only and m["in_primary"] == "1" and m["window"] != "W1"):
             continue
         if (drop_chemo and m["family_id"] in CHEMO_FAMILIES) or m["family_id"] == drop_family:
+            continue
+        if adequate_only and m["in_adequate_sensitivity"] != "1":
             continue
         o, a = out[m["outcome_id"]], arms[m["arm_id"]]
         variants = []
@@ -224,7 +228,7 @@ def run_unit(model, name, out_dir, smoke=False, od=False):
         return
     os.makedirs(udir, exist_ok=True)
     rows, fams = load_rows(settings.get("w1_only", False), settings.get("m4", False), settings.get("drop_chemo", False),
-                           settings.get("drop_family"))
+                           settings.get("drop_family"), settings.get("adequate_only", False))
     Tk = settings.get("Tk", 7.0)
     data = stan_data(rows, fams, Tk, settings)
     free = wait_for_memory()
