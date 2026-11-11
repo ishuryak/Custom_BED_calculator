@@ -106,6 +106,14 @@ are listed at the end of section F.
 - Status: PAYWALLED (not checked in Unpaywall separately; Elsevier 1995, assumed closed). Not downloaded.
 - Verbatim, Abstract (PubMed): "Analysis of duration by direct and indirect methods suggest alpha/beta ratios in the range 7-10 Gy and half-time (t1/2) values in the range 0.27-0.5 h".
 - Joiner 2023 slides (B5) list Denham et al. (1995) mucositis α/β = 9.3 (95% CL 5.8; 17.9).
+- Current status (2026-11-10): could not be obtained (no open-access copy in Europe PMC; not available to the user). Replaced as a source by A8a, which reports the same interval in a peer-reviewed review. Decision D6, `docs/development/2026_11_10_early_toxicity_step1_target_definition.md`.
+
+### A8a. Kaanders JHAM, van der Kogel AJ, Ang KK (1999) - secondary source for Denham's α/β
+- Citation: Kaanders JH, van der Kogel AJ, Ang KK. Altered fractionation: limited by mucosal reactions? Radiother Oncol. 1999;50(3):247-60.
+- DOI: 10.1016/s0167-8140(99)00012-2 · PMID: 10392810 (PubMed esummary, 2026-11-10)
+- Status: PAYWALLED. Local copy 2026-11-10, `Kaanders_1999_altered_fractionation_mucosal.pdf` (ScienceDirect web page printed to PDF: wide tables are clipped and about one line is hidden at each page break). Git-ignored.
+- Verbatim, Section 3: "For the human oropharyngeal mucosa they calculated an α/β ratio of 9.3 Gy (5.8–17.9, 95% CI) with patchy mucositis as the endpoint." Also: "From these same data they derived a very short halftime for repair of sub-lethal damage (T1/2) of 15 min (8.4–90, 95% CI)."
+- Use: secondary source for Denham 1995's interval, labeled as such. Not an independent estimate. Fowler 2003 quotes this source as "5.8–16.4 Gy", which does not match the text above.
 
 ### A9. Fowler JF (2007) and (2008), optimum overall time papers
 - Fowler JF. Is there an optimum overall time for head and neck radiotherapy? A review, with new modelling. Clin Oncol (R Coll Radiol). 2007;19(1):8-22. DOI 10.1016/j.clon.2006.09.008 · PMID 17305251. PAYWALLED. Erratum: Clin Oncol 2008;20(2):124-6 (listed in PubMed).
@@ -211,6 +219,10 @@ are listed at the end of section F.
 - No open-access full paper from the Christie series was found. Identified:
   - Sanghera P, et al. Hypofractionated accelerated radiotherapy with concurrent chemotherapy for locally advanced squamous cell carcinoma of the head and neck. Int J Radiat Oncol Biol Phys. 2007;67(5):1342-51. DOI 10.1016/j.ijrobp.2006.11.015 · PMID 17241752. PAYWALLED (Birmingham, not Christie).
   - Jegannathen A, et al. 2010 (Clin Oncol 22:185-91) and 2011 (Clin Oncol 23:149-58), Christie series, cited in Gupta 2020 Table 1; PubMed IDs not retrieved here.
+  - Current status (2026-11-10), all local copies are ScienceDirect web pages printed to PDF (wide tables clipped, about one line hidden at each page break) and git-ignored:
+    - Sanghera 2007: PMID 17241752. `Sanghera_2007_hypofx_chemoRT_HNSCC.pdf`. Verbatim, Results: "Grade 3 mucositis was experienced by 60 patients (74%), with 5 (5%) Grade 4." Table 6 (NCI CTC 1995 edition): mucositis grade 3 55 (68), grade 4 5 (6), of 81 patients. Prolonged grade 3 mucositis (≥ 4 weeks) in 7.
+    - Jegannathen 2011: Synchronous chemoradiotherapy in patients with locally advanced squamous cell carcinoma of the head and neck using capecitabine: a single-centre, open-label, single-group phase II study. Clin Oncol (R Coll Radiol). 2011;23(2):149-58. DOI 10.1016/j.clon.2010.09.010 · PMID 20951012. `Jegannathen_2011_capecitabine_chemoRT_phase2.pdf`. Verbatim, Toxicity: "Forty-seven of 50 (97%) patients developed grade 3/4 acute radiation mucosal toxicity (43/50, grade 3; 4/50, grade 4)." Scored with EORTC/RTOG criteria. 19 of the 50 patients are from the phase I study (Sykes et al., its ref. 13), so that report and the 2010 paper must be checked for duplicate patients.
+    - Lester SC, Moon DH, Patel SH, Awan MJ, Bakst RL. Leave no cancer behind: the conformal hypofractionation era and head and neck cancer. Int J Radiat Oncol Biol Phys. 2024;118(1):165-168. DOI 10.1016/j.ijrobp.2023.07.028 · PMID 38049222. `Lester_2024_conformal_hypofractionation_HN.pdf`. Editorial. Its Table 1 lists ongoing US trials (HYPORT, HYHOPE, HEADLIGHT, HEADLIGHT-S, DEHART, HART-HN, a Mount Sinai trial for unfit elderly patients, and one row lost at a page break). The dose column is clipped in the local copy. No outcome data.
   - Miller D, et al. A Multicentre Retrospective Cohort Study of Hypofractionated Radiotherapy in Head and Neck Cancer. Clin Oncol (R Coll Radiol). 2026;59:104332. DOI 10.1016/j.clon.2026.104332 · PMID 42759386. Unpaywall: closed. Full text read 2026-10-18 (local copy, section F): 119 referred, 113 completed; grade 3 mucositis (RTOG) 72/113 at end of treatment, 26% at 4 weeks; gastrostomy 54/119.
 
 ---

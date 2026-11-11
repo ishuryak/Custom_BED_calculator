@@ -116,9 +116,18 @@ Settled by version 2 unless Igor Shuryak objects:
 - HYPNO is a benchmark.
 - The two likelihoods are fitted separately.
 
+**Update 2026-11-10 (later):** D1–D5 were decided as recommended, D6 was replaced (Denham 1995 is
+not obtainable, so its interval is cited via Kaanders 1999), and D7 (follow the gates, no pilot)
+was added. Step 1 is done: `2026_11_10_early_toxicity_step1_target_definition.md`. Four PDFs were
+added to the local git-ignored reference folder: Sanghera 2007, Kaanders 1999, Lester 2024 and
+Jegannathen 2011. All four are ScienceDirect web pages printed to PDF, so wide tables are clipped
+and about one line is hidden at each page break. Use the publisher PDF for any table that becomes
+data.
+
 ## 7. Next session
 
-1. Ask D1–D6 (one round).
+1. ~~Ask D1–D6 (one round).~~ Done. **Start at step 2**, using section 7 of the step 1 record as
+   the starting index.
 2. **Step 1** (about 2 hours): write the structured target definition. No code change.
 3. **Step 2** (3–5 days, Igor Shuryak spot-checks): build `data/early_tox/` (reports, schedules,
    fractions, labels, arms, outcomes, evidence families). Every value comes from a downloaded full

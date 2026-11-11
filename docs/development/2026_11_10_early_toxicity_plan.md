@@ -464,6 +464,13 @@ Settled by this revision, unless Igor objects:
 - HYPNO is a benchmark, not a gate.
 - The two likelihoods are fitted separately by default.
 
+**Status 2026-11-10: D1–D5 decided as recommended below, D6 replaced, and D7 added** (Igor
+Shuryak: "all as recommended"). Denham 1995 could not be obtained, so D6 now reads: cite Denham's
+interval as reported by Kaanders 1999 (secondary), keep Fowler's 10 Gy as the center, and check in
+step 4 whether the hyperfractionation trials inform α/β. D7: follow the gates, with no exploratory
+pilot fit. Record: `2026_11_10_early_toxicity_step1_target_definition.md`. The original wording
+of D1–D6 follows unchanged.
+
 Open, needed before the step shown:
 
 - **D1 (before step 3). Primary endpoint group.** Maximum grade ≥ 3 acute mucositis with the scale
