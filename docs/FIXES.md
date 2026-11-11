@@ -427,3 +427,13 @@ Several R tests were red on 917825b because the new helper did not exist yet. Th
 | Arm-level mucositis counts from 36 trial reports, each extracted twice independently (`tools/early_tox/build_arms.py`, `data/early_tox/{arms,outcomes,arm_schedules,arm_fractions,evidence_families}.csv`) | No arm-level outcome data existed: the early-toxicity parameters rest on Fowler 2003 and historical labels only (plan section 2). | `tests/python/test_early_tox_arms.py`: accepting one extraction gave 1 failure (`::test_a_count_found_in_only_one_extraction_is_refused`); Saturday as a W5 day gave 9; a gap off by one gave 2 (`::test_schedule_patterns_reproduce_the_protocols[RTOG9003_AFXS-...]`); ignoring the same-day interval gave 2; ignoring the screening log gave 1 (`::test_duplicate_reports_add_no_counts_even_when_both_extractions_agree`); accepting an unknown pattern token gave 1. | Data tables only: 45 outcomes, 43 arms, 15 candidate families. |
 
 **Verification.** 2026-11-10: `python3 -m pytest -q tests/python` gave 232 passed (213 before); `stale_constant_audit.py --project . --project-root . --strict` gave 0 errors. Rebuilding after the mutation checks reproduced the committed tables byte for byte. Record: `docs/development/2026_11_10_early_toxicity_step2_data.md`.
+
+### 2026-11-10, third part: early-toxicity schedule evaluator (local, not pushed, not deployed)
+
+**Changes published numbers:** no. The app does not use `tools/early_tox/evaluator.py`.
+
+| Change | What was wrong (proof) | Test (red by mutation) | What it moves |
+|---|---|---|---|
+| One repair-aware evaluator for explicit fraction schedules (plan R8) | The exploratory fitter used repair with a 3.2 h half-time while `exploratory_after_audit/implic.py` used complete repair, so fit and prediction disagreed (plan R8). | `tests/python/test_early_tox_evaluator.py`: an inclusive clock gave 1 failure (`::test_fowler_no_repair_fixtures_from_the_step2_arm_schedules`); an undoubled repair cross-term gave 2; dropping the onset hinge gave 1 (`::test_onset_cancels_from_a_contrast_only_when_both_courses_pass_it`); half-time used as a rate gave 2; no ordering check gave 1. | Nothing in the app. Fixtures: 53.10544, 55.86597, 55.43495 (from the step 2 arm schedules), 84.12426 and +0.28402 Gy10. |
+
+**Verification.** 2026-11-10: `python3 -m pytest -q tests/python` gave 239 passed (232 before).

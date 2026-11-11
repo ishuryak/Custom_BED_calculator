@@ -129,7 +129,10 @@ data.
 1. ~~Ask D1–D6 (one round).~~ Done. ~~Step 2~~ built 2026-11-10 (record
    `2026_11_10_early_toxicity_step2_data.md`): 45 arm outcomes from 36 reports, each in two
    independent extractions. Open: Igor spot-check, historical-label crosswalk (before step 6),
-   EORTC 22851 course-2 pattern. **Next: step 3 (endpoint mapping, Igor approves).**
+   EORTC 22851 course-2 pattern. Step 3 PROPOSAL written
+   (`2026_11_10_early_toxicity_step3_mapping_proposal.md`, decisions M1-M4 and a spot-check list),
+   not applied. Step 4 groundwork: `tools/early_tox/evaluator.py` with plan tests 6-8.
+   **Next: Igor answers M1-M4 and spot-checks, then step 3 is applied and step 4 runs.**
 2. **Step 1** (about 2 hours): write the structured target definition. No code change.
 3. **Step 2** (3–5 days, Igor Shuryak spot-checks): build `data/early_tox/` (reports, schedules,
    fractions, labels, arms, outcomes, evidence families). Every value comes from a downloaded full
