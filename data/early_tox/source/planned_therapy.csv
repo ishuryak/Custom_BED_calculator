@@ -1,0 +1,35 @@
+arm_id,agents,planned_courses,planned_cumulative_mg_m2,proportion_intended,status,basis
+GORTEC9902_CRT,carboplatin + 5-FU,3,840 (carboplatin),1,known,"3 cycles, days 1-4, 22-25, 43-46"
+GORTEC9902_ACCCT,carboplatin + 5-FU,2,700 (carboplatin),1,known,days 1-5 and 29-33
+GORTEC9902_VACC,none,0,0,0,known,RT alone
+RTOG0129_SFX,cisplatin 100 mg/m2 3-weekly,3,300,1,known,x 3
+RTOG0129_AFXC,cisplatin 100 mg/m2 3-weekly,2,200,1,known,x 2
+Vienna_VCHART_MMC,mitomycin C 20 mg/m2,1,20,1,known,day 5
+Olmi_CFCT,carboplatin + 5-FU every 28 days,2,600 (carboplatin),1,known,carboplatin 75 mg/m2 days 1-4 every 28 days over 7 weeks
+Bartelink_CF,cisplatin 6 mg/m2 daily,35,210,1,known,before each of 35 fractions
+Bartelink_MFD,cisplatin 10 mg/m2 daily,15,150,1,known,15 treatment days; higher daily dose
+Tandon_SIB,cisplatin 40 mg/m2 weekly,,,1,assumed_equal,planned courses not stated; >=5 cycles delivered in 83% vs 73% (p. 4)
+Tandon_SMART,cisplatin 40 mg/m2 weekly,,,1,assumed_equal,as Tandon_SIB; 5 vs 7 weeks of RT (decision D5: 0 with a -1 sensitivity)
+Sikdar_SEQ,cisplatin 40 mg/m2 weekly (max 60 mg),,,1,assumed_equal,planned courses not stated; delivered median 4
+Sikdar_SIB,cisplatin 40 mg/m2 weekly (max 60 mg),,,1,assumed_equal,planned courses not stated; delivered median 5
+Shivananjappa_HSIB,cisplatin 100 mg/m2 3-weekly if fit,,,,assumed_equal,number of cycles missing in the text; 86% received 3
+Shivananjappa_CONV,cisplatin 100 mg/m2 3-weekly if fit,,,,assumed_equal,as HSIB
+Mani_SIB,cisplatin 35 mg/m2 weekly,,,1,assumed_equal,same RT duration in both arms
+Mani_SEQ,cisplatin 35 mg/m2 weekly,,,1,assumed_equal,same RT duration in both arms
+DAHANCA7_5F,nimorazole,30,,1,known,"with the first 30 fractions, both arms"
+DAHANCA7_6F,nimorazole,30,,1,known,"with the first 30 fractions, both arms"
+GhoshLaskar_CRT,cisplatin 30 mg/m2 weekly,,,1,known,added regimen; reference arm has none
+Grover_SEQ,cisplatin 40 mg/m2 weekly,6,240,1,known,6 cycles in both arms
+Grover_SIB,cisplatin 40 mg/m2 weekly,6,240,1,known,6 cycles in both arms
+GuptaP_CFCCT,cisplatin 75 mg/m2,3,225,1,known,"days 1, 22, 42"
+GuptaP_CBRT,none,0,0,0,known,RT alone
+GuptaP_CBRTCCT,cisplatin 75 mg/m2,3,225,1,known,"days 1, 17, 34"
+Tallari_CF,cisplatin 40 mg/m2 weekly (after induction),,,1,assumed_equal,weekly in both arms over a similar overall time
+Tallari_HF,cisplatin 40 mg/m2 weekly (after induction),,,1,assumed_equal,weekly in both arms over a similar overall time
+Singh_5F,cisplatin 100 mg/m2,3,300,1,known,"days 1, 22, 43 in both arms (day 43 falls near the end of the 6-week accelerated course)"
+Singh_6F,cisplatin 100 mg/m2,3,300,1,known,"days 1, 22, 43"
+Sanchiz_C,5-FU 250 mg/m2 every 2 days,,,1,known,added regimen
+Dwivedi_CF,cisplatin 100 mg/m2,2,200,1,known,"days 1 and 22, both arms"
+Dwivedi_HF,cisplatin 100 mg/m2,2,200,1,known,"days 1 and 22, both arms"
+HYPNO_HFX,cisplatin 35 mg/m2 weekly,4,140,0.75,known,4 courses (HYPNO p. 391); prescribed in 75% overall (p. 394)
+HYPNO_NFX,cisplatin 35 mg/m2 weekly,5,175,0.75,known,5 courses

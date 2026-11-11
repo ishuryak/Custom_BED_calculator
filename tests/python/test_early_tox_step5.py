@@ -162,3 +162,48 @@ def test_adequate_ascertainment_unit_loads_only_the_strict_set():
     rows, fams = s5.load_rows(adequate_only=True)
     assert fams == ["CAIR1", "ORO9301"] and len(rows) == 5
     assert s5.UNITS["U15"][1] == dict(adequate_only=True)
+
+
+def _cum(row):
+    v = (row or {}).get("planned_cumulative_mg_m2", "").split(" ")[0]
+    return float(v) if v else None
+
+
+def test_planned_therapy_differences_are_coded_or_declared_as_scenarios():
+    # Exposure completeness (review F1): a known planned-dose difference against the reference arm
+    # must carry a matching chemotherapy code (fitted arms) or declared scenarios (external arms).
+    pt = s5.planned_therapy()
+    arms = {a["arm_id"]: a for a in s5.read("arms.csv")}
+    ref_of = dict(s5.REF_ARM, HYPNO="HYPNO_NFX")
+    checked = 0
+    for aid, a in arms.items():
+        ref = ref_of.get(a["family_id"])
+        if ref is None or aid == ref or aid not in pt or ref not in pt:
+            continue
+        if pt[aid]["status"] == "assumed_equal":
+            assert s5.CHEMO_CUMULATIVE.get(aid, 0) == 0, aid
+            continue
+        x, y = _cum(pt[aid]), _cum(pt[ref])
+        if x is None or y is None or x == y:
+            continue
+        checked += 1
+        if aid in s5.CHEMO_CUMULATIVE:
+            assert (s5.CHEMO_CUMULATIVE[aid] > 0) == (x > y), aid
+        else:
+            assert aid in s5.EXTERNAL_CHEMO_SCENARIOS, f"{aid}: planned {x} vs {y} but no code or scenario"
+    assert checked >= 5
+
+
+def test_hypno_scenarios_and_tandon_sensitivity_are_declared():
+    sc = s5.EXTERNAL_CHEMO_SCENARIOS["HYPNO_HFX"]
+    assert sc["code_0"] == 0 and sc["code_minus1"] == -1 and sc["mixture_75pct"] == ("mixture", 0.75, -1.0)
+    pt = s5.planned_therapy()
+    assert (pt["HYPNO_HFX"]["planned_courses"], pt["HYPNO_NFX"]["planned_courses"]) == ("4", "5")
+    assert pt["Tandon_SMART"]["status"] == "assumed_equal" and s5.CHEMO_SENSITIVITY == {"Tandon_SMART": -1}
+
+
+def test_reported_totals_come_from_the_loaded_rows():
+    rows, _ = s5.load_rows()
+    assert s5.analysis_totals(rows) == dict(arms=51, families=22, evaluable=6042, events=2945)
+    with pytest.raises(ValueError, match="counted twice"):
+        s5.analysis_totals(rows + rows[:1])

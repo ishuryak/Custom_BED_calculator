@@ -74,6 +74,31 @@ CHEMO_CUMULATIVE = {
 # concurrent dose is the same (code 0).
 CHEMO_SAME_DOSE = {"GuptaP_CBRTCCT": "cisplatin 3 x 75 mg/m2 in both arms; only the days differ"}
 # Sensitivity coding: only a whole regimen added or removed counts.
+# External (never fitted) arms whose planned chemotherapy differs from their reference arm: scored
+# under declared scenarios, never a single silent code (review F1, 2026-11-11). HYPNO planned 4 vs 5
+# weekly cisplatin courses, prescribed in about 75% of patients.
+EXTERNAL_CHEMO_SCENARIOS = {
+    "HYPNO_HFX": {"code_0": 0.0, "code_minus1": -1.0, "mixture_75pct": ("mixture", 0.75, -1.0)},
+}
+# Decision D5 sensitivity: Tandon's 25-fraction arm coded -1 (planned courses not stated).
+CHEMO_SENSITIVITY = {"Tandon_SMART": -1}
+
+
+def planned_therapy():
+    """Structured planned systemic therapy per arm (data/early_tox/source/planned_therapy.csv)."""
+    out = {}
+    for r in read_source("planned_therapy.csv"):
+        if r["arm_id"] in out:
+            raise ValueError(f"{r['arm_id']}: duplicate planned-therapy row")
+        out[r["arm_id"]] = r
+    return out
+
+
+def read_source(name):
+    with open(os.path.join(ROOT, "data", "early_tox", "source", name), newline="") as f:
+        return list(csv.DictReader(f))
+
+
 CHEMO_ONOFF = {"GORTEC9902_VACC": -1, "Vienna_VCHART_MMC": +1, "Olmi_CFCT": +1,
                "GhoshLaskar_CRT": +1, "GuptaP_CBRT": -1, "Sanchiz_C": +1}
 CHEMO_FAMILIES = {"GORTEC9902", "RTOG0129", "Vienna", "ORO9301", "Bartelink2002", "GhoshLaskar", "GuptaP",
@@ -149,6 +174,15 @@ def load_rows(w1_only=False, m4=False, drop_chemo=False, drop_family=None, adequ
         if sum(1 for r in rows if r["arm_id"] == REF_ARM.get(f)) != 1:
             raise ValueError(f"family {f}: reference arm {REF_ARM.get(f)} not found exactly once")
     return rows, fams
+
+
+def analysis_totals(rows):
+    """Totals of an analysis set, derived from the loaded rows (review F6: never typed by hand)."""
+    ids = [r["arm_id"] for r in rows]
+    if len(ids) != len(set(ids)):
+        raise ValueError("an arm is counted twice")
+    return dict(arms=len(rows), families=len({r["family"] for r in rows}),
+                evaluable=sum(r["N"] for r in rows), events=sum(r["y"] for r in rows))
 
 
 def schedule_terms(doses, times, Tk):
