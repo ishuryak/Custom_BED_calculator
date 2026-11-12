@@ -205,7 +205,8 @@ test_that("the main page offers visible links to how each model was fitted and t
     hs <- as.character(output$home_settings$html)
     expect_match(hs, "id=\"how_fitted_home\"", fixed = TRUE)                  # tumor method, visible
     expect_match(hs, "id=\"tumor_trials_link\"", fixed = TRUE)                # tumor trials, visible without Details
-    expect_silent(session$setInputs(early_how = 1))
+    session$setInputs(early_how = 1)
+    expect_identical(fitted_route(), "fitted-early")   # 4.6.1: opens the methods page at the early section
     expect_silent(session$setInputs(early_trials = 1))
     expect_silent(session$setInputs(tumor_trials_link = 1))
   })

@@ -93,7 +93,7 @@ constants:
     value: 140
     provenance: design
     why: Upper bound of the "minimum days saved" inputs (app.R LIMITS and controls).
-    sites: ["app.R:58"]
+    sites: ["app.R:@^  min_days = list"]
   hypno_lrc_percent:
     value: [50.7, 51.2]
     provenance: literature

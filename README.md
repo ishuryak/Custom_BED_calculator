@@ -1,10 +1,10 @@
-# Custom BED calculator, version 4.6.0
+# Custom BED calculator, version 4.6.1
 
 **Use the calculator:** https://ishuryak.shinyapps.io/custom_bed_calculator_v4/ · **Source:** this branch (`v4`) of https://github.com/ishuryak/Custom_BED_calculator
 
-A web calculator for designing trials of shorter, hypofractionated radiotherapy for head and neck squamous cell carcinoma: it lists schedules whose modeled tumor dose stays close to 70 Gy in 35 fractions while their modeled early and late side-effect doses do not rise by more than chosen limits. It is a research tool for hypothesis generation, not for treatment decisions. User guide: `docs/user_guide/HNSCC_BED_v4_user_guide.md`. How the tumor models were fitted: `refit_in_brief.md` (short) and `docs/refit_explainer/` (full).
+A web calculator for designing trials of shorter, hypofractionated radiotherapy for head and neck squamous cell carcinoma: it lists schedules whose modeled tumor dose stays close to 70 Gy in 35 fractions while their modeled early and late side-effect doses do not rise by more than chosen limits. It is a research tool for hypothesis generation, not for treatment decisions. User guide: `docs/user_guide/HNSCC_BED_v4_user_guide.md`. How the models were fitted: the page "How the models were fitted (Bayesian)" in the app (text `how_fitted.md`, priors, settings and checks from `draws/model_methods.json`), and for the tumor fit in full `docs/refit_explainer/`.
 
-The live site runs version 4.5.0 (revision `faf6817`, deployed 2026-11-09). Release record: `docs/development/2026_11_09_v45_review_implementation.md`. Deployment history is at the end of this file.
+The live site runs version 4.6.0 (revision `c80f63b`, deployed 2026-11-11). Version 4.6.1 (this branch) adds the methods page and is not deployed. Release records: `docs/development/2026_11_11_v46_review_implementation.md` and, for 4.6.1, `docs/development/2026_11_12_v461_methods_page.md`. Deployment history is in the next section.
 
 R Shiny app for head and neck squamous cell carcinoma (HNSCC), for designing hypofractionated trial regimens. It computes:
 
@@ -37,12 +37,13 @@ Version 4 keeps the version 3.2.1 engine and changes the layout for clinicians. 
 - `draws/`: 4000 joint posterior draws per model and fit variant, with SHA-256 manifest. Produced offline by `fit/` (CmdStan); Stan never runs in the app.
 - `app.R`: the user interface.
 - `about.md`: the "Model and sources" page.
+- `how_fitted.md`, `R/methods_page.R`: the page "How the models were fitted (Bayesian)" (version 4.6.1). Its priors, fixed settings, sampler settings and checks come from `draws/model_methods.json`, built offline by `tools/build_model_methods.py`, which refuses unless each fit identity reproduces from the current data, priors and Stan models (`python3 tools/build_model_methods.py --check` tells whether the record is current).
 - `tests/testthat/`: tests of the formulas against an independent implementation and published values, of the server logic, and of the export round trip. `tests/python/`: tests of the fitting pipeline and of `tools/build_fit_trial_list.py` (run with `python3 -m pytest tests/python`, not run by continuous integration).
 - `run_app.bat`: double-click launcher for Windows. It uses `RSCRIPT` if set, else Rscript on the PATH, else the newest R under Program Files, and starts `tools/launch.R`, which uses the release library when it has been restored.
 - `tools/`: `restore_library.R` (installs the versions in `renv.lock`), `run_tests.R` (full suite in that library only), `launch.R`, `env.R`, `deploy.R` (publishes to shinyapps.io as `custom_bed_calculator_v4` only; refuses the version 1 and 2 names; pinned account; clean tree; suite passed on the same revision).
 - `.rscignore`: keeps `References/`, `tests/`, `docs/`, `fit/`, `.Rhistory` and `.Renviron` out of a shinyapps.io deployment.
 - `docs/FIXES.md`: one row per landed change, with its evidence.
-- `docs/user_guide/`: user guide to version 4.4 (`HNSCC_BED_v4_user_guide.md` and its Word copy). The guide to version 3.2.1 (every tab and menu item, the model fitting and its literature, and the uncertainty estimation) is kept as a historical record.
+- `docs/user_guide/`: user guide to version 4.6.1 (`HNSCC_BED_v4_user_guide.md` and its Word copy; the 2026-11-12 edit also has `_pre_`, `_tracked_` and `_clean_` copies and a diff). The guide to version 3.2.1 (every tab and menu item, the model fitting and its literature, and the uncertainty estimation) is kept as a historical record.
 - `docs/development/`: review records and plans. For version 3 start with `2026_10_21_v3_build.md` and `2026_10_21_v3/fit_report.md`. For version 3.1, `PLAN_codex_review_2026_10_25.md` and `2026_10_25_stages_BCDE_refit.md`.
 - `renv.lock`: the release package versions (R 4.5.1), all from the Posit Package Manager snapshot of 2026-10-15, which serves binaries of exactly these versions for Windows, macOS and Linux.
 - `References/`: sources, with `References/README.md` giving each one's license and the quoted parameter values. Paywalled or non-redistributable PDFs are git-ignored.
@@ -63,6 +64,16 @@ run_app.bat                     # or: Rscript tools/launch.R
 ```
 
 Each prints the R and package versions it used. Without the restore step the app still starts with whatever packages are installed in R, and says so; results from such a session are not from the release environment. On 2026-10-19 a restore into an empty library installed 68 packages as binaries, and `tools/run_tests.R` then gave 2541 expectations, 0 failed, 0 errors, 0 warnings.
+
+## Changes in version 4.6.1 (methods page, review of 2026-11-12; not deployed)
+
+**Changes published numbers: no.** Every list, BED value, draw and export is unchanged; the change is a page and its navigation.
+
+- New page "How the models were fitted (Bayesian)", in the menu between Organs at risk and Settings and sources, and as a button under Details. The links "How was the tumor model fitted?" (main page, Uncertainty, Settings and sources) and "How was the early-toxicity model fitted?" open it at the tumor or early section instead of a dialog.
+- The page explains what a Bayesian fit is, what was fitted (tumor control, acute mucositis) and what is not (late toxicity), the DI fit and the DD model calibrated to it one DI sample at a time, the early hierarchical model, the checks and what they do not show, and how the samples are used. The existing tumor and early summaries are embedded unchanged.
+- Priors, fixed settings, sampler settings and diagnostics are read from `draws/model_methods.json`, which the app checks against the draws it loads; a mismatch shows a warning instead of the tables. The record can be downloaded from the page.
+- The deploy bundle check requires `how_fitted.md` and the record and refuses empty copies of every page text.
+- Records: `docs/development/2026_11_12_v461_methods_page.md`; the review that led to it, `docs/development/2026_11_12_bayesian_methods_and_late_toxicity_review.md`.
 
 ## Changes in version 4.6.0 (early-toxicity research switch, 2026-11-11; deployed 2026-11-11 at `c80f63b`)
 

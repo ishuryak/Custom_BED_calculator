@@ -12,6 +12,7 @@ source("R/mod_oar.R", local = TRUE)
 source("R/mod_uncertainty.R", local = TRUE)
 source("R/v4_home.R", local = TRUE)
 source("R/v4_export.R", local = TRUE)
+source("R/methods_page.R", local = TRUE)
 # Identity of the code as loaded, so an export made after the files on disk
 # have changed says so (code$changed_since_load).
 CODE_AT_LOAD <- code_identity()
@@ -92,10 +93,10 @@ PROFILE_NAMES <- c(refit = "trial-fit point scenario", d18 = "scenario D18", cal
 # The refit explainer (docs/refit_explainer, built into www/ and served at the site root).
 REFIT_EXPLAINER_HTML <- "refit_explainer.html"
 REFIT_EXPLAINER_DOCX <- "refit_explainer.docx"
-# The short clinician text on how the tumor model was fitted (review 3, 2026-11-09), opened from
-# the main page, the Uncertainty page and Settings and sources.
-REFIT_BRIEF <- markdown::mark(file = "refit_in_brief.md")
-EARLY_BRIEF <- markdown::mark(file = "early_fit_in_brief.md")
+# The short clinician texts on how the tumor and early models were fitted (review 3, 2026-11-09)
+# are sections of the page "How the models were fitted (Bayesian)" from version 4.6.1
+# (R/methods_page.R); the links on the main page, Uncertainty and Settings open it there.
+MODEL_METHODS <- load_model_methods()
 how_fitted_link <- function(id) actionLink(id, "How was the tumor model fitted?", class = "v4-how-fitted")
 # The values a complete profile sets (all six tumor fields).
 profile_values <- function(name) switch(name, refit = REFIT_PROFILE$values, d18 = d18_profile(), NULL)
@@ -395,6 +396,10 @@ V45_PAGES <- list(
       h5("Toxicity BED differences (do not depend on the tumor setting)"),
       tableOutput("sens_tox")))),
     nav_panel("Uncertainty", page_head("Uncertainty", "unc"), how_fitted_link("how_fitted_unc"), unc_ui("unc")),
+    nav_panel(FITTED_PAGE,
+      page_head(FITTED_PAGE, "fitted",
+                "The data, assumptions, sampling and checks behind the fitted tumor and early-toxicity models."),
+      div(id = "fitted_page_box", uiOutput("fitted_page"))),
     nav_panel("Organs at risk", page_head("Organs at risk", "oar"), oar_ui("oar")),
     nav_panel("Settings and sources",
       page_head("Settings and sources", "settings",
@@ -407,13 +412,15 @@ V45_PAGES <- list(
 
 # Menu entries: page value (= the page title) and its link id.
 V4_MENU <- c("Check a regimen" = "report", "Custom search (advanced)" = "search", "Uncertainty" = "unc",
-             "Organs at risk" = "oar", "Settings and sources" = "settings")
+             "Organs at risk" = "oar", "How the models were fitted (Bayesian)" = "fitted",
+             "Settings and sources" = "settings")
 # One-line descriptions under menu entries.
 V4_MENU_NOTES <- c(
   report = "one regimen against a comparison, all BED values, side-by-side comparison",
   search = "your own criteria and limits; both-model screen; selected parameter settings",
   unc = "uncertainty from the trial refit",
   oar = "organ dose limits for a plan",
+  fitted = "data, priors and checks of the trial fits",
   settings = "model parameters, equations and sources")
 
 v4_menu <- function() {
@@ -464,7 +471,9 @@ v4_home <- function() {
         checkboxInput("home_details", "Details (which tumor model, notes, fitted trials)", value = FALSE),
         conditionalPanel("input.home_details",
           actionButton("home_trials", "Trials the tumor models were refitted to", class = "btn-outline-primary btn-sm",
-                       title = "References, arms, dose, fractionation, time and drugs of the trials in the Bayesian refit")))),
+                       title = "References, arms, dose, fractionation, time and drugs of the trials in the Bayesian refit"),
+          actionButton("home_how_fitted", FITTED_PAGE, class = "btn-outline-primary btn-sm",
+                       title = "What was fitted, the priors, the sampling and its checks, and how the samples are used")))),
     DTOutput("home_table", fill = FALSE),
     uiOutput("home_footnotes"),
     uiOutput("home_detail"),
@@ -485,6 +494,10 @@ v4_home <- function() {
       "  $('.bslib-page-main, .main, main').scrollTop(0); });",
       "$(document).on('hidden.bs.modal', function() { var b = document.getElementById('home_trials');",
       "  if (b && b.offsetParent !== null) b.focus(); });",
+      "Shiny.addCustomMessageHandler('v4-scroll-wait', function(id) { var n = 0;",
+      "  var t = setInterval(function() { var el = document.getElementById(id); n++;",
+      "    if (el) { clearInterval(t); el.scrollIntoView({block: 'start'}); el.setAttribute('tabindex', '-1'); el.focus({preventScroll: true}); }",
+      "    else if (n > 40) clearInterval(t); }, 100); });",
       "Shiny.addCustomMessageHandler('v4-scroll', function(id) {",
       "  setTimeout(function() { var el = document.getElementById(id); if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 150);",
       "});",
@@ -502,6 +515,12 @@ ui <- page_sidebar(
       ".bslib-page-title, .navbar-brand { white-space: normal; overflow-wrap: anywhere; font-size: clamp(1rem, 2.5vw, 1.25rem); }",
       "#about .MathJax_Display, #about mjx-container[display], #about .MathJax_SVG_Display { overflow-x: auto; overflow-y: hidden; max-width: 100%; }",
       "#about table { display: block; overflow-x: auto; max-width: 100%; }",
+      "#fitted_page .MathJax_Display, #fitted_page mjx-container[display], #fitted_page .MathJax_SVG_Display { overflow-x: auto; overflow-y: hidden; max-width: 100%; }",
+      "#fitted_page table { display: block; overflow-x: auto; max-width: 100%; font-size: 0.9rem; margin-bottom: 0.8rem; }",
+      "#fitted_page th, #fitted_page td { padding: 0.25rem 0.6rem; border-bottom: 1px solid #dee2e6; vertical-align: top; }",
+      "#fitted_page { max-width: 900px; } #fitted_page h4 { margin-top: 1.4rem; scroll-margin-top: 1rem; }",
+      ".fitted-short { background: #f4f6f8; border-radius: 0.4rem; padding: 0.7rem 1rem; }",
+      ".fitted-tech { margin: 0.6rem 0 1rem; } .fitted-tech summary { font-weight: 600; cursor: pointer; color: #0f6e5c; }",
       ".bed-banner { margin-bottom: 0.5rem; }",
       "a, .btn-link { color: #0f6e5c; }",
       ".v4-menu-note { display: block; color: #5c6670; font-size: 0.78rem; line-height: 1.2; }",
@@ -1815,25 +1834,45 @@ server <- function(input, output, session) {
   }
   observeEvent(input$home_trials, show_tumor_trials())
   observeEvent(input$tumor_trials_link, show_tumor_trials())
-  # Early-toxicity research option: how it was fitted, and its trials (version 4.6).
-  observeEvent(input$early_how, showModal(modalDialog(
-    title = "How the early-toxicity model was fitted", size = "l", easyClose = TRUE, footer = modalButton("Close"),
-    HTML(sub("<h3>[^<]*</h3>", "", EARLY_BRIEF)),
-    tags$p(actionLink("early_trials_from_how", "See the trials used for the fit."))))) 
+  # Early-toxicity research option: its trials (version 4.6). How it was fitted is a section of
+  # the methods page (version 4.6.1).
   show_early_trials <- function() {
     dlg <- early_fit_trials_dialog(EARLY_FIT)
     showModal(modalDialog(title = dlg$title, size = "xl", easyClose = TRUE, footer = modalButton("Close"), dlg$body))
   }
   observeEvent(input$early_trials, show_early_trials())
-  observeEvent(input$early_trials_from_how, show_early_trials())
-  for (id in c("how_fitted_home", "how_fitted_unc", "how_fitted_settings")) local({
+  observeEvent(input$fitted_early_trials, show_early_trials())
+  observeEvent(input$fitted_tumor_trials, show_tumor_trials())
+
+  # The methods page (version 4.6.1): one page, opened from the menu, Details and every
+  # "How was ... fitted?" link, each at its own section. fitted_route records the last route.
+  fitted_route <- reactiveVal(NULL)
+  open_fitted <- function(anchor) {
+    fitted_route(anchor)
+    go_to(FITTED_PAGE)
+    session$sendCustomMessage("v4-scroll-wait", anchor)
+  }
+  for (id in names(FITTED_LINKS)) local({
     id <- id
-    observeEvent(input[[id]], showModal(modalDialog(
-      title = "How the tumor model was fitted", size = "l", easyClose = TRUE, footer = modalButton("Close"),
-      HTML(sub("<h3>[^<]*</h3>", "", REFIT_BRIEF)),
-      tags$p(tags$a(href = REFIT_EXPLAINER_HTML, target = "_blank", rel = "noopener", "The full refit explainer"),
-             "gives the equations, priors, diagnostics and every fitted arm."))))
+    observeEvent(input[[id]], open_fitted(FITTED_LINKS[[id]]), ignoreInit = TRUE)
   })
+  output$fitted_page <- renderUI({
+    src <- paste0(
+      "- ", as.character(actionLink("fitted_tumor_trials", "Trials the tumor models were fitted to")), "\n",
+      "- ", as.character(actionLink("fitted_early_trials", "Trials used for the early-toxicity fit")), "\n",
+      "- ", as.character(tags$a(href = REFIT_EXPLAINER_HTML, target = "_blank", rel = "noopener",
+                                 "The full refit explainer")),
+      " (tumor model: every fitted arm, model comparison and the reasons for each choice; ",
+      as.character(tags$a(href = REFIT_EXPLAINER_DOCX, download = NA, "Word copy")), ")\n",
+      "- ", as.character(downloadLink("download_methods", "Download the methods record (JSON)")),
+      ": priors, fixed settings, sampler settings, diagnostics and the identities of the fits and draws\n",
+      "- Source code and fitting scripts: ", deployed_revision_text(), "\n")
+    txt <- methods_page_text(MODEL_METHODS, sources = src)
+    withMathJax(HTML(markdown::mark(text = txt, options = "+latex_math")))
+  })
+  output$download_methods <- downloadHandler(
+    filename = function() "model_methods.json",
+    content = function(file) file.copy(file.path(DRAWS_DIR, MODEL_METHODS_FILE), file, overwrite = TRUE))
 
   home_selected <- reactive({
     i <- input$home_table_rows_selected

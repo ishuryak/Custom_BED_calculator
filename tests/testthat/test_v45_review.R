@@ -176,12 +176,12 @@ test_that("Sensitivity never calls a directly entered DD calibrated; Main does n
 
 # --- 5: six destinations; every former page's inputs and outputs still mounted once -----------
 
-test_that("the menu has six destinations including the main page, and every former task keeps its ids", {
+test_that("the menu has seven destinations including the main page, and every former task keeps its ids", {
   e <- new.env(); withr::with_dir(app_abs, sys.source("app.R", envir = e))
   html <- as.character(htmltools::renderTags(e$ui)$html)
   expect_identical(names(e$V4_MENU), c("Check a regimen", "Custom search (advanced)", "Uncertainty", "Organs at risk",
-                                       "Settings and sources"))
-  expect_equal(length(e$V4_MENU) + 1, 6)            # plus "Suggested regimens" (home)
+                                       "How the models were fitted (Bayesian)", "Settings and sources"))
+  expect_equal(length(e$V4_MENU) + 1, 7)            # plus "Suggested regimens" (home); 4.6.1 adds the methods page
   links <- regmatches(html, gregexpr("id=\"go_[a-z]+\"", html))[[1]]
   expect_setequal(links, sprintf("id=\"go_%s\"", c("home", unname(e$V4_MENU))))
   ids <- c("report", "results", "verdicts", "acute_zone", "benchmarks", "compare_table", "cmp1_m", "cmp2_d", "cmp3_m",
@@ -248,11 +248,13 @@ test_that("'How was the tumor model fitted?' is offered on Main, Uncertainty and
   e <- new.env(); withr::with_dir(app_abs, sys.source("app.R", envir = e))
   html <- as.character(htmltools::renderTags(e$ui)$html)
   for (id in c("how_fitted_unc", "how_fitted_settings")) expect_match(html, sprintf("id=\"%s\"", id), fixed = TRUE)
-  expect_match(as.character(e$REFIT_BRIEF), "Differences between randomized arms", fixed = TRUE)
+  expect_match(paste(readLines(file.path(app_abs, "refit_in_brief.md"), encoding = "UTF-8"), collapse = " "),
+               "Differences between randomized arms", fixed = TRUE)
   shiny::testServer(app_dir, {
     do.call(session$setInputs, v45_inputs)
     expect_match(as.character(output$home_settings$html), "id=\"how_fitted_home\"", fixed = TRUE)
-    expect_silent(session$setInputs(how_fitted_home = 1))
+    session$setInputs(how_fitted_home = 1)
+    expect_identical(fitted_route(), "fitted-tumor")   # 4.6.1: opens the methods page at the tumor section
     expect_silent(session$setInputs(home_trials = 1))
   })
 })

@@ -1,0 +1,289 @@
+{
+ "created_by": "tools/build_model_methods.py",
+ "early": {
+  "diagnostics": {
+   "divergences": 0,
+   "gate_note": "tree-depth hits are recorded but are not part of this fit's pass rule",
+   "gate_pass": true,
+   "max_rhat": 1.00459,
+   "min_ebfmi": 0.6771043173680077,
+   "min_ess_bulk": 1274.13,
+   "min_ess_tail": 1873.27,
+   "n_quantities": 114,
+   "treedepth_hits": 0
+  },
+  "draws": {
+   "rows": 4000,
+   "sha256": "a6fde4626c88a1872a84408d66e78ddd1460cdabb98734d06427ce186f07b4fd"
+  },
+  "fixed": {
+   "hinge": "exact",
+   "onset_elapsed_days": 7.0,
+   "repair_halftime_h": 3.2
+  },
+  "identity": "4747b297ac104be786a513d801de053e2de026926f068edccbd3f3a5c90c7a73",
+  "identity_reproduced": true,
+  "likelihood": "binomial: patients with grade 3 or worse (or confluent) acute mucositis in each arm, logit link",
+  "model_id": "early-fit-4747b297ac10",
+  "n_arms": 51,
+  "n_evaluable": 6042,
+  "n_families": 22,
+  "priors": [
+   {
+    "parameter": "Mean trial baseline",
+    "prior": "normal(0, 2.5)",
+    "status": "weak",
+    "units": "log odds"
+   },
+   {
+    "parameter": "Spread of trial baselines",
+    "prior": "half-normal(1)",
+    "status": "weak; estimated",
+    "units": "log odds"
+   },
+   {
+    "parameter": "CTCAE version 4 grading offset",
+    "prior": "normal(0, 1)",
+    "status": "weak",
+    "units": "log odds"
+   },
+   {
+    "parameter": "Slope per 10 Gy of early BED",
+    "prior": "half-normal(1)",
+    "status": "weak; risk cannot fall with dose",
+    "units": "log odds"
+   },
+   {
+    "parameter": "Mucosal α/β",
+    "prior": "lognormal(log 10, 0.354)",
+    "status": "assumption centered on Fowler's 10 Gy",
+    "units": "Gy"
+   },
+   {
+    "parameter": "Time-loss rate r",
+    "prior": "lognormal(log 0.8, 0.5)",
+    "status": "centered near Fowler's 0.79",
+    "units": "Gy of BED per day"
+   },
+   {
+    "parameter": "Planned-chemotherapy coefficient",
+    "prior": "normal(0, 1)",
+    "status": "weak",
+    "units": "log odds"
+   },
+   {
+    "parameter": "Spread of arm-level effects",
+    "prior": "half-normal(0.5)",
+    "status": "weak; estimated",
+    "units": "log odds"
+   }
+  ],
+  "sampler": {
+   "adapt_delta": 0.95,
+   "chains": 4,
+   "samples": 1000,
+   "seed": 20261111,
+   "warmup": 1000
+  },
+  "stan_sha256": "dd1a88d196cb09103520310625485d04bb9624bec186f1bd6ccfd9d840f0c636"
+ },
+ "late": {
+  "note": "an analyst-assumed range, not an estimate from trial data; complete repair, no time factor",
+  "point_ab": 3.0,
+  "status": "not fitted",
+  "uncertainty": {
+   "central_95": [
+    2.0,
+    4.5
+   ],
+   "dist": "lognormal",
+   "median": 3.0,
+   "sd_log": 0.207
+  }
+ },
+ "schema": "model-methods-1",
+ "sources": {
+  "R/uncertainty.R": "8501206478693d048352ff27ae1b13ce231dc89149cae79a7b58ee1cdbca33d4",
+  "data/refit_trials_2026_10_25c_main.csv": "51ed5d8a2cc60acb86feb2ca694132ed775c797f0e64afccc14714517caa8409",
+  "docs/development/2026_11_10_early_toxicity/step5_review/overdispersed/U02/diagnostics.json": "6d13e2180d811ef455a7c0c8146ac663e4acfd0c1e513b36aca1a4a3eec21469",
+  "docs/development/2026_11_10_early_toxicity/step5_review/overdispersed/U02/manifest.json": "a97c175c9d685c665f86fef35d24c5a6500585ed20c199e93d35f6efe6bac2c0",
+  "draws/draws_manifest.json": "2e95b631131a68d28abf6344680b8df2a5162172fa68dc38ac01764a7c7727eb",
+  "draws/early_fit_manifest.json": "e80ecc45015651cf975d6ae7da43d26080ca7d48df539ecccdca93b4fa1a4355",
+  "fit/fit_refit.py": "18050219303177fa2de03f3f6a94aa5462a57e67a0bde9103827d3b4410309bf",
+  "fit/output_refit_2026_10_25c_main/dd_calibrated_onset7_n1000/identity.json": "cb3a6ebe8dca6acdf7df540039887d7d41520c7b0b1c66138321eb1e7285d702",
+  "fit/output_refit_2026_10_25c_main/di_primary/identity.json": "ac4d0726c75cb7143e3d814af0f37c001b1393855bcc57591880700d454dcf6a",
+  "fit/stan/dd_cal.stan": "82a444b0c4743893efc4726ef5d20b174a50fdbe8393a81c91f9c8205d5a360a",
+  "fit/stan/di.stan": "667737507b82b6e4e1f96a7b0a903779047c483f9534ab23b2f16ca31c7d0117",
+  "tools/build_model_methods.py": "1444a15b0042335b8d5328357f5f5ab7a925c1e7faf33da406bdb4103d1d5601",
+  "tools/early_tox/step5_fit.py": "fc15825221a6e2b49ae3ed96060a586e3a79ba5bdec7885897159a2ce1a20edc",
+  "tools/early_tox/step5_model.stan": "dd1a88d196cb09103520310625485d04bb9624bec186f1bd6ccfd9d840f0c636"
+ },
+ "toxicity_pairing": "tumor and toxicity draws are paired independently (an assumption, not a fitted joint distribution)",
+ "tumor": {
+  "data_file": "refit_trials_2026_10_25c_main.csv",
+  "data_sha256": "51ed5d8a2cc60acb86feb2ca694132ed775c797f0e64afccc14714517caa8409",
+  "dd": {
+   "diagnostics": {
+    "anchor_max_abs_residual_gy": 9.839974020407748e-07,
+    "divergences": 0,
+    "gate_pass": true,
+    "gate_policy": "gate-2026-10-27",
+    "max_rhat": 1.00999,
+    "min_ebfmi": 0.5635481042,
+    "min_ess_bulk_per_fit": 400.094,
+    "min_ess_tail_per_fit": 419.925,
+    "outer_fits_failing_gate": 0,
+    "outer_fits_repaired": 9,
+    "outer_fits_repaired_ess": 177,
+    "treedepth_hits": 0
+   },
+   "draws_sha256": "badda372c6297ff6502da9a90670e789959bbd6f43187386bbd16ddd2b0020b0",
+   "identity": "2a1ab8937a623e1d962e997fa2530c84a22a70c0f2e4f442299be968defa813d",
+   "n_di_draws": 1000,
+   "onset_min": 7.0,
+   "onset_scale": 1.0,
+   "parent_di_identity": "2c828af600ee3d7bafd971a00495d5ecbc9e8a47e56136783572995fbdb1a65e",
+   "priors": [
+    {
+     "parameter": "DD regrowth rate λ",
+     "prior": "lognormal(log 0.5, 1.5)",
+     "status": "weakly informative; fitted given each DI draw",
+     "units": "per day"
+    },
+    {
+     "parameter": "DD onset",
+     "prior": "soft penalty favoring onset at or after day 7 in every arm (scale 1 day), not a bound",
+     "status": "assumption",
+     "units": "days"
+    },
+    {
+     "parameter": "Tumor α, α/β and g",
+     "prior": "taken from the DI draw (not refitted)",
+     "status": "conditional construction",
+     "units": ""
+    },
+    {
+     "parameter": "DD onset constant C/α",
+     "prior": "solved so that DD equals DI at 35 × 2 Gy in 47 days (not fitted)",
+     "status": "calibration",
+     "units": "Gy·day"
+    },
+    {
+     "parameter": "Baseline of each fitting unit",
+     "prior": "normal(0, 3)",
+     "status": "as in the DI fit",
+     "units": "log(−log) scale"
+    },
+    {
+     "parameter": "Spread of arm-level effects σ",
+     "prior": "half-normal(0.5)",
+     "status": "as in the DI fit",
+     "units": "log(−log) scale"
+    }
+   ],
+   "sampler": {
+    "adapt_delta": 0.99,
+    "chains": 4,
+    "max_attempts": 3,
+    "max_treedepth": 12,
+    "samples": 250,
+    "seed": 20261021,
+    "warmup": 600
+   },
+   "stan_sha256": "82a444b0c4743893efc4726ef5d20b174a50fdbe8393a81c91f9c8205d5a360a"
+  },
+  "di": {
+   "ab_prior_95": [
+    5.0,
+    20.0
+   ],
+   "diagnostics": {
+    "divergences": 0,
+    "gate_pass": true,
+    "gate_policy": "gate-2026-10-27",
+    "max_rhat": 1.00228,
+    "min_ebfmi": 0.8073911501355053,
+    "min_ess_bulk": 1489.29,
+    "min_ess_tail": 1559.58,
+    "n_quantities": 82,
+    "ppc_inside_90": 45,
+    "treedepth_hits": 0,
+    "worst_rhat": "c[17]"
+   },
+   "draws_sha256": "bf60300e80dac83a1eb5a8a71089f5d5dc3e38f836cdcea2199dd0c9ea72d2c3",
+   "identity": "2c828af600ee3d7bafd971a00495d5ecbc9e8a47e56136783572995fbdb1a65e",
+   "priors": [
+    {
+     "parameter": "Tumor α/β",
+     "prior": "lognormal(log 10, 0.354)",
+     "status": "assumption: the plausible range of the 2018 paper",
+     "units": "Gy"
+    },
+    {
+     "parameter": "Tumor α",
+     "prior": "lognormal(log 0.2, 1)",
+     "status": "weakly informative",
+     "units": "per Gy"
+    },
+    {
+     "parameter": "DI regrowth rate λ",
+     "prior": "lognormal(log 0.1, 1.5)",
+     "status": "weakly informative",
+     "units": "per day"
+    },
+    {
+     "parameter": "DI regrowth onset Tk",
+     "prior": "normal(28, 10), limited to 0–60",
+     "status": "centered on the classic onset near 4 weeks",
+     "units": "days"
+    },
+    {
+     "parameter": "Background growth g",
+     "prior": "uniform 0.0046–0.021",
+     "status": "the plausible range of the 2018 paper",
+     "units": "per day"
+    },
+    {
+     "parameter": "Baseline of each fitting unit",
+     "prior": "normal(0, 3)",
+     "status": "weak, the same fixed prior for every unit",
+     "units": "log(−log) scale"
+    },
+    {
+     "parameter": "Spread of arm-level effects σ",
+     "prior": "half-normal(0.5)",
+     "status": "weak; estimated common spread",
+     "units": "log(−log) scale"
+    }
+   ],
+   "sampler": {
+    "adapt_delta": 0.99,
+    "chains": 4,
+    "max_treedepth": 12,
+    "samples": 2000,
+    "seed": 20261021,
+    "warmup": 1500
+   },
+   "software": {
+    "cmdstan": "2.40",
+    "cmdstanpy": "1.3.0",
+    "numpy": "2.4.3",
+    "python": "3.12.3"
+   },
+   "stan_data_reproduced": true,
+   "stan_data_sha256": "30caa6047419ddfcad6241c40534afa1e46ffea109c47c7531ac8a54320be656",
+   "stan_sha256": "667737507b82b6e4e1f96a7b0a903779047c483f9534ab23b2f16ca31c7d0117"
+  },
+  "draws": {
+   "dd_per_di_draw": 4,
+   "distinct_di_draws": 1000,
+   "gate_policy": "gate-2026-10-27",
+   "pairing": "row i of tumor_dd_<variant>.csv was fitted conditional on row i of tumor_di_<variant>.csv",
+   "rows": 4000
+  },
+  "likelihood": "binomial: patients with tumor control in each arm, a rounded count from the reported control rate times the number analyzed",
+  "n_arms": 45,
+  "n_fitting_units": 21,
+  "response": "Poisson tumor control, TCP = exp(−exp(η))"
+ }
+}

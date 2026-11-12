@@ -155,8 +155,8 @@ main <- function(args) {
   check("menu opens", isTRUE(js("!$('.bslib-sidebar-layout').hasClass('sidebar-collapsed')")))
   shot("03_menu_open")
   pages <- c(report = "Check a regimen", search = "Custom search (advanced)", unc = "Uncertainty", oar = "Organs at risk",
-             settings = "Settings and sources")
-  check("menu has five pages plus the main page", identical(as.integer(js("$('.v4-menu-link').length")), 6L))
+             fitted = "How the models were fitted (Bayesian)", settings = "Settings and sources")
+  check("menu has six pages plus the main page", identical(as.integer(js("$('.v4-menu-link').length")), 7L))
   k <- 4
   for (slug in names(pages)) {
     js(sprintf("$('#go_%s').click()", slug)); idle(2)
@@ -182,9 +182,33 @@ main <- function(args) {
   check("Model and sources tab shows the version", isTRUE(js(sprintf("$('#about').text().includes('Version %s')", app_version))),
         app_version)
   check("About includes the fitted-model summary", isTRUE(js("$('#about').text().includes('Differences between randomized arms')")))
-  js("$('#how_fitted_settings').click()"); idle(1.5)
-  check("'How was the tumor model fitted?' opens", isTRUE(js("$('.modal-title').text().includes('How the tumor model was fitted')")))
-  js("$('.modal .btn-default, .modal [data-dismiss], .modal [data-bs-dismiss]').first().click()"); idle(1)
+  # 4.6.1: every "How was ... fitted?" link, the Details button and the menu open one methods page.
+  fitted_open <- function(anchor) isTRUE(js(sprintf(paste0(
+    "$('.tab-pane.active').attr('data-value') === 'How the models were fitted (Bayesian)' && ",
+    "!!document.getElementById('%s') && Math.abs(document.getElementById('%s').getBoundingClientRect().top) < 400"),
+    anchor, anchor)))
+  js("$('#how_fitted_settings').click()"); idle(2.5)
+  check("'How was the tumor model fitted?' (Settings) opens the methods page at the tumor section", fitted_open("fitted-tumor"))
+  check("methods page shows the priors table and rendered equations",
+        isTRUE(js("$('#fitted_page table').length >= 3 && $('#fitted_page mjx-container, #fitted_page .MathJax, #fitted_page .MathJax_Display').length > 0")))
+  check("methods page has no placeholder or output error",
+        isTRUE(js("!$('#fitted_page').text().includes('{{') && !$('#fitted_page').text().includes('cannot be shown')")))
+  js("$('#fitted_page details').attr('open', true)"); idle(1)
+  shot("10_methods_page")
+  js("document.querySelector('#fitted_page details').scrollIntoView({block: 'start'})"); idle(1)
+  shot("11_methods_tables")
+  js("$('#go_unc').click()"); idle(2); js("$('#how_fitted_unc').click()"); idle(2.5)
+  check("'How was the tumor model fitted?' (Uncertainty) opens the tumor section", fitted_open("fitted-tumor"))
+  js("$('#back_fitted').click()"); idle(2)
+  check("methods page back link returns to the main page", isTRUE(js("$('.tab-pane.active').attr('data-value') === 'home'")))
+  js("$('#early_how').click()"); idle(2.5)
+  check("'How was the early-toxicity model fitted?' opens the early section", fitted_open("fitted-early"))
+  js("$('#back_fitted').click()"); idle(2)
+  js("$('#home_details').prop('checked', true).trigger('change')"); idle(1.5)
+  js("$('#home_how_fitted').click()"); idle(2.5)
+  check("Details button opens the methods page", fitted_open("fitted-bayes"))
+  js("$('#back_fitted').click()"); idle(2)
+  js("$('#home_details').prop('checked', false).trigger('change')"); idle(1)
   # Both served explainer copies exist and are the documents, not an error page.
   for (f in c("refit_explainer.html", "refit_explainer.docx")) {
     r <- tryCatch(httr2_like_get(paste0(base, "/", f)), error = function(e) NULL)
@@ -218,6 +242,16 @@ main <- function(args) {
   check("phone: menu closes after choosing a page", isTRUE(js2("$('.bslib-sidebar-layout').first().hasClass('sidebar-collapsed')")))
   js2("$('#back_report').click()"); Sys.sleep(1.5)
   b2$screenshot(file.path(out, "20_phone_main.png"), selector = "body", show = FALSE)
+  js2("$('#open_menu').click()"); Sys.sleep(2.5)
+  js2("$('#go_fitted').click()"); Sys.sleep(4)
+  check("phone: menu closes after choosing the methods page",
+        isTRUE(js2("$('.bslib-sidebar-layout').first().hasClass('sidebar-collapsed')")))
+  js2("$('#fitted_page details').attr('open', true)"); Sys.sleep(1)
+  js2("document.getElementById('fitted-tumor').scrollIntoView({block: 'start'})"); Sys.sleep(1)
+  check("phone: methods page opens with its tables and equations",
+        isTRUE(js2("$('#fitted_page table').length >= 3 && $('#fitted_page mjx-container, #fitted_page .MathJax, #fitted_page .MathJax_Display').length > 0")))
+  check("phone: methods page has no horizontal page scroll", !isTRUE(js2("document.documentElement.scrollWidth > window.innerWidth + 1")))
+  b2$screenshot(file.path(out, "21_phone_methods.png"), selector = "body", show = FALSE)
   b2$close()
 
   check("no browser console errors", length(console) == 0, paste(head(console, 3), collapse = " | "))

@@ -37,6 +37,9 @@ deploy_preflight <- function(app_name, expected_app, accounts, account, dirty,
 # Documents the pages link to and serve (review 6.4, 2026-11-09: a bundle missing both refit
 # explainer copies was accepted). Each must be in the bundle and not empty.
 SERVED_ASSETS <- c("www/refit_explainer.html", "www/refit_explainer.docx")
+# Text the pages are built from (version 4.6.1): an empty file would render an empty page section,
+# so each must be in the bundle and not empty, like the served documents.
+PAGE_CONTENT <- c("about.md", "refit_in_brief.md", "early_fit_in_brief.md", "how_fitted.md", "draws/model_methods.json")
 # Files (not folders) directly in a folder: a bundle lists files, so a subfolder such as
 # data/early_tox (research data the app does not read) must not be required by name (4.6.0).
 top_files <- function(root, dir) {
@@ -44,12 +47,12 @@ top_files <- function(root, dir) {
   file.path(dir, x[!dir.exists(file.path(root, dir, x))])
 }
 check_bundle <- function(files, root = ".", tracked = NULL) {
-  need <- c("app.R", "about.md", "refit_in_brief.md", "early_fit_in_brief.md", SERVED_ASSETS,
+  need <- c("app.R", PAGE_CONTENT, SERVED_ASSETS,
             file.path("R", list.files(file.path(root, "R"), pattern = "\\.R$")),
             top_files(root, "data"), top_files(root, "draws"))
   missing <- setdiff(need, files)
-  empty <- SERVED_ASSETS[SERVED_ASSETS %in% files & !(file.exists(file.path(root, SERVED_ASSETS)) &
-                                                       file.size(file.path(root, SERVED_ASSETS)) > 0)]
+  content <- c(SERVED_ASSETS, PAGE_CONTENT)
+  empty <- content[content %in% files & !(file.exists(file.path(root, content)) & file.size(file.path(root, content)) > 0)]
   if (length(empty)) stop("Linked documents are empty or unreadable: ", paste(empty, collapse = ", "), call. = FALSE)
   forbidden <- intersect(files, c(".Rhistory", ".Renviron", "external_proofs.yaml", ".suite_passed"))
   if (length(missing)) stop("Files the app reads are missing from the bundle: ", paste(missing, collapse = ", "), call. = FALSE)

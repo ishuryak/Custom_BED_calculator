@@ -51,7 +51,7 @@ test_that(".Rhistory, .Renviron and the suite marker are neither tracked nor dep
 })
 
 test_that("the bundle check refuses a missing draws manifest and local-only files", {
-  need <- c("app.R", "about.md", "refit_in_brief.md", "early_fit_in_brief.md", SERVED_ASSETS,
+  need <- c("app.R", PAGE_CONTENT, SERVED_ASSETS,
             file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
             top_files(app_abs, "data"), top_files(app_abs, "draws"))
   expect_true(check_bundle(need, app_abs))
@@ -63,7 +63,7 @@ test_that("the bundle check refuses a missing draws manifest and local-only file
 
 # Review S6 (2026-10-25): an untracked file could reach the bundle, so the deployed code was not the recorded revision.
 test_that("the bundle check refuses files that are not tracked by git", {
-  need <- c("app.R", "about.md", "refit_in_brief.md", "early_fit_in_brief.md", SERVED_ASSETS,
+  need <- c("app.R", PAGE_CONTENT, SERVED_ASSETS,
             file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
             top_files(app_abs, "data"), top_files(app_abs, "draws"))
   expect_true(check_bundle(need, app_abs, tracked = need))
@@ -75,7 +75,7 @@ test_that("the bundle check refuses files that are not tracked by git", {
 # Review 6.4 (2026-11-09): a synthetic bundle without both refit explainer copies was accepted, and the
 # deploy tools library was put on the library path before it existed.
 test_that("the bundle check requires each linked document, present and not empty", {
-  need <- c("app.R", "about.md", "refit_in_brief.md", "early_fit_in_brief.md", SERVED_ASSETS,
+  need <- c("app.R", PAGE_CONTENT, SERVED_ASSETS,
             file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
             top_files(app_abs, "data"), top_files(app_abs, "draws"))
   expect_true(check_bundle(need, app_abs))
@@ -111,7 +111,7 @@ test_that("the deploy tools library is created before it is put on the library p
 # 4.6.0: a bundle lists files, never folder names; the research data folder must not be required,
 # and the early-toxicity summary the main page links to must be bundled.
 test_that("the bundle check requires files only, and the early-toxicity summary", {
-  need <- c("app.R", "about.md", "refit_in_brief.md", "early_fit_in_brief.md", SERVED_ASSETS,
+  need <- c("app.R", PAGE_CONTENT, SERVED_ASSETS,
             file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
             top_files(app_abs, "data"), top_files(app_abs, "draws"))
   expect_true(dir.exists(file.path(app_abs, "data", "early_tox")))
@@ -121,3 +121,25 @@ test_that("the bundle check requires files only, and the early-toxicity summary"
   expect_error(check_bundle(setdiff(need, "draws/early_fit_trials.csv"), app_abs), "missing from the bundle")
 })
 
+
+# 4.6.1 (review of 2026-11-12, M5): the methods page is built from how_fitted.md and the methods
+# record; a bundle missing either, or holding an empty or unreadable copy, must be refused.
+test_that("the bundle check requires the methods page text and record, present and not empty", {
+  need <- c("app.R", PAGE_CONTENT, SERVED_ASSETS,
+            file.path("R", list.files(file.path(app_abs, "R"), pattern = "\\.R$")),
+            top_files(app_abs, "data"), top_files(app_abs, "draws"))
+  expect_true(all(c("how_fitted.md", "draws/model_methods.json", "R/methods_page.R") %in% need))
+  for (f in c("how_fitted.md", "draws/model_methods.json", "R/methods_page.R"))
+    expect_error(check_bundle(setdiff(need, f), app_abs), paste0("missing from the bundle.*", f))
+  tmp <- withr::local_tempdir()
+  for (f in need) { dir.create(dirname(file.path(tmp, f)), recursive = TRUE, showWarnings = FALSE); file.copy(file.path(app_abs, f), file.path(tmp, f)) }
+  expect_true(check_bundle(need, tmp))
+  for (f in c("how_fitted.md", "draws/model_methods.json")) {
+    keep <- readBin(file.path(tmp, f), "raw", file.size(file.path(tmp, f)))
+    writeBin(raw(0), file.path(tmp, f))
+    expect_error(check_bundle(need, tmp), paste0("empty or unreadable: ", f))
+    writeBin(keep, file.path(tmp, f))
+  }
+  file.remove(file.path(tmp, "how_fitted.md"))           # listed in the bundle but unreadable on disk
+  expect_error(check_bundle(need, tmp), "empty or unreadable: how_fitted.md")
+})
