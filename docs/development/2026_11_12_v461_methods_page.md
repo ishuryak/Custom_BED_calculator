@@ -1,5 +1,7 @@
 # Version 4.6.1: the page "How the models were fitted (Bayesian)"
 
+**Deployed 2026-11-12** at `7ec2faf` (suite 6,786 expectations, 0 failed; live walkthrough 73 of 73, `docs/development/2026_10_28_v4/walkthrough/20261112_141555_live`). Rollback point: 4.6.0 at `c80f63b`.
+
 2026-11-12. Base revision `52f0d3b` (4.6.0, live at `c80f63b`). Not deployed. Instruction (Igor
 Shuryak, 2026-11-12): "check, analyze and implement this review", for
 `2026_11_12_bayesian_methods_and_late_toxicity_review.md`.
