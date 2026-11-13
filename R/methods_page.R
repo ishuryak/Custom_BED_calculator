@@ -19,15 +19,73 @@ load_model_methods <- function(dir = DRAWS_DIR) {
   if (!file.exists(path) || file.size(path) == 0) return(fail("the methods record is missing"))
   m <- tryCatch(jsonlite::fromJSON(path, simplifyVector = FALSE), error = function(e) NULL)
   if (is.null(m) || !identical(m$schema, "model-methods-1")) return(fail("the methods record is unreadable"))
+  bad <- methods_record_problem(m)
+  if (nzchar(bad)) return(fail(paste("the methods record is malformed:", bad)))
+  # The record must describe the draw files' ACTUAL bytes (review B02, 2026-11-12), not only the
+  # hashes their manifests claim.
+  actual <- function(f) {
+    p <- file.path(dir, f)
+    if (!file.exists(p)) return(NA_character_)
+    digest::digest(readBin(p, "raw", n = file.size(p)), algo = "sha256", serialize = FALSE)
+  }
   tm <- tryCatch(draws_manifest(dir)$files, error = function(e) NULL)
   em <- tryCatch(jsonlite::fromJSON(file.path(dir, "early_fit_manifest.json"), simplifyVector = FALSE)$files,
                  error = function(e) NULL)
   same <- is.list(tm) && is.list(em) &&
     identical(m$tumor$di$draws_sha256, tm$tumor_di_primary.csv$sha256) &&
     identical(m$tumor$dd$draws_sha256, tm$tumor_dd_primary.csv$sha256) &&
-    identical(m$early$draws$sha256, em$early_fit_draws.csv$sha256)
+    identical(m$early$draws$sha256, em$early_fit_draws.csv$sha256) &&
+    identical(m$tumor$di$draws_sha256, actual("tumor_di_primary.csv")) &&
+    identical(m$tumor$dd$draws_sha256, actual("tumor_dd_primary.csv")) &&
+    identical(m$early$draws$sha256, actual("early_fit_draws.csv"))
   if (!same) return(fail("the methods record describes other fitted draws than those the calculator uses"))
   list(ok = TRUE, m = m)
+}
+
+# '' if every field the page reads is present with the right type, else the first missing path.
+METHODS_RECORD_NUMBERS <- c(
+  "tumor.n_arms", "tumor.n_fitting_units", "early.n_arms", "early.n_families", "early.n_evaluable",
+  "late.point_ab", "late.uncertainty.median", "tumor.dd.onset_min", "tumor.dd.n_di_draws",
+  "tumor.draws.rows", "tumor.draws.distinct_di_draws", "tumor.draws.dd_per_di_draw", "early.draws.rows",
+  "tumor.di.sampler.chains", "tumor.di.sampler.warmup", "tumor.di.sampler.samples", "tumor.di.sampler.adapt_delta",
+  "tumor.dd.sampler.chains", "tumor.dd.sampler.warmup", "tumor.dd.sampler.samples", "tumor.dd.sampler.max_attempts",
+  "early.sampler.chains", "early.sampler.warmup", "early.sampler.samples", "early.sampler.adapt_delta",
+  "tumor.di.diagnostics.divergences", "tumor.di.diagnostics.treedepth_hits", "tumor.di.diagnostics.max_rhat",
+  "tumor.di.diagnostics.min_ess_bulk", "tumor.di.diagnostics.min_ess_tail", "tumor.di.diagnostics.min_ebfmi",
+  "tumor.di.diagnostics.ppc_inside_90", "tumor.dd.diagnostics.outer_fits_repaired",
+  "tumor.dd.diagnostics.outer_fits_repaired_ess", "tumor.dd.diagnostics.max_rhat",
+  "tumor.dd.diagnostics.min_ess_bulk_per_fit", "tumor.dd.diagnostics.min_ess_tail_per_fit",
+  "early.diagnostics.divergences", "early.diagnostics.max_rhat", "early.diagnostics.min_ess_bulk",
+  "early.diagnostics.min_ess_tail", "early.diagnostics.min_ebfmi", "early.diagnostics.n_quantities",
+  "early.diagnostics.treedepth_hits", "early.fixed.onset_elapsed_days", "early.fixed.repair_halftime_h")
+METHODS_RECORD_PAIRS <- c("late.uncertainty.central_95", "tumor.di.ab_prior_95")
+METHODS_RECORD_HASHES <- c("tumor.di.draws_sha256", "tumor.dd.draws_sha256", "early.draws.sha256")
+METHODS_RECORD_PRIORS <- c("tumor.di.priors", "tumor.dd.priors", "early.priors")
+methods_record_problem <- function(m) {
+  get <- function(path) {
+    x <- m
+    for (k in strsplit(path, ".", fixed = TRUE)[[1]]) { if (!is.list(x)) return(NULL); x <- x[[k]] }
+    x
+  }
+  num <- function(x) is.numeric(x) && length(x) == 1L && is.finite(x)
+  for (p in METHODS_RECORD_NUMBERS) if (!num(get(p))) return(p)
+  for (p in METHODS_RECORD_PAIRS) {
+    x <- get(p)
+    if (!(is.list(x) && length(x) == 2L && all(vapply(x, num, TRUE)))) return(p)
+  }
+  for (p in METHODS_RECORD_HASHES) {
+    x <- get(p)
+    if (!(is.character(x) && length(x) == 1L && grepl("^[0-9a-f]{64}$", x))) return(p)
+  }
+  for (p in METHODS_RECORD_PRIORS) {
+    x <- get(p)
+    ok <- is.list(x) && length(x) > 0L && all(vapply(x, function(r) is.list(r) && all(vapply(
+      c("parameter", "units", "prior", "status"), function(k) is.character(r[[k]]) && length(r[[k]]) == 1L, TRUE)), TRUE))
+    if (!ok) return(p)
+  }
+  if (!(is.character(get("tumor.draws.gate_policy")) && length(get("tumor.draws.gate_policy")) == 1L))
+    return("tumor.draws.gate_policy")
+  ""
 }
 
 md_escape <- function(x) gsub("|", "\\|", x, fixed = TRUE)

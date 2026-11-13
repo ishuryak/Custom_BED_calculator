@@ -47,6 +47,26 @@ PACKAGE_SCHEMA = "early-fit-package-1"
 EVALUATOR_ID = "early-bed-fit-1: E = D + Q/ab - r*max(0, T_elapsed - Tk), exact hinge, repair half-time h on fraction times"
 
 
+# The gate thresholds (unchanged from v4.6) and the support every diagnostic must have before it is
+# compared with them (review B01, 2026-11-12): a JSON number that is not a boolean, finite, and inside
+# its scientific range. R-hat and ESS of -Inf/+Inf used to pass the threshold comparisons.
+GATE = dict(rhat_max=1.01, ess_min=400, ebfmi_min=0.3)
+DIAGNOSTIC_SUPPORT = {"divergences": "count", "rhat": "positive", "ess_bulk": "positive", "ess_tail": "positive",
+                      "ebfmi_min": "positive"}
+
+
+def diagnostic_problem(name, v):
+    """'' if v is a valid value of diagnostic `name`, else what is wrong with it."""
+    kind = DIAGNOSTIC_SUPPORT[name]
+    if isinstance(v, bool) or not isinstance(v, (int, float)):
+        return f"is not a number ({type(v).__name__})"
+    if kind == "count":
+        return "" if isinstance(v, int) and v >= 0 else "is not a non-negative integer count"
+    if not np.isfinite(v):
+        return "is not finite"
+    return "" if v > 0 else "is not positive"
+
+
 def _manifest_problem(m):
     spec = importlib.util.spec_from_file_location("step5_fit", os.path.join(ROOT, "tools", "early_tox", "step5_fit.py"))
     s5 = importlib.util.module_from_spec(spec)
@@ -71,8 +91,13 @@ def read_unit(unit):
     diag = json.load(open(os.path.join(unit, "diagnostics.json")))
     if diag.get("identity") != man["identity"]:
         raise RuntimeError(f"{unit}: diagnostics belong to another run; refusing to export")
-    if diag.get("gate_pass") is not True or diag.get("divergences") != 0 or not diag.get("rhat", 9) < 1.01 \
-            or not diag.get("ess_bulk", 0) > 400 or not diag.get("ess_tail", 0) > 400 or not diag.get("ebfmi_min", 0) >= 0.3:
+    for k in DIAGNOSTIC_SUPPORT:
+        problem = diagnostic_problem(k, diag.get(k))
+        if problem:
+            raise RuntimeError(f"{unit}: diagnostic {k} {problem}; refusing to export")
+    if diag.get("gate_pass") is not True or diag["divergences"] != 0 or not diag["rhat"] < GATE["rhat_max"] \
+            or not diag["ess_bulk"] > GATE["ess_min"] or not diag["ess_tail"] > GATE["ess_min"] \
+            or not diag["ebfmi_min"] >= GATE["ebfmi_min"]:
         raise RuntimeError(f"{unit}: diagnostics do not meet the gate; refusing to export")
     for k, v in PRIMARY_PROFILE.items():
         if diag.get(k) != v:
@@ -183,8 +208,10 @@ def trial_table():
             endpoint=o["endpoint_as_written"], endpoint_timepoint=ac.get("endpoint_timepoint", ""),
             grading_group=m["scale_group"], events=o["events"], patients=o["denominator"],
             analysis_population=ac.get("analysis_population", ""),
-            assessment=assessment_text(m["last_assessment_weeks_after_rt"], m["max_post_rt_gap_weeks"],
-                                       ac.get("schedule_note", ""))))
+            # A source-stated schedule (ascertainment.csv assessment_schedule, review B03) is used as
+            # written; otherwise the text is derived from the coded last assessment and largest gap.
+            assessment=ac.get("assessment_schedule") or assessment_text(
+                m["last_assessment_weeks_after_rt"], m["max_post_rt_gap_weeks"], ac.get("schedule_note", ""))))
     order = {"fitted": 0, "sensitivity check only": 1, "external benchmark (never fitted)": 2}
     rows.sort(key=lambda r: (order[r["role"]], r["trial"], -r["control_arm"], r["arm"]))
     return rows

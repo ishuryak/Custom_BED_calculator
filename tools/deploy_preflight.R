@@ -62,6 +62,28 @@ check_bundle <- function(files, root = ".", tracked = NULL) {
   invisible(TRUE)
 }
 
+# The methods record (draws/model_methods.json) must be current: every source file it names and
+# every draw file it describes must still have the recorded bytes (review B02, 2026-11-12). The full
+# rebuild check is `python3 tools/build_model_methods.py --check`; this is its dependency-free
+# counterpart, run by tools/deploy.R and by the test suite.
+check_methods_record <- function(root = ".") {
+  sha <- function(f) digest::digest(readBin(f, "raw", n = file.size(f)), algo = "sha256", serialize = FALSE)
+  p <- file.path(root, "draws", "model_methods.json")
+  m <- tryCatch(jsonlite::fromJSON(p, simplifyVector = FALSE), error = function(e) NULL)
+  if (!is.list(m) || !is.list(m$sources) || !length(m$sources))
+    stop("The methods record is missing or has no source list.", call. = FALSE)
+  want <- c(m$sources, list("draws/tumor_di_primary.csv" = m$tumor$di$draws_sha256,
+                            "draws/tumor_dd_primary.csv" = m$tumor$dd$draws_sha256,
+                            "draws/early_fit_draws.csv" = m$early$draws$sha256))
+  stale <- names(want)[vapply(names(want), function(f) {
+    path <- file.path(root, f)
+    !(is.character(want[[f]]) && file.exists(path) && identical(sha(path), want[[f]]))
+  }, TRUE)]
+  if (length(stale)) stop("The methods record is out of date for: ", paste(stale, collapse = ", "),
+                          ". Run python3 tools/build_model_methods.py.", call. = FALSE)
+  invisible(TRUE)
+}
+
 # The revision a passing suite may certify (review R09, 2026-10-26). Fails closed: a git that
 # cannot run, a non-zero exit, output that is not one 40-character hash, or uncommitted tracked
 # changes all give ok = FALSE with the reason, and no suite marker is written.

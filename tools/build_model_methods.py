@@ -87,6 +87,32 @@ def fail(msg):
     raise SystemExit(f"REFUSED: {msg}")
 
 
+def draw_file(root, name, expect_sha, n_rows, columns):
+    """The rows of draws/<name> after checking its ACTUAL bytes against the manifest hash, its columns
+    and its row count (review B02, 2026-11-12: manifests alone were trusted before)."""
+    import csv
+    path = os.path.join(root, "draws", name)
+    if not os.path.exists(path):
+        fail(f"{name} is missing")
+    if not (isinstance(expect_sha, str) and re.fullmatch(r"[0-9a-f]{64}", expect_sha)):
+        fail(f"the manifest has no valid sha256 for {name}")
+    if sha_file(path) != expect_sha:
+        fail(f"{name} does not match the sha256 in its manifest")
+    with open(path, newline="") as f:
+        rows = list(csv.DictReader(f))
+    if not rows or any(c not in rows[0] for c in columns):
+        fail(f"{name} lacks a required column ({', '.join(columns)})")
+    if len(rows) != n_rows:
+        fail(f"{name} has {len(rows)} rows, its manifest says {n_rows}")
+    for c in columns:
+        try:
+            if not all(math.isfinite(float(r[c])) for r in rows):
+                raise ValueError
+        except ValueError:
+            fail(f"{name} column {c} is not all finite numbers")
+    return rows
+
+
 def check_statements(spec, stan_text, model):
     for p in spec:
         for s in p.get("stan", []):
@@ -145,6 +171,14 @@ def tumor(root):
     di_f, dd_f = man["files"]["tumor_di_primary.csv"], man["files"]["tumor_dd_primary.csv"]
     if di_f["fit_identity"] != di["identity_sha256"] or dd_f["fit_identity"] != dd["identity_sha256"]:
         fail("the exported tumor draws were not produced by these fits")
+    di_rows = draw_file(root, "tumor_di_primary.csv", di_f.get("sha256"), di_f.get("n_draws"),
+                        ("alpha", "ab", "lambda", "Tk", "g", "di_draw"))
+    dd_rows = draw_file(root, "tumor_dd_primary.csv", dd_f.get("sha256"), dd_f.get("n_draws"),
+                        ("alpha", "ab", "lambda", "c_over_alpha", "g", "di_draw"))
+    if [r["di_draw"] for r in di_rows] != [r["di_draw"] for r in dd_rows]:
+        fail("tumor_di_primary.csv and tumor_dd_primary.csv are not paired row by row (di_draw differs)")
+    if len({r["di_draw"] for r in di_rows}) != di_f.get("n_distinct_di_draws"):
+        fail("tumor_di_primary.csv does not hold the number of distinct DI draws its manifest states")
     ab_q = [round(math.exp(data["prior_log_ab_mean"] + z * data["prior_log_ab_sd"]), 1) for z in (-1.959964, 1.959964)]
     return dict(
         data_file=os.path.basename(TUMOR_DATA), data_sha256=di["data_file_sha256"],
@@ -197,6 +231,8 @@ def early(root):
     pkg = json.load(open(os.path.join(root, "draws", "early_fit_manifest.json")))
     if pkg["source_identity"] != man["identity"]:
         fail("the exported early draws were not produced by this fit")
+    draw_file(root, "early_fit_draws.csv", pkg.get("files", {}).get("early_fit_draws.csv", {}).get("sha256"),
+              pkg.get("n_draws"), ("ab_e", "r_e", "kappa", "gamma"))
     s = diag["sampler"]
     return dict(
         identity=man["identity"], model_id=pkg["model_id"], stan_sha256=sha_file(S.STAN_FILE), identity_reproduced=True,

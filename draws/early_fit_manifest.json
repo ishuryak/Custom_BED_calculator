@@ -40,7 +40,7 @@
    "n_draws": 4000
   },
   "early_fit_trials.csv": {
-   "sha256": "12a8b35c167db8f13a9c01ab403f64eca6ccd473a278760c1b3a116fc3849538",
+   "sha256": "079d7f2f33581eb23eb68ea4b64cba5fbda6b29580db9521c52322e1c255ef04",
    "n_rows": 66,
    "citations": "PubMed esummary, verified 2026-11-11"
   }

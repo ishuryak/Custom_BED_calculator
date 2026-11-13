@@ -129,3 +129,42 @@ def test_trial_table_keeps_every_variant_weight_and_qualification():
     assert "assumed equal" in get("Tandon", "SMART")["concurrent_therapy"]
     assert "6 courses planned" in get("Grover", "SIB")["concurrent_therapy"]
     assert "third after RT" in get("ORO", "Conventional RT +")["therapy_note"]
+
+
+# Review B01 (2026-11-12): every diagnostic must be a finite number of the right type and support
+# before it is compared with the gate; -Inf R-hat or +Inf ESS used to pass.
+@pytest.mark.parametrize("field,value", [
+    ("rhat", float("-inf")), ("rhat", -1.0), ("rhat", float("nan")), ("rhat", True), ("rhat", "1.0"),
+    ("ess_bulk", float("inf")), ("ess_bulk", "unavailable"), ("ess_tail", None),
+    ("ebfmi_min", float("inf")), ("ebfmi_min", [0.6]),
+    ("divergences", False), ("divergences", 0.0), ("divergences", float("nan"))])
+def test_non_finite_or_mistyped_diagnostics_refuse(tmp_path, field, value):
+    u = _unit(tmp_path / "b01")
+    p = os.path.join(u, "diagnostics.json")
+    d = json.loads(open(p).read())
+    d[field] = value
+    open(p, "w").write(json.dumps(d))       # json.dumps writes -Infinity/Infinity/NaN, as a tampered file could
+    _rehash(u, "diagnostics.json")
+    with pytest.raises(RuntimeError, match=f"diagnostic {field}"):
+        x.read_unit(u)
+
+
+def test_valid_primary_unit_still_reads():
+    man, rows, diag = x.read_unit(x.UNIT_DEFAULT)
+    assert len(rows) == 4000 and diag["divergences"] == 0
+
+
+# Review B03 (2026-11-12): HYPNO's evaluable population and assessment schedule, as printed
+# (Bentzen et al. 2026, PMID 41711624, pp. 391 and 394). Counts are unchanged.
+def test_hypno_population_and_assessment_match_the_report():
+    rows = [r for r in x.trial_table() if r["trial"] == "HYPNO"]
+    assert len(rows) == 2
+    for r in rows:
+        assert r["analysis_population"] == ("Early-adverse-event evaluable patients, analyzed by randomized arm "
+                                            "(753/792 overall; HFX 373, NFX 380)")
+        assert r["assessment"].startswith("Weekly during and immediately after RT; first scheduled post-RT follow-up "
+                                          "about two months after RT.")
+        assert "not stated" not in r["assessment"] and "eight-week" not in r["assessment"]
+        assert r["endpoint_timepoint"] == "maximum during and immediately after treatment (CTCAE v4)"
+        assert r["role"] == "external benchmark (never fitted)"
+    assert {(r["arm"][:3], r["events"], r["patients"]) for r in rows} == {("NFX", "208", "380"), ("HFX", "190", "373")}

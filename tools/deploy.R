@@ -24,6 +24,7 @@ cat("Deploying revision", head, "\n")
 environment_report()
 files <- rsconnect::listDeploymentFiles(".")
 check_bundle(files, tracked = id$tracked)
+check_methods_record()
 cat("Files:", files, "\n")
 rsconnect::deployApp(appDir = ".", appName = APP_NAME,
                      appTitle = "HNSCC BED calculator, version 4",

@@ -24,9 +24,9 @@ In both fits, the information about dose and time comes mainly from differences 
 
 **How the model works.** The tumor fit uses a Bayesian binomial model with a Poisson tumor-control response. For arm $i$ of fitting unit $j$, the number of patients with tumor control follows a binomial distribution with probability $\mathrm{TCP}_i = \exp(-e^{\eta_i})$, where
 
-$$\eta_i = c_j - \alpha\,(\mathrm{BED}_i - \overline{\mathrm{BED}}_j) + \lambda\,\max(0, T_i - T_k) + g\,(T_i - \overline{T}_j) + \sigma z_i .$$
+$$\eta_i = c_j - \alpha\,(\mathrm{BED}_i - \overline{\mathrm{BED}}_j) + \lambda\,\mathrm{smax}(T_i - T_k) + g\,(T_i - \overline{T}_j) + \sigma z_i .$$
 
-Here $\mathrm{BED}_i$ is the linear-quadratic dose at the draw's α/β, $T_i$ the overall time in days, and the bars are the unit's means. Each fitting unit has a separate baseline $c_j$ with a fixed weak normal prior. The arm-level effects $\sigma z_i$, with an estimated common spread σ, allow more variation between arms than binomial sampling alone. This differs from the acute-mucositis model, which also estimates a common distribution for the trial baselines. The control counts are reconstructed by rounding the reported control rate times the number of patients analyzed. Most reported rates are Kaplan–Meier or cumulative-incidence estimates, so these counts are an approximation.
+Here $\mathrm{BED}_i$ is the linear-quadratic dose at the draw's α/β, $T_i$ the overall time in days, and the bars are the unit's means. The onset of regrowth is a smooth hinge, $\mathrm{smax}(x) = \log(1 + e^{3x})/3$ with $x$ in days, evaluated in a numerically stable form. It equals $\max(0, x)$ except within a few days of onset; at $x = 0$ it is $\ln 2 / 3 \approx 0.23$ days rather than zero. The fit and the calculator use the same function. Each fitting unit has a separate baseline $c_j$ with a fixed weak normal prior. The arm-level effects $\sigma z_i$, with an estimated common spread σ, allow more variation between arms than binomial sampling alone. This differs from the acute-mucositis model, which also estimates a common distribution for the trial baselines. The control counts are reconstructed by rounding the reported control rate times the number of patients analyzed. Most reported rates are Kaplan–Meier or cumulative-incidence estimates, so these counts are an approximation.
 
 **The two tumor models are not independent fits.** The dose-independent (DI) model is fitted first. The dose-dependent (DD) model used by the calculator is calibrated to it, one DI sample at a time:
 
@@ -63,7 +63,7 @@ The α/β prior puts 95% of its weight between {{AB_LO}} and {{AB_HI}} Gy.
 
 <details class="fitted-tech"><summary>Technical details: early-toxicity priors, sampling and checks</summary>
 
-For arm $i$ of trial $j$ the model is $\mathrm{logit}\,p_i = \eta_j + \kappa\,(E_i - E_{j,\mathrm{ref}}) + \gamma\,\mathrm{chemo}_i + \sigma z_i$. Here $E$ is the early BED with incomplete repair and the time-loss term, and $E_{j,\mathrm{ref}}$ is that of the trial's reference arm. The trial baseline $\eta_j = m_0 + \delta\,\mathrm{CTCAE}_j + \tau u_j$ is drawn from a common distribution.
+For arm $i$ of trial $j$ the model is $\mathrm{logit}\,p_i = \eta_j + \kappa\,(E_i - E_{j,\mathrm{ref}}) + \gamma\,\mathrm{chemo}_i + \sigma z_i$. Here $E = D + Q/(\alpha/\beta) - r\,\max(0, T_{\mathrm{elapsed}} - T_k)$ is the early BED with incomplete repair and an exact (not smoothed) time-loss hinge, and $E_{j,\mathrm{ref}}$ is that of the trial's reference arm. The trial baseline $\eta_j = m_0 + \delta\,\mathrm{CTCAE}_j + \tau u_j$ is drawn from a common distribution.
 
 {{EARLY_PRIORS}}
 

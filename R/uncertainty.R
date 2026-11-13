@@ -187,6 +187,20 @@ EARLY_FIT_FILE <- "early_fit_draws.csv"
 # draws file must match the sha256 in its manifest; anything else makes research mode unavailable.
 EARLY_FIT_SCHEMA <- "early-fit-package-1"
 EARLY_FIT_EVALUATOR <- "early-bed-fit-1"
+# Gate thresholds (as in tools/early_tox/export_fit_for_app.py GATE) and the type and support each
+# recorded diagnostic must have before it is compared with them (review B01, 2026-11-12).
+EARLY_GATE <- list(rhat_max = 1.01, ess_min = 400, ebfmi_min = 0.3)
+is_text1 <- function(x) is.character(x) && length(x) == 1L && !is.na(x) && nzchar(x)
+is_num1 <- function(x) is.numeric(x) && length(x) == 1L && is.finite(x)
+early_gate_problem <- function(g) {
+  if (!is.list(g)) return("the recorded diagnostics are missing")
+  if (!(is.logical(g$passed) && length(g$passed) == 1L && !is.na(g$passed))) return("diagnostic passed is not a boolean")
+  if (!(is_num1(g$divergences) && g$divergences >= 0 && g$divergences == round(g$divergences)))
+    return("diagnostic divergences is not a non-negative integer count")
+  for (k in c("rhat", "ess_bulk", "ess_tail", "ebfmi_min"))
+    if (!(is_num1(g[[k]]) && g[[k]] > 0)) return(paste("diagnostic", k, "is not a finite positive number"))
+  ""
+}
 
 # The fitted model's package (manifest, joint draws, point values), fully validated (review R5), or
 # ok = FALSE with a reason. Never throws: a malformed package makes research mode unavailable.
@@ -198,14 +212,21 @@ load_early_fit <- function(dir = DRAWS_DIR) {
     man <- jsonlite::fromJSON(mp, simplifyVector = FALSE)
     need <- function(ok, what) if (!isTRUE(ok)) stop(what, call. = FALSE)
     need(identical(man$schema, EARLY_FIT_SCHEMA), "unknown package schema")
-    need(is.character(man$evaluator) && startsWith(man$evaluator, EARLY_FIT_EVALUATOR), "unsupported evaluator")
+    # The evaluator ID is the token before the first colon, matched exactly (review B01: a prefix
+    # match accepted "early-bed-fit-10").
+    need(is_text1(man$evaluator) && identical(sub(":.*$", "", man$evaluator), EARLY_FIT_EVALUATOR), "unsupported evaluator")
+    need(is_text1(man$model_id) && grepl("^early-fit-[0-9a-f]{12}$", man$model_id), "missing or malformed model identity")
+    need(is_text1(man$source_identity) && grepl("^[0-9a-f]{64}$", man$source_identity) &&
+         startsWith(man$source_identity, sub("^early-fit-", "", man$model_id)), "missing or malformed source identity")
     fx <- man$fixed
     need(identical(fx$hinge, "exact") && identical(fx$clock, "elapsed days") &&
          identical(as.numeric(fx$Tk_e_elapsed_days), 7) && identical(as.numeric(fx$repair_halftime_h), 3.2),
          "unsupported evaluator settings")
     g <- man$gate
-    need(is.logical(g$passed) && isTRUE(g$passed) && identical(as.numeric(g$divergences), 0) &&
-         is.numeric(g$rhat) && g$rhat < 1.01 && g$ess_bulk > 400 && g$ess_tail > 400 && g$ebfmi_min >= 0.3,
+    bad <- early_gate_problem(g)
+    need(!nzchar(bad), bad)
+    need(isTRUE(g$passed) && g$divergences == 0 && g$rhat < EARLY_GATE$rhat_max && g$ess_bulk > EARLY_GATE$ess_min &&
+         g$ess_tail > EARLY_GATE$ess_min && g$ebfmi_min >= EARLY_GATE$ebfmi_min,
          "its recorded diagnostics do not meet the gate")
     got <- digest::digest(readBin(dp, "raw", n = file.size(dp)), algo = "sha256", serialize = FALSE)
     need(identical(got, man$files[[EARLY_FIT_FILE]]$sha256), "the draws do not match their manifest")

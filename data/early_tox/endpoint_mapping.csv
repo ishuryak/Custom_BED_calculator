@@ -42,8 +42,8 @@ O040,Pinto_CF,Pinto,confluent_mucositis_own_scale,other,W2,sensitivity,0,0,0,,0,
 O041,Pinto_HF,Pinto,confluent_mucositis_own_scale,other,W2,sensitivity,0,0,0,,0,0,end of RT,evaluable
 O042,Poddar_6F,Poddar,grade_3_mucositis_end_of_rt,G2,W2,sensitivity,0,0,4,4,0,0,at completion and at 1 month,available for analysis
 O043,Poddar_5F,Poddar,grade_3_mucositis_end_of_rt,G2,W2,sensitivity,0,0,4,4,0,0,at completion and at 1 month,available for analysis
-O044,HYPNO_HFX,HYPNO,grade_3_plus_mucositis,G2,W2,benchmark,0,0,,,0,0,maximum (CTCAE v4),randomized and treated
-O045,HYPNO_NFX,HYPNO,grade_3_plus_mucositis,G2,W2,benchmark,0,0,,,0,0,maximum (CTCAE v4),randomized and treated
+O044,HYPNO_HFX,HYPNO,grade_3_plus_mucositis,G2,W2,benchmark,0,0,,,0,0,maximum during and immediately after treatment (CTCAE v4),"Early-adverse-event evaluable patients, analyzed by randomized arm (753/792 overall; HFX 373, NFX 380)"
+O045,HYPNO_NFX,HYPNO,grade_3_plus_mucositis,G2,W2,benchmark,0,0,,,0,0,maximum during and immediately after treatment (CTCAE v4),"Early-adverse-event evaluable patients, analyzed by randomized arm (753/792 overall; HFX 373, NFX 380)"
 O046,DAHANCA7_5F,DAHANCA67,confluent_mucositis,G1,W1,primary,1,1,9,8,0,0,maximum recorded within 6 months of start,"as treated (grouped by treatment received), DAHANCA 7 part"
 O047,DAHANCA7_6F,DAHANCA67,confluent_mucositis,G1,W1,primary,1,1,9,8,0,0,maximum recorded within 6 months of start,"as treated (grouped by treatment received), DAHANCA 7 part"
 O048,GhoshLaskar_RT,GhoshLaskar,grade_3_4_mucositis,G1,W2,primary,1,0,0,,0,0,during RT,evaluated (186 of 199)

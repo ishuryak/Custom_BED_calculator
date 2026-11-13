@@ -102,3 +102,36 @@ def test_a_described_prior_missing_from_the_model_is_refused(tree):
     r = subprocess.run([sys.executable, os.path.join(tree, "tools", "build_model_methods.py"), "--root", tree],
                        capture_output=True, text=True)
     assert r.returncode != 0 and "is not in the Stan model" in (r.stdout + r.stderr)
+
+
+# Review B02 (2026-11-12): the record must be built from the draw files' actual bytes. Changing a
+# draw value without touching any manifest used to leave `--check` reporting the record current.
+def _set_cell(root, rel, col, row, value):
+    import csv
+    p = os.path.join(root, rel)
+    rows = list(csv.reader(open(p, newline="")))
+    rows[row + 1][rows[0].index(col)] = value
+    with open(p, "w", newline="") as f:
+        csv.writer(f, lineterminator="\n").writerows(rows)
+
+
+@pytest.mark.parametrize("rel,col", [("draws/tumor_di_primary.csv", "alpha"), ("draws/tumor_dd_primary.csv", "lambda"),
+                                     ("draws/early_fit_draws.csv", "r_e")])
+def test_a_changed_draw_file_is_refused_even_with_its_manifest_untouched(tree, rel, col):
+    assert run(tree).returncode == 0 and run(tree, "--check").returncode == 0
+    _set_cell(tree, rel, col, 7, "100")
+    for args in ((), ("--check",)):
+        r = run(tree, *args)
+        assert r.returncode != 0 and f"{os.path.basename(rel)} does not match" in (r.stdout + r.stderr), r.stdout + r.stderr
+
+
+def test_unpaired_or_short_tumor_draws_are_refused(tree):
+    _set_cell(tree, "draws/tumor_dd_primary.csv", "di_draw", 0, "999")
+    p = os.path.join(tree, "draws", "draws_manifest.json")
+    m = json.load(open(p))
+    import hashlib
+    m["files"]["tumor_dd_primary.csv"]["sha256"] = hashlib.sha256(
+        open(os.path.join(tree, "draws", "tumor_dd_primary.csv"), "rb").read()).hexdigest()
+    json.dump(m, open(p, "w"))
+    r = run(tree)
+    assert r.returncode != 0 and "not paired" in r.stdout + r.stderr, r.stdout + r.stderr

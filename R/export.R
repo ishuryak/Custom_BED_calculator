@@ -150,6 +150,13 @@ early_calendars <- function(eb) list(
   regimen = if (is.null(eb$regimen_calendar)) NULL else cal_parse(eb$regimen_calendar, "regimen"),
   comparison = if (is.null(eb$comparison_calendar)) NULL else cal_parse(eb$comparison_calendar, "comparison"))
 
+# Earlier package manifests that describe the SAME draws and differ only in descriptive metadata,
+# each mapped to the draws sha256 it was issued with. 4.6.2 (review B03) corrected HYPNO's population
+# and assessment text, which changed the trial-table hash inside the manifest and nothing else.
+EARLY_FIT_EQUIVALENT_PACKAGES <- c(
+  e80ecc45015651cf975d6ae7da43d26080ca7d48df539ecccdca93b4fa1a4355 =
+    "a6fde4626c88a1872a84408d66e78ddd1460cdabb98734d06427ce186f07b4fd")
+
 # Apply a recorded early block to replayed parameters: only the installed fitted model with the same
 # identity and point values can reproduce it.
 apply_early_block <- function(p, eb, fit = load_early_fit()) {
@@ -160,7 +167,10 @@ apply_early_block <- function(p, eb, fit = load_early_fit()) {
     replay_fail("it used fitted early-toxicity model ", eb$model_id, ", not this calculator's ", fit$model_id, ".")
   for (k in c("ab_e", "r_e", "Tk_e", "h_e"))
     if (!same_num(eb[[k]], fit$point[[k]])) replay_fail("its fitted early-toxicity value ", k, " differs from the installed model.")
-  if (!identical(as.character(eb$draws_sha256), fit$draws_sha256) || !identical(as.character(eb$package_sha256), fit$package_sha256))
+  pkg_ok <- identical(as.character(eb$package_sha256), fit$package_sha256) ||
+    (length(eb$package_sha256) == 1L && as.character(eb$package_sha256) %in% names(EARLY_FIT_EQUIVALENT_PACKAGES) &&
+     identical(EARLY_FIT_EQUIVALENT_PACKAGES[[as.character(eb$package_sha256)]], fit$draws_sha256))
+  if (!identical(as.character(eb$draws_sha256), fit$draws_sha256) || !pkg_ok)
     replay_fail("its early-toxicity posterior (draws or package SHA-256) is not the installed one, so exact replay is impossible.")
   if (!identical(as.character(eb$evaluator), EARLY_FIT_EVALUATOR)) replay_fail("it used an unsupported early-toxicity evaluator.")
   fitted_early_params(p, fit, calendar = cal_parse(eb$calendar, "candidate"))

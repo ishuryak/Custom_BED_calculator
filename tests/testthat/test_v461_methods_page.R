@@ -85,7 +85,7 @@ test_that("the early summary's stated priors agree with the record", {
 
 test_that("a record that does not match the deployed draws is refused, and the page says so", {
   tmp <- withr::local_tempdir()
-  file.copy(list.files(file.path(app_abs, "draws"), full.names = TRUE, pattern = "\\.json$"), tmp)
+  file.copy(list.files(file.path(app_abs, "draws"), full.names = TRUE, pattern = "\\.(json|csv)$"), tmp)
   expect_true(load_model_methods(tmp)$ok)
   m <- jsonlite::fromJSON(file.path(tmp, "model_methods.json"), simplifyVector = FALSE)
   m$tumor$di$draws_sha256 <- strrep("0", 64)
