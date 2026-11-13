@@ -9,6 +9,25 @@ exclude_paths:
   - "References/**"
 
 constants:
+  frequentist_seed:
+    value: 20261112
+    provenance: design
+    why: >
+      Base seed of the likelihood-only comparison (plan revision 3, section 5): starts, bootstrap
+      replicate seeds [seed, 7, b] and prior simulation. Part of every run identity.
+    sites: ["fit/frequentist/fit_ml.py:@^SEED = "]
+  frequentist_quad_tol:
+    value: 1e-6
+    provenance: design
+    why: >
+      Largest change in total log-likelihood allowed when quadrature nodes double at a reported
+      optimum (review F01, plan revision 3 section 5). Far below the 1.92 profile cutoff.
+    sites: ["fit/frequentist/fit_ml.py:@^QUAD_TOL = "]
+  frequentist_fail_limit:
+    value: 0.05
+    provenance: design
+    why: Share of unresolved bootstrap failures that blocks a final interval claim (review F05).
+    sites: ["fit/frequentist/fit_ml.py:@^FAIL_LIMIT = "]
   tumor_data_d_max:
     value: 2.5
     provenance: derived

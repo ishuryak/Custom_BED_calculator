@@ -2,6 +2,8 @@
 
 **Use the calculator:** https://ishuryak.shinyapps.io/custom_bed_calculator_v4/ · **Source:** this branch (`v4`) of https://github.com/ishuryak/Custom_BED_calculator
 
+**Not yet deployed (branch `frequentist_review_2026_11_12`):** version 4.6.2 applies the external review of 2026-11-12 (B01–B04: stricter validation of the early-fit package and the methods record, HYPNO's evaluable population and assessment schedule, and the smooth tumor hinge on the methods page). No number, draw or default changes. The same branch adds an offline comparison of likelihood-based and Bayesian estimates under the same observation model (`fit/frequentist/`, `docs/development/2026_11_12_frequentist_comparison_results.md`). The live site still runs 4.6.1.
+
 A web calculator for designing trials of shorter, hypofractionated radiotherapy for head and neck squamous cell carcinoma: it lists schedules whose modeled tumor dose stays close to 70 Gy in 35 fractions while their modeled early and late side-effect doses do not rise by more than chosen limits. It is a research tool for hypothesis generation, not for treatment decisions. User guide: `docs/user_guide/HNSCC_BED_v4_user_guide.md`. How the models were fitted: the page "How the models were fitted (Bayesian)" in the app (text `how_fitted.md`, priors, settings and checks from `draws/model_methods.json`), and for the tumor fit in full `docs/refit_explainer/`.
 
 The live site runs version 4.6.1 (revision `7ec2faf`, deployed 2026-11-12), which adds the page "How the models were fitted (Bayesian)". Release records: `docs/development/2026_11_11_v46_review_implementation.md` and, for 4.6.1, `docs/development/2026_11_12_v461_methods_page.md`. Deployment history is in the next section.

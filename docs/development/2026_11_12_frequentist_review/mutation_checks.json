@@ -1,0 +1,80 @@
+[
+ {
+  "mutation": "M01 cloglog orientation swapped",
+  "tests": "T2 or T3_tumor or T3_zero",
+  "red": true,
+  "result": "1 failed, 30 deselected in 4.17s"
+ },
+ {
+  "mutation": "M02 binomial constant dropped",
+  "tests": "T2",
+  "red": true,
+  "result": "1 failed, 36 deselected in 3.76s"
+ },
+ {
+  "mutation": "M03 no mode search (fixed centre)",
+  "tests": "T3",
+  "red": true,
+  "result": "1 failed, 4 passed, 21 deselected in 1.20s"
+ },
+ {
+  "mutation": "M04 tumor contrast loses Q/ab",
+  "tests": "T4",
+  "red": true,
+  "result": "1 failed, 34 deselected in 1.18s"
+ },
+ {
+  "mutation": "M05 early contrast loses dQ/ab",
+  "tests": "T4",
+  "red": true,
+  "result": "1 failed, 1 passed, 34 deselected in 1.17s"
+ },
+ {
+  "mutation": "M06 Tk gradient sign",
+  "tests": "T5_tumor",
+  "red": true,
+  "result": "1 failed, 36 deselected in 1.49s"
+ },
+ {
+  "mutation": "M07 tau gradient dropped",
+  "tests": "T5_early",
+  "red": true,
+  "result": "1 failed, 36 deselected in 1.41s"
+ },
+ {
+  "mutation": "M08 wrong profile cutoff",
+  "tests": "T8_quadratic",
+  "red": true,
+  "result": "1 failed, 36 deselected in 1.17s"
+ },
+ {
+  "mutation": "M09 no full-range scan",
+  "tests": "bimodal",
+  "red": true,
+  "result": "1 failed (rerun with the correct -k filter; the first run selected no test)"
+ },
+ {
+  "mutation": "M10 record digest not checked",
+  "tests": "T8_resume or T8_incomplete",
+  "red": true,
+  "result": "1 failed, 35 deselected in 15.88s"
+ },
+ {
+  "mutation": "M11 run identity ignores design",
+  "tests": "T1_file",
+  "red": true,
+  "result": "1 failed, 33 deselected in 1.09s"
+ },
+ {
+  "mutation": "M12 smax sharpness 2.9",
+  "tests": "T7 or T4_tumor",
+  "red": true,
+  "result": "1 failed, 1 passed, 35 deselected in 4.78s"
+ },
+ {
+  "mutation": "M13 R check on the logit link",
+  "tests": "T6",
+  "red": true,
+  "result": "1 failed, 36 deselected in 23.03s"
+ }
+]

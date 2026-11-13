@@ -371,3 +371,13 @@ parameters:
       date: "2026-11-11"
       range: [200, 1000]
       assumption_ack: true
+  - id: freq_rcheck_synthetic
+    description: "Known interior parameters of the synthetic early-toxicity counts used only by the R cross-check (fit/frequentist/r_check.py SYNTH, test T6): m0 -0.5, CTCAE offset 0.3, kappa 0.05, alpha/beta 10 Gy, r 1.0, gamma 0.5, no random effects. A numerical test fixture, not a clinical value."
+    units: "mixed (see description)"
+    source: user_supplied
+    value: 0.05
+    user_supplied:
+      provided_by: "analyst (Claude) for a code test, 2026-11-12; chosen inside the support and near the fitted values so the GLM optimum is interior"
+      date: "2026-11-12"
+      range: [0.04, 0.06]
+      assumption_ack: true

@@ -1,0 +1,2496 @@
+{
+ "models": {
+  "tumor_matched": {
+   "identity": "f0e067bed39d276d5e7eb4a71b61c7f6f1816ae49a7c625b5572e45d0312eb49",
+   "generation": "fit/output_frequentist/tumor_matched_f0e067bed39d276d",
+   "mle": {
+    "ll": -131.09788481544865,
+    "boundary": [
+     {
+      "kind": "support",
+      "parameter": "sigma",
+      "side": "lower",
+      "value": 0.0
+     }
+    ],
+    "n_ties": 12,
+    "nodes": 20
+   },
+   "n_posterior_draws": 1000,
+   "rows": [
+    {
+     "target": "alpha",
+     "units": "per Gy",
+     "mle": 0.03976959297794947,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.027904758638091696
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.05510080493195441
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.027904758638091696,
+     "profile_hi": 0.05510080493195441,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.0019275092069229796,
+      "bias_mcse": 0.00020368977174146143,
+      "mean": 0.04169710218487245,
+      "q025": 0.030045848673351194,
+      "q025_mc95": [
+       0.02867158523592473,
+       0.030577828298306065
+      ],
+      "q975": 0.05507340250820162,
+      "q975_mc95": [
+       0.05408594195385458,
+       0.056695714578132286
+      ],
+      "sd": 0.006441236147828199
+     },
+     "posterior": [
+      0.0301285765,
+      0.0443303995,
+      0.060215785825
+     ],
+     "prior": [
+      0.028105775236626773,
+      0.19959348623721562,
+      1.4185327446446088
+     ],
+     "width_ratio": 0.17350092428921718
+    },
+    {
+     "target": "ab",
+     "units": "Gy",
+     "mle": 13.430730047553334,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 6.5737588262501
+       },
+       "upper": {
+        "closed": false,
+        "value": 1000.0,
+        "why": "reaches the computational limit"
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 6.5737588262501,
+     "profile_hi": null,
+     "profile_lo_open": "",
+     "profile_hi_open": "reaches the computational limit",
+     "bootstrap": {
+      "bias": 20.03278227716286,
+      "bias_mcse": 3.9318820310125777,
+      "mean": 33.46351232471619,
+      "q025": 6.588671084218925,
+      "q025_mc95": [
+       6.364156373633247,
+       6.946033543431021
+      ],
+      "q975": 115.07475772662812,
+      "q975_mc95": [
+       79.5935053187715,
+       751.9291755703894
+      ],
+      "sd": 124.33702709088548
+     },
+     "posterior": [
+      6.866336345000001,
+      10.5800505,
+      18.91703105
+     ],
+     "prior": [
+      5.004752755818597,
+      10.01468656605072,
+      19.9799368091457
+     ]
+    },
+    {
+     "target": "lam",
+     "units": "per day",
+     "mle": 0.034546711644425465,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.01705336222106539
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.04936267257288477
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.01705336222106539,
+     "profile_hi": 0.04936267257288477,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.003961429198107706,
+      "bias_mcse": 0.001984151739968368,
+      "mean": 0.03850814084253317,
+      "q025": 0.020551770600511412,
+      "q025_mc95": [
+       0.018082725754633603,
+       0.02157413730985267
+      ],
+      "q975": 0.05591889938961951,
+      "q975_mc95": [
+       0.053844586909282115,
+       0.0580475247724115
+      ],
+      "sd": 0.06274438721686189
+     },
+     "posterior": [
+      0.01017116025,
+      0.0277094855,
+      0.048534512625
+     ],
+     "prior": [
+      0.0052829760653825475,
+      0.0996329211355671,
+      1.8831340349745402
+     ],
+     "width_ratio": 0.18087311124512342
+    },
+    {
+     "target": "Tk",
+     "units": "days",
+     "mle": 38.29050195422161,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 32.724132968781284
+       },
+       "upper": {
+        "closed": true,
+        "value": 42.238159183111705
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 32.724132968781284,
+     "profile_hi": 42.238159183111705,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.6095721401031824,
+      "bias_mcse": 0.11032164820531755,
+      "mean": 38.90007409432479,
+      "q025": 29.248681684159987,
+      "q025_mc95": [
+       27.143368549401366,
+       31.18089413696466
+      ],
+      "q975": 44.76820288846053,
+      "q975_mc95": [
+       44.1798513564556,
+       45.08548650042694
+      ],
+      "sd": 3.4886768355263067
+     },
+     "posterior": [
+      23.7468722,
+      37.2890565,
+      42.837010625
+     ],
+     "prior": [
+      8.882571988998407,
+      28.052586658564948,
+      47.42264376631974
+     ],
+     "width_ratio": 0.24686062520332128
+    },
+    {
+     "target": "g",
+     "units": "per day",
+     "mle": 0.006734500321260962,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": false,
+        "value": 0.0046,
+        "why": "reaches the support limit"
+       },
+       "upper": {
+        "closed": false,
+        "value": 0.021,
+        "why": "reaches the support limit"
+       }
+      }
+     ],
+     "profile_flat": true,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": null,
+     "profile_hi": null,
+     "profile_lo_open": "reaches the support limit",
+     "profile_hi_open": "reaches the support limit",
+     "bootstrap": {
+      "bias": 0.0020401697705067544,
+      "bias_mcse": 0.0001596674258812402,
+      "mean": 0.008774670091767717,
+      "q025": 0.0046,
+      "q025_mc95": [
+       0.0046,
+       0.0046
+      ],
+      "q975": 0.021,
+      "q975_mc95": [
+       0.021,
+       0.021
+      ],
+      "sd": 0.005049127339208363
+     },
+     "posterior": [
+      0.0049454404575,
+      0.012107421,
+      0.020404807025
+     ],
+     "prior": [
+      0.005005882669146125,
+      0.012747986048073584,
+      0.02058000650477813
+     ]
+    },
+    {
+     "target": "sigma",
+     "units": "cloglog scale",
+     "mle": 0.0,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": false,
+        "value": 0.0,
+        "why": "reaches the support limit"
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.04737067243183508
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": null,
+     "profile_hi": 0.04737067243183508,
+     "profile_lo_open": "reaches the support limit",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 4.4886414082585424e-05,
+      "bias_mcse": 3.386667177941303e-05,
+      "mean": 4.4886414082585424e-05,
+      "q025": 0.0,
+      "q025_mc95": [
+       0.0,
+       0.0
+      ],
+      "q975": 0.0,
+      "q975_mc95": [
+       0.0,
+       0.0
+      ],
+      "sd": 0.0010709581959229273
+     },
+     "posterior": [
+      0.0038673069050000003,
+      0.064976274,
+      0.174024653
+     ],
+     "prior": [
+      0.015617042815715663,
+      0.3385283832828487,
+      1.120513387992901
+     ]
+    },
+    {
+     "target": "lam_plus_g",
+     "units": "per day",
+     "mle": 0.041281211965686425,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.02936412200686269
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.05555974168933897
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.02936412200686269,
+     "profile_hi": 0.05555974168933897,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.00600159896861447,
+      "bias_mcse": 0.0019980828700073444,
+      "mean": 0.047282810934300895,
+      "q025": 0.0313218242092971,
+      "q025_mc95": [
+       0.029597179474176925,
+       0.03187238131109891
+      ],
+      "q975": 0.06791708626400915,
+      "q975_mc95": [
+       0.06334122747224405,
+       0.07238075725364138
+      ],
+      "sd": 0.06318492822989345
+     },
+     "posterior": [
+      0.0253954468275,
+      0.03952226625,
+      0.05920288
+     ],
+     "prior": [
+      0.01678608448683454,
+      0.11247298030295808,
+      1.8955090629802225
+     ],
+     "width_ratio": 0.013943311484635932
+    },
+    {
+     "target": "rate_bed",
+     "units": "Gy of BED per day",
+     "mle": 1.03800941559988,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.701808801055114
+       },
+       "upper": {
+        "closed": true,
+        "value": 1.5532814415515341
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.701808801055114,
+     "profile_hi": 1.5532814415515341,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.1158573525379023,
+      "bias_mcse": 0.048797510453101926,
+      "mean": 1.1538667681377823,
+      "q025": 0.69321478061375,
+      "q025_mc95": [
+       0.6723086292469008,
+       0.7197616054456696
+      ],
+      "q975": 1.6952971918008746,
+      "q975_mc95": [
+       1.6057285733761533,
+       1.8774818915932296
+      ],
+      "sd": 1.5431127717767719
+     },
+     "posterior": [
+      0.5467490400855324,
+      0.9028232030867138,
+      1.4635250115612473
+     ],
+     "prior": [
+      0.034362006851553266,
+      0.591308085825767,
+      17.01117811745986
+     ],
+     "width_ratio": 0.050155025238469784
+    },
+    {
+     "target": "rate_eqd2",
+     "units": "Gy EQD2 per day",
+     "mle": 0.9034714627744446,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.5985234092370143
+       },
+       "upper": {
+        "closed": true,
+        "value": 1.3630028898763162
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.5985234092370143,
+     "profile_hi": 1.3630028898763162,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.09033595691010032,
+      "bias_mcse": 0.03848534543911852,
+      "mean": 0.9938074196845449,
+      "q025": 0.604987391379957,
+      "q025_mc95": [
+       0.5713065104719738,
+       0.6175753476967146
+      ],
+      "q975": 1.4673706450551247,
+      "q975_mc95": [
+       1.4080653858242302,
+       1.6241408243641384
+      ],
+      "sd": 1.2170134812598754
+     },
+     "posterior": [
+      0.464000864276402,
+      0.7564442553263773,
+      1.2386664075411926
+     ],
+     "prior": [
+      0.028254193260711123,
+      0.4885214068691902,
+      14.113050907942084
+     ],
+     "width_ratio": 0.05427692682581937
+    },
+    {
+     "target": "contrast[0]",
+     "units": "Gy of tumor BED",
+     "mle": -3.040579625295308,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -6.650605644780783
+       },
+       "upper": {
+        "closed": true,
+        "value": 1.7685282083592226
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -6.650605644780783,
+     "profile_hi": 1.7685282083592226,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.17975014249791288,
+      "bias_mcse": 0.06096903051854691,
+      "mean": -2.8608294827973952,
+      "q025": -6.353410004147633,
+      "q025_mc95": [
+       -6.638136906285666,
+       -5.999778400844356
+      ],
+      "q975": 1.2902677143503372,
+      "q975_mc95": [
+       0.9335457756088061,
+       1.9071205404616194
+      ],
+      "sd": 1.9280100317092501
+     },
+     "posterior": [
+      -5.616878172409709,
+      -1.9492811982296985,
+      3.189385288298486
+     ],
+     "prior": [
+      -13.434506384370849,
+      -4.777084670447188,
+      265.8725334783328
+     ],
+     "width_ratio": 0.030142934661720383
+    },
+    {
+     "target": "contrast[1]",
+     "units": "Gy of tumor BED",
+     "mle": -10.88385258244653,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -14.564191089027394
+       },
+       "upper": {
+        "closed": true,
+        "value": -6.096750671556845
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -14.564191089027394,
+     "profile_hi": -6.096750671556845,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.41096884527680366,
+      "bias_mcse": 0.06418953320100852,
+      "mean": -10.472883737169726,
+      "q025": -14.1545467591289,
+      "q025_mc95": [
+       -14.395333116255522,
+       -13.885935102943115
+      ],
+      "q975": -5.906581911597115,
+      "q975_mc95": [
+       -6.471019452178311,
+       -4.956203679136344
+      ],
+      "sd": 2.029851268581857
+     },
+     "posterior": [
+      -13.193533980708363,
+      -9.175606354349128,
+      -3.456228221177968
+     ],
+     "prior": [
+      -22.462047977105623,
+      -12.692341599123761,
+      292.24849322774446
+     ],
+     "width_ratio": 0.026905487134474333
+    },
+    {
+     "target": "contrast[2]",
+     "units": "Gy of tumor BED",
+     "mle": -5.169377070276674,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -9.3257995099702
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.020212441378320792
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -9.3257995099702,
+     "profile_hi": 0.020212441378320792,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.3372806327269897,
+      "bias_mcse": 0.06929147221022743,
+      "mean": -4.832096437549684,
+      "q025": -8.779984819893427,
+      "q025_mc95": [
+       -9.29843347931262,
+       -8.465703515030569
+      ],
+      "q975": -0.12862608115167756,
+      "q975_mc95": [
+       -0.5832499270235587,
+       0.5188704095772465
+      ],
+      "sd": 2.1911887461058024
+     },
+     "posterior": [
+      -7.697490316545673,
+      -3.641012439449703,
+      2.0182859648261835
+     ],
+     "prior": [
+      -15.950300725922581,
+      -6.523071415697988,
+      281.3095774223094
+     ],
+     "width_ratio": 0.03144054289993359
+    },
+    {
+     "target": "contrast[3]",
+     "units": "Gy of tumor BED",
+     "mle": 0.23424802420363733,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -2.668173725306995
+       },
+       "upper": {
+        "closed": true,
+        "value": 4.92596479204307
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -2.668173725306995,
+     "profile_hi": 4.92596479204307,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.23507440756993764,
+      "bias_mcse": 0.05259016533124532,
+      "mean": -0.0008263833663003197,
+      "q025": -2.8845985347320164,
+      "q025_mc95": [
+       -3.1188767891273415,
+       -2.7813321776075455
+      ],
+      "q975": 3.5371236665856323,
+      "q975_mc95": [
+       3.1361939176800604,
+       4.024538549768856
+      ],
+      "sd": 1.6630470497155867
+     },
+     "posterior": [
+      -2.989815012886671,
+      0.09337030354091524,
+      4.556857593939274
+     ],
+     "prior": [
+      -9.232519878529201,
+      -2.731745130944777,
+      199.57889069558266
+     ],
+     "width_ratio": 0.03636840772480072
+    },
+    {
+     "target": "contrast[4]",
+     "units": "Gy of tumor BED",
+     "mle": 2.3264019720194824,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -0.024783199251805776
+       },
+       "upper": {
+        "closed": true,
+        "value": 5.734379274690396
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -0.024783199251805776,
+     "profile_hi": 5.734379274690396,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.2849858060210875,
+      "bias_mcse": 0.04306610354916093,
+      "mean": 2.041416165998395,
+      "q025": -0.41431464059108175,
+      "q025_mc95": [
+       -0.6359589858719801,
+       -0.2663555409914835
+      ],
+      "q975": 4.859287972929784,
+      "q975_mc95": [
+       4.573568615114674,
+       5.150198616757919
+      ],
+      "sd": 1.3618697716400976
+     },
+     "posterior": [
+      -1.1253272400943803,
+      1.2183801630708224,
+      4.470603423089737
+     ],
+     "prior": [
+      -4.71805769769133,
+      -1.180539343024158,
+      107.28073983084758
+     ],
+     "width_ratio": 0.05142164559824568
+    },
+    {
+     "target": "contrast[5]",
+     "units": "Gy of tumor BED",
+     "mle": -2.5196301006681736,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -3.432060395412487
+       },
+       "upper": {
+        "closed": true,
+        "value": -1.3964888203656292
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -3.432060395412487,
+     "profile_hi": -1.3964888203656292,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.06735191749218572,
+      "bias_mcse": 0.0170383209877072,
+      "mean": -2.452278183175988,
+      "q025": -3.404478981189218,
+      "q025_mc95": [
+       -3.4923329743724025,
+       -3.3315185681604973
+      ],
+      "q975": -1.283955887083498,
+      "q975_mc95": [
+       -1.3970951326077312,
+       -1.1425884533203998
+      ],
+      "sd": 0.5387990182620451
+     },
+     "posterior": [
+      -3.7015742213165974,
+      -2.966839154672705,
+      -1.82925162846873
+     ],
+     "prior": [
+      -5.123098804442913,
+      -3.6967116526927413,
+      28.129476623480716
+     ],
+     "width_ratio": 0.06121545621207734
+    },
+    {
+     "target": "contrast[6]",
+     "units": "Gy of tumor BED",
+     "mle": -4.224767120023188,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -7.047907965451579
+       },
+       "upper": {
+        "closed": true,
+        "value": -0.8050951309820302
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -7.047907965451579,
+     "profile_hi": -0.8050951309820302,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.39653536530865896,
+      "bias_mcse": 0.046403403388158126,
+      "mean": -4.621302485331847,
+      "q025": -7.406053258988561,
+      "q025_mc95": [
+       -7.695174799847116,
+       -7.167339281455099
+      ],
+      "q975": -1.8980863762156928,
+      "q975_mc95": [
+       -2.0920825164612395,
+       -1.4843159439919305
+      ],
+      "sd": 1.4674044589015411
+     },
+     "posterior": [
+      -8.188441362426357,
+      -5.8046198834162155,
+      -2.5252874810316475
+     ],
+     "prior": [
+      -12.642985691675385,
+      -8.31012502197488,
+      100.08952585847794
+     ],
+     "width_ratio": 0.05537721770433719
+    },
+    {
+     "target": "contrast[7]",
+     "units": "Gy of tumor BED",
+     "mle": 4.392892378655944,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 1.2028480155907464
+       },
+       "upper": {
+        "closed": true,
+        "value": 7.849089940219377
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 1.2028480155907464,
+     "profile_hi": 7.849089940219377,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.8817467831371077,
+      "bias_mcse": 0.04840727035968402,
+      "mean": 3.511145595518836,
+      "q025": 0.7301545198212968,
+      "q025_mc95": [
+       0.36649095697747214,
+       0.8884118094180451
+      ],
+      "q975": 6.669295700154416,
+      "q975_mc95": [
+       6.433154543132247,
+       7.025612492018013
+      ],
+      "sd": 1.5307722964815973
+     },
+     "posterior": [
+      0.051089908475650675,
+      2.7491705183102297,
+      6.458658345714543
+     ],
+     "prior": [
+      -4.708584100010445,
+      -0.14034100010238149,
+      137.32935636695188
+     ],
+     "width_ratio": 0.04679201840563529
+    },
+    {
+     "target": "contrast[8]",
+     "units": "Gy of tumor BED",
+     "mle": 7.264355208337776,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 4.91265916491937
+       },
+       "upper": {
+        "closed": true,
+        "value": 10.658061489366425
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 4.91265916491937,
+     "profile_hi": 10.658061489366425,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.28944778839258856,
+      "bias_mcse": 0.04296167581869325,
+      "mean": 6.974907419945187,
+      "q025": 4.5173627926994335,
+      "q025_mc95": [
+       4.295871073215537,
+       4.639728851939353
+      ],
+      "q975": 9.775088696803108,
+      "q975_mc95": [
+       9.51467887145035,
+       10.044142543231118
+      ],
+      "sd": 1.3585674768484972
+     },
+     "posterior": [
+      3.7948439222969994,
+      6.141092660621979,
+      9.390797674973307
+     ],
+     "prior": [
+      0.19534741012705722,
+      3.7313650806922354,
+      112.19138390874015
+     ],
+     "width_ratio": 0.051300050466680604
+    },
+    {
+     "target": "contrast[9]",
+     "units": "Gy of tumor BED",
+     "mle": 8.466886621128566,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 5.198790772541047
+       },
+       "upper": {
+        "closed": false,
+        "value": 11.345628072312277,
+        "why": "not crossed within the search"
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 5.198790772541047,
+     "profile_hi": null,
+     "profile_lo_open": "",
+     "profile_hi_open": "not crossed within the search",
+     "bootstrap": {
+      "bias": -0.2253122618314496,
+      "bias_mcse": 0.04715268041385925,
+      "mean": 8.241574359297116,
+      "q025": 5.213279534516129,
+      "q025_mc95": [
+       4.9879688792158134,
+       5.541866284277333
+      ],
+      "q975": 11.234324574856652,
+      "q975_mc95": [
+       11.071313647621494,
+       11.544037282543158
+      ],
+      "sd": 1.4910986788980618
+     },
+     "posterior": [
+      5.471549653037269,
+      7.622703249430494,
+      9.375549362540086
+     ],
+     "prior": [
+      3.1919922412698485,
+      7.398171043849715,
+      9.493887232872257
+     ]
+    }
+   ],
+   "bootstrap": {
+    "B": 1000,
+    "ok": 1000,
+    "unresolved_failures": 0,
+    "failure_rate": 0.0,
+    "provisional": false,
+    "boundary_solutions": 998,
+    "seconds_total": 3412.69
+   },
+   "sigma_sensitivity": {
+    "contrast[0]__sigma_0.065": {
+     "target": "contrast[0]",
+     "sigma": 0.065,
+     "estimate": -2.7468981072446894,
+     "set": [
+      [
+       -7.146259272404612,
+       2.965513892434568,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[0]__sigma_0.17": {
+     "target": "contrast[0]",
+     "sigma": 0.17,
+     "estimate": -1.766615422486268,
+     "set": [
+      [
+       -7.934747407372884,
+       9.577906589877943,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[1]__sigma_0.065": {
+     "target": "contrast[1]",
+     "sigma": 0.065,
+     "estimate": -10.948391648083636,
+     "set": [
+      [
+       -15.05988906229111,
+       -4.966861231357295,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[1]__sigma_0.17": {
+     "target": "contrast[1]",
+     "sigma": 0.17,
+     "estimate": -10.131769971405532,
+     "set": [
+      [
+       -15.922854110033093,
+       1.3216659863159368,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[2]__sigma_0.065": {
+     "target": "contrast[2]",
+     "sigma": 0.065,
+     "estimate": -5.048627914098148,
+     "set": [
+      [
+       -9.864567286684649,
+       1.2021172988755913,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[2]__sigma_0.17": {
+     "target": "contrast[2]",
+     "sigma": 0.17,
+     "estimate": -3.980577949379395,
+     "set": [
+      [
+       -10.72917685467805,
+       8.179278777836942,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[3]__sigma_0.065": {
+     "target": "contrast[3]",
+     "sigma": 0.065,
+     "estimate": 0.914182625772824,
+     "set": [
+      [
+       -3.0769451330891346,
+       6.037025927988521,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[3]__sigma_0.17": {
+     "target": "contrast[3]",
+     "sigma": 0.17,
+     "estimate": 1.8300541542719344,
+     "set": [
+      [
+       -3.7834152687003404,
+       12.076066730670798,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[4]__sigma_0.065": {
+     "target": "contrast[4]",
+     "sigma": 0.065,
+     "estimate": 2.300039403239154,
+     "set": [
+      [
+       -0.3347089037916985,
+       6.552899344921058,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[4]__sigma_0.17": {
+     "target": "contrast[4]",
+     "sigma": 0.17,
+     "estimate": 2.9100212031010244,
+     "set": [
+      [
+       -0.6887410573171426,
+       11.657489450372614,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[5]__sigma_0.065": {
+     "target": "contrast[5]",
+     "sigma": 0.065,
+     "estimate": -2.511537854607326,
+     "set": [
+      [
+       -3.534495234518808,
+       -1.0903193480720874,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[5]__sigma_0.17": {
+     "target": "contrast[5]",
+     "sigma": 0.17,
+     "estimate": -2.4681904525729976,
+     "set": [
+      [
+       -3.7855524659104134,
+       0.45923828758051494,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[6]__sigma_0.065": {
+     "target": "contrast[6]",
+     "sigma": 0.065,
+     "estimate": -4.210430651562326,
+     "set": [
+      [
+       -7.366276478811095,
+       0.050756160989142915,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[6]__sigma_0.17": {
+     "target": "contrast[6]",
+     "sigma": 0.17,
+     "estimate": -3.9315636724953364,
+     "set": [
+      [
+       -8.012282484235259,
+       4.781342476433247,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[7]__sigma_0.065": {
+     "target": "contrast[7]",
+     "sigma": 0.065,
+     "estimate": 4.701631313493891,
+     "set": [
+      [
+       1.0799077364310092,
+       8.73036053883947,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[7]__sigma_0.17": {
+     "target": "contrast[7]",
+     "sigma": 0.17,
+     "estimate": 5.342723667335406,
+     "set": [
+      [
+       null,
+       13.976952503846977,
+       "root not bracketed",
+       ""
+      ]
+     ]
+    },
+    "contrast[8]__sigma_0.065": {
+     "target": "contrast[8]",
+     "sigma": 0.065,
+     "estimate": 7.239620601047093,
+     "set": [
+      [
+       4.6062271240470825,
+       11.47458655464059,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[8]__sigma_0.17": {
+     "target": "contrast[8]",
+     "sigma": 0.17,
+     "estimate": 7.836357808077182,
+     "set": [
+      [
+       4.250748153503247,
+       16.553107528149035,
+       "",
+       ""
+      ]
+     ]
+    },
+    "contrast[9]__sigma_0.065": {
+     "target": "contrast[9]",
+     "sigma": 0.065,
+     "estimate": 8.549092164509787,
+     "set": [
+      [
+       4.708214867533787,
+       null,
+       "",
+       "not crossed within the search"
+      ]
+     ]
+    },
+    "contrast[9]__sigma_0.17": {
+     "target": "contrast[9]",
+     "sigma": 0.17,
+     "estimate": 7.880293204875429,
+     "set": [
+      [
+       1.6910202858958185,
+       null,
+       "",
+       "not crossed within the search"
+      ]
+     ]
+    }
+   }
+  },
+  "tumor_expanded": {
+   "identity": "5affd91c876d9b961e16cbd7e5ec8f89151d42f8224843fa54de706bfb45256e",
+   "generation": "fit/output_frequentist/tumor_expanded_5affd91c876d9b96",
+   "mle": {
+    "ll": -131.097884815449,
+    "boundary": [
+     {
+      "kind": "support",
+      "parameter": "sigma",
+      "side": "lower",
+      "value": 0.0
+     }
+    ],
+    "n_ties": 9,
+    "nodes": 20
+   },
+   "n_posterior_draws": 1000,
+   "rows": [
+    {
+     "target": "alpha",
+     "units": "per Gy",
+     "mle": 0.039769592482536156,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.025523366346204817
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.05510080493195311
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.025523366346204817,
+     "profile_hi": 0.05510080493195311,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      0.0301285765,
+      0.0443303995,
+      0.060215785825
+     ],
+     "prior": [
+      0.02824814225621632,
+      0.20008793357738075,
+      1.4316567813913443
+     ],
+     "width_ratio": 0.19604081334364104
+    },
+    {
+     "target": "ab",
+     "units": "Gy",
+     "mle": 13.430728035489107,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 6.573758826252237
+       },
+       "upper": {
+        "closed": false,
+        "value": 1000.0,
+        "why": "reaches the computational limit"
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 6.573758826252237,
+     "profile_hi": null,
+     "profile_lo_open": "",
+     "profile_hi_open": "reaches the computational limit",
+     "posterior": [
+      6.866336345000001,
+      10.5800505,
+      18.91703105
+     ],
+     "prior": [
+      4.969238264414706,
+      9.998322845531963,
+      20.06060549698452
+     ]
+    },
+    {
+     "target": "lam",
+     "units": "per day",
+     "mle": 0.03454671178949358,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.017053362221065772
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.05116389232241998
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.017053362221065772,
+     "profile_hi": 0.05116389232241998,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      0.01017116025,
+      0.0277094855,
+      0.048534512625
+     ],
+     "prior": [
+      0.005382255531983327,
+      0.10024296262547322,
+      1.9312407717464044
+     ],
+     "width_ratio": 0.1867622092975255
+    },
+    {
+     "target": "Tk",
+     "units": "days",
+     "mle": 38.29050134087362,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 32.526798365179296
+       },
+       "upper": {
+        "closed": true,
+        "value": 42.238163106301805
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 32.526798365179296,
+     "profile_hi": 42.238163106301805,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      23.7468722,
+      37.2890565,
+      42.837010625
+     ],
+     "prior": [
+      8.782823171724388,
+      28.030807307428212,
+      47.46309511557343
+     ],
+     "width_ratio": 0.2510676438681764
+    },
+    {
+     "target": "g",
+     "units": "per day",
+     "mle": 0.006734499964423279,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": false,
+        "value": 0.0,
+        "why": "reaches the support limit"
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.021597923052134146
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": null,
+     "profile_hi": 0.021597923052134146,
+     "profile_lo_open": "reaches the support limit",
+     "profile_hi_open": "",
+     "posterior": [
+      0.0049454404575,
+      0.012107421,
+      0.020404807025
+     ],
+     "prior": [
+      0.005012440656015678,
+      0.01279072826435024,
+      0.02059206352769948
+     ]
+    },
+    {
+     "target": "sigma",
+     "units": "cloglog scale",
+     "mle": 0.0,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": false,
+        "value": 0.0,
+        "why": "reaches the support limit"
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.04737067243184303
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": null,
+     "profile_hi": 0.04737067243184303,
+     "profile_lo_open": "reaches the support limit",
+     "profile_hi_open": "",
+     "posterior": [
+      0.0038673069050000003,
+      0.064976274,
+      0.174024653
+     ],
+     "prior": [
+      0.015440988058939707,
+      0.3362762494023168,
+      1.1192085836039722
+     ]
+    },
+    {
+     "target": "lam_plus_g",
+     "units": "per day",
+     "mle": 0.04128121175391686,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.029306050390290824
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.05555974168936328
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.029306050390290824,
+     "profile_hi": 0.05555974168936328,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      0.0253954468275,
+      0.03952226625,
+      0.05920288
+     ],
+     "prior": [
+      0.01686509357816017,
+      0.1131097926704592,
+      1.9442706611911753
+     ],
+     "width_ratio": 0.013621259448568571
+    },
+    {
+     "target": "rate_bed",
+     "units": "Gy of BED per day",
+     "mle": 1.038009423205543,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.7018086925398102
+       },
+       "upper": {
+        "closed": true,
+        "value": 1.635731238235281
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.7018086925398102,
+     "profile_hi": 1.635731238235281,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      0.5467490400855324,
+      0.9028232030867138,
+      1.4635250115612473
+     ],
+     "prior": [
+      0.03362389561925467,
+      0.5897467587659353,
+      17.78960827818547
+     ],
+     "width_ratio": 0.05259762148768539
+    },
+    {
+     "target": "rate_eqd2",
+     "units": "Gy EQD2 per day",
+     "mle": 0.9034714518514726,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.5985231607274759
+       },
+       "upper": {
+        "closed": true,
+        "value": 1.5061642407580764
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.5985231607274759,
+     "profile_hi": 1.5061642407580764,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      0.464000864276402,
+      0.7564442553263773,
+      1.2386664075411926
+     ],
+     "prior": [
+      0.027673317830699498,
+      0.4876522431487762,
+      14.711302554131816
+     ],
+     "width_ratio": 0.06181312980763058
+    },
+    {
+     "target": "contrast[0]",
+     "units": "Gy of tumor BED",
+     "mle": -3.040578985121691,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -7.15147635841485
+       },
+       "upper": {
+        "closed": true,
+        "value": 1.7803923223785867
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -7.15147635841485,
+     "profile_hi": 1.7803923223785867,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      -5.616878172409709,
+      -1.9492811982296985,
+      3.189385288298486
+     ],
+     "prior": [
+      -13.426505627933494,
+      -4.789401861246748,
+      275.420125953007
+     ],
+     "width_ratio": 0.030922530174254607
+    },
+    {
+     "target": "contrast[1]",
+     "units": "Gy of tumor BED",
+     "mle": -10.88385206951068,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -15.708620576987256
+       },
+       "upper": {
+        "closed": true,
+        "value": -6.096750671556256
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -15.708620576987256,
+     "profile_hi": -6.096750671556256,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      -13.193533980708363,
+      -9.175606354349128,
+      -3.456228221177968
+     ],
+     "prior": [
+      -22.460927504076345,
+      -12.703975316461452,
+      305.8081625299562
+     ],
+     "width_ratio": 0.029280459833834836
+    },
+    {
+     "target": "contrast[2]",
+     "units": "Gy of tumor BED",
+     "mle": -5.169376373811481,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -10.284718490905304
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.02021220985956867
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -10.284718490905304,
+     "profile_hi": 0.02021220985956867,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      -7.697490316545673,
+      -3.641012439449703,
+      2.0182859648261835
+     ],
+     "prior": [
+      -15.946383452383072,
+      -6.531226686713737,
+      294.75692137551516
+     ],
+     "width_ratio": 0.03316646633827368
+    },
+    {
+     "target": "contrast[3]",
+     "units": "Gy of tumor BED",
+     "mle": 0.2342486315506278,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -2.6681737477934653
+       },
+       "upper": {
+        "closed": true,
+        "value": 5.897985613208768
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -2.6681737477934653,
+     "profile_hi": 5.897985613208768,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      -2.989815012886671,
+      0.09337030354091524,
+      4.556857593939274
+     ],
+     "prior": [
+      -9.232785345027724,
+      -2.737653853520893,
+      210.06127897157916
+     ],
+     "width_ratio": 0.0390624314784681
+    },
+    {
+     "target": "contrast[4]",
+     "units": "Gy of tumor BED",
+     "mle": 2.3264020376643657,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -0.024783197603327773
+       },
+       "upper": {
+        "closed": true,
+        "value": 6.432259611849389
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -0.024783197603327773,
+     "profile_hi": 6.432259611849389,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      -1.1253272400943803,
+      1.2183801630708224,
+      4.470603423089737
+     ],
+     "prior": [
+      -4.718315661942991,
+      -1.1747849597298412,
+      112.83392277074313
+     ],
+     "width_ratio": 0.05492913529800804
+    },
+    {
+     "target": "contrast[5]",
+     "units": "Gy of tumor BED",
+     "mle": -2.519630174691315,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -3.432059948671672
+       },
+       "upper": {
+        "closed": true,
+        "value": -1.032690294952933
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -3.432059948671672,
+     "profile_hi": -1.032690294952933,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      -3.7015742213165974,
+      -2.966839154672705,
+      -1.82925162846873
+     ],
+     "prior": [
+      -5.131642846389299,
+      -3.7009446035496687,
+      29.779161615569592
+     ],
+     "width_ratio": 0.06872856958461813
+    },
+    {
+     "target": "contrast[6]",
+     "units": "Gy of tumor BED",
+     "mle": -4.224767286759729,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": -7.04790775354876
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.45946508536561986
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": -7.04790775354876,
+     "profile_hi": 0.45946508536561986,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      -8.188441362426357,
+      -5.8046198834162155,
+      -2.5252874810316475
+     ],
+     "prior": [
+      -12.656591520760308,
+      -8.309177329767596,
+      105.74227409299466
+     ],
+     "width_ratio": 0.0634074726983044
+    },
+    {
+     "target": "contrast[7]",
+     "units": "Gy of tumor BED",
+     "mle": 4.392892727637559,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 1.20284906009937
+       },
+       "upper": {
+        "closed": true,
+        "value": 9.232924459094793
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 1.20284906009937,
+     "profile_hi": 9.232924459094793,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      0.051089908475650675,
+      2.7491705183102297,
+      6.458658345714543
+     ],
+     "prior": [
+      -4.7148936550878595,
+      -0.13156696332742257,
+      144.26743467494322
+     ],
+     "width_ratio": 0.053899516063454916
+    },
+    {
+     "target": "contrast[8]",
+     "units": "Gy of tumor BED",
+     "mle": 7.264355264687396,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 4.912658700641416
+       },
+       "upper": {
+        "closed": true,
+        "value": 11.379676470579144
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 4.912658700641416,
+     "profile_hi": 11.379676470579144,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "posterior": [
+      3.7948439222969994,
+      6.141092660621979,
+      9.390797674973307
+     ],
+     "prior": [
+      0.19364461189479593,
+      3.737598251100003,
+      117.74658287942823
+     ],
+     "width_ratio": 0.055013663335404965
+    },
+    {
+     "target": "contrast[9]",
+     "units": "Gy of tumor BED",
+     "mle": 8.466886151755247,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 5.198790772540696
+       },
+       "upper": {
+        "closed": false,
+        "value": 11.34562744335203,
+        "why": "not crossed within the search"
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 5.198790772540696,
+     "profile_hi": null,
+     "profile_lo_open": "",
+     "profile_hi_open": "not crossed within the search",
+     "posterior": [
+      5.471549653037269,
+      7.622703249430494,
+      9.375549362540086
+     ],
+     "prior": [
+      3.131901317378219,
+      7.391294135007925,
+      9.50235643653197
+     ]
+    }
+   ],
+   "bootstrap": null,
+   "sigma_sensitivity": {}
+  },
+  "early_early_matched": {
+   "identity": "48a6a4f0039e68f08e3ac95af793c2b5fbd2502efbcd4434a4ae1305e68cb908",
+   "generation": "fit/output_frequentist/early_early_matched_48a6a4f0039e68f0",
+   "mle": {
+    "ll": -179.77568720592626,
+    "boundary": [
+     {
+      "kind": "comp",
+      "parameter": "ab",
+      "side": "upper",
+      "value": 1000.0
+     }
+    ],
+    "n_ties": 13,
+    "nodes": [
+     20,
+     20
+    ]
+   },
+   "n_posterior_draws": 4000,
+   "rows": [
+    {
+     "target": "kappa",
+     "units": "log odds per Gy of early BED",
+     "mle": 0.04419729591388445,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.0146609914210039
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.07554216997009101
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.0146609914210039,
+     "profile_hi": 0.07554216997009101,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.0004140863336763931,
+      "bias_mcse": 0.000680720193364304,
+      "mean": 0.04378320958020806,
+      "q025": 0.0165602610672552,
+      "q025_mc95": [
+       0.01054787809185822,
+       0.018447606371679536
+      ],
+      "q975": 0.07497467684005558,
+      "q975_mc95": [
+       0.07328305984751464,
+       0.07841727935935641
+      ],
+      "sd": 0.01522136626019385
+     },
+     "posterior": [
+      0.024493945,
+      0.04669255,
+      0.076833185
+     ],
+     "prior": [
+      0.0031177792931573263,
+      0.06745103529788078,
+      0.22398466270759831
+     ],
+     "width_ratio": 0.2756464781315717
+    },
+    {
+     "target": "ab",
+     "units": "Gy",
+     "mle": 1000.0,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 11.256835111985621
+       },
+       "upper": {
+        "closed": false,
+        "value": 1000.0,
+        "why": "reaches the computational limit"
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 11.256835111985621,
+     "profile_hi": null,
+     "profile_lo_open": "",
+     "profile_hi_open": "reaches the computational limit",
+     "bootstrap": {
+      "bias": -520.1504048719844,
+      "bias_mcse": 21.719735184096773,
+      "mean": 479.84959512801566,
+      "q025": 4.151685352242426,
+      "q025_mc95": [
+       3.2414322964776483,
+       4.8846498564010625
+      ],
+      "q975": 1000.0,
+      "q975_mc95": [
+       1000.0,
+       1000.0
+      ],
+      "sd": 485.66804324934293
+     },
+     "posterior": [
+      6.9413995,
+      12.8683,
+      24.042855
+     ],
+     "prior": [
+      4.979589619470319,
+      9.997912640716162,
+      20.02583543772512
+     ]
+    },
+    {
+     "target": "r",
+     "units": "Gy of BED per day",
+     "mle": 1.7490808972999234,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 1.076828751689541
+       },
+       "upper": {
+        "closed": true,
+        "value": 4.873151627370049
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 1.076828751689541,
+     "profile_hi": 4.873151627370049,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.29556890296683225,
+      "bias_mcse": 0.0685213790787,
+      "mean": 2.0446498002667557,
+      "q025": 1.0658513700776862,
+      "q025_mc95": [
+       1.0149053818290998,
+       1.113161512026873
+      ],
+      "q975": 4.376244272359865,
+      "q975_mc95": [
+       3.8558207094203683,
+       5.764576477680823
+      ],
+      "sd": 1.5321846153200511
+     },
+     "posterior": [
+      1.00296875,
+      1.553845,
+      2.7124127500000004
+     ],
+     "prior": [
+      0.30108374048567554,
+      0.7994186548582154,
+      2.130503618697027
+     ],
+     "width_ratio": 0.7715546717652082
+    },
+    {
+     "target": "gamma",
+     "units": "log odds",
+     "mle": 0.5837616199682617,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.263492931246646
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.9014528072771255
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.263492931246646,
+     "profile_hi": 0.9014528072771255,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.004473089537843422,
+      "bias_mcse": 0.007118586036849676,
+      "mean": 0.5792885304304183,
+      "q025": 0.26568799104521174,
+      "q025_mc95": [
+       0.23507120784419303,
+       0.285830178071623
+      ],
+      "q975": 0.8945165465283142,
+      "q975_mc95": [
+       0.8604024663248504,
+       0.9359833316359061
+      ],
+      "sd": 0.159176422820767
+     },
+     "posterior": [
+      0.19985875,
+      0.55307,
+      0.9038821750000001
+     ],
+     "prior": [
+      -1.9669895881814616,
+      0.0010219125997707745,
+      1.9658821182285529
+     ],
+     "width_ratio": 0.1622122264986922
+    },
+    {
+     "target": "tau",
+     "units": "log odds",
+     "mle": 0.7284366980185305,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.5264584096381281
+       },
+       "upper": {
+        "closed": true,
+        "value": 1.05059983785289
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.5264584096381281,
+     "profile_hi": 1.05059983785289,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.03424527744964223,
+      "bias_mcse": 0.005837800926910413,
+      "mean": 0.6941914205688883,
+      "q025": 0.4464874849522007,
+      "q025_mc95": [
+       0.39550675795465484,
+       0.4732967605836196
+      ],
+      "q975": 0.9558535873626827,
+      "q975_mc95": [
+       0.9306312724307616,
+       1.022568864683437
+      ],
+      "sd": 0.13053719711682965
+     },
+     "posterior": [
+      0.556530075,
+      0.7847934999999999,
+      1.142604
+     ],
+     "prior": [
+      0.0312447761711671,
+      0.6748287295055664,
+      2.2422277678767015
+     ],
+     "width_ratio": 0.23706262335851053
+    },
+    {
+     "target": "sigma_arm",
+     "units": "log odds",
+     "mle": 0.18217404967275344,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.08883586419876599
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.3095359120112674
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.08883586419876599,
+     "profile_hi": 0.3095359120112674,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.057299299926657554,
+      "bias_mcse": 0.0032032645834819,
+      "mean": 0.12487474974609589,
+      "q025": 0.0,
+      "q025_mc95": [
+       0.0,
+       0.0
+      ],
+      "q975": 0.24353688378665955,
+      "q975_mc95": [
+       0.2311855198139463,
+       0.25715406483386616
+      ],
+      "sd": 0.07162717358583079
+     },
+     "posterior": [
+      0.13360650000000002,
+      0.24020750000000002,
+      0.3917269
+     ],
+     "prior": [
+      0.016007978361700866,
+      0.3377543196789,
+      1.120346991515696
+     ],
+     "width_ratio": 0.19984809481843938
+    },
+    {
+     "target": "lor[0]",
+     "units": "log odds ratio",
+     "mle": 1.3930282032031076,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.8390330559076351
+       },
+       "upper": {
+        "closed": true,
+        "value": 1.9791000576054114
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.8390330559076351,
+     "profile_hi": 1.9791000576054114,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": 0.04193153209696843,
+      "bias_mcse": 0.013149884929085878,
+      "mean": 1.434959735300076,
+      "q025": 0.9020821071417735,
+      "q025_mc95": [
+       0.8032914542946505,
+       0.9473378363354265
+      ],
+      "q975": 2.0375351147007406,
+      "q975_mc95": [
+       1.976654604960955,
+       2.1514066872923365
+      ],
+      "sd": 0.2940403659773603
+     },
+     "posterior": [
+      0.8401405791188734,
+      1.3902945540702316,
+      1.9559629448089701
+     ],
+     "prior": [
+      -0.3983850840064958,
+      0.4887329875749223,
+      5.290424820654167
+     ],
+     "width_ratio": 0.20040518505702842
+    },
+    {
+     "target": "lor[1]",
+     "units": "log odds ratio",
+     "mle": 0.9609397598696906,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.5114975205324175
+       },
+       "upper": {
+        "closed": true,
+        "value": 1.432450577466256
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.5114975205324175,
+     "profile_hi": 1.432450577466256,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.007724732968709347,
+      "bias_mcse": 0.010265927428704072,
+      "mean": 0.9532150269009813,
+      "q025": 0.5225530310154364,
+      "q025_mc95": [
+       0.46346866257968256,
+       0.5716026792201302
+      ],
+      "q975": 1.4297977717655994,
+      "q975_mc95": [
+       1.3671147771509897,
+       1.5035400774710121
+      ],
+      "sd": 0.2295531158266193
+     },
+     "posterior": [
+      0.4376741535567036,
+      0.876959844172474,
+      1.302815892406618
+     ],
+     "prior": [
+      -0.8263853107823328,
+      0.1169810117414348,
+      3.2848480431967766
+     ],
+     "width_ratio": 0.22400894759293638
+    },
+    {
+     "target": "lor[2]",
+     "units": "log odds ratio",
+     "mle": 0.6404704430728724,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.34077446676569034
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.9548749313809628
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.34077446676569034,
+     "profile_hi": 0.9548749313809628,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.011634426090880723,
+      "bias_mcse": 0.006848752199353053,
+      "mean": 0.6288360169819917,
+      "q025": 0.346699368108252,
+      "q025_mc95": [
+       0.2990928227299335,
+       0.38053179515027424
+      ],
+      "q975": 0.9440276574125764,
+      "q975_mc95": [
+       0.9075820797567303,
+       0.9866448789082607
+      ],
+      "sd": 0.15314275478804618
+     },
+     "posterior": [
+      0.27776146273912183,
+      0.5707411281726562,
+      0.8591703552178684
+     ],
+     "prior": [
+      -0.6044382856738972,
+      0.05921940414658383,
+      2.129674998903029
+     ],
+     "width_ratio": 0.22460681058074655
+    },
+    {
+     "target": "lor[3]",
+     "units": "log odds ratio",
+     "mle": 0.3645752040942956,
+     "profile_set": [
+      {
+       "lower": {
+        "closed": true,
+        "value": 0.23183267277462943
+       },
+       "upper": {
+        "closed": true,
+        "value": 0.5057027470283003
+       }
+      }
+     ],
+     "profile_flat": false,
+     "profile_disconnected": false,
+     "profile_better_point": false,
+     "profile_lo": 0.23183267277462943,
+     "profile_hi": 0.5057027470283003,
+     "profile_lo_open": "",
+     "profile_hi_open": "",
+     "bootstrap": {
+      "bias": -0.00030251809986275857,
+      "bias_mcse": 0.0030467699727888286,
+      "mean": 0.36427268599443285,
+      "q025": 0.24020636751758515,
+      "q025_mc95": [
+       0.22518444884687766,
+       0.2540593154667192
+      ],
+      "q975": 0.5077403982862113,
+      "q975_mc95": [
+       0.4905452619140889,
+       0.5273701650586098
+      ],
+      "sd": 0.06812784770961006
+     },
+     "posterior": [
+      0.20823550552999118,
+      0.34406385824095786,
+      0.48218565010580344
+     ],
+     "prior": [
+      -0.12044748051097977,
+      0.10650904109876025,
+      1.2772802508073802
+     ],
+     "width_ratio": 0.19593950103240212
+    }
+   ],
+   "bootstrap": {
+    "B": 500,
+    "ok": 500,
+    "unresolved_failures": 0,
+    "failure_rate": 0.0,
+    "provisional": false,
+    "boundary_solutions": 274,
+    "seconds_total": 16270.01
+   },
+   "sigma_sensitivity": {}
+  }
+ },
+ "figure": "fit/output_frequentist/comparison/figures/frequentist_profiles.png"
+}

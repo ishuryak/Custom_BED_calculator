@@ -1,0 +1,23 @@
+fit_ml bootstrap model=early support=early_matched workers=20 argv=['bootstrap', '--model', 'early', '--B', '20', '--out', 'fit/output_frequentist/pilot/early_B']
+bootstrap early/early_matched: 0 complete, 0 failed after retries, 20 to run
+  replicate 11 ok attempt 1 22.02 s
+  replicate 5 ok attempt 1 23.1 s
+  replicate 4 ok attempt 1 27.65 s
+  replicate 10 ok attempt 1 28.83 s
+  replicate 18 ok attempt 1 29.41 s
+  replicate 13 ok attempt 1 29.82 s
+  replicate 14 ok attempt 1 30.48 s
+  replicate 20 ok attempt 1 33.36 s
+  replicate 12 ok attempt 1 33.74 s
+  replicate 1 ok attempt 1 40.51 s
+  replicate 9 ok attempt 1 42.7 s
+  replicate 3 ok attempt 1 44.56 s
+  replicate 8 ok attempt 1 44.96 s
+  replicate 16 ok attempt 1 48.59 s
+  replicate 15 ok attempt 1 48.8 s
+  replicate 19 ok attempt 1 49.48 s
+  replicate 17 ok attempt 1 51.41 s
+  replicate 6 ok attempt 1 52.0 s
+  replicate 7 ok attempt 1 52.07 s
+  replicate 2 ok attempt 1 58.41 s
+{"B": 20, "ok": 20, "unresolved_failures": 0, "boundary_solutions": 9, "seconds_total": 776.48}

@@ -1,0 +1,1669 @@
+revision 4a639ce4282a40606745941c397665e57dd855c3 2026-11-12T20:28:28-05:00
+fit_ml validate model=tumor support=matched workers=20 argv=['validate']
+{"tumor_di": "2c828af600ee3d7bafd971a00495d5ecbc9e8a47e56136783572995fbdb1a65e", "tumor_stan_data": "30caa6047419ddfcad6241c40534afa1e46ffea109c47c7531ac8a54320be656", "early": "4747b297ac104be786a513d801de053e2de026926f068edccbd3f3a5c90c7a73"}
+fit_ml profiles model=tumor support=matched workers=20 argv=['profiles', '--model', 'tumor', '--support', 'matched']
+  profile sigma: 34 points, 36.1 s, set [(0.0, 0.04737067243183508)]
+  profile g: 33 points, 40.7 s, set [(0.0046, 0.021)]
+  profile Tk: 44 points, 78.0 s, set [(32.724132968781284, 42.238159183111705)]
+  profile alpha: 47 points, 85.5 s, set [(0.027904758638091696, 0.05510080493195441)]
+  profile lam: 45 points, 94.7 s, set [(0.01705336222106539, 0.04936267257288477)]
+  profile rate_eqd2: 38 points, 143.6 s, set [(0.5985234092370143, 1.3630028898763162)]
+  profile contrast[9]: 29 points, 162.7 s, set [(5.198790772541047, 11.345628072312277)]
+  profile contrast[6]: 47 points, 225.4 s, set [(-7.047907965451579, -0.8050951309820302)]
+  profile contrast[5]: 45 points, 257.6 s, set [(-3.432060395412487, -1.3964888203656292)]
+  profile contrast[7]: 46 points, 280.7 s, set [(1.2028480155907464, 7.849089940219377)]
+  profile rate_bed: 37 points, 455.5 s, set [(0.701808801055114, 1.5532814415515341)]
+  profile contrast[8]: 37 points, 489.2 s, set [(4.91265916491937, 10.658061489366425)]
+  profile contrast[2]: 39 points, 630.3 s, set [(-9.3257995099702, 0.020212441378320792)]
+  profile contrast[4]: 38 points, 660.2 s, set [(-0.024783199251805776, 5.734379274690396)]
+  profile contrast[1]: 37 points, 671.5 s, set [(-14.564191089027394, -6.096750671556845)]
+  profile contrast[0]: 40 points, 825.6 s, set [(-6.650605644780783, 1.7685282083592226)]
+  profile contrast[3]: 47 points, 863.8 s, set [(-2.668173725306995, 4.92596479204307)]
+  profile lam_plus_g: 35 points, 1207.0 s, set [(0.02936412200686269, 0.05555974168933897)]
+fit_ml profiles model=tumor support=expanded workers=20 argv=['profiles', '--model', 'tumor', '--support', 'expanded']
+  profile sigma: 34 points, 52.1 s, set [(0.0, 0.04737067243184303)]
+  profile Tk: 44 points, 56.4 s, set [(32.526798365179296, 42.238163106301805)]
+  profile g: 41 points, 66.1 s, set [(0.0, 0.021597923052134146)]
+  profile ab: 47 points, 76.3 s, set [(6.573758826252237, 1000.0)]
+  profile lam: 46 points, 76.9 s, set [(0.017053362221065772, 0.05116389232241998)]
+  profile alpha: 48 points, 102.2 s, set [(0.025523366346204817, 0.05510080493195311)]
+  profile contrast[5]: 47 points, 217.9 s, set [(-3.432059948671672, -1.032690294952933)]
+  profile contrast[6]: 49 points, 235.1 s, set [(-7.04790775354876, 0.45946508536561986)]
+  profile contrast[7]: 45 points, 342.3 s, set [(1.20284906009937, 9.232924459094793)]
+  profile contrast[1]: 37 points, 467.8 s, set [(-15.708620576987256, -6.096750671556256)]
+  profile contrast[3]: 47 points, 516.4 s, set [(-2.6681737477934653, 5.897985613208768)]
+  profile contrast[9]: 29 points, 651.0 s, set [(5.198790772540696, 11.34562744335203)]
+  profile contrast[0]: 40 points, 732.4 s, set [(-7.15147635841485, 1.7803923223785867)]
+  profile contrast[2]: 34 points, 868.3 s, set [(-10.284718490905304, 0.02021220985956867)]
+  profile contrast[4]: 39 points, 939.5 s, set [(-0.024783197603327773, 6.432259611849389)]
+  profile contrast[8]: 37 points, 955.0 s, set [(4.912658700641416, 11.379676470579144)]
+  profile lam_plus_g: 35 points, 1056.2 s, set [(0.029306050390290824, 0.05555974168936328)]
+  profile rate_eqd2: 39 points, 1317.8 s, set [(0.5985231607274759, 1.5061642407580764)]
+  profile rate_bed: 38 points, 1347.8 s, set [(0.7018086925398102, 1.635731238235281)]
+fit_ml profiles model=early support=early_matched workers=20 argv=['profiles', '--model', 'early']
+  profile sigma_arm: 43 points, 225.6 s, set [(0.08883586419876599, 0.3095359120112674)]
+  profile kappa: 44 points, 285.6 s, set [(0.0146609914210039, 0.07554216997009101)]
+  profile gamma: 47 points, 396.8 s, set [(0.263492931246646, 0.9014528072771255)]
+  profile tau: 45 points, 493.8 s, set [(0.5264584096381281, 1.05059983785289)]
+  profile r: 52 points, 652.2 s, set [(1.076828751689541, 4.873151627370049)]
+  profile lor[1]: 47 points, 1105.7 s, set [(0.5114975205324175, 1.432450577466256)]
+  profile lor[2]: 47 points, 1185.8 s, set [(0.34077446676569034, 0.9548749313809628)]
+  profile lor[3]: 46 points, 1482.4 s, set [(0.23183267277462943, 0.5057027470283003)]
+  profile lor[0]: 47 points, 1504.9 s, set [(0.8390330559076351, 1.9791000576054114)]
+fit_ml sigma_sensitivity model=tumor support=matched workers=20 argv=['sigma_sensitivity', '--model', 'tumor', '--support', 'matched']
+  sigma=0.065 contrast[1] 136.1 s
+  sigma=0.065 contrast[2] 173.2 s
+  sigma=0.065 contrast[9] 181.9 s
+  sigma=0.065 contrast[8] 216.9 s
+  sigma=0.17 contrast[1] 236.0 s
+  sigma=0.065 contrast[0] 239.4 s
+  sigma=0.17 contrast[0] 244.4 s
+  sigma=0.17 contrast[2] 255.7 s
+  sigma=0.065 contrast[3] 284.1 s
+  sigma=0.17 contrast[3] 287.5 s
+  sigma=0.065 contrast[4] 333.9 s
+  sigma=0.065 contrast[7] 345.7 s
+  sigma=0.065 contrast[5] 346.6 s
+  sigma=0.17 contrast[4] 356.1 s
+  sigma=0.065 contrast[6] 373.2 s
+  sigma=0.17 contrast[7] 385.4 s
+  sigma=0.17 contrast[8] 391.2 s
+  sigma=0.17 contrast[9] 458.2 s
+  sigma=0.17 contrast[5] 475.4 s
+  sigma=0.17 contrast[6] 484.8 s
+fit_ml bootstrap model=tumor support=matched workers=20 argv=['bootstrap', '--model', 'tumor', '--support', 'matched', '--B', '1000']
+bootstrap tumor/matched: 0 complete, 0 failed after retries, 1000 to run
+  replicate 19 ok attempt 1 1.9 s
+  replicate 6 ok attempt 1 2.08 s
+  replicate 20 ok attempt 1 2.3 s
+  replicate 4 ok attempt 1 2.41 s
+  replicate 7 ok attempt 1 2.48 s
+  replicate 9 ok attempt 1 2.57 s
+  replicate 2 ok attempt 1 2.71 s
+  replicate 16 ok attempt 1 2.78 s
+  replicate 11 ok attempt 1 3.04 s
+  replicate 3 ok attempt 1 3.33 s
+  replicate 12 ok attempt 1 3.34 s
+  replicate 13 ok attempt 1 3.57 s
+  replicate 1 ok attempt 1 3.7 s
+  replicate 8 ok attempt 1 3.83 s
+  replicate 10 ok attempt 1 3.84 s
+  replicate 17 ok attempt 1 4.19 s
+  replicate 5 ok attempt 1 4.26 s
+  replicate 15 ok attempt 1 4.33 s
+  replicate 26 ok attempt 1 1.84 s
+  replicate 23 ok attempt 1 2.15 s
+  replicate 25 ok attempt 1 1.99 s
+  replicate 24 ok attempt 1 2.13 s
+  replicate 14 ok attempt 1 4.62 s
+  replicate 21 ok attempt 1 2.85 s
+  replicate 28 ok attempt 1 2.75 s
+  replicate 18 ok attempt 1 5.92 s
+  replicate 27 ok attempt 1 3.52 s
+  replicate 32 ok attempt 1 2.71 s
+  replicate 31 ok attempt 1 3.2 s
+  replicate 30 ok attempt 1 3.28 s
+  replicate 29 ok attempt 1 3.61 s
+  replicate 36 ok attempt 1 2.65 s
+  replicate 22 ok attempt 1 4.87 s
+  replicate 39 ok attempt 1 2.57 s
+  replicate 42 ok attempt 1 2.55 s
+  replicate 33 ok attempt 1 3.62 s
+  replicate 44 ok attempt 1 2.87 s
+  replicate 45 ok attempt 1 2.48 s
+  replicate 41 ok attempt 1 3.72 s
+  replicate 43 ok attempt 1 3.73 s
+  replicate 35 ok attempt 1 4.52 s
+  replicate 34 ok attempt 1 4.93 s
+  replicate 37 ok attempt 1 4.84 s
+  replicate 51 ok attempt 1 2.4 s
+  replicate 47 ok attempt 1 2.87 s
+  replicate 40 ok attempt 1 4.83 s
+  replicate 48 ok attempt 1 3.04 s
+  replicate 49 ok attempt 1 3.1 s
+  replicate 55 ok attempt 1 2.66 s
+  replicate 50 ok attempt 1 3.48 s
+  replicate 53 ok attempt 1 3.17 s
+  replicate 54 ok attempt 1 3.2 s
+  replicate 46 ok attempt 1 4.41 s
+  replicate 52 ok attempt 1 3.48 s
+  replicate 57 ok attempt 1 2.7 s
+  replicate 38 ok attempt 1 6.37 s
+  replicate 59 ok attempt 1 2.67 s
+  replicate 56 ok attempt 1 3.82 s
+  replicate 58 ok attempt 1 3.36 s
+  replicate 64 ok attempt 1 2.69 s
+  replicate 60 ok attempt 1 3.71 s
+  replicate 66 ok attempt 1 2.73 s
+  replicate 65 ok attempt 1 2.88 s
+  replicate 67 ok attempt 1 2.79 s
+  replicate 72 ok attempt 1 2.15 s
+  replicate 61 ok attempt 1 4.21 s
+  replicate 68 ok attempt 1 2.93 s
+  replicate 70 ok attempt 1 2.55 s
+  replicate 62 ok attempt 1 3.99 s
+  replicate 63 ok attempt 1 3.7 s
+  replicate 69 ok attempt 1 3.22 s
+  replicate 71 ok attempt 1 2.94 s
+  replicate 73 ok attempt 1 3.08 s
+  replicate 75 ok attempt 1 3.27 s
+  replicate 76 ok attempt 1 3.12 s
+  replicate 79 ok attempt 1 2.84 s
+  replicate 77 ok attempt 1 4.09 s
+  replicate 83 ok attempt 1 2.95 s
+  replicate 80 ok attempt 1 3.29 s
+  replicate 82 ok attempt 1 3.06 s
+  replicate 87 ok attempt 1 2.6 s
+  replicate 81 ok attempt 1 3.18 s
+  replicate 85 ok attempt 1 3.0 s
+  replicate 91 ok attempt 1 2.5 s
+  replicate 90 ok attempt 1 2.82 s
+  replicate 84 ok attempt 1 3.51 s
+  replicate 94 ok attempt 1 2.07 s
+  replicate 78 ok attempt 1 4.58 s
+  replicate 88 ok attempt 1 3.68 s
+  replicate 96 ok attempt 1 2.11 s
+  replicate 74 ok attempt 1 6.37 s
+  replicate 86 ok attempt 1 4.54 s
+  replicate 92 ok attempt 1 4.06 s
+  replicate 95 ok attempt 1 3.47 s
+  replicate 93 ok attempt 1 4.08 s
+  replicate 100 ok attempt 1 2.38 s
+  replicate 98 ok attempt 1 2.95 s
+  replicate 97 ok attempt 1 2.99 s
+  replicate 104 ok attempt 1 2.61 s
+  replicate 102 ok attempt 1 2.95 s
+  replicate 103 ok attempt 1 2.77 s
+  replicate 99 ok attempt 1 3.13 s
+  replicate 89 ok attempt 1 5.59 s
+  replicate 101 ok attempt 1 3.22 s
+  replicate 108 ok attempt 1 3.17 s
+  replicate 105 ok attempt 1 3.26 s
+  replicate 113 ok attempt 1 1.95 s
+  replicate 110 ok attempt 1 2.99 s
+  replicate 107 ok attempt 1 3.63 s
+  replicate 114 ok attempt 1 2.31 s
+  replicate 109 ok attempt 1 3.34 s
+  replicate 106 ok attempt 1 4.35 s
+  replicate 122 ok attempt 1 2.11 s
+  replicate 112 ok attempt 1 3.27 s
+  replicate 111 ok attempt 1 3.75 s
+  replicate 116 ok attempt 1 3.18 s
+  replicate 119 ok attempt 1 2.57 s
+  replicate 115 ok attempt 1 3.43 s
+  replicate 123 ok attempt 1 2.82 s
+  replicate 121 ok attempt 1 3.05 s
+  replicate 129 ok attempt 1 1.95 s
+  replicate 126 ok attempt 1 2.44 s
+  replicate 117 ok attempt 1 3.57 s
+  replicate 125 ok attempt 1 2.65 s
+  replicate 127 ok attempt 1 2.68 s
+  replicate 124 ok attempt 1 3.61 s
+  replicate 130 ok attempt 1 2.52 s
+  replicate 118 ok attempt 1 4.47 s
+  replicate 137 ok attempt 1 2.56 s
+  replicate 133 ok attempt 1 3.05 s
+  replicate 139 ok attempt 1 2.17 s
+  replicate 136 ok attempt 1 2.83 s
+  replicate 128 ok attempt 1 4.19 s
+  replicate 131 ok attempt 1 4.11 s
+  replicate 132 ok attempt 1 3.86 s
+  replicate 138 ok attempt 1 3.05 s
+  replicate 141 ok attempt 1 2.56 s
+  replicate 135 ok attempt 1 3.59 s
+  replicate 134 ok attempt 1 3.69 s
+  replicate 144 ok attempt 1 2.87 s
+  replicate 145 ok attempt 1 2.98 s
+  replicate 143 ok attempt 1 3.38 s
+  replicate 148 ok attempt 1 2.5 s
+  replicate 120 ok attempt 1 6.83 s
+  replicate 140 ok attempt 1 4.1 s
+  replicate 142 ok attempt 1 4.03 s
+  replicate 151 ok attempt 1 2.1 s
+  replicate 146 ok attempt 1 3.6 s
+  replicate 152 ok attempt 1 2.15 s
+  replicate 147 ok attempt 1 3.6 s
+  replicate 149 ok attempt 1 2.52 s
+  replicate 157 ok attempt 1 2.09 s
+  replicate 159 ok attempt 1 2.41 s
+  replicate 156 ok attempt 1 3.07 s
+  replicate 160 ok attempt 1 2.87 s
+  replicate 161 ok attempt 1 2.67 s
+  replicate 169 ok attempt 1 1.87 s
+  replicate 158 ok attempt 1 3.64 s
+  replicate 153 ok attempt 1 4.24 s
+  replicate 167 ok attempt 1 2.5 s
+  replicate 168 ok attempt 1 2.56 s
+  replicate 164 ok attempt 1 3.32 s
+  replicate 171 ok attempt 1 2.71 s
+  replicate 154 ok attempt 1 4.94 s
+  replicate 163 ok attempt 1 3.94 s
+  replicate 155 ok attempt 1 5.08 s
+  replicate 162 ok attempt 1 4.11 s
+  replicate 170 ok attempt 1 3.36 s
+  replicate 173 ok attempt 1 2.6 s
+  replicate 166 ok attempt 1 3.7 s
+  replicate 165 ok attempt 1 3.98 s
+  replicate 172 ok attempt 1 3.51 s
+  replicate 176 ok attempt 1 2.27 s
+  replicate 150 ok attempt 1 6.55 s
+  replicate 174 ok attempt 1 2.93 s
+  replicate 180 ok attempt 1 2.25 s
+  replicate 178 ok attempt 1 2.83 s
+  replicate 183 ok attempt 1 2.64 s
+  replicate 175 ok attempt 1 4.43 s
+  replicate 193 ok attempt 1 2.01 s
+  replicate 192 ok attempt 1 2.3 s
+  replicate 185 ok attempt 1 2.97 s
+  replicate 179 ok attempt 1 4.08 s
+  replicate 182 ok attempt 1 3.66 s
+  replicate 186 ok attempt 1 3.01 s
+  replicate 191 ok attempt 1 2.7 s
+  replicate 187 ok attempt 1 3.25 s
+  replicate 190 ok attempt 1 3.27 s
+  replicate 188 ok attempt 1 3.33 s
+  replicate 181 ok attempt 1 4.27 s
+  replicate 177 ok attempt 1 5.61 s
+  replicate 198 ok attempt 1 2.14 s
+  replicate 195 ok attempt 1 3.42 s
+  replicate 197 ok attempt 1 3.09 s
+  replicate 194 ok attempt 1 3.87 s
+  replicate 184 ok attempt 1 5.26 s
+  replicate 189 ok attempt 1 5.12 s
+  replicate 201 ok attempt 1 2.47 s
+  replicate 196 ok attempt 1 4.56 s
+  replicate 202 ok attempt 1 2.95 s
+  replicate 199 ok attempt 1 3.25 s
+  replicate 209 ok attempt 1 2.71 s
+  replicate 207 ok attempt 1 3.16 s
+  replicate 211 ok attempt 1 2.44 s
+  replicate 208 ok attempt 1 3.29 s
+  replicate 203 ok attempt 1 4.04 s
+  replicate 205 ok attempt 1 4.03 s
+  replicate 212 ok attempt 1 2.91 s
+  replicate 210 ok attempt 1 3.86 s
+  replicate 214 ok attempt 1 3.01 s
+  replicate 200 ok attempt 1 4.89 s
+  replicate 206 ok attempt 1 4.76 s
+  replicate 218 ok attempt 1 2.4 s
+  replicate 204 ok attempt 1 5.38 s
+  replicate 216 ok attempt 1 3.37 s
+  replicate 222 ok attempt 1 2.27 s
+  replicate 219 ok attempt 1 2.99 s
+  replicate 215 ok attempt 1 4.06 s
+  replicate 221 ok attempt 1 2.85 s
+  replicate 224 ok attempt 1 2.95 s
+  replicate 220 ok attempt 1 3.84 s
+  replicate 213 ok attempt 1 5.43 s
+  replicate 231 ok attempt 1 2.17 s
+  replicate 225 ok attempt 1 3.3 s
+  replicate 230 ok attempt 1 2.53 s
+  replicate 217 ok attempt 1 5.1 s
+  replicate 223 ok attempt 1 3.86 s
+  replicate 226 ok attempt 1 3.6 s
+  replicate 237 ok attempt 1 2.16 s
+  replicate 234 ok attempt 1 2.92 s
+  replicate 227 ok attempt 1 4.25 s
+  replicate 229 ok attempt 1 4.16 s
+  replicate 228 ok attempt 1 4.31 s
+  replicate 240 ok attempt 1 2.2 s
+  replicate 236 ok attempt 1 3.54 s
+  replicate 245 ok attempt 1 1.82 s
+  replicate 239 ok attempt 1 3.68 s
+  replicate 244 ok attempt 1 2.7 s
+  replicate 246 ok attempt 1 2.39 s
+  replicate 233 ok attempt 1 5.1 s
+  replicate 232 ok attempt 1 5.45 s
+  replicate 238 ok attempt 1 4.44 s
+  replicate 243 ok attempt 1 3.45 s
+  replicate 249 ok attempt 1 2.49 s
+  replicate 241 ok attempt 1 3.84 s
+  replicate 235 ok attempt 1 5.3 s
+  replicate 252 ok attempt 1 2.45 s
+  replicate 247 ok attempt 1 4.07 s
+  replicate 248 ok attempt 1 3.95 s
+  replicate 253 ok attempt 1 2.92 s
+  replicate 251 ok attempt 1 3.29 s
+  replicate 254 ok attempt 1 2.7 s
+  replicate 250 ok attempt 1 3.51 s
+  replicate 242 ok attempt 1 4.94 s
+  replicate 256 ok attempt 1 3.33 s
+  replicate 255 ok attempt 1 3.51 s
+  replicate 257 ok attempt 1 2.97 s
+  replicate 259 ok attempt 1 3.12 s
+  replicate 260 ok attempt 1 3.08 s
+  replicate 261 ok attempt 1 3.04 s
+  replicate 263 ok attempt 1 2.96 s
+  replicate 262 ok attempt 1 3.48 s
+  replicate 264 ok attempt 1 3.24 s
+  replicate 265 ok attempt 1 3.44 s
+  replicate 272 ok attempt 1 2.88 s
+  replicate 267 ok attempt 1 3.55 s
+  replicate 271 ok attempt 1 3.13 s
+  replicate 268 ok attempt 1 3.54 s
+  replicate 258 ok attempt 1 5.29 s
+  replicate 270 ok attempt 1 3.49 s
+  replicate 276 ok attempt 1 2.83 s
+  replicate 266 ok attempt 1 4.7 s
+  replicate 279 ok attempt 1 2.56 s
+  replicate 277 ok attempt 1 2.9 s
+  replicate 275 ok attempt 1 3.32 s
+  replicate 278 ok attempt 1 2.82 s
+  replicate 274 ok attempt 1 4.0 s
+  replicate 269 ok attempt 1 4.38 s
+  replicate 273 ok attempt 1 4.23 s
+  replicate 282 ok attempt 1 2.56 s
+  replicate 283 ok attempt 1 2.55 s
+  replicate 281 ok attempt 1 3.32 s
+  replicate 286 ok attempt 1 2.85 s
+  replicate 293 ok attempt 1 2.11 s
+  replicate 285 ok attempt 1 3.32 s
+  replicate 289 ok attempt 1 3.08 s
+  replicate 290 ok attempt 1 3.07 s
+  replicate 287 ok attempt 1 3.42 s
+  replicate 301 ok attempt 1 1.78 s
+  replicate 295 ok attempt 1 2.56 s
+  replicate 296 ok attempt 1 2.89 s
+  replicate 284 ok attempt 1 4.68 s
+  replicate 291 ok attempt 1 3.49 s
+  replicate 292 ok attempt 1 3.43 s
+  replicate 294 ok attempt 1 3.33 s
+  replicate 304 ok attempt 1 1.79 s
+  replicate 297 ok attempt 1 3.66 s
+  replicate 288 ok attempt 1 4.62 s
+  replicate 300 ok attempt 1 3.23 s
+  replicate 298 ok attempt 1 3.82 s
+  replicate 280 ok attempt 1 6.6 s
+  replicate 305 ok attempt 1 2.06 s
+  replicate 299 ok attempt 1 4.09 s
+  replicate 307 ok attempt 1 2.08 s
+  replicate 309 ok attempt 1 2.13 s
+  replicate 302 ok attempt 1 3.72 s
+  replicate 303 ok attempt 1 3.02 s
+  replicate 306 ok attempt 1 3.13 s
+  replicate 312 ok attempt 1 2.71 s
+  replicate 310 ok attempt 1 3.73 s
+  replicate 315 ok attempt 1 3.04 s
+  replicate 316 ok attempt 1 3.09 s
+  replicate 308 ok attempt 1 4.44 s
+  replicate 318 ok attempt 1 3.03 s
+  replicate 314 ok attempt 1 3.81 s
+  replicate 319 ok attempt 1 3.08 s
+  replicate 311 ok attempt 1 4.17 s
+  replicate 322 ok attempt 1 2.81 s
+  replicate 325 ok attempt 1 2.48 s
+  replicate 313 ok attempt 1 4.09 s
+  replicate 320 ok attempt 1 3.28 s
+  replicate 327 ok attempt 1 2.92 s
+  replicate 324 ok attempt 1 3.27 s
+  replicate 317 ok attempt 1 4.17 s
+  replicate 321 ok attempt 1 4.07 s
+  replicate 331 ok attempt 1 2.23 s
+  replicate 323 ok attempt 1 4.15 s
+  replicate 330 ok attempt 1 2.44 s
+  replicate 326 ok attempt 1 4.0 s
+  replicate 333 ok attempt 1 2.82 s
+  replicate 328 ok attempt 1 4.38 s
+  replicate 329 ok attempt 1 4.15 s
+  replicate 336 ok attempt 1 3.11 s
+  replicate 343 ok attempt 1 2.37 s
+  replicate 332 ok attempt 1 3.31 s
+  replicate 340 ok attempt 1 3.04 s
+  replicate 342 ok attempt 1 2.77 s
+  replicate 339 ok attempt 1 3.59 s
+  replicate 334 ok attempt 1 3.89 s
+  replicate 349 ok attempt 1 2.2 s
+  replicate 337 ok attempt 1 3.93 s
+  replicate 338 ok attempt 1 4.03 s
+  replicate 348 ok attempt 1 2.43 s
+  replicate 347 ok attempt 1 2.7 s
+  replicate 345 ok attempt 1 3.33 s
+  replicate 335 ok attempt 1 4.86 s
+  replicate 350 ok attempt 1 2.63 s
+  replicate 344 ok attempt 1 4.53 s
+  replicate 346 ok attempt 1 4.14 s
+  replicate 341 ok attempt 1 5.3 s
+  replicate 354 ok attempt 1 2.5 s
+  replicate 357 ok attempt 1 2.35 s
+  replicate 351 ok attempt 1 2.98 s
+  replicate 352 ok attempt 1 3.14 s
+  replicate 360 ok attempt 1 2.28 s
+  replicate 356 ok attempt 1 3.28 s
+  replicate 355 ok attempt 1 3.28 s
+  replicate 363 ok attempt 1 2.46 s
+  replicate 358 ok attempt 1 3.02 s
+  replicate 361 ok attempt 1 2.97 s
+  replicate 353 ok attempt 1 4.26 s
+  replicate 359 ok attempt 1 3.57 s
+  replicate 371 ok attempt 1 2.13 s
+  replicate 367 ok attempt 1 2.45 s
+  replicate 365 ok attempt 1 4.0 s
+  replicate 375 ok attempt 1 2.57 s
+  replicate 364 ok attempt 1 4.6 s
+  replicate 366 ok attempt 1 4.28 s
+  replicate 379 ok attempt 1 2.5 s
+  replicate 372 ok attempt 1 3.37 s
+  replicate 362 ok attempt 1 5.25 s
+  replicate 374 ok attempt 1 3.44 s
+  replicate 377 ok attempt 1 3.1 s
+  replicate 376 ok attempt 1 3.2 s
+  replicate 378 ok attempt 1 3.13 s
+  replicate 380 ok attempt 1 3.02 s
+  replicate 368 ok attempt 1 4.8 s
+  replicate 370 ok attempt 1 4.75 s
+  replicate 384 ok attempt 1 2.55 s
+  replicate 382 ok attempt 1 3.11 s
+  replicate 381 ok attempt 1 3.22 s
+  replicate 383 ok attempt 1 3.35 s
+  replicate 369 ok attempt 1 5.95 s
+  replicate 389 ok attempt 1 2.47 s
+  replicate 385 ok attempt 1 3.13 s
+  replicate 390 ok attempt 1 2.68 s
+  replicate 387 ok attempt 1 3.13 s
+  replicate 386 ok attempt 1 3.41 s
+  replicate 388 ok attempt 1 3.23 s
+  replicate 395 ok attempt 1 2.6 s
+  replicate 396 ok attempt 1 2.49 s
+  replicate 392 ok attempt 1 3.09 s
+  replicate 399 ok attempt 1 2.49 s
+  replicate 402 ok attempt 1 2.09 s
+  replicate 391 ok attempt 1 3.93 s
+  replicate 397 ok attempt 1 3.14 s
+  replicate 401 ok attempt 1 3.13 s
+  replicate 373 ok attempt 1 8.0 s
+  replicate 398 ok attempt 1 3.69 s
+  replicate 408 ok attempt 1 1.86 s
+  replicate 406 ok attempt 1 2.22 s
+  replicate 403 ok attempt 1 2.82 s
+  replicate 400 ok attempt 1 3.94 s
+  replicate 413 ok attempt 1 1.8 s
+  replicate 405 ok attempt 1 3.3 s
+  replicate 411 ok attempt 1 2.66 s
+  replicate 407 ok attempt 1 3.33 s
+  replicate 414 ok attempt 1 2.07 s
+  replicate 410 ok attempt 1 3.02 s
+  replicate 393 ok attempt 1 5.86 s
+  replicate 412 ok attempt 1 2.96 s
+  replicate 409 ok attempt 1 3.33 s
+  replicate 394 ok attempt 1 6.5 s
+  replicate 421 ok attempt 1 2.21 s
+  replicate 420 ok attempt 1 2.33 s
+  replicate 404 ok attempt 1 4.76 s
+  replicate 416 ok attempt 1 3.32 s
+  replicate 415 ok attempt 1 3.75 s
+  replicate 417 ok attempt 1 3.9 s
+  replicate 423 ok attempt 1 3.28 s
+  replicate 426 ok attempt 1 2.71 s
+  replicate 418 ok attempt 1 3.99 s
+  replicate 428 ok attempt 1 2.56 s
+  replicate 429 ok attempt 1 2.59 s
+  replicate 427 ok attempt 1 2.85 s
+  replicate 425 ok attempt 1 3.29 s
+  replicate 432 ok attempt 1 3.1 s
+  replicate 435 ok attempt 1 2.38 s
+  replicate 436 ok attempt 1 2.35 s
+  replicate 424 ok attempt 1 4.36 s
+  replicate 422 ok attempt 1 4.94 s
+  replicate 433 ok attempt 1 3.28 s
+  replicate 434 ok attempt 1 3.23 s
+  replicate 431 ok attempt 1 4.18 s
+  replicate 444 ok attempt 1 2.49 s
+  replicate 430 ok attempt 1 5.04 s
+  replicate 419 ok attempt 1 6.44 s
+  replicate 437 ok attempt 1 3.79 s
+  replicate 443 ok attempt 1 2.69 s
+  replicate 445 ok attempt 1 2.99 s
+  replicate 438 ok attempt 1 4.19 s
+  replicate 448 ok attempt 1 2.4 s
+  replicate 449 ok attempt 1 2.63 s
+  replicate 450 ok attempt 1 2.49 s
+  replicate 453 ok attempt 1 2.08 s
+  replicate 447 ok attempt 1 2.99 s
+  replicate 440 ok attempt 1 4.25 s
+  replicate 452 ok attempt 1 2.69 s
+  replicate 442 ok attempt 1 4.72 s
+  replicate 454 ok attempt 1 2.85 s
+  replicate 441 ok attempt 1 4.93 s
+  replicate 451 ok attempt 1 3.54 s
+  replicate 459 ok attempt 1 2.22 s
+  replicate 464 ok attempt 1 1.82 s
+  replicate 458 ok attempt 1 3.03 s
+  replicate 446 ok attempt 1 5.16 s
+  replicate 439 ok attempt 1 6.26 s
+  replicate 460 ok attempt 1 2.69 s
+  replicate 462 ok attempt 1 2.86 s
+  replicate 455 ok attempt 1 3.81 s
+  replicate 457 ok attempt 1 3.92 s
+  replicate 456 ok attempt 1 4.04 s
+  replicate 461 ok attempt 1 3.42 s
+  replicate 473 ok attempt 1 2.14 s
+  replicate 467 ok attempt 1 3.47 s
+  replicate 463 ok attempt 1 3.98 s
+  replicate 465 ok attempt 1 4.04 s
+  replicate 466 ok attempt 1 4.15 s
+  replicate 468 ok attempt 1 3.77 s
+  replicate 471 ok attempt 1 3.14 s
+  replicate 469 ok attempt 1 3.56 s
+  replicate 472 ok attempt 1 3.47 s
+  replicate 480 ok attempt 1 2.13 s
+  replicate 479 ok attempt 1 2.68 s
+  replicate 478 ok attempt 1 2.92 s
+  replicate 474 ok attempt 1 3.45 s
+  replicate 476 ok attempt 1 3.33 s
+  replicate 470 ok attempt 1 4.54 s
+  replicate 481 ok attempt 1 3.33 s
+  replicate 477 ok attempt 1 3.86 s
+  replicate 482 ok attempt 1 3.29 s
+  replicate 487 ok attempt 1 2.05 s
+  replicate 484 ok attempt 1 3.13 s
+  replicate 489 ok attempt 1 2.77 s
+  replicate 475 ok attempt 1 5.16 s
+  replicate 493 ok attempt 1 2.46 s
+  replicate 486 ok attempt 1 3.65 s
+  replicate 490 ok attempt 1 3.28 s
+  replicate 497 ok attempt 1 2.4 s
+  replicate 485 ok attempt 1 4.24 s
+  replicate 502 ok attempt 1 2.1 s
+  replicate 495 ok attempt 1 3.26 s
+  replicate 498 ok attempt 1 3.03 s
+  replicate 499 ok attempt 1 2.49 s
+  replicate 483 ok attempt 1 5.79 s
+  replicate 496 ok attempt 1 3.62 s
+  replicate 491 ok attempt 1 4.44 s
+  replicate 506 ok attempt 1 1.96 s
+  replicate 492 ok attempt 1 4.72 s
+  replicate 500 ok attempt 1 3.28 s
+  replicate 504 ok attempt 1 2.92 s
+  replicate 494 ok attempt 1 4.95 s
+  replicate 501 ok attempt 1 4.07 s
+  replicate 503 ok attempt 1 3.81 s
+  replicate 505 ok attempt 1 3.57 s
+  replicate 512 ok attempt 1 2.29 s
+  replicate 507 ok attempt 1 3.22 s
+  replicate 510 ok attempt 1 2.76 s
+  replicate 511 ok attempt 1 2.87 s
+  replicate 508 ok attempt 1 3.54 s
+  replicate 514 ok attempt 1 3.0 s
+  replicate 488 ok attempt 1 7.84 s
+  replicate 515 ok attempt 1 3.31 s
+  replicate 518 ok attempt 1 2.92 s
+  replicate 520 ok attempt 1 2.75 s
+  replicate 519 ok attempt 1 3.01 s
+  replicate 522 ok attempt 1 2.37 s
+  replicate 521 ok attempt 1 2.74 s
+  replicate 513 ok attempt 1 4.25 s
+  replicate 516 ok attempt 1 4.19 s
+  replicate 509 ok attempt 1 5.37 s
+  replicate 517 ok attempt 1 4.08 s
+  replicate 526 ok attempt 1 2.7 s
+  replicate 527 ok attempt 1 2.97 s
+  replicate 529 ok attempt 1 2.93 s
+  replicate 525 ok attempt 1 3.61 s
+  replicate 523 ok attempt 1 4.3 s
+  replicate 524 ok attempt 1 4.22 s
+  replicate 536 ok attempt 1 2.44 s
+  replicate 531 ok attempt 1 3.27 s
+  replicate 532 ok attempt 1 3.13 s
+  replicate 528 ok attempt 1 4.32 s
+  replicate 537 ok attempt 1 2.78 s
+  replicate 535 ok attempt 1 3.18 s
+  replicate 540 ok attempt 1 2.46 s
+  replicate 534 ok attempt 1 3.46 s
+  replicate 543 ok attempt 1 2.36 s
+  replicate 533 ok attempt 1 3.77 s
+  replicate 538 ok attempt 1 3.52 s
+  replicate 530 ok attempt 1 5.1 s
+  replicate 542 ok attempt 1 3.29 s
+  replicate 539 ok attempt 1 3.62 s
+  replicate 541 ok attempt 1 3.63 s
+  replicate 544 ok attempt 1 3.04 s
+  replicate 545 ok attempt 1 3.16 s
+  replicate 548 ok attempt 1 3.1 s
+  replicate 547 ok attempt 1 3.41 s
+  replicate 554 ok attempt 1 2.65 s
+  replicate 557 ok attempt 1 2.24 s
+  replicate 550 ok attempt 1 3.32 s
+  replicate 553 ok attempt 1 3.08 s
+  replicate 556 ok attempt 1 3.04 s
+  replicate 549 ok attempt 1 3.8 s
+  replicate 555 ok attempt 1 3.17 s
+  replicate 546 ok attempt 1 4.5 s
+  replicate 561 ok attempt 1 2.68 s
+  replicate 564 ok attempt 1 2.47 s
+  replicate 552 ok attempt 1 4.29 s
+  replicate 560 ok attempt 1 3.16 s
+  replicate 551 ok attempt 1 4.4 s
+  replicate 562 ok attempt 1 3.14 s
+  replicate 559 ok attempt 1 3.59 s
+  replicate 558 ok attempt 1 4.08 s
+  replicate 567 ok attempt 1 2.09 s
+  replicate 574 ok attempt 1 1.55 s
+  replicate 565 ok attempt 1 3.09 s
+  replicate 566 ok attempt 1 2.74 s
+  replicate 563 ok attempt 1 4.2 s
+  replicate 569 ok attempt 1 2.82 s
+  replicate 571 ok attempt 1 2.68 s
+  replicate 568 ok attempt 1 3.22 s
+  replicate 573 ok attempt 1 2.82 s
+  replicate 577 ok attempt 1 2.4 s
+  replicate 572 ok attempt 1 3.39 s
+  replicate 575 ok attempt 1 3.69 s
+  replicate 581 ok attempt 1 2.86 s
+  replicate 576 ok attempt 1 3.5 s
+  replicate 585 ok attempt 1 2.69 s
+  replicate 582 ok attempt 1 3.09 s
+  replicate 579 ok attempt 1 3.57 s
+  replicate 583 ok attempt 1 3.26 s
+  replicate 587 ok attempt 1 3.24 s
+  replicate 589 ok attempt 1 2.69 s
+  replicate 593 ok attempt 1 2.25 s
+  replicate 584 ok attempt 1 3.86 s
+  replicate 594 ok attempt 1 2.04 s
+  replicate 588 ok attempt 1 3.26 s
+  replicate 590 ok attempt 1 3.17 s
+  replicate 580 ok attempt 1 4.67 s
+  replicate 578 ok attempt 1 4.86 s
+  replicate 570 ok attempt 1 6.2 s
+  replicate 592 ok attempt 1 3.4 s
+  replicate 591 ok attempt 1 3.82 s
+  replicate 603 ok attempt 1 1.44 s
+  replicate 598 ok attempt 1 2.48 s
+  replicate 586 ok attempt 1 5.43 s
+  replicate 597 ok attempt 1 3.81 s
+  replicate 604 ok attempt 1 2.5 s
+  replicate 605 ok attempt 1 2.6 s
+  replicate 600 ok attempt 1 4.01 s
+  replicate 595 ok attempt 1 4.67 s
+  replicate 609 ok attempt 1 2.89 s
+  replicate 596 ok attempt 1 4.82 s
+  replicate 612 ok attempt 1 2.4 s
+  replicate 601 ok attempt 1 4.33 s
+  replicate 602 ok attempt 1 3.92 s
+  replicate 599 ok attempt 1 4.84 s
+  replicate 615 ok attempt 1 2.55 s
+  replicate 610 ok attempt 1 3.71 s
+  replicate 614 ok attempt 1 2.85 s
+  replicate 608 ok attempt 1 3.86 s
+  replicate 607 ok attempt 1 4.13 s
+  replicate 611 ok attempt 1 4.37 s
+  replicate 613 ok attempt 1 3.77 s
+  replicate 624 ok attempt 1 2.29 s
+  replicate 618 ok attempt 1 3.5 s
+  replicate 616 ok attempt 1 4.32 s
+  replicate 619 ok attempt 1 3.64 s
+  replicate 623 ok attempt 1 3.4 s
+  replicate 617 ok attempt 1 4.25 s
+  replicate 631 ok attempt 1 2.61 s
+  replicate 628 ok attempt 1 2.95 s
+  replicate 621 ok attempt 1 3.95 s
+  replicate 626 ok attempt 1 3.55 s
+  replicate 625 ok attempt 1 3.65 s
+  replicate 627 ok attempt 1 3.41 s
+  replicate 630 ok attempt 1 3.25 s
+  replicate 606 ok attempt 1 7.39 s
+  replicate 634 ok attempt 1 2.58 s
+  replicate 620 ok attempt 1 4.54 s
+  replicate 622 ok attempt 1 4.54 s
+  replicate 632 ok attempt 1 3.92 s
+  replicate 635 ok attempt 1 2.65 s
+  replicate 633 ok attempt 1 3.54 s
+  replicate 636 ok attempt 1 2.72 s
+  replicate 629 ok attempt 1 4.8 s
+  replicate 637 ok attempt 1 2.8 s
+  replicate 641 ok attempt 1 2.58 s
+  replicate 653 ok attempt 1 1.58 s
+  replicate 640 ok attempt 1 3.29 s
+  replicate 638 ok attempt 1 3.75 s
+  replicate 648 ok attempt 1 2.64 s
+  replicate 647 ok attempt 1 2.8 s
+  replicate 639 ok attempt 1 3.62 s
+  replicate 646 ok attempt 1 3.48 s
+  replicate 645 ok attempt 1 3.5 s
+  replicate 654 ok attempt 1 2.44 s
+  replicate 642 ok attempt 1 4.0 s
+  replicate 650 ok attempt 1 3.41 s
+  replicate 643 ok attempt 1 4.18 s
+  replicate 652 ok attempt 1 3.41 s
+  replicate 658 ok attempt 1 2.55 s
+  replicate 656 ok attempt 1 3.14 s
+  replicate 655 ok attempt 1 3.69 s
+  replicate 657 ok attempt 1 3.53 s
+  replicate 659 ok attempt 1 2.59 s
+  replicate 663 ok attempt 1 2.48 s
+  replicate 661 ok attempt 1 2.56 s
+  replicate 649 ok attempt 1 5.08 s
+  replicate 651 ok attempt 1 5.2 s
+  replicate 662 ok attempt 1 2.85 s
+  replicate 668 ok attempt 1 2.22 s
+  replicate 665 ok attempt 1 2.95 s
+  replicate 666 ok attempt 1 3.07 s
+  replicate 664 ok attempt 1 3.57 s
+  replicate 669 ok attempt 1 2.88 s
+  replicate 644 ok attempt 1 6.92 s
+  replicate 674 ok attempt 1 1.76 s
+  replicate 671 ok attempt 1 2.83 s
+  replicate 667 ok attempt 1 4.06 s
+  replicate 670 ok attempt 1 3.71 s
+  replicate 660 ok attempt 1 4.98 s
+  replicate 673 ok attempt 1 3.25 s
+  replicate 679 ok attempt 1 2.69 s
+  replicate 677 ok attempt 1 2.74 s
+  replicate 676 ok attempt 1 3.55 s
+  replicate 672 ok attempt 1 4.33 s
+  replicate 683 ok attempt 1 2.81 s
+  replicate 682 ok attempt 1 3.24 s
+  replicate 680 ok attempt 1 3.82 s
+  replicate 688 ok attempt 1 2.47 s
+  replicate 675 ok attempt 1 4.24 s
+  replicate 687 ok attempt 1 2.84 s
+  replicate 678 ok attempt 1 4.41 s
+  replicate 681 ok attempt 1 4.3 s
+  replicate 685 ok attempt 1 3.6 s
+  replicate 689 ok attempt 1 3.34 s
+  replicate 686 ok attempt 1 4.18 s
+  replicate 695 ok attempt 1 2.96 s
+  replicate 684 ok attempt 1 4.65 s
+  replicate 691 ok attempt 1 3.48 s
+  replicate 696 ok attempt 1 2.51 s
+  replicate 699 ok attempt 1 2.72 s
+  replicate 694 ok attempt 1 4.05 s
+  replicate 690 ok attempt 1 4.79 s
+  replicate 701 ok attempt 1 3.04 s
+  replicate 697 ok attempt 1 3.55 s
+  replicate 700 ok attempt 1 3.23 s
+  replicate 705 ok attempt 1 2.99 s
+  replicate 708 ok attempt 1 2.3 s
+  replicate 707 ok attempt 1 2.78 s
+  replicate 709 ok attempt 1 2.35 s
+  replicate 704 ok attempt 1 3.8 s
+  replicate 710 ok attempt 1 3.03 s
+  replicate 706 ok attempt 1 4.1 s
+  replicate 693 ok attempt 1 6.37 s
+  replicate 702 ok attempt 1 4.89 s
+  replicate 703 ok attempt 1 4.73 s
+  replicate 714 ok attempt 1 2.65 s
+  replicate 713 ok attempt 1 3.11 s
+  replicate 711 ok attempt 1 3.89 s
+  replicate 717 ok attempt 1 2.76 s
+  replicate 712 ok attempt 1 3.94 s
+  replicate 716 ok attempt 1 2.94 s
+  replicate 720 ok attempt 1 2.39 s
+  replicate 719 ok attempt 1 2.7 s
+  replicate 715 ok attempt 1 3.56 s
+  replicate 725 ok attempt 1 2.35 s
+  replicate 698 ok attempt 1 7.53 s
+  replicate 723 ok attempt 1 3.02 s
+  replicate 722 ok attempt 1 3.47 s
+  replicate 718 ok attempt 1 4.4 s
+  replicate 692 ok attempt 1 9.41 s
+  replicate 728 ok attempt 1 2.92 s
+  replicate 727 ok attempt 1 3.25 s
+  replicate 721 ok attempt 1 4.5 s
+  replicate 729 ok attempt 1 3.11 s
+  replicate 734 ok attempt 1 3.02 s
+  replicate 733 ok attempt 1 3.2 s
+  replicate 736 ok attempt 1 3.0 s
+  replicate 731 ok attempt 1 3.81 s
+  replicate 732 ok attempt 1 3.86 s
+  replicate 730 ok attempt 1 4.06 s
+  replicate 726 ok attempt 1 5.12 s
+  replicate 724 ok attempt 1 5.38 s
+  replicate 735 ok attempt 1 4.06 s
+  replicate 741 ok attempt 1 2.59 s
+  replicate 739 ok attempt 1 3.03 s
+  replicate 742 ok attempt 1 2.94 s
+  replicate 740 ok attempt 1 3.3 s
+  replicate 743 ok attempt 1 3.14 s
+  replicate 748 ok attempt 1 2.64 s
+  replicate 737 ok attempt 1 5.21 s
+  replicate 749 ok attempt 1 2.78 s
+  replicate 747 ok attempt 1 3.43 s
+  replicate 753 ok attempt 1 2.37 s
+  replicate 750 ok attempt 1 2.86 s
+  replicate 744 ok attempt 1 4.31 s
+  replicate 738 ok attempt 1 5.15 s
+  replicate 745 ok attempt 1 4.21 s
+  replicate 752 ok attempt 1 3.6 s
+  replicate 758 ok attempt 1 3.06 s
+  replicate 757 ok attempt 1 3.29 s
+  replicate 746 ok attempt 1 5.41 s
+  replicate 754 ok attempt 1 4.51 s
+  replicate 761 ok attempt 1 3.65 s
+  replicate 755 ok attempt 1 4.46 s
+  replicate 756 ok attempt 1 4.42 s
+  replicate 759 ok attempt 1 4.08 s
+  replicate 760 ok attempt 1 4.12 s
+  replicate 762 ok attempt 1 3.12 s
+  replicate 764 ok attempt 1 3.01 s
+  replicate 763 ok attempt 1 3.41 s
+  replicate 769 ok attempt 1 2.94 s
+  replicate 773 ok attempt 1 1.83 s
+  replicate 766 ok attempt 1 3.31 s
+  replicate 772 ok attempt 1 2.2 s
+  replicate 765 ok attempt 1 3.84 s
+  replicate 771 ok attempt 1 2.65 s
+  replicate 768 ok attempt 1 3.86 s
+  replicate 751 ok attempt 1 6.86 s
+  replicate 767 ok attempt 1 4.26 s
+  replicate 770 ok attempt 1 4.01 s
+  replicate 774 ok attempt 1 2.85 s
+  replicate 782 ok attempt 1 2.49 s
+  replicate 781 ok attempt 1 2.86 s
+  replicate 786 ok attempt 1 2.33 s
+  replicate 785 ok attempt 1 2.5 s
+  replicate 776 ok attempt 1 3.38 s
+  replicate 779 ok attempt 1 3.25 s
+  replicate 783 ok attempt 1 3.13 s
+  replicate 789 ok attempt 1 2.32 s
+  replicate 780 ok attempt 1 3.6 s
+  replicate 775 ok attempt 1 3.92 s
+  replicate 777 ok attempt 1 3.83 s
+  replicate 787 ok attempt 1 2.86 s
+  replicate 778 ok attempt 1 3.92 s
+  replicate 788 ok attempt 1 2.85 s
+  replicate 784 ok attempt 1 3.97 s
+  replicate 795 ok attempt 1 2.36 s
+  replicate 791 ok attempt 1 3.46 s
+  replicate 792 ok attempt 1 3.56 s
+  replicate 798 ok attempt 1 2.43 s
+  replicate 797 ok attempt 1 2.6 s
+  replicate 793 ok attempt 1 4.0 s
+  replicate 802 ok attempt 1 2.44 s
+  replicate 796 ok attempt 1 3.39 s
+  replicate 790 ok attempt 1 5.06 s
+  replicate 807 ok attempt 1 3.1 s
+  replicate 806 ok attempt 1 3.16 s
+  replicate 799 ok attempt 1 3.93 s
+  replicate 808 ok attempt 1 3.45 s
+  replicate 805 ok attempt 1 3.74 s
+  replicate 800 ok attempt 1 4.23 s
+  replicate 803 ok attempt 1 3.88 s
+  replicate 812 ok attempt 1 2.33 s
+  replicate 811 ok attempt 1 2.85 s
+  replicate 810 ok attempt 1 3.09 s
+  replicate 814 ok attempt 1 2.7 s
+  replicate 804 ok attempt 1 4.77 s
+  replicate 801 ok attempt 1 5.23 s
+  replicate 813 ok attempt 1 3.15 s
+  replicate 809 ok attempt 1 4.99 s
+  replicate 794 ok attempt 1 7.6 s
+  replicate 817 ok attempt 1 3.52 s
+  replicate 822 ok attempt 1 2.49 s
+  replicate 816 ok attempt 1 3.95 s
+  replicate 821 ok attempt 1 3.04 s
+  replicate 828 ok attempt 1 2.13 s
+  replicate 818 ok attempt 1 4.19 s
+  replicate 826 ok attempt 1 3.07 s
+  replicate 825 ok attempt 1 3.33 s
+  replicate 819 ok attempt 1 4.01 s
+  replicate 824 ok attempt 1 3.46 s
+  replicate 823 ok attempt 1 3.76 s
+  replicate 830 ok attempt 1 2.83 s
+  replicate 829 ok attempt 1 3.2 s
+  replicate 832 ok attempt 1 2.95 s
+  replicate 827 ok attempt 1 3.98 s
+  replicate 815 ok attempt 1 6.39 s
+  replicate 837 ok attempt 1 2.24 s
+  replicate 838 ok attempt 1 2.34 s
+  replicate 820 ok attempt 1 5.76 s
+  replicate 834 ok attempt 1 3.18 s
+  replicate 841 ok attempt 1 2.2 s
+  replicate 835 ok attempt 1 3.08 s
+  replicate 839 ok attempt 1 2.81 s
+  replicate 833 ok attempt 1 4.08 s
+  replicate 848 ok attempt 1 1.96 s
+  replicate 840 ok attempt 1 3.17 s
+  replicate 845 ok attempt 1 2.61 s
+  replicate 831 ok attempt 1 5.09 s
+  replicate 836 ok attempt 1 4.04 s
+  replicate 842 ok attempt 1 3.58 s
+  replicate 849 ok attempt 1 2.79 s
+  replicate 851 ok attempt 1 2.47 s
+  replicate 846 ok attempt 1 3.67 s
+  replicate 844 ok attempt 1 4.19 s
+  replicate 843 ok attempt 1 4.34 s
+  replicate 856 ok attempt 1 2.6 s
+  replicate 850 ok attempt 1 3.59 s
+  replicate 855 ok attempt 1 2.85 s
+  replicate 853 ok attempt 1 3.09 s
+  replicate 857 ok attempt 1 2.65 s
+  replicate 860 ok attempt 1 2.25 s
+  replicate 859 ok attempt 1 2.35 s
+  replicate 854 ok attempt 1 3.34 s
+  replicate 858 ok attempt 1 3.02 s
+  replicate 847 ok attempt 1 5.27 s
+  replicate 863 ok attempt 1 3.04 s
+  replicate 852 ok attempt 1 4.58 s
+  replicate 861 ok attempt 1 3.34 s
+  replicate 866 ok attempt 1 2.75 s
+  replicate 874 ok attempt 1 2.07 s
+  replicate 864 ok attempt 1 3.62 s
+  replicate 868 ok attempt 1 3.03 s
+  replicate 867 ok attempt 1 3.29 s
+  replicate 865 ok attempt 1 3.71 s
+  replicate 870 ok attempt 1 2.84 s
+  replicate 869 ok attempt 1 3.27 s
+  replicate 862 ok attempt 1 4.93 s
+  replicate 876 ok attempt 1 2.71 s
+  replicate 877 ok attempt 1 2.78 s
+  replicate 871 ok attempt 1 3.52 s
+  replicate 873 ok attempt 1 3.47 s
+  replicate 875 ok attempt 1 3.89 s
+  replicate 880 ok attempt 1 3.28 s
+  replicate 881 ok attempt 1 3.38 s
+  replicate 884 ok attempt 1 2.7 s
+  replicate 892 ok attempt 1 1.82 s
+  replicate 879 ok attempt 1 4.05 s
+  replicate 882 ok attempt 1 3.83 s
+  replicate 889 ok attempt 1 2.77 s
+  replicate 886 ok attempt 1 3.11 s
+  replicate 872 ok attempt 1 5.98 s
+  replicate 893 ok attempt 1 2.85 s
+  replicate 887 ok attempt 1 3.59 s
+  replicate 885 ok attempt 1 4.26 s
+  replicate 883 ok attempt 1 4.98 s
+  replicate 894 ok attempt 1 3.43 s
+  replicate 890 ok attempt 1 4.12 s
+  replicate 895 ok attempt 1 3.45 s
+  replicate 878 ok attempt 1 6.1 s
+  replicate 897 ok attempt 1 2.67 s
+  replicate 899 ok attempt 1 2.68 s
+  replicate 900 ok attempt 1 2.67 s
+  replicate 898 ok attempt 1 2.94 s
+  replicate 896 ok attempt 1 3.55 s
+  replicate 891 ok attempt 1 4.78 s
+  replicate 903 ok attempt 1 2.46 s
+  replicate 905 ok attempt 1 2.07 s
+  replicate 901 ok attempt 1 3.73 s
+  replicate 904 ok attempt 1 4.06 s
+  replicate 915 ok attempt 1 2.18 s
+  replicate 908 ok attempt 1 3.25 s
+  replicate 902 ok attempt 1 4.65 s
+  replicate 914 ok attempt 1 2.71 s
+  replicate 906 ok attempt 1 4.01 s
+  replicate 921 ok attempt 1 2.35 s
+  replicate 888 ok attempt 1 7.77 s
+  replicate 920 ok attempt 1 2.51 s
+  replicate 911 ok attempt 1 3.74 s
+  replicate 918 ok attempt 1 3.12 s
+  replicate 913 ok attempt 1 3.81 s
+  replicate 907 ok attempt 1 5.03 s
+  replicate 909 ok attempt 1 4.47 s
+  replicate 919 ok attempt 1 3.91 s
+  replicate 916 ok attempt 1 4.19 s
+  replicate 917 ok attempt 1 4.18 s
+  replicate 910 ok attempt 1 5.41 s
+  replicate 912 ok attempt 1 5.4 s
+  replicate 929 ok attempt 1 2.38 s
+  replicate 927 ok attempt 1 2.85 s
+  replicate 925 ok attempt 1 3.09 s
+  replicate 923 ok attempt 1 3.33 s
+  replicate 931 ok attempt 1 2.45 s
+  replicate 928 ok attempt 1 2.89 s
+  replicate 922 ok attempt 1 4.29 s
+  replicate 924 ok attempt 1 3.68 s
+  replicate 936 ok attempt 1 2.38 s
+  replicate 930 ok attempt 1 3.54 s
+  replicate 938 ok attempt 1 2.45 s
+  replicate 934 ok attempt 1 3.58 s
+  replicate 926 ok attempt 1 4.67 s
+  replicate 933 ok attempt 1 3.87 s
+  replicate 932 ok attempt 1 4.22 s
+  replicate 941 ok attempt 1 2.94 s
+  replicate 937 ok attempt 1 3.72 s
+  replicate 942 ok attempt 1 2.66 s
+  replicate 939 ok attempt 1 3.83 s
+  replicate 950 ok attempt 1 2.19 s
+  replicate 949 ok attempt 1 2.48 s
+  replicate 946 ok attempt 1 3.23 s
+  replicate 947 ok attempt 1 3.27 s
+  replicate 940 ok attempt 1 3.92 s
+  replicate 935 ok attempt 1 5.38 s
+  replicate 944 ok attempt 1 3.66 s
+  replicate 943 ok attempt 1 3.84 s
+  replicate 948 ok attempt 1 3.54 s
+  replicate 953 ok attempt 1 2.39 s
+  replicate 952 ok attempt 1 2.85 s
+  replicate 945 ok attempt 1 4.31 s
+  replicate 955 ok attempt 1 2.66 s
+  replicate 954 ok attempt 1 2.79 s
+  replicate 951 ok attempt 1 3.64 s
+  replicate 959 ok attempt 1 2.28 s
+  replicate 960 ok attempt 1 2.39 s
+  replicate 962 ok attempt 1 2.35 s
+  replicate 963 ok attempt 1 2.45 s
+  replicate 957 ok attempt 1 3.5 s
+  replicate 966 ok attempt 1 2.28 s
+  replicate 968 ok attempt 1 2.51 s
+  replicate 958 ok attempt 1 3.95 s
+  replicate 976 ok attempt 1 1.81 s
+  replicate 964 ok attempt 1 3.61 s
+  replicate 972 ok attempt 1 2.61 s
+  replicate 956 ok attempt 1 5.01 s
+  replicate 971 ok attempt 1 2.82 s
+  replicate 969 ok attempt 1 3.31 s
+  replicate 967 ok attempt 1 3.49 s
+  replicate 970 ok attempt 1 3.66 s
+  replicate 961 ok attempt 1 4.74 s
+  replicate 975 ok attempt 1 3.21 s
+  replicate 979 ok attempt 1 2.36 s
+  replicate 978 ok attempt 1 2.84 s
+  replicate 973 ok attempt 1 3.83 s
+  replicate 965 ok attempt 1 5.31 s
+  replicate 977 ok attempt 1 3.56 s
+  replicate 974 ok attempt 1 4.48 s
+  replicate 980 ok attempt 1 3.25 s
+  replicate 981 ok attempt 1 3.4 s
+  replicate 982 ok attempt 1 3.22 s
+  replicate 992 ok attempt 1 2.26 s
+  replicate 990 ok attempt 1 2.8 s
+  replicate 984 ok attempt 1 3.49 s
+  replicate 987 ok attempt 1 3.29 s
+  replicate 991 ok attempt 1 2.81 s
+  replicate 989 ok attempt 1 3.33 s
+  replicate 985 ok attempt 1 3.56 s
+  replicate 997 ok attempt 1 2.0 s
+  replicate 983 ok attempt 1 4.14 s
+  replicate 995 ok attempt 1 2.46 s
+  replicate 996 ok attempt 1 2.47 s
+  replicate 994 ok attempt 1 2.86 s
+  replicate 999 ok attempt 1 2.23 s
+  replicate 988 ok attempt 1 4.27 s
+  replicate 1000 ok attempt 1 2.1 s
+  replicate 993 ok attempt 1 3.55 s
+  replicate 986 ok attempt 1 4.55 s
+  replicate 998 ok attempt 1 2.78 s
+{"B": 1000, "ok": 1000, "unresolved_failures": 0, "boundary_solutions": 998, "seconds_total": 3412.69}
+fit_ml bootstrap model=early support=early_matched workers=20 argv=['bootstrap', '--model', 'early', '--B', '500']
+bootstrap early/early_matched: 0 complete, 0 failed after retries, 500 to run
+  replicate 18 ok attempt 1 17.03 s
+  replicate 11 ok attempt 1 21.65 s
+  replicate 9 ok attempt 1 23.03 s
+  replicate 19 ok attempt 1 23.45 s
+  replicate 7 ok attempt 1 24.19 s
+  replicate 5 ok attempt 1 24.89 s
+  replicate 8 ok attempt 1 30.13 s
+  replicate 1 ok attempt 1 31.19 s
+  replicate 10 ok attempt 1 34.19 s
+  replicate 16 ok attempt 1 34.87 s
+  replicate 21 ok attempt 1 19.38 s
+  replicate 4 ok attempt 1 37.28 s
+  replicate 6 ok attempt 1 38.67 s
+  replicate 17 ok attempt 1 39.59 s
+  replicate 24 ok attempt 1 16.59 s
+  replicate 12 ok attempt 1 41.31 s
+  replicate 26 ok attempt 1 18.82 s
+  replicate 25 ok attempt 1 19.74 s
+  replicate 14 ok attempt 1 45.31 s
+  replicate 15 ok attempt 1 47.06 s
+  replicate 13 ok attempt 1 47.35 s
+  replicate 2 ok attempt 1 47.97 s
+  replicate 20 ok attempt 1 52.22 s
+  replicate 23 ok attempt 1 29.9 s
+  replicate 31 ok attempt 1 21.72 s
+  replicate 34 ok attempt 1 19.54 s
+  replicate 27 ok attempt 1 29.31 s
+  replicate 35 ok attempt 1 21.13 s
+  replicate 3 ok attempt 1 62.69 s
+  replicate 38 ok attempt 1 19.74 s
+  replicate 29 ok attempt 1 30.3 s
+  replicate 37 ok attempt 1 25.44 s
+  replicate 33 ok attempt 1 34.34 s
+  replicate 22 ok attempt 1 52.93 s
+  replicate 28 ok attempt 1 44.56 s
+  replicate 32 ok attempt 1 38.66 s
+  replicate 47 ok attempt 1 19.12 s
+  replicate 40 ok attempt 1 33.71 s
+  replicate 30 ok attempt 1 46.97 s
+  replicate 36 ok attempt 1 40.7 s
+  replicate 42 ok attempt 1 35.11 s
+  replicate 44 ok attempt 1 30.95 s
+  replicate 45 ok attempt 1 25.82 s
+  replicate 39 ok attempt 1 39.82 s
+  replicate 41 ok attempt 1 40.1 s
+  replicate 50 ok attempt 1 24.04 s
+  replicate 46 ok attempt 1 34.33 s
+  replicate 48 ok attempt 1 34.98 s
+  replicate 57 ok attempt 1 17.72 s
+  replicate 52 ok attempt 1 30.61 s
+  replicate 55 ok attempt 1 24.46 s
+  replicate 56 ok attempt 1 26.03 s
+  replicate 53 ok attempt 1 29.38 s
+  replicate 65 ok attempt 1 15.11 s
+  replicate 51 ok attempt 1 39.79 s
+  replicate 49 ok attempt 1 42.95 s
+  replicate 63 ok attempt 1 21.38 s
+  replicate 62 ok attempt 1 24.53 s
+  replicate 66 ok attempt 1 26.08 s
+  replicate 69 ok attempt 1 20.19 s
+  replicate 58 ok attempt 1 36.34 s
+  replicate 64 ok attempt 1 33.24 s
+  replicate 59 ok attempt 1 37.66 s
+  replicate 43 ok attempt 1 67.99 s
+  replicate 60 ok attempt 1 38.82 s
+  replicate 54 ok attempt 1 47.83 s
+  replicate 68 ok attempt 1 28.52 s
+  replicate 70 ok attempt 1 27.86 s
+  replicate 77 ok attempt 1 23.38 s
+  replicate 74 ok attempt 1 27.32 s
+  replicate 79 ok attempt 1 16.69 s
+  replicate 76 ok attempt 1 28.55 s
+  replicate 75 ok attempt 1 30.57 s
+  replicate 71 ok attempt 1 36.12 s
+  replicate 82 ok attempt 1 21.1 s
+  replicate 72 ok attempt 1 38.59 s
+  replicate 80 ok attempt 1 24.02 s
+  replicate 78 ok attempt 1 33.46 s
+  replicate 87 ok attempt 1 23.81 s
+  replicate 73 ok attempt 1 48.17 s
+  replicate 86 ok attempt 1 28.18 s
+  replicate 67 ok attempt 1 57.24 s
+  replicate 88 ok attempt 1 26.44 s
+  replicate 83 ok attempt 1 35.83 s
+  replicate 84 ok attempt 1 36.27 s
+  replicate 89 ok attempt 1 28.44 s
+  replicate 95 ok attempt 1 19.53 s
+  replicate 93 ok attempt 1 24.2 s
+  replicate 91 ok attempt 1 28.61 s
+  replicate 97 ok attempt 1 19.42 s
+  replicate 90 ok attempt 1 30.93 s
+  replicate 85 ok attempt 1 41.01 s
+  replicate 81 ok attempt 1 45.73 s
+  replicate 92 ok attempt 1 32.55 s
+  replicate 61 ok attempt 1 87.32 s
+  replicate 94 ok attempt 1 35.41 s
+  replicate 98 ok attempt 1 31.07 s
+  replicate 103 ok attempt 1 23.03 s
+  replicate 99 ok attempt 1 31.3 s
+  replicate 109 ok attempt 1 24.22 s
+  replicate 107 ok attempt 1 28.29 s
+  replicate 96 ok attempt 1 48.42 s
+  replicate 106 ok attempt 1 31.95 s
+  replicate 110 ok attempt 1 30.09 s
+  replicate 101 ok attempt 1 39.8 s
+  replicate 102 ok attempt 1 41.53 s
+  replicate 100 ok attempt 1 44.26 s
+  replicate 117 ok attempt 1 22.66 s
+  replicate 104 ok attempt 1 41.75 s
+  replicate 115 ok attempt 1 31.71 s
+  replicate 114 ok attempt 1 35.48 s
+  replicate 113 ok attempt 1 41.68 s
+  replicate 118 ok attempt 1 28.09 s
+  replicate 105 ok attempt 1 49.86 s
+  replicate 111 ok attempt 1 45.41 s
+  replicate 120 ok attempt 1 23.72 s
+  replicate 112 ok attempt 1 45.84 s
+  replicate 116 ok attempt 1 37.35 s
+  replicate 119 ok attempt 1 29.25 s
+  replicate 108 ok attempt 1 52.6 s
+  replicate 121 ok attempt 1 25.39 s
+  replicate 124 ok attempt 1 22.92 s
+  replicate 128 ok attempt 1 22.51 s
+  replicate 126 ok attempt 1 27.37 s
+  replicate 127 ok attempt 1 29.2 s
+  replicate 142 ok attempt 1 14.21 s
+  replicate 123 ok attempt 1 38.83 s
+  replicate 131 ok attempt 1 26.06 s
+  replicate 122 ok attempt 1 45.18 s
+  replicate 137 ok attempt 1 27.21 s
+  replicate 140 ok attempt 1 24.67 s
+  replicate 139 ok attempt 1 31.3 s
+  replicate 129 ok attempt 1 44.48 s
+  replicate 141 ok attempt 1 28.96 s
+  replicate 135 ok attempt 1 37.99 s
+  replicate 143 ok attempt 1 27.4 s
+  replicate 130 ok attempt 1 43.93 s
+  replicate 138 ok attempt 1 36.97 s
+  replicate 133 ok attempt 1 40.82 s
+  replicate 146 ok attempt 1 21.08 s
+  replicate 132 ok attempt 1 44.77 s
+  replicate 136 ok attempt 1 43.94 s
+  replicate 150 ok attempt 1 17.6 s
+  replicate 125 ok attempt 1 63.46 s
+  replicate 148 ok attempt 1 26.21 s
+  replicate 151 ok attempt 1 21.45 s
+  replicate 134 ok attempt 1 52.53 s
+  replicate 152 ok attempt 1 18.0 s
+  replicate 145 ok attempt 1 34.76 s
+  replicate 144 ok attempt 1 39.18 s
+  replicate 147 ok attempt 1 34.98 s
+  replicate 149 ok attempt 1 31.74 s
+  replicate 160 ok attempt 1 23.09 s
+  replicate 153 ok attempt 1 30.71 s
+  replicate 158 ok attempt 1 26.95 s
+  replicate 157 ok attempt 1 29.48 s
+  replicate 154 ok attempt 1 37.91 s
+  replicate 161 ok attempt 1 31.35 s
+  replicate 163 ok attempt 1 28.13 s
+  replicate 166 ok attempt 1 24.35 s
+  replicate 173 ok attempt 1 15.17 s
+  replicate 165 ok attempt 1 32.79 s
+  replicate 164 ok attempt 1 34.77 s
+  replicate 156 ok attempt 1 48.4 s
+  replicate 159 ok attempt 1 48.68 s
+  replicate 162 ok attempt 1 44.68 s
+  replicate 174 ok attempt 1 23.87 s
+  replicate 177 ok attempt 1 19.78 s
+  replicate 169 ok attempt 1 41.07 s
+  replicate 170 ok attempt 1 45.68 s
+  replicate 178 ok attempt 1 24.13 s
+  replicate 155 ok attempt 1 61.4 s
+  replicate 179 ok attempt 1 26.7 s
+  replicate 181 ok attempt 1 21.66 s
+  replicate 168 ok attempt 1 50.15 s
+  replicate 171 ok attempt 1 45.73 s
+  replicate 167 ok attempt 1 53.05 s
+  replicate 180 ok attempt 1 29.46 s
+  replicate 172 ok attempt 1 47.87 s
+  replicate 175 ok attempt 1 44.64 s
+  replicate 182 ok attempt 1 31.97 s
+  replicate 176 ok attempt 1 45.41 s
+  replicate 188 ok attempt 1 22.02 s
+  replicate 184 ok attempt 1 27.93 s
+  replicate 183 ok attempt 1 36.98 s
+  replicate 198 ok attempt 1 15.39 s
+  replicate 185 ok attempt 1 33.22 s
+  replicate 187 ok attempt 1 32.79 s
+  replicate 186 ok attempt 1 35.4 s
+  replicate 190 ok attempt 1 29.03 s
+  replicate 192 ok attempt 1 28.31 s
+  replicate 189 ok attempt 1 36.52 s
+  replicate 194 ok attempt 1 30.03 s
+  replicate 195 ok attempt 1 33.52 s
+  replicate 196 ok attempt 1 34.82 s
+  replicate 200 ok attempt 1 26.98 s
+  replicate 204 ok attempt 1 22.77 s
+  replicate 203 ok attempt 1 28.04 s
+  replicate 197 ok attempt 1 39.36 s
+  replicate 206 ok attempt 1 24.43 s
+  replicate 191 ok attempt 1 48.24 s
+  replicate 205 ok attempt 1 28.08 s
+  replicate 199 ok attempt 1 41.95 s
+  replicate 201 ok attempt 1 38.01 s
+  replicate 202 ok attempt 1 37.24 s
+  replicate 208 ok attempt 1 29.6 s
+  replicate 207 ok attempt 1 31.06 s
+  replicate 213 ok attempt 1 21.44 s
+  replicate 193 ok attempt 1 53.33 s
+  replicate 214 ok attempt 1 19.56 s
+  replicate 218 ok attempt 1 21.16 s
+  replicate 216 ok attempt 1 27.12 s
+  replicate 209 ok attempt 1 42.29 s
+  replicate 211 ok attempt 1 41.06 s
+  replicate 220 ok attempt 1 23.6 s
+  replicate 212 ok attempt 1 40.44 s
+  replicate 228 ok attempt 1 17.14 s
+  replicate 223 ok attempt 1 22.0 s
+  replicate 229 ok attempt 1 17.5 s
+  replicate 217 ok attempt 1 34.75 s
+  replicate 222 ok attempt 1 29.14 s
+  replicate 219 ok attempt 1 31.78 s
+  replicate 231 ok attempt 1 13.08 s
+  replicate 215 ok attempt 1 40.38 s
+  replicate 225 ok attempt 1 32.27 s
+  replicate 221 ok attempt 1 37.96 s
+  replicate 224 ok attempt 1 34.11 s
+  replicate 230 ok attempt 1 30.72 s
+  replicate 210 ok attempt 1 60.97 s
+  replicate 239 ok attempt 1 20.47 s
+  replicate 227 ok attempt 1 40.26 s
+  replicate 241 ok attempt 1 20.22 s
+  replicate 234 ok attempt 1 31.41 s
+  replicate 226 ok attempt 1 49.58 s
+  replicate 232 ok attempt 1 37.32 s
+  replicate 237 ok attempt 1 33.53 s
+  replicate 243 ok attempt 1 26.8 s
+  replicate 244 ok attempt 1 28.32 s
+  replicate 238 ok attempt 1 35.77 s
+  replicate 235 ok attempt 1 38.3 s
+  replicate 245 ok attempt 1 23.55 s
+  replicate 240 ok attempt 1 36.99 s
+  replicate 248 ok attempt 1 26.64 s
+  replicate 249 ok attempt 1 25.51 s
+  replicate 242 ok attempt 1 38.28 s
+  replicate 233 ok attempt 1 47.55 s
+  replicate 236 ok attempt 1 45.93 s
+  replicate 251 ok attempt 1 25.72 s
+  replicate 250 ok attempt 1 26.63 s
+  replicate 252 ok attempt 1 22.46 s
+  replicate 254 ok attempt 1 20.0 s
+  replicate 260 ok attempt 1 14.37 s
+  replicate 256 ok attempt 1 17.34 s
+  replicate 257 ok attempt 1 18.91 s
+  replicate 246 ok attempt 1 41.56 s
+  replicate 258 ok attempt 1 24.01 s
+  replicate 255 ok attempt 1 27.65 s
+  replicate 261 ok attempt 1 27.83 s
+  replicate 273 ok attempt 1 14.19 s
+  replicate 259 ok attempt 1 30.42 s
+  replicate 253 ok attempt 1 39.01 s
+  replicate 266 ok attempt 1 25.48 s
+  replicate 262 ok attempt 1 32.76 s
+  replicate 263 ok attempt 1 30.09 s
+  replicate 270 ok attempt 1 26.23 s
+  replicate 264 ok attempt 1 32.52 s
+  replicate 272 ok attempt 1 25.15 s
+  replicate 271 ok attempt 1 26.21 s
+  replicate 279 ok attempt 1 11.99 s
+  replicate 269 ok attempt 1 30.95 s
+  replicate 267 ok attempt 1 37.11 s
+  replicate 265 ok attempt 1 40.94 s
+  replicate 247 ok attempt 1 71.53 s
+  replicate 277 ok attempt 1 27.72 s
+  replicate 274 ok attempt 1 37.28 s
+  replicate 285 ok attempt 1 18.09 s
+  replicate 288 ok attempt 1 15.84 s
+  replicate 281 ok attempt 1 30.73 s
+  replicate 268 ok attempt 1 52.03 s
+  replicate 284 ok attempt 1 28.25 s
+  replicate 276 ok attempt 1 41.63 s
+  replicate 280 ok attempt 1 35.95 s
+  replicate 287 ok attempt 1 26.46 s
+  replicate 295 ok attempt 1 17.12 s
+  replicate 289 ok attempt 1 30.56 s
+  replicate 290 ok attempt 1 29.69 s
+  replicate 275 ok attempt 1 54.13 s
+  replicate 282 ok attempt 1 40.17 s
+  replicate 286 ok attempt 1 37.43 s
+  replicate 296 ok attempt 1 22.54 s
+  replicate 283 ok attempt 1 45.35 s
+  replicate 278 ok attempt 1 53.71 s
+  replicate 298 ok attempt 1 20.64 s
+  replicate 293 ok attempt 1 34.03 s
+  replicate 292 ok attempt 1 35.04 s
+  replicate 291 ok attempt 1 39.8 s
+  replicate 294 ok attempt 1 36.44 s
+  replicate 297 ok attempt 1 31.48 s
+  replicate 300 ok attempt 1 25.39 s
+  replicate 306 ok attempt 1 20.26 s
+  replicate 305 ok attempt 1 22.52 s
+  replicate 303 ok attempt 1 28.27 s
+  replicate 302 ok attempt 1 30.01 s
+  replicate 310 ok attempt 1 19.2 s
+  replicate 301 ok attempt 1 36.68 s
+  replicate 304 ok attempt 1 31.94 s
+  replicate 316 ok attempt 1 16.89 s
+  replicate 318 ok attempt 1 16.2 s
+  replicate 307 ok attempt 1 31.5 s
+  replicate 314 ok attempt 1 24.7 s
+  replicate 319 ok attempt 1 18.96 s
+  replicate 317 ok attempt 1 23.33 s
+  replicate 321 ok attempt 1 20.01 s
+  replicate 308 ok attempt 1 42.41 s
+  replicate 312 ok attempt 1 34.13 s
+  replicate 311 ok attempt 1 35.49 s
+  replicate 313 ok attempt 1 34.08 s
+  replicate 315 ok attempt 1 40.16 s
+  replicate 320 ok attempt 1 31.57 s
+  replicate 329 ok attempt 1 19.93 s
+  replicate 322 ok attempt 1 33.45 s
+  replicate 324 ok attempt 1 30.24 s
+  replicate 328 ok attempt 1 25.02 s
+  replicate 309 ok attempt 1 53.49 s
+  replicate 330 ok attempt 1 26.58 s
+  replicate 331 ok attempt 1 26.17 s
+  replicate 323 ok attempt 1 39.56 s
+  replicate 333 ok attempt 1 23.57 s
+  replicate 335 ok attempt 1 23.33 s
+  replicate 334 ok attempt 1 27.06 s
+  replicate 299 ok attempt 1 79.94 s
+  replicate 340 ok attempt 1 20.7 s
+  replicate 326 ok attempt 1 45.78 s
+  replicate 336 ok attempt 1 32.36 s
+  replicate 341 ok attempt 1 23.99 s
+  replicate 325 ok attempt 1 51.72 s
+  replicate 346 ok attempt 1 19.85 s
+  replicate 332 ok attempt 1 47.97 s
+  replicate 337 ok attempt 1 43.41 s
+  replicate 348 ok attempt 1 23.08 s
+  replicate 345 ok attempt 1 26.08 s
+  replicate 338 ok attempt 1 37.74 s
+  replicate 339 ok attempt 1 37.39 s
+  replicate 343 ok attempt 1 34.65 s
+  replicate 354 ok attempt 1 19.06 s
+  replicate 353 ok attempt 1 21.49 s
+  replicate 344 ok attempt 1 40.26 s
+  replicate 342 ok attempt 1 41.86 s
+  replicate 350 ok attempt 1 28.4 s
+  replicate 355 ok attempt 1 19.73 s
+  replicate 349 ok attempt 1 33.41 s
+  replicate 327 ok attempt 1 73.29 s
+  replicate 352 ok attempt 1 31.56 s
+  replicate 347 ok attempt 1 44.68 s
+  replicate 351 ok attempt 1 38.39 s
+  replicate 357 ok attempt 1 27.57 s
+  replicate 363 ok attempt 1 21.15 s
+  replicate 362 ok attempt 1 23.92 s
+  replicate 364 ok attempt 1 21.59 s
+  replicate 361 ok attempt 1 24.82 s
+  replicate 358 ok attempt 1 32.46 s
+  replicate 360 ok attempt 1 31.0 s
+  replicate 356 ok attempt 1 40.54 s
+  replicate 370 ok attempt 1 22.81 s
+  replicate 368 ok attempt 1 31.01 s
+  replicate 377 ok attempt 1 19.74 s
+  replicate 379 ok attempt 1 19.01 s
+  replicate 359 ok attempt 1 44.17 s
+  replicate 373 ok attempt 1 29.76 s
+  replicate 372 ok attempt 1 30.61 s
+  replicate 371 ok attempt 1 34.68 s
+  replicate 376 ok attempt 1 25.25 s
+  replicate 382 ok attempt 1 16.3 s
+  replicate 367 ok attempt 1 40.86 s
+  replicate 378 ok attempt 1 25.94 s
+  replicate 366 ok attempt 1 43.04 s
+  replicate 365 ok attempt 1 48.61 s
+  replicate 384 ok attempt 1 21.95 s
+  replicate 380 ok attempt 1 37.65 s
+  replicate 374 ok attempt 1 43.57 s
+  replicate 393 ok attempt 1 15.92 s
+  replicate 392 ok attempt 1 18.56 s
+  replicate 385 ok attempt 1 25.9 s
+  replicate 375 ok attempt 1 46.09 s
+  replicate 369 ok attempt 1 57.68 s
+  replicate 387 ok attempt 1 24.06 s
+  replicate 381 ok attempt 1 38.76 s
+  replicate 398 ok attempt 1 13.58 s
+  replicate 386 ok attempt 1 29.7 s
+  replicate 389 ok attempt 1 26.74 s
+  replicate 391 ok attempt 1 31.89 s
+  replicate 388 ok attempt 1 35.78 s
+  replicate 396 ok attempt 1 29.63 s
+  replicate 390 ok attempt 1 38.68 s
+  replicate 409 ok attempt 1 13.37 s
+  replicate 383 ok attempt 1 52.67 s
+  replicate 401 ok attempt 1 26.38 s
+  replicate 402 ok attempt 1 24.81 s
+  replicate 394 ok attempt 1 40.98 s
+  replicate 406 ok attempt 1 22.77 s
+  replicate 399 ok attempt 1 32.19 s
+  replicate 408 ok attempt 1 26.46 s
+  replicate 400 ok attempt 1 32.84 s
+  replicate 395 ok attempt 1 50.62 s
+  replicate 410 ok attempt 1 29.21 s
+  replicate 412 ok attempt 1 23.55 s
+  replicate 420 ok attempt 1 16.49 s
+  replicate 404 ok attempt 1 40.81 s
+  replicate 415 ok attempt 1 23.0 s
+  replicate 407 ok attempt 1 39.24 s
+  replicate 397 ok attempt 1 52.76 s
+  replicate 416 ok attempt 1 27.17 s
+  replicate 403 ok attempt 1 47.29 s
+  replicate 421 ok attempt 1 20.28 s
+  replicate 411 ok attempt 1 36.96 s
+  replicate 422 ok attempt 1 19.91 s
+  replicate 418 ok attempt 1 26.2 s
+  replicate 413 ok attempt 1 35.49 s
+  replicate 419 ok attempt 1 27.42 s
+  replicate 423 ok attempt 1 22.82 s
+  replicate 405 ok attempt 1 51.09 s
+  replicate 427 ok attempt 1 11.6 s
+  replicate 414 ok attempt 1 38.13 s
+  replicate 425 ok attempt 1 23.76 s
+  replicate 436 ok attempt 1 18.97 s
+  replicate 430 ok attempt 1 27.4 s
+  replicate 417 ok attempt 1 46.07 s
+  replicate 424 ok attempt 1 36.37 s
+  replicate 426 ok attempt 1 35.35 s
+  replicate 429 ok attempt 1 31.66 s
+  replicate 437 ok attempt 1 23.85 s
+  replicate 431 ok attempt 1 34.76 s
+  replicate 428 ok attempt 1 37.24 s
+  replicate 433 ok attempt 1 32.43 s
+  replicate 442 ok attempt 1 30.27 s
+  replicate 438 ok attempt 1 33.91 s
+  replicate 440 ok attempt 1 33.28 s
+  replicate 444 ok attempt 1 28.94 s
+  replicate 434 ok attempt 1 40.71 s
+  replicate 432 ok attempt 1 44.01 s
+  replicate 435 ok attempt 1 41.99 s
+  replicate 446 ok attempt 1 25.8 s
+  replicate 439 ok attempt 1 43.51 s
+  replicate 445 ok attempt 1 26.94 s
+  replicate 453 ok attempt 1 17.3 s
+  replicate 447 ok attempt 1 33.86 s
+  replicate 441 ok attempt 1 53.29 s
+  replicate 455 ok attempt 1 23.63 s
+  replicate 454 ok attempt 1 27.7 s
+  replicate 443 ok attempt 1 52.38 s
+  replicate 457 ok attempt 1 23.57 s
+  replicate 451 ok attempt 1 36.14 s
+  replicate 450 ok attempt 1 39.86 s
+  replicate 464 ok attempt 1 20.19 s
+  replicate 448 ok attempt 1 48.9 s
+  replicate 461 ok attempt 1 29.73 s
+  replicate 456 ok attempt 1 36.47 s
+  replicate 452 ok attempt 1 46.64 s
+  replicate 460 ok attempt 1 34.66 s
+  replicate 458 ok attempt 1 37.75 s
+  replicate 465 ok attempt 1 31.61 s
+  replicate 449 ok attempt 1 55.67 s
+  replicate 463 ok attempt 1 33.64 s
+  replicate 474 ok attempt 1 15.75 s
+  replicate 459 ok attempt 1 44.23 s
+  replicate 468 ok attempt 1 27.25 s
+  replicate 466 ok attempt 1 33.04 s
+  replicate 472 ok attempt 1 26.41 s
+  replicate 473 ok attempt 1 26.08 s
+  replicate 462 ok attempt 1 44.06 s
+  replicate 467 ok attempt 1 39.72 s
+  replicate 470 ok attempt 1 38.11 s
+  replicate 480 ok attempt 1 23.13 s
+  replicate 471 ok attempt 1 40.4 s
+  replicate 475 ok attempt 1 31.43 s
+  replicate 479 ok attempt 1 27.01 s
+  replicate 477 ok attempt 1 30.7 s
+  replicate 469 ok attempt 1 45.68 s
+  replicate 484 ok attempt 1 25.15 s
+  replicate 476 ok attempt 1 36.83 s
+  replicate 487 ok attempt 1 21.6 s
+  replicate 478 ok attempt 1 36.26 s
+  replicate 482 ok attempt 1 31.93 s
+  replicate 486 ok attempt 1 33.0 s
+  replicate 489 ok attempt 1 29.07 s
+  replicate 488 ok attempt 1 32.43 s
+  replicate 483 ok attempt 1 40.69 s
+  replicate 485 ok attempt 1 36.28 s
+  replicate 481 ok attempt 1 46.16 s
+  replicate 490 ok attempt 1 35.52 s
+  replicate 494 ok attempt 1 24.94 s
+  replicate 493 ok attempt 1 26.4 s
+  replicate 497 ok attempt 1 24.25 s
+  replicate 498 ok attempt 1 23.98 s
+  replicate 500 ok attempt 1 20.45 s
+  replicate 495 ok attempt 1 27.69 s
+  replicate 491 ok attempt 1 33.79 s
+  replicate 492 ok attempt 1 35.25 s
+  replicate 496 ok attempt 1 30.72 s
+  replicate 499 ok attempt 1 28.22 s
+{"B": 500, "ok": 500, "unresolved_failures": 0, "boundary_solutions": 274, "seconds_total": 16270.01}
+{
+ "R": "R version 4.5.1 (2025-06-13 ucrt)",
+ "lme4": "1.1.37",
+ "python": {
+  "ab": 13.430730047553334,
+  "Tk": 38.29050195422161
+ },
+ "tumor": {
+  "alpha": {
+   "python": 0.03976959665473939,
+   "R": 0.0397696315404755,
+   "ok": true
+  },
+  "lam": {
+   "python": 0.03454670669471796,
+   "R": 0.0345468330816548,
+   "ok": true
+  },
+  "g": {
+   "python": 0.006734504278341287,
+   "R": 0.00673447299729411,
+   "ok": true
+  },
+  "objective": {
+   "python_at_python": -131.09788481544894,
+   "python_at_R": -131.09788481597673,
+   "R_reported": -16.7297679627168,
+   "ok": true
+  },
+  "sigma": {
+   "python": 0.0,
+   "R": 1.88710621361179e-13,
+   "ok": true
+  }
+ },
+ "early_glm": {
+  "dD": {
+   "python": 0.05496039647330861,
+   "R": 0.0549603964784544,
+   "ok": true
+  },
+  "dQ": {
+   "python": 0.006817397498255078,
+   "R": 0.00681739749800311,
+   "ok": true
+  },
+  "dTe": {
+   "python": -0.054501357679658406,
+   "R": -0.0545013576782838,
+   "ok": true
+  },
+  "chemo": {
+   "python": 0.5250473245451985,
+   "R": 0.525047324545548,
+   "ok": true
+  },
+  "kappa_profile": {
+   "python": [
+    0.03960843795646888,
+    0.07032196919458289
+   ],
+   "R": [
+    0.0396084226130091,
+    0.0703218964368515
+   ],
+   "ok": true
+  },
+  "truth": {
+   "kappa": 0.05,
+   "ab": 10.0,
+   "r": 1.0,
+   "gamma": 0.5
+  }
+ },
+ "early_laplace_descriptive": {
+  "coef": {
+   "(Intercept)": -0.543279387673708,
+   "grp": -0.393295541068379,
+   "dD": 0.0399878564504384,
+   "dQ": -0.00941837993420812,
+   "dTe": -0.0810042640673187,
+   "chemo": 0.593469228981464
+  },
+  "tau": 0.73757558666897,
+  "sigma_arm": 0.127454527552383,
+  "logLik": -177.104959690576
+ },
+ "passed": true
+}
+done 2026-11-12T22:01:24-05:00

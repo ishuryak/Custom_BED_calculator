@@ -1,0 +1,23 @@
+fit_ml bootstrap model=tumor support=matched workers=20 argv=['bootstrap', '--model', 'tumor', '--B', '20', '--out', 'fit/output_frequentist/pilot/tumor_A']
+bootstrap tumor/matched: 0 complete, 0 failed after retries, 20 to run
+  replicate 16 ok attempt 1 2.24 s
+  replicate 1 ok attempt 1 2.34 s
+  replicate 9 ok attempt 1 2.67 s
+  replicate 6 ok attempt 1 2.83 s
+  replicate 7 ok attempt 1 2.83 s
+  replicate 8 ok attempt 1 2.93 s
+  replicate 19 ok attempt 1 2.93 s
+  replicate 20 ok attempt 1 3.12 s
+  replicate 14 ok attempt 1 3.16 s
+  replicate 15 ok attempt 1 3.31 s
+  replicate 10 ok attempt 1 3.96 s
+  replicate 12 ok attempt 1 4.35 s
+  replicate 4 ok attempt 1 4.36 s
+  replicate 13 ok attempt 1 4.47 s
+  replicate 2 ok attempt 1 4.51 s
+  replicate 11 ok attempt 1 4.59 s
+  replicate 5 ok attempt 1 4.69 s
+  replicate 18 ok attempt 1 4.71 s
+  replicate 17 ok attempt 1 4.73 s
+  replicate 3 ok attempt 1 4.82 s
+{"B": 20, "ok": 20, "unresolved_failures": 0, "boundary_solutions": 20, "seconds_total": 73.55}

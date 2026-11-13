@@ -552,3 +552,34 @@ Also found, not changed: the registry site `app.R:835` of `hypno_lrc_percent` al
 **Verification.** 2026-11-12, working tree on base `52f0d3b` (uncommitted, so the suite marker is not written): `Rscript tools/run_tests.R` gave 6,786 expectations, 0 failed, 0 errors, 0 skipped (4.6.0 baseline: 6,701). `python3 -m pytest -q -m "not sampling" tests/python`: 324 passed, 1 skipped, 2 failed, the 2 failures being `test_early_tox_step5.py::test_run_identity_changes_with_each_defining_input` and `test_early_tox_step6.py::test_cache_without_identity_or_with_another_identity_is_refused`, which call `cmdstan_path()` and fail because this computer has no CmdStan installation (they do not touch the changed files). `python3 tools/build_model_methods.py --check`: current. `stale_constant_audit.py --project . --project-root . --strict`: 0 errors (31 constants). Local browser walkthrough `docs/development/2026_10_28_v4/walkthrough_v4.R`: 73 of 73 (`walkthrough/20261112_123953_local`), including every route to the page, the back link, rendered tables and equations, and the phone view. Every new test was seen red against the unchanged code or a mutation. Not deployed: the full suite must be rerun on the committed revision before `tools/deploy.R`, and deployment needs Igor Shuryak's approval.
 
 **Deployment.** 2026-11-12, on Igor Shuryak's instruction ("ok, deploy the current version"): revision `7ec2faf` passed `tools/run_tests.R` (6,786 expectations, 0 failed, suite marker for `7ec2faf`), was deployed with `Rscript tools/deploy.R` to https://ishuryak.shinyapps.io/custom_bed_calculator_v4/ (bundle 12814540, after the shinyapps.io token on this computer was renewed), and passed the live walkthrough (73 of 73, `docs/development/2026_10_28_v4/walkthrough/20261112_141555_live`). Rollback point: 4.6.0 at `c80f63b`.
+
+### 2026-11-12: version 4.6.2, the external review of 2026-11-12 (B01–B04), and the offline likelihood-based comparison (local, not deployed)
+
+**Changes published numbers: no.** Every draw file is byte-identical, and the defaults and lists are unchanged (69 doses by default, 9 in research mode). The likelihood-based comparison is a new offline analysis and changes nothing in the app. Records:
+
+- `docs/development/2026_11_12_frequentist_review_response.md` (finding by finding);
+- `docs/development/2026_11_12_frequentist_comparison_plan.md` (revision 3);
+- `docs/development/2026_11_12_frequentist_comparison_results.md`.
+
+The review itself is in `docs/development/2026_11_12_frequentist_review/`.
+
+| Change | What was wrong (proof) | Test (red without the change) | What it moves |
+|---|---|---|---|
+| B01 Typed, finite validation of early-fit diagnostics (exporter and loader); exact evaluator ID; well-formed identities | The exporter accepted R-hat −Inf and ESS +Inf. The loader accepted `early-bed-fit-10`, ESS "unavailable", R-hat −1 and a missing model ID (all reproduced before the fix) | `tests/python/test_early_tox_export.py::test_non_finite_or_mistyped_diagnostics_refuse` (13 cases); `tests/testthat/test_v462_review.R` B01 blocks | Nothing for valid packages |
+| B02 The methods record is built and checked from the draw files' actual bytes; the loader validates every field it reads; deploy runs `check_methods_record()` | Changing a draw value without its manifest left `build_model_methods.py --check` reporting "current" | `tests/python/test_model_methods.py::test_a_changed_draw_file_is_refused_even_with_its_manifest_untouched`, `::test_unpaired_or_short_tumor_draws_are_refused`; `test_v462_review.R` B02 blocks | `draws/model_methods.json` source hashes |
+| B03 HYPNO: 753/792 evaluable (HFX 373, NFX 380) and the printed assessment schedule (pp. 391 and 394) | The trial table said "randomized and treated" and "follow-up after RT not stated" | `tests/python/test_early_tox_export.py::test_hypno_population_and_assessment_match_the_report`; `test_v462_review.R` B03 replay block | Trial-table text and the package hash. Counts unchanged. 4.6.0/4.6.1 scenarios still replay exactly |
+| B04 The methods page shows the smooth tumor hinge smax and the exact early hinge | The page showed max(0, T − Tk) for a fit that uses smax (0.23 days at onset) | `test_v462_review.R` "B04: the page shows smax…" | Text only |
+| Likelihood-based comparison engine (`fit/frequentist/`) | New. Plan revision 2 had a sign error in its reference value (131.29, not 10553.5), an unsupported quadrature claim (fixed-node error −6.87 log units) and an impossible recovery test. The first engine draft's mode search cycled on a real arm (integral 114 log units too low) | `tests/python/test_frequentist.py`, 37 tests. 13 deliberate mutations each turn a test red (`docs/development/2026_11_12_frequentist_review/mutation_checks.json`) | Nothing in the app. Results are in the record above |
+
+**Verification.** 2026-11-12, working tree after the Phase 2 commit `c156fbc`:
+
+- `testthat::test_dir("tests/testthat")` in the release library: 6,860 expectations, 0 failed, 0 errors.
+- `python3 -m pytest -m "not sampling" tests/python`: 346 passed.
+- `stale_constant_audit.py --strict`: 0 errors.
+- `sim_provenance.py validate`: registry OK.
+
+The frequentist full run, at revision `4a639ce`:
+
+- 1,000 of 1,000 tumor and 500 of 500 early bootstrap replicates converged.
+- The R cross-checks passed (`fit/output_frequentist/r_check/r_check.json`).
+- The pilot, killed and resumed, reproduced its uninterrupted records exactly.
