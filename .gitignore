@@ -45,3 +45,6 @@ docs/development/2026_11_10_early_toxicity/step6_review/cache/
 # large per-unit draws kept locally (hashed in each manifest); primary units are committed
 docs/development/2026_11_10_early_toxicity/step5_review/binomial/*/draws.csv.gz
 docs/development/2026_11_10_early_toxicity/step5_review/overdispersed/L_*/draws.csv.gz
+
+# Frequentist comparison: scratch output of the R cross-check test (fit/frequentist/r_check.py)
+fit/output_frequentist/_t6_test/
