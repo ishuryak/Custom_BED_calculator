@@ -583,3 +583,11 @@ The frequentist full run, at revision `4a639ce`:
 - 1,000 of 1,000 tumor and 500 of 500 early bootstrap replicates converged.
 - The R cross-checks passed (`fit/output_frequentist/r_check/r_check.json`).
 - The pilot, killed and resumed, reproduced its uninterrupted records exactly.
+
+**Deployment.** 2026-11-12, on Igor Shuryak's instruction ("yes, push and deploy"):
+
+- `frequentist_review_2026_11_12` was pushed and `v4` fast-forwarded to `f3d2865`.
+- `f3d2865` passed `tools/run_tests.R` (6,860 expectations, 0 failed; suite marker for `f3d2865`).
+- It was deployed with `Rscript tools/deploy.R` to https://ishuryak.shinyapps.io/custom_bed_calculator_v4/.
+- The live walkthrough `docs/development/2026_10_28_v4/walkthrough_v4.R --live` gave 73 of 73 checks the same day, with version 4.6.2 shown and the smooth hinge visible on the methods page. Screenshots: `walkthrough/20261112_230402_live/`.
+- Rollback point: 4.6.1 at `7ec2faf`.
