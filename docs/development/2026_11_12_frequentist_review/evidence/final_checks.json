@@ -1,0 +1,17 @@
+{
+  "tracked_files": 1542,
+  "changed_original_vs_snapshot": [],
+  "plans": {
+    "2026_11_12_frequentist_comparison_plan.md": {
+      "sha256": "44d2324f5e7820d9b9155cef43c17f8d5d32bc09e5d25623f3c369c95a0cf292",
+      "matches_capture": true
+    },
+    "2026_11_12_frequentist_comparison_plan_audit.md": {
+      "sha256": "c1b445873cdb7c7026d727b960c247216326c5e1321dbce567f8002defd95deb",
+      "matches_capture": true
+    }
+  },
+  "DT_original_files": 368,
+  "DT_local_files": 368,
+  "DT_byte_identical": true
+}

@@ -1,0 +1,6 @@
+unchanged positive exit 0 draws/model_methods.json is current
+changed tumor_di_primary.csv column alpha file hash altered True
+changed draw bytes methods check exit 0 draws/model_methods.json is current
+changed early_fit_draws.csv column r_e file hash altered True
+changed draw bytes methods check exit 0 draws/model_methods.json is current
+changed scientific model negative exit 1 REFUSED: the early fit's identity does not reproduce from the current data, settings, priors and Stan model

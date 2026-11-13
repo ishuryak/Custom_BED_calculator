@@ -1,0 +1,3 @@
+positive real cache identity reproduced and loaded 4000 draws
+old changed-array defect refused TEMP\candidate__all_primary.npz: bytes or identity differ from cache_manifest.json; refusing to reuse
+Native NumPy 1.26.4 used for arrays; fit metadata version used only for deterministic hash reconstruction

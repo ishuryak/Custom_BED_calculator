@@ -1,0 +1,14 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+[1] "LC_COLLATE=English_United States.utf8;LC_CTYPE=English_United States.utf8;LC_MONETARY=English_United States.utf8;LC_NUMERIC=C;LC_TIME=English_United States.utf8"
+{
+  "file_exists": true,
+  "file_access": -1,
+  "direct_read_sha256": "51ed5d8a2cc60acb86feb2ca694132ed775c797f0e64afccc14714517caa8409",
+  "manifest_sha256": "51ed5d8a2cc60acb86feb2ca694132ed775c797f0e64afccc14714517caa8409",
+  "hash_matches": true,
+  "recorded_gates": [true, true, true, true]
+}

@@ -1,0 +1,420 @@
+{
+  "target": "C:\\Users\\ishur\\OneDrive\\Desktop\\Office\\HNSCC_BED_calculator\\Custom_BED_calculator_v45",
+  "plan_files": {
+    "2026_11_12_frequentist_comparison_plan.md": {
+      "sha256": "44d2324f5e7820d9b9155cef43c17f8d5d32bc09e5d25623f3c369c95a0cf292",
+      "bytes": 14917
+    },
+    "2026_11_12_frequentist_comparison_plan_audit.md": {
+      "sha256": "c1b445873cdb7c7026d727b960c247216326c5e1321dbce567f8002defd95deb",
+      "bytes": 12230
+    }
+  },
+  "single_arm_quadrature": [
+    {
+      "case": "tumor largest arm",
+      "N": 750,
+      "y": 525,
+      "eta": -1.0309304331587228,
+      "sigma": 0.05,
+      "link": "cloglog_control",
+      "quad_loglik": -3.6703392908554817,
+      "quad_estimated_relative_error": 1.8306894253423788e-13,
+      "adaptive_GH30_error": 3.1086244689504383e-15,
+      "gh": {
+        "20": {
+          "loglik": -3.6703392908554684,
+          "error": 1.3322676295501878e-14
+        },
+        "30": {
+          "loglik": -3.6703392908555066,
+          "error": -2.4868995751603507e-14
+        },
+        "60": {
+          "loglik": -3.6703392908555075,
+          "error": -2.5757174171303632e-14
+        },
+        "120": {
+          "loglik": -3.6703392908554937,
+          "error": -1.199040866595169e-14
+        }
+      }
+    },
+    {
+      "case": "tumor largest arm",
+      "N": 750,
+      "y": 525,
+      "eta": -1.0309304331587228,
+      "sigma": 0.25,
+      "link": "cloglog_control",
+      "quad_loglik": -4.799961515988503,
+      "quad_estimated_relative_error": 2.707035833597658e-13,
+      "adaptive_GH30_error": 1.9539925233402755e-14,
+      "gh": {
+        "20": {
+          "loglik": -4.936830334902588,
+          "error": -0.13686881891408476
+        },
+        "30": {
+          "loglik": -4.833914172436857,
+          "error": -0.03395265644835366
+        },
+        "60": {
+          "loglik": -4.800508791453879,
+          "error": -0.0005472754653759182
+        },
+        "120": {
+          "loglik": -4.799961508279834,
+          "error": 7.70866925847713e-09
+        }
+      }
+    },
+    {
+      "case": "tumor largest arm",
+      "N": 750,
+      "y": 525,
+      "eta": -1.0309304331587228,
+      "sigma": 1.0,
+      "link": "cloglog_control",
+      "quad_loglik": -6.153702023801557,
+      "quad_estimated_relative_error": 1.161966929657099e-14,
+      "adaptive_GH30_error": 5.329070518200751e-15,
+      "gh": {
+        "20": {
+          "loglik": -16.74868819718888,
+          "error": -10.594986173387323
+        },
+        "30": {
+          "loglik": -13.02525709235476,
+          "error": -6.871555068553203
+        },
+        "60": {
+          "loglik": -9.11191244356584,
+          "error": -2.958210419764283
+        },
+        "120": {
+          "loglik": -7.213497260085433,
+          "error": -1.0597952362838754
+        }
+      }
+    },
+    {
+      "case": "DAHANCA7_6F",
+      "N": 398,
+      "y": 269,
+      "eta": 0.7348989752401671,
+      "sigma": 0.05,
+      "link": "logit",
+      "quad_loglik": -3.2522979225075703,
+      "quad_estimated_relative_error": 3.890475439508495e-13,
+      "adaptive_GH30_error": 1.7763568394002505e-15,
+      "gh": {
+        "20": {
+          "loglik": -3.2522979225075637,
+          "error": 6.661338147750939e-15
+        },
+        "30": {
+          "loglik": -3.2522979225075743,
+          "error": -3.9968028886505635e-15
+        },
+        "60": {
+          "loglik": -3.2522979225075734,
+          "error": -3.1086244689504383e-15
+        },
+        "120": {
+          "loglik": -3.252297922507567,
+          "error": 3.1086244689504383e-15
+        }
+      }
+    },
+    {
+      "case": "DAHANCA7_6F",
+      "N": 398,
+      "y": 269,
+      "eta": 0.7348989752401671,
+      "sigma": 0.25,
+      "link": "logit",
+      "quad_loglik": -4.085205089955901,
+      "quad_estimated_relative_error": 5.932241675069678e-13,
+      "adaptive_GH30_error": 3.552713678800501e-15,
+      "gh": {
+        "20": {
+          "loglik": -4.088561630607842,
+          "error": -0.003356540651941131
+        },
+        "30": {
+          "loglik": -4.0853510238760995,
+          "error": -0.00014593392019879303
+        },
+        "60": {
+          "loglik": -4.085205098346953,
+          "error": -8.391052297440638e-09
+        },
+        "120": {
+          "loglik": -4.0852050899559105,
+          "error": -9.769962616701378e-15
+        }
+      }
+    },
+    {
+      "case": "DAHANCA7_6F",
+      "N": 398,
+      "y": 269,
+      "eta": 0.7348989752401671,
+      "sigma": 1.0,
+      "link": "logit",
+      "quad_loglik": -5.392732535928346,
+      "quad_estimated_relative_error": 7.117782012011137e-13,
+      "adaptive_GH30_error": -9.769962616701378e-15,
+      "gh": {
+        "20": {
+          "loglik": -9.013954512164258,
+          "error": -3.621221976235912
+        },
+        "30": {
+          "loglik": -7.4965654648191755,
+          "error": -2.1038329288908297
+        },
+        "60": {
+          "loglik": -6.081613068762372,
+          "error": -0.688880532834026
+        },
+        "120": {
+          "loglik": -5.53207598942201,
+          "error": -0.13934345349366417
+        }
+      }
+    }
+  ],
+  "outer_family_quadrature": [
+    {
+      "family": "RTOG0129",
+      "N": [
+        361,
+        360
+      ],
+      "y": [
+        141,
+        119
+      ],
+      "eta": [
+        -0.4448676559741933,
+        -0.7056734403791256
+      ],
+      "tau": 0.5,
+      "sigma_arm": 0,
+      "quad_loglik": -8.128280798730488,
+      "quad_estimated_relative_error": 4.271135772824556e-13,
+      "adaptive_GH20_error": -7.105427357601002e-15,
+      "gh": {
+        "20": {
+          "loglik": -9.39464252616749,
+          "error": -1.2663617274370012
+        },
+        "40": {
+          "loglik": -8.477488789120523,
+          "error": -0.3492079903900347
+        },
+        "80": {
+          "loglik": -8.174229944874545,
+          "error": -0.045949146144057096
+        },
+        "160": {
+          "loglik": -8.129319010944709,
+          "error": -0.001038212214220735
+        }
+      }
+    },
+    {
+      "family": "RTOG0129",
+      "N": [
+        361,
+        360
+      ],
+      "y": [
+        141,
+        119
+      ],
+      "eta": [
+        -0.4448676559741933,
+        -0.7056734403791256
+      ],
+      "tau": 1.0,
+      "sigma_arm": 0,
+      "quad_loglik": -8.812489171689503,
+      "quad_estimated_relative_error": 4.673678105865556e-12,
+      "adaptive_GH20_error": 7.105427357601002e-15,
+      "gh": {
+        "20": {
+          "loglik": -16.786511912633845,
+          "error": -7.974022740944342
+        },
+        "40": {
+          "loglik": -12.245373051806473,
+          "error": -3.43288388011697
+        },
+        "80": {
+          "loglik": -10.080082919797114,
+          "error": -1.2675937481076112
+        },
+        "160": {
+          "loglik": -9.155058015922963,
+          "error": -0.34256884423346
+        }
+      }
+    },
+    {
+      "family": "RTOG0129",
+      "N": [
+        361,
+        360
+      ],
+      "y": [
+        141,
+        119
+      ],
+      "eta": [
+        -0.4448676559741933,
+        -0.7056734403791256
+      ],
+      "tau": 2.0,
+      "sigma_arm": 0,
+      "quad_loglik": -9.503376398643862,
+      "quad_estimated_relative_error": 3.8803724978396506e-13,
+      "adaptive_GH20_error": -3.552713678800501e-15,
+      "gh": {
+        "20": {
+          "loglik": -44.41664816378041,
+          "error": -34.91327176513654
+        },
+        "40": {
+          "loglik": -26.881481044511634,
+          "error": -17.378104645867772
+        },
+        "80": {
+          "loglik": -17.605913900274487,
+          "error": -8.102537501630625
+        },
+        "160": {
+          "loglik": -12.957779762720104,
+          "error": -3.454403364076242
+        }
+      }
+    }
+  ],
+  "early_T4_rounding": [
+    {
+      "schedule": [
+        15,
+        3.5
+      ],
+      "terms": [
+        -17.5,
+        44.138307281135155,
+        -28.0
+      ],
+      "max_abs_error": 1.5079403093309907e-05,
+      "n_exceed_1e_minus6": 3397,
+      "row_worst": 1137,
+      "max_relative_error": 1.2662370069973685e-05
+    },
+    {
+      "schedule": [
+        20,
+        2.75
+      ],
+      "terms": [
+        -15.0,
+        11.349849952414132,
+        -21.0
+      ],
+      "max_abs_error": 1.3264180612537757e-05,
+      "n_exceed_1e_minus6": 3091,
+      "row_worst": 32,
+      "max_relative_error": 3.0531830629690724e-05
+    },
+    {
+      "schedule": [
+        25,
+        2.4
+      ],
+      "terms": [
+        -10.0,
+        4.03550203710941,
+        -14.0
+      ],
+      "max_abs_error": 6.399647763832839e-06,
+      "n_exceed_1e_minus6": 2648,
+      "row_worst": 3977,
+      "max_relative_error": 3.163661253425031e-05
+    },
+    {
+      "schedule": [
+        30,
+        2.2
+      ],
+      "terms": [
+        -4.0,
+        5.246153141911179,
+        -7.0
+      ],
+      "max_abs_error": 3.43016191067802e-06,
+      "n_exceed_1e_minus6": 1505,
+      "row_worst": 454,
+      "max_relative_error": 1.1190281380181392e-05
+    }
+  ],
+  "T5_oracle_family_SD": {
+    "J": 22,
+    "assumption": "22 iid Normal(mu,tau^2) effects observed exactly, unknown mean, MLE SD",
+    "tau_hat_over_tau_95_interval": [
+      0.6836698360028254,
+      1.2699118778612386
+    ],
+    "probability_within_2_percent": 0.10116677421911457
+  },
+  "flat_prior_skew_counterexample": {
+    "model": "one exponential waiting time y=1; likelihood lambda*exp(-lambda), flat prior on positive rate",
+    "mle_and_posterior_mode": 1.0,
+    "posterior_median": 1.6783469900166612
+  },
+  "percentile_order_MC": {
+    "500": {
+      "expected_order_at_025": 12.5,
+      "95_binomial_count_range": [
+        6.0,
+        20.0
+      ]
+    },
+    "1000": {
+      "expected_order_at_025": 25.0,
+      "95_binomial_count_range": [
+        16.0,
+        35.0
+      ]
+    }
+  },
+  "previous_verified_math_inputs": {
+    "tools/early_tox/evaluator.py": {
+      "same_normalized_content": true,
+      "sha256_current": "393be9aede47f21a8c493003a732e5f38a5e52ed746b4a293f217d025a4a88f9"
+    },
+    "tools/early_tox/step5_model.stan": {
+      "same_normalized_content": true,
+      "sha256_current": "dd1a88d196cb09103520310625485d04bb9624bec186f1bd6ccfd9d840f0c636"
+    },
+    "data/early_tox/arm_fractions.csv": {
+      "same_normalized_content": true,
+      "sha256_current": "66748adba88652275c4ca545942ef81ecbda320986e8944fb3ad9a404da0733c"
+    },
+    "data/early_tox/outcomes.csv": {
+      "same_normalized_content": true,
+      "sha256_current": "70d8e44c79bc8f59f85a000b6b302c2ef6b5c14b43af27940aadb31c83351de9"
+    },
+    "draws/early_fit_draws.csv": {
+      "same_normalized_content": true,
+      "sha256_current": "a6fde4626c88a1872a84408d66e78ddd1460cdabb98734d06427ce186f07b4fd"
+    }
+  },
+  "current_primary_stan_input_equals_previous_verified": true
+}

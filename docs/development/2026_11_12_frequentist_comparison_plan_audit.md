@@ -1,5 +1,15 @@
 # Audit: plan for likelihood-only refits of the tumor DI and acute-mucositis models
 
+> **Superseded on 2026-11-12 by plan revision 3.** An external review of this audit and of plan revision 2 (`docs/development/2026_11_12_frequentist_review/`) found that four of its conclusions were wrong, and revision 3 corrects them:
+>
+> - **Finding 2 had the sign backwards.** The archived 5342.4066 is a negative log-likelihood without log C(N, y), so the full value is 5342.4066 − 5211.1155 = **131.2911**. Adding the constant gives 10553.5.
+> - **Finding 4's recovery idea was invalid.** Multiplying N on the same design cannot recover variance components, because it leaves the same 21–22 realized effects.
+> - **The quadrature claim was unsupported.** Ordinary 30-node Gauss–Hermite is off by up to −6.9 log units on these trial sizes, so revision 3 uses adaptive quadrature with a convergence ladder.
+> - **Finding 3 overstated the prior attribution.** A maximum-likelihood estimate and a posterior median also differ in how nuisance parameters are handled, in summary type and in support, not only "by exactly the prior effect".
+>
+> The rest is kept as the record of what revision 2 was reviewed against.
+
+
 Date: 2026-11-12. Audited file: `2026_11_12_frequentist_comparison_plan.md` (first draft, same day).
 Framework: `~/.claude/methods-audit/METHODS_AUDIT_INSTRUCTIONS.md` (six factors), in the actionable format (finding, fix, test, verification, order). Single-context review, no subagents.
 

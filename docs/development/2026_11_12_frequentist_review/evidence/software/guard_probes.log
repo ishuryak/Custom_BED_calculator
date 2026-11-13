@@ -1,0 +1,16 @@
+valid 4-chain gate True
+NaN at each chain position [False, False, False, False]
+Inf at each chain position [False, False, False, False]
+wrong chain count accepted False
+old incomplete manifest problem smoke is not a boolean
+old grade1 endpoint problem endpoint 'other: grade 1 mucositis' is not an accepted equivalent of class grade_3_4_mucositis (no standard pairing or recorded equivalence)
+export source U02 accepted
+export source U04 refused SOURCE_UNITS\U04: not the approved primary profile (settings = {'Tk': 21.0, 'use_od': 1}, expected {'use_od': 1}); refusing to export it under the primary description
+export source U15 refused SOURCE_UNITS\U15: not the approved primary profile (settings = {'adequate_only': True, 'use_od': 1}, expected {'use_od': 1}); refusing to export it under the primary description
+export source U17 refused SOURCE_UNITS\U17: not the approved primary profile (settings = {'halftime_h': 2.0, 'use_od': 1}, expected {'use_od': 1}); refusing to export it under the primary description
+export source U19 refused SOURCE_UNITS\U19: not the approved primary profile (settings = {'halftime_h': 'complete', 'use_od': 1}, expected {'use_od': 1}); refusing to export it under the primary description
+export nonfinite gate metadata accepted True
+retained recheck rows 114 checked 114 passed 111
+recorded failures ['step5_review/binomial/U01', 'step5_review/binomial/U05', 'step5_review/binomial/U07']
+recheck energy complete finite True minimum 0.6525243985397455
+No raw chains or sampling rechecked in this harness.

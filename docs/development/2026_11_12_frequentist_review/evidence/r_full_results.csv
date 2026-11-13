@@ -1,0 +1,379 @@
+"file","context","test","nb","failed","skipped","error","warning","user","system","real","passed"
+"test_app_server.R","app_server","default inputs render results, comparisons and suggestions",14,0,FALSE,FALSE,0,4.22,0.66,6.33,14
+"test_app_server.R","app_server","DD rate 0: warning on both tabs, no NaN, no NA rows",7,0,FALSE,FALSE,0,2.4,0.47,2.91,7
+"test_app_server.R","app_server","DI rate 0 is treated as no repopulation, without a warning",2,0,FALSE,FALSE,0,1.61,0.4,2.01,2
+"test_app_server.R","app_server","inputs are validated with readable messages",3,0,FALSE,FALSE,0,3.75,0.44,4.25,3
+"test_app_server.R","app_server","typed overall times cannot be shorter than the calendar allows",4,0,FALSE,FALSE,0,7.36,0.78,8.24,4
+"test_app_server.R","app_server","reference overall time follows the reference fractions",3,0,FALSE,FALSE,0,2.27,0.41,2.69,3
+"test_app_server.R","app_server","Fowler limit option and chemotherapy change the early cap",4,0,FALSE,FALSE,0,2.78,0.33,3.12,4
+"test_app_server.R","app_server","search inputs reach the search",4,0,FALSE,FALSE,0,3.92,0.51,4.56,4
+"test_app_server.R","app_server","download is a ZIP with full-precision results and a rerunnable scenario",9,0,FALSE,FALSE,0,2.14,0.42,2.69,9
+"test_app_server.R","app_server","every preset in the menu exists, and each one calibrates",11,0,FALSE,FALSE,0,7.13,0.859999999999999,8.03,11
+"test_app_server.R","app_server","allowed early excess reaches the search",2,0,FALSE,FALSE,0,2.19,0.37,2.63,2
+"test_app_server.R","app_server","a regimen equal to the reference is reported as the same",1,0,FALSE,FALSE,0,2.35,0.44,2.78,1
+"test_app_server.R","app_server","changed acute parameters disable the Fowler zone and limit",5,0,FALSE,FALSE,0,4.33,0.45,4.84,5
+"test_app_server.R","app_server","worst-case ranking with an unavailable DD model explains itself",1,0,FALSE,FALSE,0,1.71,0.43,2.16,1
+"test_app_server.R","app_server","negative BEDs are flagged",2,0,FALSE,FALSE,0,2.98,0.32,3.31,2
+"test_app_server.R","app_server","early BED unit follows the mucosal alpha/beta",2,0,FALSE,FALSE,0,2.5,0.44,3.02,2
+"test_app_server.R","app_server","empty-search hint does not suggest the criterion already chosen",3,0,FALSE,FALSE,0,3.22000000000001,0.49,3.67,3
+"test_app_server.R","app_server","an unavailable DD column reads 'not available'",3,0,FALSE,FALSE,0,3.08,0.640000000000001,3.81,3
+"test_app_server.R","app_server","comparison regimen does not move the DD model; only the anchor does",5,0,FALSE,FALSE,0,4.7,0.699999999999999,5.41999999999999,5
+"test_app_server.R","app_server","HYPNO acute and late limits reach the search",5,0,FALSE,FALSE,0,3,0.5,3.5,5
+"test_app_server.R","app_server","a negative minimum change (non-inferiority margin) is accepted",2,0,FALSE,FALSE,0,3.81999999999999,0.449999999999999,4.38000000000001,2
+"test_app_server.R","app_server","results show late BED at alpha/beta 2 and 4, and the sensitivity tab renders",7,0,FALSE,FALSE,0,2.77000000000001,0.460000000000001,3.25999999999999,7
+"test_app_server.R","app_server","search table shows which model credits each row and flags large fractions",2,0,FALSE,FALSE,0,2.22,0.31,2.57000000000001,2
+"test_app_server.R","app_server","HYHOPE benchmark row and HYPNO context are shown",2,0,FALSE,FALSE,0,2.56,0.359999999999999,2.97,2
+"test_app_server.R","app_server","Fenwick acute limit reaches the search and the Results tab",8,0,FALSE,FALSE,0,5.23999999999999,0.59,5.84999999999999,8
+"test_app_server.R","app_server","model agreement tab lists the regimens both models support against HYPNO",7,0,FALSE,FALSE,0,3.12,0.470000000000001,3.69000000000001,7
+"test_bed_models.R","bed_models","golden values: talk table (HNSCC_modeling_update.pptx slide 6)",4,0,FALSE,FALSE,0,0.0300000000000011,0,0.0300000000000011,4
+"test_bed_models.R","bed_models","DD equals v1 website at tumor alpha/beta = 10 wherever DD is calibratable",61,0,FALSE,FALSE,0,0.189999999999998,0.0299999999999994,0.240000000000009,61
+"test_bed_models.R","bed_models","all BEDs match the independent implementation over a parameter grid",240,0,FALSE,FALSE,0,0.390000000000001,0.0800000000000001,0.469999999999999,240
+"test_bed_models.R","bed_models","DD is calibrated to DI at the reference for every tumor alpha/beta (v1 is not)",47,0,FALSE,FALSE,0,0.129999999999995,0.109999999999999,0.230000000000004,47
+"test_bed_models.R","bed_models","overall time matches a day-by-day Mon-Fri calendar",81,0,FALSE,FALSE,0,0.0600000000000023,0.0800000000000001,0.169999999999987,81
+"test_bed_models.R","bed_models","early and late toxicity BEDs match hand calculations",8,0,FALSE,FALSE,0,0.00999999999999091,0,0.0200000000000102,8
+"test_bed_models.R","bed_models","DD calibration status: ok, no repopulation, infeasible",10,0,FALSE,FALSE,0,0.0500000000000114,0,0.0300000000000011,10
+"test_bed_models.R","bed_models","suggestions equal an independent brute-force search",387,0,FALSE,FALSE,0,4.73999999999999,0.23,5.05999999999999,387
+"test_bed_models.R","bed_models","default search returns non-trivial results, and none when impossible",5,0,FALSE,FALSE,0,0.0400000000000063,0.0199999999999996,0.0700000000000074,5
+"test_bed_models.R","bed_models","next_step names the limit the next dose step actually breaks",284,0,FALSE,FALSE,0,0.390000000000001,0.15,0.540000000000006,284
+"test_bed_models.R","bed_models","an infeasible DD model never leaks NA rows or DD criteria",20,0,FALSE,FALSE,0,0.109999999999999,0.0700000000000003,0.159999999999997,20
+"test_bed_models.R","bed_models","dose grid uses round multiples of the step",3,0,FALSE,FALSE,0,0.0499999999999972,0,0.0600000000000023,3
+"test_bed_models.R","bed_models","results stay finite over the allowed input box, including zero rates",64,0,FALSE,FALSE,0,0.609999999999999,0.279999999999999,0.879999999999995,64
+"test_bed_models.R","bed_models","smooth max helpers are inverse and do not overflow",3,0,FALSE,FALSE,0,0,0.00999999999999979,0.0300000000000011,3
+"test_bed_models.R","bed_models","Fowler zone, presets and benchmark regimens match their sources",15,0,FALSE,FALSE,0,0.0499999999999972,0,0.039999999999992,15
+"test_bed_models.R","bed_models","version 3: overall_time() stays the Mon-Fri closed form; other calendars go through `calendar`",4,0,FALSE,FALSE,0,0.0600000000000023,0,0.0700000000000074,4
+"test_bed_models.R","bed_models","empty searches say why",3,0,FALSE,FALSE,0,0.0300000000000011,0,0.0300000000000011,3
+"test_bed_models.R","bed_models","search range follows the reference number of fractions",5,0,FALSE,FALSE,0,0.00999999999999091,0,0.00999999999999091,5
+"test_bed_models.R","bed_models","preset matching recognizes presets and edited values",9,0,FALSE,FALSE,0,0,0.0299999999999994,0.0500000000000114,9
+"test_deploy_preflight.R","deploy_preflight","a clean tree, the pinned account and the branch's app name pass",1,0,FALSE,FALSE,0,0.019999999999996,0,0.0100000000000051,1
+"test_deploy_preflight.R","deploy_preflight","the first configured account is never used in place of the pinned one",1,0,FALSE,FALSE,0,0.0100000000000051,0.0400000000000009,0.0499999999999972,1
+"test_deploy_preflight.R","deploy_preflight","the live version 1 and version 2 sites and other app names are refused",7,0,FALSE,FALSE,0,0.0300000000000011,0.00999999999999979,0.0499999999999972,7
+"test_deploy_preflight.R","deploy_preflight","a revision the suite has not passed on is refused",5,0,FALSE,FALSE,0,0.0499999999999972,0.0199999999999996,0.0400000000000063,5
+"test_deploy_preflight.R","deploy_preflight","uncommitted tracked changes stop the deploy",1,0,FALSE,FALSE,0,0,0,0.019999999999996,1
+"test_deploy_preflight.R","deploy_preflight","deploy.R uses the preflight and the pinned account, not the first account",3,0,FALSE,FALSE,0,0.019999999999996,0.00999999999999979,0.0300000000000011,3
+"test_deploy_preflight.R","deploy_preflight","deploy.R titles the shinyapps.io app as version 4",1,0,FALSE,FALSE,0,0.0300000000000011,0,0.019999999999996,1
+"test_deploy_preflight.R","deploy_preflight",".Rhistory, .Renviron and the suite marker are neither tracked nor deployed",3,0,FALSE,FALSE,0,0.0100000000000051,0.0199999999999996,0.0400000000000063,3
+"test_deploy_preflight.R","deploy_preflight","the bundle check refuses a missing draws manifest and local-only files",5,0,FALSE,FALSE,0,0.0299999999999869,0.0899999999999999,0.109999999999999,5
+"test_deploy_preflight.R","deploy_preflight","the bundle check refuses files that are not tracked by git",4,0,FALSE,FALSE,0,0,0.0800000000000001,0.0799999999999983,4
+"test_deploy_preflight.R","deploy_preflight","the bundle check requires each linked document, present and not empty",6,0,FALSE,FALSE,0,0.0500000000000114,0.41,0.47999999999999,6
+"test_deploy_preflight.R","deploy_preflight","the deploy tools library is created before it is put on the library path",5,0,FALSE,FALSE,0,0,0.0700000000000003,0.0800000000000125,5
+"test_deploy_preflight.R","deploy_preflight","the bundle check requires files only, and the early-toxicity summary",5,0,FALSE,FALSE,0,0.019999999999996,0.110000000000001,0.129999999999995,5
+"test_deploy_preflight.R","deploy_preflight","the bundle check requires the methods page text and record, present and not empty",8,0,FALSE,FALSE,0,0.179999999999993,0.35,0.530000000000001,8
+"test_eric_feedback.R","eric_feedback","negative BEDs cannot meet the tumor threshold",14,0,FALSE,FALSE,0,4.21000000000001,0.629999999999999,4.86,14
+"test_eric_feedback.R","eric_feedback","uncertainty tab starts with both models",4,0,FALSE,FALSE,0,0.450000000000003,0.199999999999999,0.659999999999997,4
+"test_eric_feedback.R","eric_feedback","source link uses the deployed commit",7,0,FALSE,FALSE,0,0.420000000000002,0.130000000000003,0.569999999999993,7
+"test_v21_changes.R","v21_changes","acute BED follows Fowler's elapsed-day convention (Fowler 2003, 2010)",7,0,FALSE,FALSE,0,0.039999999999992,0.0199999999999996,0.0600000000000023,7
+"test_v21_changes.R","v21_changes","the low-level acute function keeps its time on the model clock",1,0,FALSE,FALSE,0,0.0200000000000102,0,0.019999999999996,1
+"test_v21_changes.R","v21_changes","the DD anchor is separate from the comparison regimen",6,0,FALSE,FALSE,0,0.0300000000000011,0.0300000000000011,0.0600000000000023,6
+"test_v21_changes.R","v21_changes","Withers preset follows the tumor alpha/beta",5,0,FALSE,FALSE,0,0.0599999999999881,0,0.0600000000000023,5
+"test_v21_changes.R","v21_changes","source presets carry their published values and clocks",11,0,FALSE,FALSE,0,0.0500000000000114,0,0.0499999999999972,11
+"test_v21_changes.R","v21_changes","a negative reference BED blocks that endpoint",4,0,FALSE,FALSE,0,0.0300000000000011,0,0.0200000000000102,4
+"test_v21_changes.R","v21_changes","search rows say which model credits them, and flag fraction sizes beyond precedent",5,0,FALSE,FALSE,0,0.0599999999999881,0,0.0799999999999983,5
+"test_v21_changes.R","v21_changes","search counts under the corrected clock (Review B fixtures)",6,0,FALSE,FALSE,0,0.13000000000001,0.0100000000000016,0.11999999999999,6
+"test_v21_changes.R","v21_changes","absolute late cap (HYPNO 55/20) is honored",3,0,FALSE,FALSE,0,0.0499999999999972,0.0199999999999996,0.0600000000000023,3
+"test_v21_changes.R","v21_changes","background growth g subtracts gT/alpha in both models and keeps the calibration",4,0,FALSE,FALSE,0,0.0100000000000051,0.0199999999999996,0.019999999999996,4
+"test_v21_changes.R","v21_changes","late comparison of 20 x 2.9 Gy reverses between alpha/beta 3 and 2",4,0,FALSE,FALSE,0,0,0.00999999999999801,0.0300000000000011,4
+"test_v21_changes.R","v21_changes","an exported scenario reruns to the same rows",6,0,FALSE,FALSE,0,0.0999999999999943,0.0300000000000011,0.109999999999999,6
+"test_v22_fenwick.R","v22_fenwick","Fenwick boundary reproduces the published formula and its domain",5,0,FALSE,FALSE,0,0.0300000000000011,0,0.0300000000000011,5
+"test_v22_fenwick.R","v22_fenwick","the Fenwick option replaces the early cap in the search",5,0,FALSE,FALSE,0,0.0799999999999983,0,0.0600000000000023,5
+"test_v22_review_fixes.R","v22_review_fixes","an unusable model shows no difference and does not enter the score",6,0,FALSE,FALSE,0,0.0799999999999983,0.0100000000000016,0.0800000000000125,6
+"test_v22_review_fixes.R","v22_review_fixes","both models negative gives its own reason",1,0,FALSE,FALSE,0,0,0.0199999999999996,0.019999999999996,1
+"test_v22_review_fixes.R","v22_review_fixes","a candidate with a negative DD BED cannot qualify on DD",4,0,FALSE,FALSE,0,0.0499999999999972,0.0199999999999996,0.0799999999999983,4
+"test_v22_review_fixes.R","v22_review_fixes","sensitivity rows use their own tumor alpha/beta",2,0,FALSE,FALSE,0,0.0600000000000023,0.0100000000000016,0.0600000000000023,2
+"test_v22_review_fixes.R","v22_review_fixes","exports with absolute caps and the Fenwick option rerun exactly",12,0,FALSE,FALSE,0,0.399999999999991,0,0.390000000000001,12
+"test_v22_review_fixes.R","v22_review_fixes","scenario ID ignores interface context but not search settings",2,0,FALSE,FALSE,0,0.0800000000000125,0.0199999999999996,0.109999999999999,2
+"test_v23_defaults.R","v23_defaults","default tumor parameters are scenario D18",5,0,FALSE,FALSE,0,0.019999999999996,0.0199999999999996,0.0400000000000063,5
+"test_v23_defaults.R","v23_defaults","the default search uses the HYPNO acute limit and is not empty",4,0,FALSE,FALSE,0,0.0600000000000023,0,0.0699999999999932,4
+"test_v23_defaults.R","v23_defaults","the interface starts from these defaults",3,0,FALSE,FALSE,0,1.25,0.640000000000001,4.10000000000001,3
+"test_v24_agreement.R","v24_agreement","against HYPNO, both models support 17-19 fractions within -3 Gy10",12,0,FALSE,FALSE,0,0.140000000000001,0,0.159999999999997,12
+"test_v24_agreement.R","v24_agreement","no regimen is supported by both models without a loss",1,0,FALSE,FALSE,0,0,0.0199999999999996,0,1
+"test_v24_agreement.R","v24_agreement","scenario count drops when the margin is tighter than some scenarios allow",2,0,FALSE,FALSE,0,0.0799999999999983,0,0.0799999999999983,2
+"test_v24_agreement.R","v24_agreement","against 70/35, scenario counts need both models and long courses pass the DI onset",6,0,FALSE,FALSE,0,0.5,0.0300000000000011,0.560000000000002,6
+"test_v25_review_fixes.R","v25_review_fixes","F01: agreement counts only scenarios in which both comparisons are evaluable",7,0,FALSE,FALSE,0,0.100000000000009,0,0.0699999999999932,7
+"test_v25_review_fixes.R","v25_review_fixes","F01: the default agreement rows keep 15 evaluable scenarios out of 15",4,0,FALSE,FALSE,0,0.0900000000000034,0.0199999999999996,0.110000000000014,4
+"test_v25_review_fixes.R","v25_review_fixes","F01: sensitivity table hides deltas against a negative comparison BED",5,0,FALSE,FALSE,0,0.0499999999999972,0.0299999999999976,0.0799999999999983,5
+"test_v25_review_fixes.R","v25_review_fixes","F01: endpoint rule covers negative candidate, zero, unavailable and all-invalid",9,0,FALSE,FALSE,0,0.0300000000000011,0.0100000000000016,0.0499999999999972,9
+"test_v25_review_fixes.R","v25_review_fixes","F01: Sensitivity tab and its summary count evaluable scenarios only",3,0,FALSE,FALSE,0,1.88,0.5,2.40000000000001,3
+"test_v25_review_fixes.R","v25_review_fixes","F02: withdrawn claims are gone from the About page and the interface",30,0,FALSE,FALSE,0,0.150000000000006,0.129999999999999,0.289999999999992,30
+"test_v25_review_fixes.R","v25_review_fixes","N1: the D18 HYPNO statement is conditional on a cited dose-response slope",2,0,FALSE,FALSE,0,0.0300000000000011,0,0.0300000000000011,2
+"test_v25_review_fixes.R","v25_review_fixes","F02: before the DI onset, background growth still rewards a shorter course",6,0,FALSE,FALSE,0,2.91999999999999,0.620000000000001,3.56999999999999,6
+"test_v25_review_fixes.R","v25_review_fixes","F03: agreement does not depend on candidate-only inputs",5,0,FALSE,FALSE,0,9.36,0.77,10.21,5
+"test_v25_review_fixes.R","v25_review_fixes","F03: the candidate export does not depend on the Results regimen",2,0,FALSE,FALSE,0,2.49000000000001,0.330000000000002,2.85999999999999,2
+"test_v25_review_fixes.R","v25_review_fixes","F03: in fixed-anchor mode the sidebar comparison does not move the agreement",3,0,FALSE,FALSE,0,3.94,0.559999999999999,4.57999999999998,3
+"test_v25_review_fixes.R","v25_review_fixes","version 1 calibration is reproduced by entering the comparison regimen as the anchor",3,0,FALSE,FALSE,0,3.45,0.699999999999999,4.19,3
+"test_v25_review_fixes.R","v25_review_fixes","the UI has no legacy coupling switch and the anchor note explains the anchor",4,0,FALSE,FALSE,0,2.79999999999998,0.420000000000002,3.30000000000001,4
+"test_v25_review_fixes.R","v25_review_fixes","the preset menu explains the default and every preset",17,0,FALSE,FALSE,0,2.14000000000001,0.399999999999999,2.56,17
+"test_v25_review_fixes.R","v25_review_fixes","F03: an empty agreement explains its own reason",3,0,FALSE,FALSE,0,2.12,0.43,2.56,3
+"test_v25_review_fixes.R","v25_review_fixes","F04: the agreement analysis downloads and replays in a fresh process",11,0,FALSE,FALSE,0,2.57999999999998,0.5,3.69999999999999,11
+"test_v25_review_fixes.R","v25_review_fixes","F04: download names carry the app version and the analysis",2,0,FALSE,FALSE,0,0.159999999999997,0.100000000000001,0.27000000000001,2
+"test_v25_review_fixes.R","v25_review_fixes","F05: replay rejects unsupported model versions, hinge and clocks",13,0,FALSE,FALSE,0,0.0400000000000205,0.0299999999999976,0.0799999999999841,13
+"test_v25_review_fixes.R","v25_review_fixes","F05: schema 1 candidate files are refused by strict replay and migrated on request",3,0,FALSE,FALSE,0,0.0699999999999932,0,0.0400000000000205,3
+"test_v25_review_fixes.R","v25_review_fixes","F05: the scenario ID ignores key order but not scientific inputs",5,0,FALSE,FALSE,0,0.0300000000000011,0.0100000000000016,0.0499999999999829,5
+"test_v25_review_fixes.R","v25_review_fixes","F06: the HYPNO acute cap is labeled with the mucosal alpha/beta in use",3,0,FALSE,FALSE,0,3.75999999999999,0.609999999999999,4.39000000000001,3
+"test_v25_review_fixes.R","v25_review_fixes","F06: Fenwick is not described as an elapsed-day model",1,0,FALSE,FALSE,0,0.0200000000000102,0,0.0300000000000011,1
+"test_v25_review_fixes.R","v25_review_fixes","F06: the fraction-size flag names the benchmark set literally",2,0,FALSE,FALSE,0,2.65000000000001,0.330000000000002,2.94,2
+"test_v25_review_fixes.R","v25_review_fixes","N3: an infinite DD onset is shown as 'none'",3,0,FALSE,FALSE,0,1.92999999999998,0.389999999999997,2.31,3
+"test_v25_review_fixes.R","v25_review_fixes","Wide tables scroll horizontally instead of being cut off (walkthrough finding)",4,0,FALSE,FALSE,0,0.0100000000000193,0.0200000000000031,0.0300000000000011,4
+"test_v25_review_fixes.R","v25_review_fixes","F01: the Results and benchmark tables apply the validity rule too",6,0,FALSE,FALSE,0,3.23999999999998,0.559999999999999,3.85999999999999,6
+"test_v25_review_fixes.R","v25_review_fixes","N5: Results rows carry BED units",2,0,FALSE,FALSE,0,2.42000000000002,0.620000000000001,3.09999999999999,2
+"test_v25_review_fixes.R","v25_review_fixes","F06: the sensitivity record states inherited values",3,0,FALSE,FALSE,0,0.039999999999992,0,0.0300000000000011,3
+"test_v25_review_fixes.R","v25_review_fixes","F07: versions agree and source statements are current",8,0,FALSE,FALSE,0,0.0500000000000114,0,0.0499999999999829,8
+"test_v26_review_fixes.R","v26_review_fixes","R1: the conservative ranking never lists a regimen whose DD BED is not positive",8,0,FALSE,FALSE,0,0.0100000000000193,0.0199999999999996,0.00999999999999091,8
+"test_v26_review_fixes.R","v26_review_fixes","R1: a DD ranking with no evaluable DD returns an explicit reason, never an NA score",4,0,FALSE,FALSE,0,0,0.0199999999999996,0.0300000000000011,4
+"test_v26_review_fixes.R","v26_review_fixes","R1: all 16 criterion and ranking pairs list only rankable rows, best per fraction number",748,0,FALSE,FALSE,0,1.38,0.669999999999998,2.05000000000001,748
+"test_v26_review_fixes.R","v26_review_fixes","R1: the next-dose column names a ranking that becomes non-evaluable",2,0,FALSE,FALSE,0,0.00999999999999091,0,0,2
+"test_v26_review_fixes.R","v26_review_fixes","R1: default candidate rows are unchanged",7,0,FALSE,FALSE,0,0.0200000000000102,0,0.0199999999999818,7
+"test_v26_review_fixes.R","v26_review_fixes","R1: the app explains a search with no rankable regimen",3,0,FALSE,FALSE,0,3.5,0.560000000000002,4.11000000000001,3
+"test_v26_review_fixes.R","v26_review_fixes","R5: both ranges use the scenarios in which both models are evaluable",7,0,FALSE,FALSE,0,0.0799999999999841,0,0.0600000000000023,7
+"test_v26_review_fixes.R","v26_review_fixes","R5: all-invalid scenarios give NA ranges",3,0,FALSE,FALSE,0,0.0100000000000193,0,0.0300000000000011,3
+"test_v26_review_fixes.R","v26_review_fixes","R2: the Fenwick flag must be one true or false value",7,0,FALSE,FALSE,0,0.0499999999999829,0,0.0300000000000011,7
+"test_v26_review_fixes.R","v26_review_fixes","R2: enumerated fields, calibration and the grid size are validated",7,0,FALSE,FALSE,0,0.0500000000000114,0,0.0499999999999829,7
+"test_v26_review_fixes.R","v26_review_fixes","R2: agreement files cannot carry search fields that contradict the agreement",6,0,FALSE,FALSE,0,0.199999999999989,0.0299999999999976,0.230000000000018,6
+"test_v26_review_fixes.R","v26_review_fixes","R2: source hashes are read from the bytes and flag code changed since loading",4,0,FALSE,FALSE,0,0.0900000000000034,0.0600000000000023,0.169999999999987,4
+"test_v26_review_fixes.R","v26_review_fixes","R3: a version 2.4 file is refused by strict replay and reanalyzed only on request",12,0,FALSE,FALSE,0,0.0500000000000114,0,0.0300000000000011,12
+"test_v26_review_fixes.R","v26_review_fixes","R3: version 2.5 files need migration; unknown and Fenwick-2.1 files are refused",7,0,FALSE,FALSE,0,0.169999999999987,0,0.189999999999998,7
+"test_v26_review_fixes.R","v26_review_fixes","R4: the illustration reproduces the review's independent values",10,0,FALSE,FALSE,0,0.0200000000000102,0,0.0200000000000102,10
+"test_v26_review_fixes.R","v26_review_fixes","R4: the About page states the illustration's assumptions and no unconditional verdict",6,0,FALSE,FALSE,0,0.00999999999999091,0.0500000000000007,0.0600000000000023,6
+"test_v26_review_fixes.R","v26_review_fixes","R6: each analysis tab names its own comparison, anchor and numerical limits",16,0,FALSE,FALSE,0,2.55000000000001,0.469999999999999,3.03,16
+"test_v26_review_fixes.R","v26_review_fixes","R7: default narrative, preset wording, version footer and source records are current",15,0,FALSE,FALSE,0,1.07999999999998,0.280000000000001,1.41,15
+"test_v26_review_fixes.R","v26_review_fixes","R1/R7: versions agree across the code and DESCRIPTION",2,0,FALSE,FALSE,0,0.0100000000000193,0,0.00999999999999091,2
+"test_v27_colleague_review.R","v27_colleague_review","A: app.R builds its UI (a helper used by the UI must be defined at top level)",2,0,FALSE,FALSE,0,0.370000000000005,0.129999999999999,0.5,2
+"test_v27_colleague_review.R","v27_colleague_review","E2: the page opens with both models, the smaller change and +1 Gy",4,0,FALSE,FALSE,0,0.430000000000007,0.109999999999999,0.530000000000001,4
+"test_v27_colleague_review.R","v27_colleague_review","E4 (version 3): one caveat line on each of the Report card, Results, Search and Both-model screen tabs",18,0,FALSE,FALSE,0,0.430000000000007,0.210000000000001,0.75,18
+"test_v27_colleague_review.R","v27_colleague_review","E1 (version 3): the Model and sources page links the v3 source branch and the live version 2",4,0,FALSE,FALSE,0,1.98000000000002,0.32,2.34999999999999,4
+"test_v27_colleague_review.R","v27_colleague_review","E2: at the opening settings no candidate qualifies and the message explains it",8,0,FALSE,FALSE,0,4.76999999999998,0.699999999999999,5.56,8
+"test_v27_colleague_review.R","v27_colleague_review","E2: an allowed loss of 3 Gy lists three regimens in conservative order",7,0,FALSE,FALSE,0,4.89000000000001,0.5,5.41,7
+"test_v27_colleague_review.R","v27_colleague_review","E2: the either/larger screen is still available and unchanged",2,0,FALSE,FALSE,0,2.5,0.34,2.89000000000001,2
+"test_v27_colleague_review.R","v27_colleague_review","E2: with DD unavailable the DD-specific explanation is shown, not the generic one",2,0,FALSE,FALSE,0,3.13,0.530000000000001,3.69999999999999,2
+"test_v27_colleague_review.R","v27_colleague_review","E2 (version 3: explicit override): the both-model screen can take its own comparison, threshold and days",4,0,FALSE,FALSE,0,2.65000000000001,0.349999999999998,3.02000000000001,4
+"test_v27_colleague_review.R","v27_colleague_review","E3: agreement counts are labeled as selected parameter settings",4,0,FALSE,FALSE,0,2.16,0.400000000000002,2.56,4
+"test_v27_colleague_review.R","v27_colleague_review","E3: with invalid settings the denominator is the evaluable count, shown with the invalid count",1,0,FALSE,FALSE,0,1.82999999999998,0.41,2.22,1
+"test_v27_colleague_review.R","v27_colleague_review","E3: the Sensitivity summary qualifies what the settings are",6,0,FALSE,FALSE,0,3.78,0.379999999999999,4.22,6
+"test_v27_colleague_review.R","v27_colleague_review","D: compatible version 2.6 files replay to the same results",117,0,FALSE,FALSE,0,0.230000000000018,0.0300000000000011,0.289999999999992,117
+"test_v27_colleague_review.R","v27_colleague_review","D: a new export records the current version and the chosen settings (updated for version 3)",10,0,FALSE,FALSE,0,0.0300000000000011,0,0.0300000000000011,10
+"test_v27_colleague_review.R","v27_colleague_review","D: app and DESCRIPTION carry the same version",2,0,FALSE,FALSE,0,0.0199999999999818,0,0,2
+"test_v3_app.R","v3_app","one comparison and one threshold: the both-model screen follows the sidebar unless overridden",7,0,FALSE,FALSE,0,3.08000000000001,0.390000000000001,3.51999999999998,7
+"test_v3_app.R","v3_app","the banner names the evaluated regimen, the comparison, the threshold and the DD set-up",4,0,FALSE,FALSE,0,2.15000000000001,0.439999999999998,2.62,4
+"test_v3_app.R","v3_app","report card: values, named differences, limit status and the refit column",7,0,FALSE,FALSE,0,2.72,0.5,3.28999999999999,7
+"test_v3_app.R","v3_app","organ rows reach the report card, and blank organs are not assessed",3,0,FALSE,FALSE,0,3.13,0.479999999999997,3.66,3
+"test_v3_app.R","v3_app","fitted DD: the DD BED uses the fitted values, the anchor is not used",5,0,FALSE,FALSE,0,2.17000000000002,0.390000000000001,2.58000000000001,5
+"test_v3_app.R","v3_app","calendars: 6 fractions/week, a Thursday start and skipped days change the overall time",6,0,FALSE,FALSE,0,8.91,0.810000000000002,9.84,6
+"test_v3_app.R","v3_app","6 fractions/week also shapes the search grid",2,0,FALSE,FALSE,0,2.79999999999998,0.439999999999998,3.23999999999998,2
+"test_v3_app.R","v3_app","difference headers name the comparison and the unit; days, not weeks",6,0,FALSE,FALSE,0,3.03,0.450000000000003,3.56,6
+"test_v3_app.R","v3_app","each toxicity limit shows its value next to its control",3,0,FALSE,FALSE,0,3.08000000000001,0.359999999999999,3.5,3
+"test_v3_app.R","v3_app","organ limits entered as % of prescription restrict the search when chosen",6,0,FALSE,FALSE,0,6.97,0.660000000000004,7.80000000000001,6
+"test_v3_app.R","v3_app","schema 3 export: calendar and fitted DD replay exactly; a v2.6 file still replays",9,0,FALSE,FALSE,0,4.06999999999999,0.529999999999994,4.77999999999997,9
+"test_v3_app.R","v3_app","uncertainty module: summary, conditional TCP, search, and a ZIP that replays",9,0,FALSE,FALSE,0,2.31999999999999,0.470000000000006,2.82000000000005,9
+"test_v3_app.R","v3_app","under uncertainty the Fowler and Fenwick early limits are refused with a reason",1,0,FALSE,FALSE,0,1.93000000000001,0.359999999999999,2.31999999999999,1
+"test_v3_app.R","v3_app","the chemotherapy box says what it changes, and cisplatin weeks are context only",2,0,FALSE,FALSE,0,2.80000000000001,0.549999999999997,3.38999999999999,2
+"test_v3_app.R","v3_app","compare regimens lists the evaluated regimen, three entries and the benchmarks",4,0,FALSE,FALSE,0,2.51999999999998,0.350000000000001,2.89999999999998,4
+"test_v3_app.R","v3_app","verdict words use a 0.5 Gy tolerance",1,0,FALSE,FALSE,0,3.29000000000002,0.399999999999999,3.77000000000004,1
+"test_v3_app.R","v3_app","the refit preset values come from the draws, as medians of identified quantities",3,0,FALSE,FALSE,0,0.269999999999982,0.00999999999999801,0.269999999999982,3
+"test_v3_app.R","v3_app","README claim: at the version 3 defaults the both-model screen opens empty; HYPNO and -3 Gy restore 17-19 fractions",3,0,FALSE,FALSE,0,3.65000000000001,0.670000000000002,4.35000000000002,3
+"test_v3_oar_schedule.R","v3_oar_schedule","the default calendar reproduces the version 1/2 closed form for 1-80 fractions",1,0,FALSE,FALSE,0,0.0199999999999818,0,0.0299999999999727,1
+"test_v3_oar_schedule.R","v3_oar_schedule","6 fractions per week gives HYPNO's control arm, 33 fractions in 38 days",1,0,FALSE,FALSE,0,0,0,0,1
+"test_v3_oar_schedule.R","v3_oar_schedule","a Thursday start puts a weekend inside short courses",3,0,FALSE,FALSE,0,0.0100000000000193,0,0.0200000000000387,3
+"test_v3_oar_schedule.R","v3_oar_schedule","skipped days lengthen the course by the treatment days they remove",3,0,FALSE,FALSE,0,0.0199999999999818,0,0.00999999999999091,3
+"test_v3_oar_schedule.R","v3_oar_schedule","typed skipped days are parsed and checked",4,0,FALSE,FALSE,0,0.0100000000000193,0,0.0199999999999818,4
+"test_v3_oar_schedule.R","v3_oar_schedule","EQD2 and its inverse are consistent and fixed at 2 Gy per fraction",17,0,FALSE,FALSE,0,0.0699999999999932,0,0.0500000000000114,17
+"test_v3_oar_schedule.R","v3_oar_schedule","HYHOPE's 15-fraction cord limit of 37 Gy is EQD2 41.3 Gy at α/β 2 and 43.0 at 0.87 (plan section B4)",2,0,FALSE,FALSE,0,0,0,0.00999999999999091,2
+"test_v3_oar_schedule.R","v3_oar_schedule","fewer, larger fractions lower the physical limit of a 2-Gy-fraction constraint",2,0,FALSE,FALSE,0,0.00999999999999091,0.0200000000000031,0.0300000000000296,2
+"test_v3_oar_schedule.R","v3_oar_schedule","HYHOPE's three tables agree with one LQ EQD2 per organ within 7%",3,0,FALSE,FALSE,0,0.0200000000000102,0,0.0199999999999818,3
+"test_v3_oar_schedule.R","v3_oar_schedule","every HYHOPE mandatory value matches the protocol tables (pages 13-14)",3,0,FALSE,FALSE,0,0.00999999999999091,0,0.00999999999999091,3
+"test_v3_oar_schedule.R","v3_oar_schedule","every library row carries a source, page and quote",2,0,FALSE,FALSE,0,0.0200000000000102,0.00999999999999801,0.0300000000000296,2
+"test_v3_oar_schedule.R","v3_oar_schedule","bin-by-bin mean EQD2 of a linear differential DVH matches the analytic integral",3,0,FALSE,FALSE,0,1.44,0.019999999999996,1.46999999999997,3
+"test_v3_oar_schedule.R","v3_oar_schedule","cGy and Gy, % and cc are read; a uniform dose gives its own mean",4,0,FALSE,FALSE,0,2.28999999999999,0.0200000000000031,2.32999999999998,4
+"test_v3_oar_schedule.R","v3_oar_schedule","files with patient identifiers are refused without echoing them",3,0,FALSE,FALSE,0,0.0300000000000011,0,0.0200000000000387,3
+"test_v3_oar_schedule.R","v3_oar_schedule","oversize files and CSVs without units are refused",3,0,FALSE,FALSE,0,0.0500000000000114,0.00999999999999801,0.0600000000000023,3
+"test_v3_oar_schedule.R","v3_oar_schedule","blank inputs are 'not assessed', never a pass",2,0,FALSE,FALSE,0,0.0600000000000023,0,0.089999999999975,2
+"test_v3_oar_schedule.R","v3_oar_schedule","status words follow the converted limit, with a 5% band",3,0,FALSE,FALSE,0,0.0199999999999818,0,0.0199999999999818,3
+"test_v3_oar_schedule.R","v3_oar_schedule","organs without a verified QUANTEC constraint say so, and HYHOPE fills them",3,0,FALSE,FALSE,0,0,0.0200000000000031,0.0100000000000477,3
+"test_v3_oar_schedule.R","v3_oar_schedule","a mean dose entered as a number is flagged as converted as if uniform",1,0,FALSE,FALSE,0,0,0,0.0199999999999818,1
+"test_v3_oar_schedule.R","v3_oar_schedule","the alpha/beta flip check finds where the status changes",2,0,FALSE,FALSE,0,0.0500000000000114,0.00999999999999801,0.0500000000000114,2
+"test_v3_oar_schedule.R","v3_oar_schedule","the binding constraint is the one with the smallest relative margin",1,0,FALSE,FALSE,0,0.00999999999999091,0.0200000000000031,0.0299999999999727,1
+"test_v3_oar_schedule.R","v3_oar_schedule","the 2018 Table 1 file has 35 arms, 16 trials and 7283 patients, as the paper states",3,0,FALSE,FALSE,0,0,0.00999999999999801,0.00999999999999091,3
+"test_v3_uncertainty.R","v3_uncertainty","vectorized DI and DD agree with the scalar functions on 1000 random cases",2000,0,FALSE,FALSE,0,3.32999999999998,0.579999999999998,3.97999999999996,2000
+"test_v3_uncertainty.R","v3_uncertainty","one draw reproduces the deterministic fitted-DD and DI results of compute_all() exactly",4,0,FALSE,FALSE,0,0.0100000000000477,0.00999999999999801,0.0400000000000205,4
+"test_v3_uncertainty.R","v3_uncertainty","unevaluable draws are counted and never meet a criterion",4,0,FALSE,FALSE,0,0.0199999999999818,0,0.00999999999999091,4
+"test_v3_uncertainty.R","v3_uncertainty","shared draws: a regimen compared with itself has zero difference in every draw",2,0,FALSE,FALSE,0,0.0600000000000023,0.0300000000000011,0.0900000000000318,2
+"test_v3_uncertainty.R","v3_uncertainty","draws files match the manifest, and a changed file is refused",5,0,FALSE,FALSE,0,0.0699999999999932,0,0.0799999999999841,5
+"test_v3_uncertainty.R","v3_uncertainty","golden values: 50 shipped DI draws, HYPNO 55/20 vs 35 x 2 Gy (pinned 2026-10-26, draws 3.1)",1,0,FALSE,FALSE,0,0.00999999999999091,0.0399999999999991,0.0500000000000114,1
+"test_v3_uncertainty.R","v3_uncertainty","Monte Carlo: toxicity shares from two seeds agree within 4 standard errors",1,0,FALSE,FALSE,0,0.0300000000000296,0,0.0300000000000296,1
+"test_v3_uncertainty.R","v3_uncertainty","toxicity draws are reproducible and leave the caller's random stream untouched",3,0,FALSE,FALSE,0,0.0199999999999818,0,0.0199999999999818,3
+"test_v3_uncertainty.R","v3_uncertainty","conditional TCP: zero difference returns the control rate; more BED raises TCP",4,0,FALSE,FALSE,0,0,0.0300000000000011,0.00999999999999091,4
+"test_v3_uncertainty.R","v3_uncertainty","display rounding: shares to 5 points with open ends, BEDs to 0.5 Gy",2,0,FALSE,FALSE,0,0.00999999999999091,0,0.0100000000000477,2
+"test_v3_uncertainty.R","v3_uncertainty","the dose-per-fraction support of the tumor data is read from the data file",1,0,FALSE,FALSE,0,0.0199999999999818,0,0,1
+"test_v3_uncertainty.R","v3_uncertainty","the uncertainty search lists one regimen per fraction number by the stated rule and flags extrapolation",20,0,FALSE,FALSE,0,0.260000000000048,0.0500000000000043,0.329999999999984,20
+"test_v3_uncertainty.R","v3_uncertainty","OAR draw checker: a cord dose within the constraint at every alpha/beta passes every draw",4,0,FALSE,FALSE,0,0.0399999999999636,0.029999999999994,0.0600000000000023,4
+"test_v3_uncertainty.R","v3_uncertainty","the refit numbers quoted on the About page match the shipped draws",3,0,FALSE,FALSE,0,0.0400000000000205,0,0.0500000000000114,3
+"test_v31_stage_a.R","v31_stage_a","golden: D18 vs 35 x 2 Gy/47 d at -3 Gy lists 30/29/28 without organ limits and with a non-binding cord",2,0,FALSE,FALSE,0,4.5,0.480000000000004,5,2
+"test_v31_stage_a.R","v31_stage_a","S9: clearing an applied organ's alpha/beta blocks the search instead of dropping the cord limit",7,0,FALSE,FALSE,0,6.43000000000001,0.460000000000001,6.91000000000003,7
+"test_v31_stage_a.R","v31_stage_a","S9: an entered organ with no verified constraint in the library blocks an applied search",4,0,FALSE,FALSE,0,5.13999999999999,0.579999999999998,5.70999999999998,4
+"test_v31_stage_a.R","v31_stage_a","S9: the checkers refuse an organ without a constraint instead of passing it",2,0,FALSE,FALSE,0,0,0.00999999999999801,0.0400000000000205,2
+"test_v31_stage_a.R","v31_stage_a","S1: changing any effective input after the search invalidates the uncertainty results",50,0,FALSE,FALSE,0,28.28,2.94,31.78,50
+"test_v31_stage_a.R","v31_stage_a","S2 golden: HYPNO against itself with cord 100% applied has toxicity share 0, and the file replays as 0",52,0,FALSE,FALSE,0,7.03000000000003,0.979999999999997,7.97000000000003,52
+"test_v31_stage_a.R","v31_stage_a","S8: fixed-toxicity uncertainty uses the organ alpha/beta set on the Organs at risk tab",4,0,FALSE,FALSE,0,5.31999999999999,0.630000000000003,6.10000000000002,4
+"test_v31_stage_a.R","v31_stage_a","S8: one fixed draw gives the deterministic organ check at several alpha/beta values",3,0,FALSE,FALSE,0,0.0199999999999818,0,0.0399999999999636,3
+"test_v31_stage_a.R","v31_stage_a","S3: the deterministic README replays six-day, Thursday-start and organ scenarios in a clean R process",4,0,FALSE,FALSE,0,10.34,1.33,13.39,4
+"test_v31_stage_a.R","v31_stage_a","S4: replay refuses incompatible or malformed uncertainty metadata, and old 3.0 files",19,0,FALSE,FALSE,0,3.20999999999998,0.5,3.81,19
+"test_v31_stage_a.R","v31_stage_a","S4: the search part of an uncertainty file replays its listed rows and neighbors exactly",27,0,FALSE,FALSE,0,3.48000000000002,0.560000000000002,4.09000000000003,27
+"test_v31_stage_a.R","v31_stage_a","S5: both searches build candidates on the regular calendar; skipped days apply to the evaluated regimen",4,0,FALSE,FALSE,0,3.51999999999998,0.809999999999995,4.36000000000001,4
+"test_v31_stage_a.R","v31_stage_a","S7: the direct calendar API rejects fractional, missing, negative and out-of-range skipped days",13,0,FALSE,FALSE,0,0.0400000000000205,0.0200000000000031,0.0600000000000023,13
+"test_v31_stage_a.R","v31_stage_a","OAR-01: a parotid physical mean of 25 Gy in 35 fractions does not pass the 20 Gy physical goal",8,0,FALSE,FALSE,0,0.0799999999999841,0.0300000000000011,0.110000000000014,8
+"test_v31_stage_a.R","v31_stage_a","OAR-01: the search checks use the same physical mean comparison",2,0,FALSE,FALSE,0,0.0199999999999818,0.00999999999999801,0.0299999999999727,2
+"test_v31_stage_a.R","v31_stage_a","OAR-02: HYHOPE PRVs are organs of their own; a cord PRV above its limit is not hidden by the cord",3,0,FALSE,FALSE,0,0.00999999999999091,0.019999999999996,0.0300000000000296,3
+"test_v31_stage_a.R","v31_stage_a","OAR-02: HYHOPE's strict '<' limit: cord exactly 37 Gy in 15 fractions is not per protocol",2,0,FALSE,FALSE,0,0,0.0200000000000031,0.0199999999999818,2
+"test_v31_stage_a.R","v31_stage_a","OAR-02: unassessed mandatory metrics are listed and block an 'all met' reading",5,0,FALSE,FALSE,0,2.5,0.450000000000003,2.89999999999998,5
+"test_v31_stage_a.R","v31_stage_a","OAR-03: HYHOPE 'Max' keeps its unspecified volume definition; no D0.03cc is claimed",2,0,FALSE,FALSE,0,0.0300000000000296,0.00999999999999801,0.0699999999999932,2
+"test_v31_stage_a.R","v31_stage_a","OAR-04: the upper end of a source range is labeled as the calculator's choice",2,0,FALSE,FALSE,0,0.0199999999999818,0.019999999999996,0.0100000000000477,2
+"test_v31_stage_a.R","v31_stage_a","OAR-05: HYHOPE rows name protocol version 4.2 and the section, and 12 fractions is historical",4,0,FALSE,FALSE,0,0.0300000000000296,0.0200000000000031,0.0499999999999545,4
+"test_v31_stage_a.R","v31_stage_a","D1: the DVH maximum is an interval; a top bin straddling the limit is indeterminate",4,0,FALSE,FALSE,0,0.0199999999999818,0,0.0300000000000296,4
+"test_v31_stage_a.R","v31_stage_a","D2: malformed DVHs are refused (NaN, Inf, negative, duplicate, unordered, truncated, short, partial %)",14,0,FALSE,FALSE,0,0.00999999999999091,0.0399999999999991,0.139999999999986,14
+"test_v31_stage_a.R","v31_stage_a","D3: quoted, BOM-prefixed and padded identifier headers are refused",8,0,FALSE,FALSE,0,0.5,0.0600000000000023,0.639999999999986,8
+"test_v31_stage_a.R","v31_stage_a","M3: one valid +10 draw among 99 invalid draws is not a conservative +10",2,0,FALSE,FALSE,0,0,0.019999999999996,0.0300000000000296,2
+"test_v31_stage_a.R","v31_stage_a","M3: the 10th percentile is evaluable only while the invalid draws stay below it",9,0,FALSE,FALSE,0,0.0500000000000114,0.0200000000000031,0.0699999999999932,9
+"test_v31_stage_a.R","v31_stage_a","M4: at a required toxicity share of 100% every listed regimen passes on all draws",6,0,FALSE,FALSE,0,4.21999999999997,0.479999999999997,4.75999999999999,6
+"test_v31_stage_a.R","v31_stage_a","M4 and wording: at the default 90% no choice fails the full check; 5 x 5 Gy is not shown as meeting +1",7,0,FALSE,FALSE,0,4.38999999999999,0.640000000000001,5.09000000000003,7
+"test_v31_stage_e.R","v31_stage_e","the shipped draws come from the corrected verified-trial refit and pass the gate",2,0,FALSE,TRUE,0,0.0300000000000296,0,0.0299999999999727,2
+"test_v31_stage_e.R","v31_stage_e","DD row i was fitted on DI row i, in both variants",13,0,FALSE,FALSE,0,0.0799999999999841,0.0200000000000031,0.0800000000000409,13
+"test_v31_stage_e.R","v31_stage_e","a draws file whose fit failed the diagnostic gate is refused",2,0,FALSE,FALSE,0,0.0299999999999727,0.0300000000000011,0.0799999999999841,2
+"test_v31_stage_e.R","v31_stage_e","the tumor data range comes from the dataset named in the manifest",3,0,FALSE,FALSE,0,0,0.00999999999999801,0.00999999999999091,3
+"test_v31_stage_e.R","v31_stage_e","BED differences over draws are labeled Gy10 only when alpha/beta is 10 in every draw",2,0,FALSE,FALSE,0,0.0300000000000296,0.0200000000000031,0.0500000000000114,2
+"test_v31_stage_e.R","v31_stage_e","the refit point values are the calibrated-DD model at the DI medians",3,0,FALSE,FALSE,0,0,0,0.0199999999999818,3
+"test_v31_stage_e.R","v31_stage_e","superseded claims about the old fit are gone from the app text",5,0,FALSE,FALSE,0,0.0199999999999818,0.0499999999999972,0.0400000000000205,5
+"test_v32_review.R","v32_review","the default evaluated regimen is 18 x 2.9 Gy (52.2 Gy in 24 days)",6,0,FALSE,FALSE,0,2.94,0.640000000000001,3.66000000000003,6
+"test_v32_review.R","v32_review","R04: all three benchmark rows carry their DI and DD differences, matching Compare regimens",10,0,FALSE,FALSE,0,2.34000000000003,0.359999999999999,2.77999999999997,10
+"test_v32_review.R","v32_review","R05: a straddling top bin is indeterminate at every alpha/beta, never 'within throughout'",8,0,FALSE,FALSE,0,0.420000000000016,0.0300000000000011,0.439999999999998,8
+"test_v32_review.R","v32_review","R10: NaN, Inf, missing and text values inside an Eclipse DVH block are refused with a line number",8,0,FALSE,FALSE,0,2.10999999999996,0.119999999999997,2.30000000000001,8
+"test_v32_review.R","v32_review","R03: unnamed, duplicate, blank, unknown, non-scalar and non-finite organ mappings are refused",30,0,FALSE,FALSE,0,0.140000000000043,0.0200000000000031,0.150000000000034,30
+"test_v32_review.R","v32_review","R03: both replay paths refuse a malformed organ mapping and replay a well-formed one",10,0,FALSE,FALSE,0,3.51999999999998,0.689999999999998,4.31,10
+"test_v32_review.R","v32_review","an uncertainty replay grid above the app's largest is refused before any calculation",8,0,FALSE,FALSE,0,3.11000000000001,0.479999999999997,3.65999999999997,8
+"test_v32_review.R","v32_review","R09: release_revision fails closed",9,0,FALSE,FALSE,0,0.0299999999999727,0.0500000000000043,0.0600000000000023,9
+"test_v32_review.R","v32_review","R01: the app checks recorded draws diagnostics against the gate, ESS included",8,0,FALSE,FALSE,0,0.0300000000000296,0.0399999999999991,0.0800000000000409,8
+"test_v32_review.R","v32_review","R07: the review's wording corrections are in place",13,0,FALSE,FALSE,0,2.44,0.520000000000003,3,13
+"test_v32_review.R","v32_review","audit 1: report card organ rows carry the alpha/beta-range result and the mean-dose note, with coverage",4,0,FALSE,FALSE,0,2.10999999999996,0.409999999999997,2.53999999999996,4
+"test_v32_review.R","v32_review","audit 2: the banner flags a fraction size outside the tumor data, and only then",2,0,FALSE,FALSE,0,3.25,0.369999999999997,3.69,2
+"test_v32_review.R","v32_review","audit 3: the default's help text says it is an example, not a recommendation",2,0,FALSE,FALSE,0,0.510000000000048,0.190000000000005,0.700000000000045,2
+"test_v32_review.R","v32_review","audit 4: the Results tab shows both Fowler zones and which one the search uses",4,0,FALSE,FALSE,0,2.13,0.449999999999996,2.60999999999996,4
+"test_v32_review.R","v32_review","audit 5: the organ table labels a mean limit as the source's and a maximum as converted",3,0,FALSE,FALSE,0,2.72999999999996,0.410000000000004,3.11000000000001,3
+"test_v321_deploy_identity.R","v321_deploy_identity","M01: a clean, certified revision gives its hash and tracked files",2,0,FALSE,FALSE,0,0,0,0.0100000000000477,2
+"test_v321_deploy_identity.R","v321_deploy_identity","M01: every failed or empty git answer, and every bad marker, stops before deployment",10,0,FALSE,FALSE,0,0.110000000000014,0.00999999999999801,0.109999999999957,10
+"test_v321_deploy_identity.R","v321_deploy_identity","M01: preflight refuses matching empty identities, and deploy.R uses only checked git calls",4,0,FALSE,FALSE,0,0.0199999999999818,0.0200000000000031,0.0400000000000205,4
+"test_v321_dvh_parser.R","v321_dvh_parser","F01-A: a three-column row missing its relative-dose field is refused (review false parotid pass)",3,0,FALSE,FALSE,0,0.0199999999999818,0,0.00999999999999091,3
+"test_v321_dvh_parser.R","v321_dvh_parser","F01-A: removing any one field, or adding one, is refused in both layouts",6,0,FALSE,FALSE,0,0.0299999999999727,0,0.0500000000000114,6
+"test_v321_dvh_parser.R","v321_dvh_parser","F01-A: the volume is read from the column the header names, not the last one",1,0,FALSE,FALSE,0,0.0200000000000387,0,0,1
+"test_v321_dvh_parser.R","v321_dvh_parser","F01-B: two structures with the same name are refused (review false cord pass)",5,0,FALSE,FALSE,0,0.0299999999999727,0,0.0199999999999818,5
+"test_v321_dvh_parser.R","v321_dvh_parser","F01-B: a blank structure name is refused",1,0,FALSE,FALSE,0,0,0,0.0100000000000477,1
+"test_v321_dvh_parser.R","v321_dvh_parser","F01: CSV rows with a missing or extra field, blank or split structures are refused",6,0,FALSE,FALSE,0,0.0400000000000205,0,0.0399999999999636,6
+"test_v321_gate.R","v321_gate","F02: the shared gate fixture table gives the same verdicts in R as in Python",15,0,FALSE,FALSE,0,0.00999999999999091,0.00999999999999801,0.00999999999999091,15
+"test_v321_gate.R","v321_gate","F02: vector, logical and NULL diagnostics fail",4,0,FALSE,FALSE,0,0.0199999999999818,0,0.0199999999999818,4
+"test_v321_gate.R","v321_gate","F02: the real loader refuses a manifest whose ESS is the JSON literal 1e999",3,0,FALSE,FALSE,0,0.0400000000000205,0,0.0500000000000114,3
+"test_v321_golden.R","v321_golden","golden: deterministic default values (review section 4.3)",4,0,FALSE,FALSE,0,0.0199999999999818,0,0,4
+"test_v321_golden.R","v321_golden","golden: uncertainty medians and shares on the shipped primary draws (review section 4.4)",5,0,FALSE,FALSE,0,0.0300000000000296,0.0200000000000031,0.0400000000000205,5
+"test_v321_review_text.R","v321_review_text","F06: a regimen passing 12 of 15 settings is listed by the Both-model screen (review example)",7,0,FALSE,FALSE,0,0.0600000000000023,0.0200000000000031,0.0800000000000409,7
+"test_v321_review_text.R","v321_review_text","F06: the guide no longer says the screen requires every one of the 15 settings",3,0,FALSE,FALSE,0,0.0299999999999727,0,0.0299999999999727,3
+"test_v321_review_text.R","v321_review_text","F07: the repair count matches repair_ess.json (752 = 748 bulk + 4 tail only)",7,0,FALSE,FALSE,0,0.0699999999999932,0.00999999999999801,0.0799999999999841,7
+"test_v321_ui_items.R","v321_ui_items","M03: toxicity shares near the required share show one decimal, the count and the side",7,0,FALSE,FALSE,0,0.0100000000000477,0.0200000000000031,0.0300000000000296,7
+"test_v321_ui_items.R","v321_ui_items","M02: the unused DVH fraction-count input is gone and the help says what is used",2,0,FALSE,FALSE,0,0,0.00999999999999801,0.00999999999999091,2
+"test_v4_home.R","v4_home","the standard is 35 x 2 Gy in 47 days on the Mon-Fri calendar",4,0,FALSE,FALSE,0,0.00999999999999091,0,0,4
+"test_v4_home.R","v4_home","the list is exactly the regimens meeting all three conditions (defaults)",6,0,FALSE,FALSE,0,1.63,0.0499999999999972,1.67999999999995,6
+"test_v4_home.R","v4_home","the list matches brute force under other tumor settings",6,0,FALSE,FALSE,0,5.40000000000003,0.230000000000004,5.70000000000005,6
+"test_v4_home.R","v4_home","pinned result at the defaults (scenario D18, calibrated DD)",23,0,FALSE,FALSE,0,0.0799999999999841,0.019999999999996,0.089999999999975,23
+"test_v4_home.R","v4_home","refit support: share of refit draws meeting the tumor condition",4,0,FALSE,FALSE,0,0.0999999999999659,0.0800000000000054,0.180000000000007,4
+"test_v4_home.R","v4_home","summary wording follows which models qualify",10,0,FALSE,FALSE,0,0.0300000000000296,0,0.0400000000000205,10
+"test_v4_home.R","v4_home","plot data: one bar per fraction number and endpoint, spanning the listed doses",5,0,FALSE,FALSE,0,0.0299999999999727,0.00999999999999801,0.0299999999999727,5
+"test_v4_home.R","v4_home","range explanation: the doses next to a row fail, for the stated reasons",39,0,FALSE,FALSE,0,0.0800000000000409,0.0399999999999991,0.110000000000014,39
+"test_v4_home.R","v4_home","wider margins list more regimens, zero margins fewer",2,0,FALSE,FALSE,0,0.0399999999999636,0.00999999999999801,0.0999999999999659,2
+"test_v4_home.R","v4_home","an empty list carries the engine's reason",3,0,FALSE,FALSE,0,0.0200000000000387,0,0.0100000000000477,3
+"test_v4_home.R","v4_home","the main page lists the regimens and reacts to the model settings",35,0,FALSE,FALSE,0,9.47999999999996,1.25,10.81,35
+"test_v4_home.R","v4_home","the main page opens first and every menu page exists",23,0,FALSE,FALSE,0,0.520000000000039,0.200000000000003,0.70999999999998,23
+"test_v43_review.R","v43_review","F01: the default list and its worked example are unchanged",8,0,FALSE,FALSE,0,0.0600000000000023,0,0.0600000000000023,8
+"test_v43_review.R","v43_review","F01: a non-monotone DD row names the doses of its extremes",4,0,FALSE,FALSE,0,0.0299999999999727,0.0200000000000031,0.0600000000000023,4
+"test_v43_review.R","v43_review","F01: an unusable reference never credits a schedule in the explanation",9,0,FALSE,FALSE,0,0.0300000000000296,0,0.0299999999999727,9
+"test_v43_review.R","v43_review","F01: unavailable DD and a negative candidate are named, not left blank",5,0,FALSE,FALSE,0,0,0.0500000000000043,0.0500000000000114,5
+"test_v43_review.R","v43_review","F01: a dose range with a gap is shown as separate runs",5,0,FALSE,FALSE,0,0.0199999999999818,0,0.0300000000000296,5
+"test_v43_review.R","v43_review","F02: the tumor margin's EQD2 equivalent follows alpha/beta",2,0,FALSE,FALSE,0,0,0.00999999999999801,0,2
+"test_v43_review.R","v43_review","F02: the DD model description names the actual anchor and mode",7,0,FALSE,FALSE,0,0.0199999999999818,0,0.0299999999999727,7
+"test_v43_review.R","v43_review","F02: a finite but negative standard DD BED is unusable",5,0,FALSE,FALSE,0,0.0300000000000296,0.0300000000000011,0.0500000000000114,5
+"test_v43_review.R","v43_review","F05: only a listed point of the current list can be transferred",23,0,FALSE,FALSE,0,0.089999999999975,0.100000000000001,0.21999999999997,23
+"test_v43_review.R","v43_review","F12: a failed draw load is retried after a bounded wait; a success is cached",8,0,FALSE,FALSE,0,0,0.00999999999999801,0.0300000000000296,8
+"test_v43_review.R","v43_review","F02/F03: the main page text follows the settings and quotes HYPNO correctly",29,0,FALSE,FALSE,0,19.58,1.96,21.83,29
+"test_v43_review.R","v43_review","F04/F05: the transfer states its scope and refuses a dose outside the row",5,0,FALSE,FALSE,0,3.33999999999997,0.5,3.82999999999998,5
+"test_v43_review.R","v43_review","F08: the default main list is exported in full and replays in a fresh R process",52,0,FALSE,FALSE,0,0.230000000000018,0.00999999999999801,0.939999999999998,52
+"test_v43_review.R","v43_review","F08: nondefault, empty and unavailable cases replay exactly",230,0,FALSE,FALSE,0,1.44999999999999,0.359999999999999,1.96999999999997,230
+"test_v43_review.R","v43_review","F08: unavailable support is recorded and replayed as unavailable, never recomputed",21,0,FALSE,FALSE,0,0.170000000000016,0.0500000000000043,0.220000000000027,21
+"test_v43_review.R","v43_review","F08: the analysis ID follows scientific inputs only; mismatches are refused",10,0,FALSE,FALSE,0,0.629999999999995,0.199999999999996,0.829999999999984,10
+"test_v43_review.R","v43_review","F08: the page offers the main-list download",4,0,FALSE,FALSE,0,2.10999999999996,0.270000000000003,2.43000000000001,4
+"test_v43_review.R","v43_review","F10: CI runs on pushes to the v4 branch",1,0,FALSE,FALSE,0,0,0,0.0199999999999818,1
+"test_v431_refit_explainer.R","v431_refit_explainer","the explainer is served from www/ as a self-contained page and a Word file",10,0,FALSE,FALSE,0,0.0499999999999545,0.0300000000000011,0.0799999999999841,10
+"test_v431_refit_explainer.R","v431_refit_explainer","the served page is built from the committed source",2,0,FALSE,FALSE,0,0.0200000000000387,0,0.0300000000000296,2
+"test_v431_refit_explainer.R","v431_refit_explainer","the main page links to the explainer",4,0,FALSE,FALSE,0,0.449999999999989,0.189999999999998,0.639999999999986,4
+"test_v431_refit_explainer.R","v431_refit_explainer","the About section links to the explainer",2,0,FALSE,FALSE,0,1.27999999999997,0.259999999999998,1.56,2
+"test_v431_refit_explainer.R","v431_refit_explainer","the explainer's sensitivity table matches the fit summaries",18,0,FALSE,FALSE,0,0.0299999999999727,0,0.0500000000000114,18
+"test_v44_trials_support.R","v44_trials_support","the Refit support column and its footnote are shown without Details",8,0,FALSE,FALSE,0,2.25999999999999,0.619999999999997,2.95999999999998,8
+"test_v44_trials_support.R","v44_trials_support","Details offers the fitted-trial list",3,0,FALSE,FALSE,0,0.270000000000039,0.100000000000001,0.370000000000005,3
+"test_v44_trials_support.R","v44_trials_support","the fitted-trial list follows the fitting data named in the draws manifest",13,0,FALSE,FALSE,0,0.0499999999999545,0.0100000000000051,0.0600000000000023,13
+"test_v44_trials_support.R","v44_trials_support","a trial list that does not match the fitting data is refused",3,0,FALSE,FALSE,0,0.120000000000005,0.019999999999996,0.160000000000025,3
+"test_v44_trials_support.R","v44_trials_support","the trial table gives each trial's reference once, with footnotes for drugs and new trials",22,0,FALSE,FALSE,0,0.270000000000039,0,0.25,22
+"test_v44_trials_support.R","v44_trials_support","margins: checked, and out-of-range values are refused with a message",4,0,FALSE,FALSE,0,0.00999999999999091,0,0,4
+"test_v44_trials_support.R","v44_trials_support","the main page follows the limits the user sets, and passes them on",28,0,FALSE,FALSE,0,4.24000000000001,0.719999999999999,5.04000000000002,28
+"test_v44_trials_support.R","v44_trials_support","the Report card receives the limits in use",3,0,FALSE,FALSE,0,0,0,0.0199999999999818,3
+"test_v44_trials_support.R","v44_trials_support","a main-list export with changed limits replays exactly",8,0,FALSE,FALSE,0,0.310000000000002,0.0699999999999932,0.420000000000016,8
+"test_v44_trials_support.R","v44_trials_support","the dialog's opening text is accurate about drugs, strata and what was fitted",5,0,FALSE,FALSE,0,0.0199999999999818,0.0200000000000102,0.0199999999999818,5
+"test_v44_trials_support.R","v44_trials_support","the plot draws one dashed line per limit, in the colour of its bars, and the caption names all three",9,0,FALSE,FALSE,0,0.0299999999999727,0,0.0300000000000296,9
+"test_v44_trials_support.R","v44_trials_support","the support column and the failure explanations use the limits in force",5,0,FALSE,FALSE,0,0.150000000000034,0.0300000000000011,0.199999999999989,5
+"test_v44_trials_support.R","v44_trials_support","the main table has 9 columns (Caution from 4.5.0), and 12 with Details",2,0,FALSE,FALSE,0,1.99000000000001,0.419999999999987,2.44,2
+"test_v44_trials_support.R","v44_trials_support","a box Shiny reports as NULL keeps the limits in use rather than resetting them",1,0,FALSE,FALSE,0,2.38999999999999,0.52000000000001,3.15000000000003,1
+"test_v44_trials_support.R","v44_trials_support","replay refuses an edited export and still reproduces a real 4.3.1 export exactly",5,0,FALSE,FALSE,0,0.139999999999986,0.0300000000000011,0.17999999999995,5
+"test_v45_review.R","v45_review","a named profile label never covers values that differ from it (review 4.1)",6,0,FALSE,FALSE,0,10.13,1,11.24,6
+"test_v45_review.R","v45_review","profile matching uses all six fields for complete profiles and the documented fields for partial ones",18,0,FALSE,FALSE,0,0.0600000000000023,0,0.0399999999999636,18
+"test_v45_review.R","v45_review","the app starts from one complete profile, the trial-fit point scenario",14,0,FALSE,FALSE,0,0.420000000000016,0.22999999999999,0.6400000000001,14
+"test_v45_review.R","v45_review","an unreadable or malformed point-profile file starts on D18 and says so",11,0,FALSE,FALSE,0,0.0500000000000114,0.0400000000000063,0.0999999999999091,11
+"test_v45_review.R","v45_review","a Main ZIP agrees with its own scenario after a draw-loading failure recovers (review 6.2)",9,0,FALSE,FALSE,0,3.13999999999999,0.480000000000004,3.75999999999999,9
+"test_v45_review.R","v45_review","exact replay needs the exported ID; an intentional edit is a new analysis (review 6.3)",6,0,FALSE,FALSE,0,0.439999999999998,0.0600000000000023,0.490000000000009,6
+"test_v45_review.R","v45_review","Sensitivity never calls a directly entered DD calibrated; Main does not invent a DD loss",8,0,FALSE,FALSE,0,7.73000000000002,0.719999999999999,8.65000000000009,8
+"test_v45_review.R","v45_review","the menu has seven destinations including the main page, and every former task keeps its ids",28,0,FALSE,FALSE,0,0.670000000000016,0.159999999999997,0.819999999999936,28
+"test_v45_review.R","v45_review","the count names dose and fraction combinations, for zero, one and many rows",3,0,FALSE,FALSE,0,0,0,0,3
+"test_v45_review.R","v45_review","EQD2 is a display of the same BED change: no eligibility or support changes (review 4.2)",14,0,FALSE,FALSE,0,3.06999999999999,0.5,3.62,14
+"test_v45_review.R","v45_review","D18 and the trial-fit point reproduce the review's fixtures (review 4.1)",7,0,FALSE,FALSE,0,0.0799999999999841,0,0.0800000000000409,7
+"test_v45_review.R","v45_review","'How was the tumor model fitted?' is offered on Main, Uncertainty and Settings and sources (review 3)",6,0,FALSE,FALSE,0,2.88999999999999,0.649999999999991,3.50999999999999,6
+"test_v45_trials.R","v45_trials","a reordered but valid reference list gives the same table (positive control)",1,0,FALSE,FALSE,0,0.0299999999999727,0.0200000000000102,0.0299999999999727,1
+"test_v45_trials.R","v45_trials","a repeated arm on either side is refused with the arm named",2,0,FALSE,FALSE,0,0.0500000000000114,0,0.0600000000000591,2
+"test_v45_trials.R","v45_trials","an omitted, renamed or empty arm is refused with the arm named",3,0,FALSE,FALSE,0,0.0400000000000205,0,0.0799999999999272,3
+"test_v45_trials.R","v45_trials","a substituted PMID is refused, and a reformatted one is accepted",2,0,FALSE,FALSE,0,0.0199999999999818,0,0.0400000000000773,2
+"test_v45_trials.R","v45_trials","an altered source percentage is refused, by the manifest hash and by the published-fitted check",3,0,FALSE,FALSE,0,0.0600000000000023,0.019999999999996,0.129999999999995,3
+"test_v45_trials.R","v45_trials","all 45 arms join to the right reference and published value",15,0,FALSE,FALSE,0,0.0299999999999727,0.0300000000000011,0.0499999999999545,15
+"test_v45_trials.R","v45_trials","KROG conventional, both Yamazaki strata and CAIR show the published values",6,0,FALSE,FALSE,0,0.0200000000000387,0.0100000000000051,0.0299999999999727,6
+"test_v45_trials.R","v45_trials","trials without an ordinary conventional arm are not given one, and RTOG 88-09 shows its complement",15,0,FALSE,FALSE,0,0.169999999999959,0.0299999999999869,0.220000000000027,15
+"test_v45_trials.R","v45_trials","the dialog says the list is unavailable instead of failing or showing an unchecked citation",7,0,FALSE,FALSE,0,0.120000000000005,0.0300000000000011,0.139999999999986,7
+"test_v45_trials.R","v45_trials","the refit explainer states counts from the data and the corrected model statements",29,0,FALSE,FALSE,0,0.0699999999999932,0.0500000000000114,0.120000000000005,29
+"test_v46_app_switch.R","v46_app_switch","Fowler is the default; the switch changes the main list and shows the research note",11,0,FALSE,FALSE,0,6.61000000000001,0.699999999999989,7.38999999999999,11
+"test_v46_app_switch.R","v46_app_switch","research mode gives the regimen and the comparator their own treatment dates (review R3)",5,0,FALSE,FALSE,0,3.02999999999997,0.52000000000001,3.61000000000001,5
+"test_v46_app_switch.R","v46_app_switch","a research-mode Uncertainty export records each regimen's dates and replays exactly (review R3)",27,0,FALSE,FALSE,0,3.04000000000002,0.439999999999998,3.52999999999997,27
+"test_v46_app_switch.R","v46_app_switch","a typed overall time the calendar cannot give is explained, not spread over invented gaps (review R3)",6,0,FALSE,FALSE,0,5.43000000000001,0.870000000000005,6.52999999999997,6
+"test_v46_app_switch.R","v46_app_switch","no text claims a risk meaning for +5, a universal chemotherapy effect or few post-RT assessments (review R1)",8,0,FALSE,FALSE,0,2.71999999999997,0.5,3.30000000000007,8
+"test_v46_app_switch.R","v46_app_switch","the shared banner and Model settings name the active early model and its values",11,0,FALSE,FALSE,0,4.49000000000001,0.669999999999987,5.19999999999993,11
+"test_v46_app_switch.R","v46_app_switch","the Fowler fields are shown only for Fowler; the fitted values only for the fit",5,0,FALSE,FALSE,0,0.54000000000002,0.150000000000006,0.700000000000045,5
+"test_v46_app_switch.R","v46_app_switch","Uncertainty names the early source; a research export records which prior entries were used",12,0,FALSE,FALSE,0,9.56999999999999,1.45,11.29,12
+"test_v46_app_switch.R","v46_app_switch","the Fowler zone limit is refused with the fitted model",1,0,FALSE,FALSE,0,1.94999999999999,0.390000000000001,2.36000000000001,1
+"test_v46_app_switch.R","v46_app_switch","a research-mode main export records the model and replays exactly; another model is refused",6,0,FALSE,FALSE,0,0.220000000000027,0.0600000000000023,0.289999999999964,6
+"test_v46_app_switch.R","v46_app_switch","the main page offers visible links to how each model was fitted and to its trials",9,0,FALSE,FALSE,0,2.53999999999996,0.640000000000001,3.28000000000009,9
+"test_v46_app_switch.R","v46_app_switch","the early-toxicity trial list is complete, cited and hash-checked; the summary agrees with it",12,0,FALSE,FALSE,0,0.109999999999957,0.019999999999996,0.129999999999995,12
+"test_v46_early_research.R","v46_early_research","the fitted model loads, with its point values, and refuses a changed draws file",8,0,FALSE,FALSE,0,0,0.0600000000000023,0.0399999999999636,8
+"test_v46_early_research.R","v46_early_research","the R evaluator agrees with the Python evaluator used for fitting",48,0,FALSE,FALSE,0,0.0600000000000023,0.019999999999996,0.100000000000023,48
+"test_v46_early_research.R","v46_early_research","Fowler mode is unchanged: 69 doses in 18 fraction counts",2,0,FALSE,FALSE,0,0.0200000000000387,0,0.00999999999999091,2
+"test_v46_early_research.R","v46_early_research","research mode lists 9 doses in 26 to 30 fractions with the +5 margin",3,0,FALSE,FALSE,0,0.0399999999999636,0.0100000000000051,0.0500000000000682,3
+"test_v46_early_research.R","v46_early_research","same regimen gives a zero difference and full support in every draw, even where E <= 0",2,0,FALSE,FALSE,0,0.0200000000000387,0,0.0299999999999727,2
+"test_v46_early_research.R","v46_early_research","swapping candidate and reference negates the difference in every draw",2,0,FALSE,FALSE,0,0.0199999999999818,0,0,2
+"test_v46_early_research.R","v46_early_research","research mode drops the positivity requirement but Fowler mode keeps it",3,0,FALSE,FALSE,0,0.00999999999999091,0,0.0199999999999818,3
+"test_v46_early_research.R","v46_early_research","fixed toxicity in research mode reproduces the point model",1,0,FALSE,FALSE,0,0.0199999999999818,0,0.00999999999999091,1
+"test_v46_early_research.R","v46_early_research","a package with failed diagnostics, wrong point values or unknown definitions is unavailable",14,0,FALSE,FALSE,0,0.0400000000000205,0.0799999999999983,0.220000000000027,14
+"test_v46_early_research.R","v46_early_research","reordered draws with a matching hash load, but an old exact scenario refuses to replay",4,0,FALSE,FALSE,0,0.100000000000023,0.0300000000000011,0.120000000000005,4
+"test_v46_early_research.R","v46_early_research","custom calendars use their own dates, matching the independent Python evaluator",5,0,FALSE,FALSE,0,0.00999999999999091,0,0.0199999999999818,5
+"test_v46_early_research.R","v46_early_research","an overall time that the calendar cannot produce gives no repair-aware result",2,0,FALSE,FALSE,0,0.0299999999999727,0,0.0199999999999818,2
+"test_v46_early_research.R","v46_early_research","search candidates and the comparator use their own calendars; equal regimens still give zero",4,0,FALSE,FALSE,0,0.0500000000000114,0,0.0600000000000591,4
+"test_v461_methods_page.R","v461_methods_page","the methods record loads and describes the draws the calculator uses",3,0,FALSE,FALSE,0,0.0300000000000296,0,0.0199999999999818,3
+"test_v461_methods_page.R","v461_methods_page","every route reaches the one methods page, at its own section",19,0,FALSE,FALSE,0,2.63,0.460000000000008,3.10000000000002,19
+"test_v461_methods_page.R","v461_methods_page","the page shows the active priors and settings from the record, with no placeholder left",33,0,FALSE,FALSE,0,2.28999999999996,0.359999999999999,2.75,33
+"test_v461_methods_page.R","v461_methods_page","the early summary's stated priors agree with the record",12,0,FALSE,FALSE,0,0.0400000000000205,0,0.0399999999999636,12
+"test_v461_methods_page.R","v461_methods_page","a record that does not match the deployed draws is refused, and the page says so",6,0,FALSE,FALSE,0,0.0699999999999932,0.0100000000000051,0.07000000000005,6
+"test_v461_methods_page.R","v461_methods_page","a placeholder the record cannot fill stops the page instead of showing braces",1,0,FALSE,FALSE,0,0.0500000000000114,0.019999999999996,0.0499999999999545,1

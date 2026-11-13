@@ -1,0 +1,131 @@
+{
+  "tumor": {
+    "arms": 45,
+    "units": 21,
+    "N": 8279,
+    "timepoints_years": [
+      "2",
+      "3",
+      "5"
+    ],
+    "estimate_type_counts": {
+      "actuarial/KM": 39,
+      "cumulative incidence": 6
+    }
+  },
+  "early": {
+    "displayed_rows": 66,
+    "fitted_arms": 51,
+    "families": 22,
+    "N": 6042,
+    "events": 2945,
+    "CAIR_rows": [
+      {
+        "role": "fitted",
+        "trial": "CAIR (Gliwice)",
+        "reference": "Skladowski K et al., Radiother Oncol 2000",
+        "pmid": "10799721",
+        "doi": "10.1016/s0167-8140(00)00139-0",
+        "arm": "Control 5 days a week",
+        "control_arm": "1",
+        "schedule": "weight 21: 35 fractions, 70 Gy, 47 days; weight 28: 40 fractions, 72 Gy, 54 days",
+        "schedule_variants": "2",
+        "schedule_notes": "as CAIR arm; variants weighted 21 (2.0 Gy era) and 28 (1.8 Gy era)",
+        "dose_per_fraction_gy": "2.0",
+        "fractions_per_day": "1",
+        "schedule_class": "conventional",
+        "concurrent_therapy": "none",
+        "therapy_note": "",
+        "endpoint": "peak acute mucosal reaction EORTC grade III or IV (Dische score > 10), per Table 4 approximate mapping",
+        "endpoint_timepoint": "peak acute reaction during RT and the first 2 months",
+        "grading_group": "G1",
+        "events": "35",
+        "patients": "49",
+        "analysis_population": "evaluated for acute toxicity",
+        "assessment": "last scored 8 weeks after RT; largest gap after RT 2 weeks (every 2 weeks during the first 2 months of follow-up)"
+      },
+      {
+        "role": "fitted",
+        "trial": "CAIR (Gliwice)",
+        "reference": "Skladowski K et al., Radiother Oncol 2000",
+        "pmid": "10799721",
+        "doi": "10.1016/s0167-8140(00)00139-0",
+        "arm": "CAIR 7 days a week",
+        "control_arm": "0",
+        "schedule": "weight 23: 35 fractions, 70 Gy, 35 days; weight 27: 40 fractions, 72 Gy, 40 days",
+        "schedule_variants": "2",
+        "schedule_notes": "two eras with the same fraction size in both arms: 2.0 Gy to end of 1994 (23 CAIR patients, Maciejewski 1996) then 1.8 Gy; totals 66-72 Gy by T stage. Variants: 70/35 at 2.0 Gy (weight 23) and 72/40 at 1.8 Gy (weight 27); era counts per arm from Maciejewski 1996 and the arm totals",
+        "dose_per_fraction_gy": "2.0",
+        "fractions_per_day": "1",
+        "schedule_class": "accelerated",
+        "concurrent_therapy": "none",
+        "therapy_note": "",
+        "endpoint": "peak acute mucosal reaction EORTC grade III or IV (Dische score > 10), per Table 4 approximate mapping",
+        "endpoint_timepoint": "peak acute reaction during RT and the first 2 months",
+        "grading_group": "G1",
+        "events": "48",
+        "patients": "50",
+        "analysis_population": "evaluated for acute toxicity",
+        "assessment": "last scored 8 weeks after RT; largest gap after RT 2 weeks (every 2 weeks during the first 2 months of follow-up)"
+      }
+    ],
+    "HYPNO_rows": [
+      {
+        "role": "external benchmark (never fitted)",
+        "trial": "HYPNO",
+        "reference": "Bentzen SM et al., Int J Radiat Oncol Biol Phys 2026",
+        "pmid": "41711624",
+        "doi": "10.1016/j.ijrobp.2025.12.056",
+        "arm": "NFX 66 Gy / 33 at six a week",
+        "control_arm": "1",
+        "schedule": "33 fractions, 66 Gy, 38 days",
+        "schedule_variants": "1",
+        "schedule_notes": "how the sixth weekly fraction is given is not stated (Saturday nominal)",
+        "dose_per_fraction_gy": "2.0",
+        "fractions_per_day": "1",
+        "schedule_class": "accelerated",
+        "concurrent_therapy": "cisplatin 35 mg/m2 weekly, 5 courses planned, intended for about 75% of patients",
+        "therapy_note": "5 courses",
+        "endpoint": "maximum grade of mucositis of 3+",
+        "endpoint_timepoint": "maximum (CTCAE v4)",
+        "grading_group": "G2",
+        "events": "208",
+        "patients": "380",
+        "analysis_population": "randomized and treated",
+        "assessment": "follow-up after RT not stated (benchmark only)"
+      },
+      {
+        "role": "external benchmark (never fitted)",
+        "trial": "HYPNO",
+        "reference": "Bentzen SM et al., Int J Radiat Oncol Biol Phys 2026",
+        "pmid": "41711624",
+        "doi": "10.1016/j.ijrobp.2025.12.056",
+        "arm": "HFX 55 Gy / 20",
+        "control_arm": "0",
+        "schedule": "20 fractions, 55 Gy, 26 days",
+        "schedule_variants": "1",
+        "schedule_notes": "external benchmark (plan R6), not fitted",
+        "dose_per_fraction_gy": "2.75",
+        "fractions_per_day": "1",
+        "schedule_class": "hypofractionated",
+        "concurrent_therapy": "cisplatin 35 mg/m2 weekly, 4 courses planned, intended for about 75% of patients",
+        "therapy_note": "4 courses (HYPNO p. 391); prescribed in 75% overall (p. 394)",
+        "endpoint": "maximum grade of mucositis of 3+",
+        "endpoint_timepoint": "maximum (CTCAE v4)",
+        "grading_group": "G2",
+        "events": "190",
+        "patients": "373",
+        "analysis_population": "randomized and treated",
+        "assessment": "follow-up after RT not stated (benchmark only)"
+      }
+    ]
+  },
+  "sha256": {
+    "docs/development/2026_11_12_frequentist_comparison_plan.md": "44d2324f5e7820d9b9155cef43c17f8d5d32bc09e5d25623f3c369c95a0cf292",
+    "docs/development/2026_11_12_frequentist_comparison_plan_audit.md": "c1b445873cdb7c7026d727b960c247216326c5e1321dbce567f8002defd95deb",
+    "how_fitted.md": "30d11c25eb24eb1893b726f78e0594b7bef81897359ad4ccd10b9394fce38647",
+    "draws/model_methods.json": "11593529c923168392e40cc24dd2cacb9a386ec3b14a40aea87524605ae54f8d",
+    "data/early_tox/source/ascertainment.csv": "a299fd76f0ec74a64cdb06aa73b804ffcf4f68f444c06ec20ae59161bf43a20b",
+    "draws/early_fit_trials.csv": "12a8b35c167db8f13a9c01ab403f64eca6ccd473a278760c1b3a116fc3849538"
+  }
+}

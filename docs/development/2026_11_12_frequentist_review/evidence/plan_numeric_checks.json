@@ -1,0 +1,81 @@
+{
+  "source": "79e9c812f91482fa57ffa1dddabe89dc329a6303",
+  "n_arms": 45,
+  "n_units": 21,
+  "time_range": [
+    12.0,
+    54.0
+  ],
+  "log_binomial_constant": 5211.11548984419,
+  "old_nll_record": 5342.406617400148,
+  "old_nll_reprofiled_intercepts": 5342.406617356896,
+  "full_nll": 131.29112755595816,
+  "full_log_likelihood": -131.29112755595816,
+  "incorrect_plan_addition": 10553.522107244338,
+  "export_rows": 4000,
+  "distinct_di_rows": 1000,
+  "tumor_T4_comparisons": [
+    {
+      "regimen": "HYPNO 55 Gy/20 (26 d)",
+      "current_export_median": -1.9492811982296985,
+      "archived_8000_median": -2.02217185,
+      "difference": 0.0728906517703014
+    },
+    {
+      "regimen": "HYHOPE-type 46.5 Gy/15 (19 d)",
+      "current_export_median": -9.175606354349128,
+      "archived_8000_median": -9.26785795,
+      "difference": 0.09225159565087182
+    },
+    {
+      "regimen": "17 x 3.05 Gy (23 d)",
+      "current_export_median": -3.641012439449703,
+      "archived_8000_median": -3.6830413999999996,
+      "difference": 0.04202896055029637
+    },
+    {
+      "regimen": "60 Gy/25 (33 d)",
+      "current_export_median": 0.09337030354091524,
+      "archived_8000_median": 0.160343985,
+      "difference": -0.06697368145908475
+    },
+    {
+      "regimen": "65 Gy/30 (40 d)",
+      "current_export_median": 1.218380163070826,
+      "archived_8000_median": 1.21011955,
+      "difference": 0.00826061307082604
+    },
+    {
+      "regimen": "66 Gy/33 (45 d)",
+      "current_export_median": -2.9668391546727086,
+      "archived_8000_median": -2.9654854,
+      "difference": -0.0013537546727087069
+    },
+    {
+      "regimen": "30 x 2 Gy (40 d), last week dropped",
+      "current_export_median": -5.8046198834162155,
+      "archived_8000_median": -5.7711217999999995,
+      "difference": -0.03349808341621596
+    },
+    {
+      "regimen": "33 x 2 Gy, 6 per week (38 d)",
+      "current_export_median": 2.7491705183102297,
+      "archived_8000_median": 2.77049985,
+      "difference": -0.02132933168977047
+    },
+    {
+      "regimen": "70 Gy/35, 6 per week (40 d)",
+      "current_export_median": 6.141092660621979,
+      "archived_8000_median": 6.1331145,
+      "difference": 0.007978160621979313
+    },
+    {
+      "regimen": "68 x 1.2 Gy twice daily (47 d)",
+      "current_export_median": 7.622703249430494,
+      "archived_8000_median": 7.637473249999999,
+      "difference": -0.014770000569505726
+    }
+  ],
+  "max_abs_median_difference": 0.09225159565087182,
+  "T4_exceeds_0_1": 0
+}

@@ -1,0 +1,11 @@
+Step5 manifests 62 output hashes all match True required files all present True gates passing 59 diagnostic identities/gates match True chain hash counts [4]
+Step6 caches 52 n_draws [4000] finite True gates pass 52 scope ['complete schema gate'] chain hash counts [4]
+builder arms 66 byte match True
+builder outcomes 68 byte match True
+builder arm_schedules 28 byte match True
+builder arm_fractions 1053 byte match True
+builder evidence_families 42 byte match True
+endpoint 'other: grade 1 mucositis' problem "endpoint 'other: grade 1 mucositis' is not an accepted equivalent of class grade_3_4_mucositis (no standard pairing or recorded equivalence)"
+endpoint 'other: grade 2 mucositis' problem "endpoint 'other: grade 2 mucositis' is not an accepted equivalent of class grade_3_4_mucositis (no standard pairing or recorded equivalence)"
+endpoint 'max_grade_ge3_mucositis' problem ''
+Raw chain bytes were not checked; manifests name a separate Linux archive.

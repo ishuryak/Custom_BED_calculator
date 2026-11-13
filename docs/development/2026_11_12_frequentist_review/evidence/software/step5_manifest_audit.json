@@ -1,0 +1,1118 @@
+[
+ {
+  "unit": "binomial\\U01",
+  "identity": "aeb28b8fe558cbcea7ed3bedcc0ec95ac1dcac1ce38bfcd62c2d06d6a6926882",
+  "gate": false,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/aeb28b8fe558cbce",
+  "ebfmi_min": 0.6891310783208544
+ },
+ {
+  "unit": "binomial\\U02",
+  "identity": "26b095b60c1ea72a6fa3148890af2a1669e45bb1ff388ea0a248b9455e7e0cfc",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/26b095b60c1ea72a",
+  "ebfmi_min": 0.7360112388147605
+ },
+ {
+  "unit": "binomial\\U03",
+  "identity": "871da457ecb0b6b9ac0a118582bbc743cd7bd42ba300c1fc1e6e59c832868e73",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/871da457ecb0b6b9",
+  "ebfmi_min": 0.7360112388147605
+ },
+ {
+  "unit": "binomial\\U04",
+  "identity": "e68f5dd8aa4437b23a66b5fae7e40727be95bcc87c237395e4830c7664501060",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/e68f5dd8aa4437b2",
+  "ebfmi_min": 0.7090600535128921
+ },
+ {
+  "unit": "binomial\\U05",
+  "identity": "8b3d99665207b00f59ffd887473e0413077624763f396b41c6fb1fe9e59d420a",
+  "gate": false,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/8b3d99665207b00f",
+  "ebfmi_min": 0.6765392494857276
+ },
+ {
+  "unit": "binomial\\U06",
+  "identity": "67318da62cc135291c8c9774cb82f450537be4e5001fccf176e019c0826d21eb",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/67318da62cc13529",
+  "ebfmi_min": 0.7311994120326212
+ },
+ {
+  "unit": "binomial\\U07",
+  "identity": "ac58be387dd46061b1714392be5a0b9d355e55954fd19eb349cdd1fb7ca78d17",
+  "gate": false,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/ac58be387dd46061",
+  "ebfmi_min": 0.6962617633414871
+ },
+ {
+  "unit": "binomial\\U08",
+  "identity": "f0b22fa9194c0d10cec41ef93e49180b4c51cf0880ba10fbae89a329c5c17e30",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/f0b22fa9194c0d10",
+  "ebfmi_min": 0.7264249132940411
+ },
+ {
+  "unit": "binomial\\U09",
+  "identity": "536f193ae8c61925bd44499187a3b7477088e0ea1717f46bf21ce38fe3a6b06f",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/536f193ae8c61925",
+  "ebfmi_min": 0.7294805601761342
+ },
+ {
+  "unit": "binomial\\U10",
+  "identity": "6d72e3068f66c5131f143a66e05d9f3ff46ad7c3fea5c2ab07bd63df059b21e8",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/6d72e3068f66c513",
+  "ebfmi_min": 0.7622554525422826
+ },
+ {
+  "unit": "binomial\\U11",
+  "identity": "347c3f131dcec1d232c115e5f8744c338aa95ab9c41fe998da4a2608070d4f9e",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/347c3f131dcec1d2",
+  "ebfmi_min": 0.6525243985397455
+ },
+ {
+  "unit": "binomial\\U14",
+  "identity": "16d7edb2049294c2feda66193ff989007b485e61610031be30944d44f7480e2d",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/16d7edb2049294c2",
+  "ebfmi_min": 0.7093605942809268
+ },
+ {
+  "unit": "binomial\\U15",
+  "identity": "47112bb22594b238b4c006dc350afc775da98e9aa92e436a0e6cff6feceb8dba",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/47112bb22594b238",
+  "ebfmi_min": 0.8816068531264974
+ },
+ {
+  "unit": "binomial\\U16",
+  "identity": "7d603c09c201ec645d55456c49854a4ba57b88d590a02e5eb6647a88b18984b3",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/7d603c09c201ec64",
+  "ebfmi_min": 0.8514894112648635
+ },
+ {
+  "unit": "binomial\\U17",
+  "identity": "a22769cc64b37f6d44f931d772b05d6171ade7190af0e3fded4337d5387b23c0",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/a22769cc64b37f6d",
+  "ebfmi_min": 0.7737516991255888
+ },
+ {
+  "unit": "binomial\\U18",
+  "identity": "f2fa0e54af6af7f851089acef3f94490892e2f8ed279810997b42e6eb85be52b",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/f2fa0e54af6af7f8",
+  "ebfmi_min": 0.785192899549687
+ },
+ {
+  "unit": "binomial\\U19",
+  "identity": "5f7833cf2c5f38485ebb7074d1848ed86ed5d980d40646b2b25254eb5accab15",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/5f7833cf2c5f3848",
+  "ebfmi_min": 0.7424822825142542
+ },
+ {
+  "unit": "binomial\\U20",
+  "identity": "d06bda95f1afe7e98e72eeaef10c07a2682c64e14be28204d510aac2710fc2f3",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/d06bda95f1afe7e9",
+  "ebfmi_min": 0.7093912259239898
+ },
+ {
+  "unit": "binomial\\U21",
+  "identity": "f570dc083b9fa375be9b2d7e7ce0a49dd4809c2ff4913d25f084d1ace5aeac8a",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/f570dc083b9fa375",
+  "ebfmi_min": 0.7395266308838709
+ },
+ {
+  "unit": "binomial\\U22",
+  "identity": "dabcae9aae9b76cc7cbda83f6ed7997f76304503685d2725b6ea25f0d17015de",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/dabcae9aae9b76cc",
+  "ebfmi_min": 0.6747131306738248
+ },
+ {
+  "unit": "overdispersed\\L_Bartelink2002",
+  "identity": "c6dd7909be4d134af31f23fcc07621c8d9041027e172682f03fced65bc2c7018",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/c6dd7909be4d134a",
+  "ebfmi_min": 0.7469479292422334
+ },
+ {
+  "unit": "overdispersed\\L_CAIR1",
+  "identity": "4dbc4d236a9e0f9886655e08c9bc7b60bb2285a2fb579928358a335da42d5524",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/4dbc4d236a9e0f98",
+  "ebfmi_min": 0.7588596977998597
+ },
+ {
+  "unit": "overdispersed\\L_DAHANCA67",
+  "identity": "4572a1a1f8936733b89f95231624d027f560f92c2b24b5d2bedf4adf4e824f29",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/4572a1a1f8936733",
+  "ebfmi_min": 0.7777484777694164
+ },
+ {
+  "unit": "overdispersed\\L_EORTC22791",
+  "identity": "4b4c52515cba7d34ff63175db77f7000d272b5934cb376d2ec0efcadde3626c4",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/4b4c52515cba7d34",
+  "ebfmi_min": 0.7545045766334852
+ },
+ {
+  "unit": "overdispersed\\L_EORTC22851",
+  "identity": "2da38b2b88e79cd6f8077c85f1c68beb53d6cd5847f3a11ba226056c1d0ff93f",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/2da38b2b88e79cd6",
+  "ebfmi_min": 0.8244007560858563
+ },
+ {
+  "unit": "overdispersed\\L_Ghoshal",
+  "identity": "4f087c71c32720f355a16175d4fd7e922c0b9e2db1658ff48f6d700477dba6ec",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/4f087c71c32720f3",
+  "ebfmi_min": 0.8240214470375233
+ },
+ {
+  "unit": "overdispersed\\L_GhoshLaskar",
+  "identity": "a1a72749074ae4a659d7c514c5bd63c3a591df12e1f3e91350369860fc804230",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/a1a72749074ae4a6",
+  "ebfmi_min": 0.7829161298489362
+ },
+ {
+  "unit": "overdispersed\\L_GORTEC9902",
+  "identity": "446bf5bcf3b15672d5fca37c152572dbc19181db637f8e2999f8138b7037ee32",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/446bf5bcf3b15672",
+  "ebfmi_min": 0.8136151072226115
+ },
+ {
+  "unit": "overdispersed\\L_Grover",
+  "identity": "f098bd82fd5d26b2d359128e501e03ead9808049634d8386ae139a2f20af15d1",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/f098bd82fd5d26b2",
+  "ebfmi_min": 0.7848964097529919
+ },
+ {
+  "unit": "overdispersed\\L_GuptaM",
+  "identity": "18f9e07fc72242e3f8031d00b050cdf9947ccd59b991680dc9c8bfaaf8def6c3",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/18f9e07fc72242e3",
+  "ebfmi_min": 0.778862602601065
+ },
+ {
+  "unit": "overdispersed\\L_GuptaP",
+  "identity": "cf502690cfb374a22d4205418963ff4c9d4fe59e454dc2a14db733de34b6a009",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/cf502690cfb374a2",
+  "ebfmi_min": 0.7492646456913932
+ },
+ {
+  "unit": "overdispersed\\L_Mani",
+  "identity": "24e821e4ea0519de261f532fc970c5cf6ffd1a0d1e8af117e4c536c9c98e0abe",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/24e821e4ea0519de",
+  "ebfmi_min": 0.752384352576497
+ },
+ {
+  "unit": "overdispersed\\L_ORO9301",
+  "identity": "f5994ecc42db3e16a454beb15bc8f2fb3eaaef0de8739e70eaf7824a3358e501",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/f5994ecc42db3e16",
+  "ebfmi_min": 0.77883474424199
+ },
+ {
+  "unit": "overdispersed\\L_PMH_HF",
+  "identity": "7267c2e4055a5d7d80c600f763347b2718231b9f3a19b87d9ac87c3d0847971d",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/7267c2e4055a5d7d",
+  "ebfmi_min": 0.7893825651888065
+ },
+ {
+  "unit": "overdispersed\\L_RTOG0129",
+  "identity": "2bc3f0da1e7d596cf9846d89022a6e0f631bfb659fb4a04c02288376050864c8",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/2bc3f0da1e7d596c",
+  "ebfmi_min": 0.8089354436107863
+ },
+ {
+  "unit": "overdispersed\\L_RTOG9003",
+  "identity": "687ab0ce5939b99b469400eaecc9dcd0588fcb4071d612b737cfc8e618243f49",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/687ab0ce5939b99b",
+  "ebfmi_min": 0.6908952225188659
+ },
+ {
+  "unit": "overdispersed\\L_Shivananjappa",
+  "identity": "959c1c857d77330486886f7087bdbbd6c547e24b81fe9bb63bd29847b59f5169",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/959c1c857d773304",
+  "ebfmi_min": 0.7795920789218588
+ },
+ {
+  "unit": "overdispersed\\L_Sikdar",
+  "identity": "74a6032d9df83d4769909f9262db7eecbe4e0730e2182f8b92a05e24e9e9a496",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/74a6032d9df83d47",
+  "ebfmi_min": 0.798791334018703
+ },
+ {
+  "unit": "overdispersed\\L_Singh",
+  "identity": "f8c903e63f58cd1056b6ea9ebe208074f4f64507fc9b4c2f9ab654f3145bcc9b",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/f8c903e63f58cd10",
+  "ebfmi_min": 0.7532723679101777
+ },
+ {
+  "unit": "overdispersed\\L_Tallari",
+  "identity": "97edb8640aea29659e4a745ace11792ae0dc6b3f5b97ec0326d4714911b6b4de",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/97edb8640aea2965",
+  "ebfmi_min": 0.7335230782518553
+ },
+ {
+  "unit": "overdispersed\\L_Tandon",
+  "identity": "8c6f55e8d532999fb2cd05d9aa071d04bd74d285a69a9299e9ef8c3ad28e22c5",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/8c6f55e8d532999f",
+  "ebfmi_min": 0.799084659744383
+ },
+ {
+  "unit": "overdispersed\\L_Vienna",
+  "identity": "0e91117af0a4234298952f9d73dd228d479c78029743f48351741fcbb8245510",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/0e91117af0a42342",
+  "ebfmi_min": 0.7860534326428583
+ },
+ {
+  "unit": "overdispersed\\U01",
+  "identity": "02b4a9575128929811495404af68491d4fd135c7b7aec9ca7d5521e7ba9103a5",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/02b4a95751289298",
+  "ebfmi_min": 0.7218611519323131
+ },
+ {
+  "unit": "overdispersed\\U02",
+  "identity": "4747b297ac104be786a513d801de053e2de026926f068edccbd3f3a5c90c7a73",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/4747b297ac104be7",
+  "ebfmi_min": 0.6771043173680077
+ },
+ {
+  "unit": "overdispersed\\U03",
+  "identity": "11416b278e2eb41df722553ec07c684def1679f6a7e4fb30e987b3b553f2870a",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/11416b278e2eb41d",
+  "ebfmi_min": 0.6771043173680077
+ },
+ {
+  "unit": "overdispersed\\U04",
+  "identity": "1cd97f92194e1b84fa8eb710680c1b33ff3e9b6d1133a968b7f4db28be5c3952",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/1cd97f92194e1b84",
+  "ebfmi_min": 0.7973776846963839
+ },
+ {
+  "unit": "overdispersed\\U05",
+  "identity": "10806db5ebf0bf26382fdac3369243e9b05b88606d4863a3e5ad77c4e236915f",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/10806db5ebf0bf26",
+  "ebfmi_min": 0.7498015792611652
+ },
+ {
+  "unit": "overdispersed\\U06",
+  "identity": "9bb88c1f495e1c9c6efc520899b054dc54906b12960db95b270ad169c5986853",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/9bb88c1f495e1c9c",
+  "ebfmi_min": 0.7182394030560858
+ },
+ {
+  "unit": "overdispersed\\U07",
+  "identity": "143e0247d08ea5c98aa40d427aa8ed139ae1c2dc1e0b67eabdcfc7702683ff39",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/143e0247d08ea5c9",
+  "ebfmi_min": 0.7330304551069682
+ },
+ {
+  "unit": "overdispersed\\U08",
+  "identity": "536bc1ecc26392f7069ad7a4ff873e090782a7d519b8abf55be72e4745a28734",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/536bc1ecc26392f7",
+  "ebfmi_min": 0.7444499151924739
+ },
+ {
+  "unit": "overdispersed\\U09",
+  "identity": "b0303dccbf41da2458fe89ef7f8b4ac8bdac1f3df4c130c507ce5174210cb027",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/b0303dccbf41da24",
+  "ebfmi_min": 0.7703180394540996
+ },
+ {
+  "unit": "overdispersed\\U10",
+  "identity": "ca39ed41069a3aa1a9ce2b2084f8d0cb602cf9cd4ffa846d3ded5dd6f33afd99",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/ca39ed41069a3aa1",
+  "ebfmi_min": 0.701274276203391
+ },
+ {
+  "unit": "overdispersed\\U11",
+  "identity": "c7f7c92b06e88dce05d8058787501e5afa761896ad6a22214b14aa07b72475fa",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/c7f7c92b06e88dce",
+  "ebfmi_min": 0.7851099883771475
+ },
+ {
+  "unit": "overdispersed\\U14",
+  "identity": "c31bf56f1bf965da7840c1020ea2dec38346d0b2e448cb471119eafb5cd4db1d",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/c31bf56f1bf965da",
+  "ebfmi_min": 0.7566606247787191
+ },
+ {
+  "unit": "overdispersed\\U15",
+  "identity": "224969c2ac6c884d517719ccf8ab12cbe4aea8b5d7bb57f75c5ab2c93808e376",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/224969c2ac6c884d",
+  "ebfmi_min": 0.9029993981842885
+ },
+ {
+  "unit": "overdispersed\\U16",
+  "identity": "cb088c5984e076f4b937d5afecc512c1d2003b55526a21e41df0a5e1922ddf36",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/cb088c5984e076f4",
+  "ebfmi_min": 0.919104417728457
+ },
+ {
+  "unit": "overdispersed\\U17",
+  "identity": "a00224cc3a8fa921315692e967952e49f77639d8ad78743b1d3b15541c8c8bcd",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/a00224cc3a8fa921",
+  "ebfmi_min": 0.8434943902589324
+ },
+ {
+  "unit": "overdispersed\\U18",
+  "identity": "550fbfc32a378ae80154400c9b172379e08c76b50e7280b5fab911a19b126c54",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/550fbfc32a378ae8",
+  "ebfmi_min": 0.7762369847755117
+ },
+ {
+  "unit": "overdispersed\\U19",
+  "identity": "ff60f486f436131db4b865b8eceafb8c6d72122ca575951ae7dc28a265296b0f",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/ff60f486f436131d",
+  "ebfmi_min": 0.7867657388106918
+ },
+ {
+  "unit": "overdispersed\\U20",
+  "identity": "e17cdcd8ae1ba7dcc0dc91b08811dd8728a8e5b6e9ce69bb575f3ecd8c83eb14",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/e17cdcd8ae1ba7dc",
+  "ebfmi_min": 0.7659414544674529
+ },
+ {
+  "unit": "overdispersed\\U21",
+  "identity": "d52ea8d548b4a1f15d2f59fb5e0c42a92f97a511cfa347b293ed56d62ff0ddb3",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/d52ea8d548b4a1f1",
+  "ebfmi_min": 0.7360468960575642
+ },
+ {
+  "unit": "overdispersed\\U22",
+  "identity": "b748db439922861c4c00e8b73a9a5c63507e4e6a578a91d3f6ef1360e614d9a2",
+  "gate": true,
+  "declared_keys": [
+   "diagnostics.json",
+   "draws.csv.gz",
+   "ppc_arms.csv",
+   "summary.csv"
+  ],
+  "required_keys_present": true,
+  "hashes_match": true,
+  "diagnostic_identity_match": true,
+  "diagnostic_gate_match": true,
+  "chain_hash_count": 4,
+  "archive": "/home/ishuryak/early_tox_chain_archive/b748db439922861c",
+  "ebfmi_min": 0.7526563412355981
+ }
+]

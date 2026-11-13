@@ -1,0 +1,79 @@
+{
+  "source": "79e9c812f91482fa57ffa1dddabe89dc329a6303",
+  "fit_ok": true,
+  "default_dose_points": 69,
+  "research_dose_points": 9,
+  "package_cases": {
+    "failed_gate": {
+      "accepted": false,
+      "reason": "the fitted early-toxicity package is invalid: its recorded diagnostics do not meet the gate",
+      "model_id": {}
+    },
+    "unknown_evaluator_10": {
+      "accepted": true,
+      "reason": {},
+      "model_id": "early-fit-4747b297ac10"
+    },
+    "non_numeric_ess": {
+      "accepted": true,
+      "reason": {},
+      "model_id": "early-fit-4747b297ac10"
+    },
+    "negative_rhat": {
+      "accepted": true,
+      "reason": {},
+      "model_id": "early-fit-4747b297ac10"
+    },
+    "missing_model_id": {
+      "accepted": true,
+      "reason": {},
+      "model_id": {}
+    },
+    "correct_package": {
+      "accepted": true,
+      "reason": {},
+      "model_id": "early-fit-4747b297ac10"
+    }
+  },
+  "calendar": {
+    "skipped": 31.114045446908769,
+    "six_day_reference": 29.736988417602845,
+    "manual_mismatch_unavailable": true,
+    "toxicity_share": 0.84750000000000003,
+    "early_only_share": 0.84750000000000003
+  },
+  "roundtrip": {
+    "ok": true,
+    "result": [
+      {
+        "m": 20,
+        "d": 2.75,
+        "T": 31,
+        "n_draws": 4000,
+        "di_q025": -8.5088851871587607,
+        "di_q10": -7.8897535117560089,
+        "di_median": -6.3152981238449115,
+        "di_q90": -4.1903061349750743,
+        "di_q975": -2.8681708536039792,
+        "dd_q025": -6.7361491199607784,
+        "dd_q10": -5.9952166977317729,
+        "dd_median": -4.443615412308155,
+        "dd_q90": -2.6770609337055498,
+        "dd_q975": -1.5207042189489171,
+        "min_q10": -7.8897535117560089,
+        "share_di": 0.193,
+        "share_dd": 0.65900000000000003,
+        "share_both": 0.17874999999999999,
+        "n_invalid_di": 0,
+        "n_invalid_dd": 0,
+        "n_valid_both": 4000,
+        "share_tox": 0.84750000000000003,
+        "share_joint": 0.15075
+      }
+    ]
+  },
+  "changed_draw_replay": {
+    "accepted": false,
+    "reason": "Cannot rerun this scenario: its early-toxicity posterior (draws or package SHA-256) is not the installed one, so exact replay is impossible."
+  }
+}

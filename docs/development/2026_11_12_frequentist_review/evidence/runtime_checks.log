@@ -1,0 +1,85 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+[1] "LC_COLLATE=English_United States.utf8;LC_CTYPE=English_United States.utf8;LC_MONETARY=English_United States.utf8;LC_NUMERIC=C;LC_TIME=English_United States.utf8"
+{
+  "source": "79e9c812f91482fa57ffa1dddabe89dc329a6303",
+  "fit_ok": true,
+  "default_dose_points": 69,
+  "research_dose_points": 9,
+  "package_cases": {
+    "failed_gate": {
+      "accepted": false,
+      "reason": "the fitted early-toxicity package is invalid: its recorded diagnostics do not meet the gate",
+      "model_id": {}
+    },
+    "unknown_evaluator_10": {
+      "accepted": true,
+      "reason": {},
+      "model_id": "early-fit-4747b297ac10"
+    },
+    "non_numeric_ess": {
+      "accepted": true,
+      "reason": {},
+      "model_id": "early-fit-4747b297ac10"
+    },
+    "negative_rhat": {
+      "accepted": true,
+      "reason": {},
+      "model_id": "early-fit-4747b297ac10"
+    },
+    "missing_model_id": {
+      "accepted": true,
+      "reason": {},
+      "model_id": {}
+    },
+    "correct_package": {
+      "accepted": true,
+      "reason": {},
+      "model_id": "early-fit-4747b297ac10"
+    }
+  },
+  "calendar": {
+    "skipped": 31.1140454469,
+    "six_day_reference": 29.7369884176,
+    "manual_mismatch_unavailable": true,
+    "toxicity_share": 0.8475,
+    "early_only_share": 0.8475
+  },
+  "roundtrip": {
+    "ok": true,
+    "result": [
+      {
+        "m": 20,
+        "d": 2.75,
+        "T": 31,
+        "n_draws": 4000,
+        "di_q025": -8.5088851872,
+        "di_q10": -7.8897535118,
+        "di_median": -6.3152981238,
+        "di_q90": -4.190306135,
+        "di_q975": -2.8681708536,
+        "dd_q025": -6.73614912,
+        "dd_q10": -5.9952166977,
+        "dd_median": -4.4436154123,
+        "dd_q90": -2.6770609337,
+        "dd_q975": -1.5207042189,
+        "min_q10": -7.8897535118,
+        "share_di": 0.193,
+        "share_dd": 0.659,
+        "share_both": 0.17875,
+        "n_invalid_di": 0,
+        "n_invalid_dd": 0,
+        "n_valid_both": 4000,
+        "share_tox": 0.8475,
+        "share_joint": 0.15075
+      }
+    ]
+  },
+  "changed_draw_replay": {
+    "accepted": false,
+    "reason": "Cannot rerun this scenario: its early-toxicity posterior (draws or package SHA-256) is not the installed one, so exact replay is impossible."
+  }
+}
